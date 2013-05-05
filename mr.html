@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>mr : a tiny relational database for minneron</title>
+<!-- 2013-05-05 Sun 03:12 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal"/>
+<link rel="stylesheet" type="text/css" href="etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">mr : a tiny relational database for minneron</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. overview</a>
+<ul>
+<li><a href="#sec-1-1">1.1. GOAL a simple graph database with a strong relational bias.</a></li>
+<li><a href="#sec-1-2">1.2. project breakdown</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. storing nodes, relations, arbitrary graphs</a>
+<ul>
+<li><a href="#sec-1-2-1-1">1.2.1.1. variable-length content gets stored as nodes:</a></li>
+<li><a href="#sec-1-2-1-2">1.2.1.2. fixed width tables are stored as relations</a></li>
+<li><a href="#sec-1-2-1-3">1.2.1.3. default 3-column table (triplestore) for arbitrary graphs</a></li>
+<li><a href="#sec-1-2-1-4">1.2.1.4. semi-structured data can go either way</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2-2">1.2.2. indexing the data</a>
+<ul>
+<li><a href="#sec-1-2-2-1">1.2.2.1. use a b+ tree to store locations of table/string descriptors</a></li>
+<li><a href="#sec-1-2-2-2">1.2.2.2. Individual columns can be indexed, just like strings.</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2-3">1.2.3. paged model for database layout</a>
+<ul>
+<li><a href="#sec-1-2-3-1">1.2.3.1. linked list of pages</a></li>
+<li><a href="#sec-1-2-3-2">1.2.3.2. Links are stored in their own descriptor pages, separate from the pages.</a></li>
+<li><a href="#sec-1-2-3-3">1.2.3.3. These index pages are just sequences of integers.</a></li>
+<li><a href="#sec-1-2-3-4">1.2.3.4. The link index can grow like any other table, and thus contains itself.</a></li>
+<li><a href="#sec-1-2-3-5">1.2.3.5. In the linked list, 0 reperesents null.</a></li>
+<li><a href="#sec-1-2-3-6">1.2.3.6. relations with fixed-width values always start on a page boundary</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2-4">1.2.4. correlating data in ram : the relational algebra</a></li>
+<li><a href="#sec-1-2-5">1.2.5. the ACID properties</a>
+<ul>
+<li><a href="#sec-1-2-5-1">1.2.5.1. For working in RAM, though, we may just want to append to entries to a temporary table. This should help with ACID.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. implementation</a>
+<ul>
+<li><a href="#sec-2-1">2.1. implementing nodes</a>
+<ul>
+<li><a href="#sec-2-1-1">2.1.1. Nodes are just blobs of text or binary data.</a></li>
+<li><a href="#sec-2-1-2">2.1.2. NIds are assigned sequentially, starting at 1</a></li>
+<li><a href="#sec-2-1-3">2.1.3. NId &rarr; Str</a></li>
+<li><a href="#sec-2-1-4">2.1.4. Str &rarr; NId</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-2">2.2. Indexing : B+ Trees</a></li>
+<li><a href="#sec-2-3">2.3. Storing Tuples</a>
+<ul>
+<li><a href="#sec-2-3-1">2.3.1. Records should (could?) be stored in sequence, and updated in-place.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-3">3. Extensions</a>
+<ul>
+<li><a href="#sec-3-1">3.1. Version Control</a>
+<ul>
+<li><a href="#sec-3-1-1">3.1.1. For version control, it probably makes sense to keep a running log of transactions as triples.</a></li>
+<li><a href="#sec-3-1-2">3.1.2. For branching,  we would annotate each triple with <code>.prev</code> pointer, to create a linked list.</a></li>
+<li><a href="#sec-3-1-3">3.1.3. As an optimization, the current state of the working copy would be cached as a more traditional database.</a></li>
+<li><a href="#sec-3-1-4">3.1.4. The old value for each change could also be stored.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> overview</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> GOAL a simple graph database with a strong relational bias.</h3>
+<div class="outline-text-3" id="text-1-1">
+<ul class="org-ul">
+<li>We want to store data and documents in one place.
+</li>
+<li>We want to use the relational model when possible.
+<ul class="org-ul">
+<li>It's always possible.
+<ul class="org-ul">
+<li>Some things like source code, html might even benefit.
+</li>
+<li>Imagine querying for all the level 2 headlines in posts by a certain author between some dates.
+</li>
+</ul>
+</li>
+<li>But sometimes we don't actually <i>need</i> the relational model and it can be more efficient to just use a raw graph.
+<ul class="org-ul">
+<li>Example: storing the NFA/DFA for a grammar.
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> project breakdown</h3>
+<div class="outline-text-3" id="text-1-2">
+</div><div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> storing nodes, relations, arbitrary graphs</h4>
+<div class="outline-text-4" id="text-1-2-1">
+</div><div id="outline-container-sec-1-2-1-1" class="outline-5">
+<h5 id="sec-1-2-1-1"><span class="section-number-5">1.2.1.1</span> variable-length content gets stored as nodes:</h5>
+<div class="outline-text-5" id="text-1-2-1-1">
+<ul class="org-ul">
+<li>strings / text
+</li>
+<li>images
+</li>
+<li>audio 
+</li>
+<li>video
+</li>
+<li>compiled code
+</li>
+<li>raw binary data
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-1-2" class="outline-5">
+<h5 id="sec-1-2-1-2"><span class="section-number-5">1.2.1.2</span> fixed width tables are stored as relations</h5>
+<div class="outline-text-5" id="text-1-2-1-2">
+</div><ol class="org-ol"><li>really just a special kind of blob that grows<br/></li>
+<li>each row is a fixed-size array of bytes<br/></li>
+<li>these can be converted to record structures when needed<br/></li>
+<li>booleans are stored as octets unless they can be bit packed.<br/></li></ol>
+</div>
+
+<div id="outline-container-sec-1-2-1-3" class="outline-5">
+<h5 id="sec-1-2-1-3"><span class="section-number-5">1.2.1.3</span> default 3-column table (triplestore) for arbitrary graphs</h5>
+</div>
+<div id="outline-container-sec-1-2-1-4" class="outline-5">
+<h5 id="sec-1-2-1-4"><span class="section-number-5">1.2.1.4</span> semi-structured data can go either way</h5>
+<div class="outline-text-5" id="text-1-2-1-4">
+<ul class="org-ul">
+<li>html files
+</li>
+<li>source code
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> indexing the data</h4>
+<div class="outline-text-4" id="text-1-2-2">
+</div><div id="outline-container-sec-1-2-2-1" class="outline-5">
+<h5 id="sec-1-2-2-1"><span class="section-number-5">1.2.2.1</span> use a b+ tree to store locations of table/string descriptors</h5>
+</div>
+<div id="outline-container-sec-1-2-2-2" class="outline-5">
+<h5 id="sec-1-2-2-2"><span class="section-number-5">1.2.2.2</span> Individual columns can be indexed, just like strings.</h5>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-3" class="outline-4">
+<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> paged model for database layout</h4>
+<div class="outline-text-4" id="text-1-2-3">
+</div><div id="outline-container-sec-1-2-3-1" class="outline-5">
+<h5 id="sec-1-2-3-1"><span class="section-number-5">1.2.3.1</span> linked list of pages</h5>
+</div>
+<div id="outline-container-sec-1-2-3-2" class="outline-5">
+<h5 id="sec-1-2-3-2"><span class="section-number-5">1.2.3.2</span> Links are stored in their own descriptor pages, separate from the pages.</h5>
+<div class="outline-text-5" id="text-1-2-3-2">
+<p>
+Mostly this just seems cleaner to me, but also:
+</p>
+
+<ul class="org-ul">
+<li>Pages can use an entire power-of-2-sized block for data (hopefully making pointer arithmetic slightly more efficient).
+</li>
+
+<li>The linked list can be walked and examined without actually loading it, so you can figure out which blocks contain a particular blob without actually loading and walking the pages. <sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-2-3-3" class="outline-5">
+<h5 id="sec-1-2-3-3"><span class="section-number-5">1.2.3.3</span> These index pages are just sequences of integers.</h5>
+<div class="outline-text-5" id="text-1-2-3-3">
+<p>
+These would act as a sort of parallel array to the pages themselves (the pages are contained a virtual "array" in that they're numbered sequentially within the database file). On the first index page, <code>item[0]</code> would contain the <code>.next</code> link for <code>page[0]</code>, and so on.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-2-3-4" class="outline-5">
+<h5 id="sec-1-2-3-4"><span class="section-number-5">1.2.3.4</span> The link index can grow like any other table, and thus contains itself.</h5>
+<div class="outline-text-5" id="text-1-2-3-4">
+<p>
+Suppose the index grows large enough that it needs to be extended, but the next block is already in use.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-2-3-5" class="outline-5">
+<h5 id="sec-1-2-3-5"><span class="section-number-5">1.2.3.5</span> In the linked list, 0 reperesents null.</h5>
+<div class="outline-text-5" id="text-1-2-3-5">
+<p>
+The pages are arranged in linked lists, or trees trees, but never in a loop. Therefore, there  would never be a back-link to page 0, and it's safe to use 0 to represent a link to null (and thus the end of a chain).
+</p>
+
+<p>
+Zero is a nice number to compare to because many CPUs make it eazy to branch when things are zero.
+</p>
+
+<p>
+Negative values might represent unused pages, or pages in need of cleanup.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-3-6" class="outline-5">
+<h5 id="sec-1-2-3-6"><span class="section-number-5">1.2.3.6</span> relations with fixed-width values always start on a page boundary</h5>
+<div class="outline-text-5" id="text-1-2-3-6">
+<p>
+this just makes it slightly simpler to do arithmetic
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-2-4" class="outline-4">
+<h4 id="sec-1-2-4"><span class="section-number-4">1.2.4</span> correlating data in ram : the relational algebra</h4>
+</div>
+<div id="outline-container-sec-1-2-5" class="outline-4">
+<h4 id="sec-1-2-5"><span class="section-number-4">1.2.5</span> the ACID properties</h4>
+<div class="outline-text-4" id="text-1-2-5">
+</div><div id="outline-container-sec-1-2-5-1" class="outline-5">
+<h5 id="sec-1-2-5-1"><span class="section-number-5">1.2.5.1</span> For working in RAM, though, we may just want to append to entries to a temporary table. This should help with <a href="http://en.wikipedia.org/wiki/ACID">ACID</a>.</h5>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> implementation</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> implementing nodes</h3>
+<div class="outline-text-3" id="text-2-1">
+</div><div id="outline-container-sec-2-1-1" class="outline-4">
+<h4 id="sec-2-1-1"><span class="section-number-4">2.1.1</span> Nodes are just blobs of text or binary data.</h4>
+</div>
+<div id="outline-container-sec-2-1-2" class="outline-4">
+<h4 id="sec-2-1-2"><span class="section-number-4">2.1.2</span> NIds are assigned sequentially, starting at 1</h4>
+</div>
+<div id="outline-container-sec-2-1-3" class="outline-4">
+<h4 id="sec-2-1-3"><span class="section-number-4">2.1.3</span> NId &rarr; Str</h4>
+<div class="outline-text-4" id="text-2-1-3">
+<ul class="org-ul">
+<li>Find the string entry in the descriptor table. (Easy since they're in order.)
+</li>
+<li>Use this to find the start page of the string.
+</li>
+<li>Given length, it's easy to figure out which pages to load, and then load the whole string.
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-2-1-4" class="outline-4">
+<h4 id="sec-2-1-4"><span class="section-number-4">2.1.4</span> Str &rarr; NId</h4>
+<div class="outline-text-4" id="text-2-1-4">
+<ul class="org-ul">
+<li>This uses the string descriptor table in conjunction with a b+ tree as an index. The string is used as the comparison key for the lookup,
+</li>
+<li>since we want the string index to be ordered for sorting, probably the first 4-8 characters should be cast as an int, and if that doesn't bring us to a leaf node, use the next set of characters.
+</li>
+<li>the value stored in the b+ tree is just a pointer to the string table
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Indexing : B+ Trees</h3>
+</div>
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> Storing Tuples</h3>
+<div class="outline-text-3" id="text-2-3">
+</div><div id="outline-container-sec-2-3-1" class="outline-4">
+<h4 id="sec-2-3-1"><span class="section-number-4">2.3.1</span> Records should (could?) be stored in sequence, and updated in-place.</h4>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Extensions</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> Version Control</h3>
+<div class="outline-text-3" id="text-3-1">
+</div><div id="outline-container-sec-3-1-1" class="outline-4">
+<h4 id="sec-3-1-1"><span class="section-number-4">3.1.1</span> For version control, it probably makes sense to keep a running log of transactions as triples.</h4>
+</div>
+<div id="outline-container-sec-3-1-2" class="outline-4">
+<h4 id="sec-3-1-2"><span class="section-number-4">3.1.2</span> For branching,  we would annotate each triple with <code>.prev</code> pointer, to create a linked list.</h4>
+</div>
+<div id="outline-container-sec-3-1-3" class="outline-4">
+<h4 id="sec-3-1-3"><span class="section-number-4">3.1.3</span> As an optimization, the current state of the working copy would be cached as a more traditional database.</h4>
+</div>
+<div id="outline-container-sec-3-1-4" class="outline-4">
+<h4 id="sec-3-1-4"><span class="section-number-4">3.1.4</span> The old value for each change could also be stored.</h4>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
+I don't know if this is useful or not yet, but it <i>seems</i> like it might come in handy for garbage collection/defragmentation.
+</p></div>
+
+
+</div>
+</div></div>
+</body>
+</html>
