@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title>tangentstorm's github page</title>
+<title></title>
 <!-- 2013-05-05 Sun 04:53 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
@@ -57,10 +57,27 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">tangentstorm's github page</h1>
-<p>
-<a href="mr.html">mr:a tiny database system</a>
-</p>
+<h1 class="title"></h1>
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">FindText</span>( key : TNid );
+  <span style="color: #ff00ff;">var</span> start, blocks, offs : int32;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">findTheStartBlock</span>;
+    <span style="color: #00ffff;">begin</span>
+      startAddr := bptree.lookup( key );
+      DivMod( startAddr, pageSize, startPage, offset );
+    <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">calcNumberOfBlocks</span>;
+    <span style="color: #00ffff;">begin</span>
+      firstChunk := pageSize - offset;
+      DivMod( strLen - firstChunk, pageSize, numBlocks, lastChunk );
+    <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">begin</span>
+    findTheStartBlock( key );
+    calcNumberOfBlocks;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
 </div>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>mr : a tiny relational database for minneron</title>
-<!-- 2013-05-05 Sun 03:28 -->
+<!-- 2013-05-05 Sun 04:53 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -68,7 +68,7 @@ for the JavaScript code in this tag.
 */
 
 <!--/*--><![CDATA[/*><!--*/
-org_html_manager.set("TOC_DEPTH", "4");
+org_html_manager.set("TOC_DEPTH", "3");
 org_html_manager.set("LINK_HOME", "");
 org_html_manager.set("LINK_UP", "");
 org_html_manager.set("LOCAL_TOC", "1");
@@ -136,39 +136,14 @@ for the JavaScript code in this tag.
 <ul>
 <li><a href="#sec-1">1. overview</a>
 <ul>
-<li><a href="#sec-1-1">1.1. a simple graph database with a strong relational bias.</a></li>
+<li><a href="#sec-1-1">1.1. GOAL a simple graph database with a strong relational bias.</a></li>
 <li><a href="#sec-1-2">1.2. project breakdown</a>
 <ul>
-<li><a href="#sec-1-2-1">1.2.1. storing nodes, relations, arbitrary graphs</a>
-<ul>
-<li><a href="#sec-1-2-1-1">1.2.1.1. variable-length content gets stored as nodes:</a></li>
-<li><a href="#sec-1-2-1-2">1.2.1.2. fixed width tables are stored as relations</a></li>
-<li><a href="#sec-1-2-1-3">1.2.1.3. default 3-column table (triplestore) for arbitrary graphs</a></li>
-<li><a href="#sec-1-2-1-4">1.2.1.4. semi-structured data can go either way</a></li>
-</ul>
-</li>
-<li><a href="#sec-1-2-2">1.2.2. indexing the data</a>
-<ul>
-<li><a href="#sec-1-2-2-1">1.2.2.1. use a b+ tree to store locations of table/string descriptors</a></li>
-<li><a href="#sec-1-2-2-2">1.2.2.2. Individual columns can be indexed, just like strings.</a></li>
-</ul>
-</li>
-<li><a href="#sec-1-2-3">1.2.3. paged model for database layout</a>
-<ul>
-<li><a href="#sec-1-2-3-1">1.2.3.1. linked list of pages</a></li>
-<li><a href="#sec-1-2-3-2">1.2.3.2. Links are stored in their own descriptor pages, separate from the pages.</a></li>
-<li><a href="#sec-1-2-3-3">1.2.3.3. These index pages are just sequences of integers.</a></li>
-<li><a href="#sec-1-2-3-4">1.2.3.4. The link index can grow like any other table, and thus contains itself.</a></li>
-<li><a href="#sec-1-2-3-5">1.2.3.5. In the linked list, 0 reperesents null.</a></li>
-<li><a href="#sec-1-2-3-6">1.2.3.6. relations with fixed-width values always start on a page boundary</a></li>
-</ul>
-</li>
+<li><a href="#sec-1-2-1">1.2.1. storing nodes, relations, arbitrary graphs</a></li>
+<li><a href="#sec-1-2-2">1.2.2. indexing the data</a></li>
+<li><a href="#sec-1-2-3">1.2.3. paged model for database layout</a></li>
 <li><a href="#sec-1-2-4">1.2.4. correlating data in ram : the relational algebra</a></li>
-<li><a href="#sec-1-2-5">1.2.5. the ACID properties</a>
-<ul>
-<li><a href="#sec-1-2-5-1">1.2.5.1. For working in RAM, though, we may just want to append to entries to a temporary table. This should help with ACID.</a></li>
-</ul>
-</li>
+<li><a href="#sec-1-2-5">1.2.5. the ACID properties</a></li>
 </ul>
 </li>
 </ul>
@@ -211,7 +186,7 @@ for the JavaScript code in this tag.
 <h2 id="sec-1"><span class="section-number-2">1</span> overview</h2>
 <div class="outline-text-2" id="text-1">
 </div><div id="outline-container-sec-1-1" class="outline-3">
-<h3 id="sec-1-1"><span class="section-number-3">1.1</span> <span class="todo GOAL">GOAL</span> a simple graph database with a strong relational bias.</h3>
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> GOAL a simple graph database with a strong relational bias.</h3>
 <div class="outline-text-3" id="text-1-1">
 <ul class="org-ul">
 <li>We want to store data and documents in one place.
@@ -243,9 +218,7 @@ for the JavaScript code in this tag.
 </div><div id="outline-container-sec-1-2-1" class="outline-4">
 <h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> storing nodes, relations, arbitrary graphs</h4>
 <div class="outline-text-4" id="text-1-2-1">
-</div><div id="outline-container-sec-1-2-1-1" class="outline-5">
-<h5 id="sec-1-2-1-1"><span class="section-number-5">1.2.1.1</span> variable-length content gets stored as nodes:</h5>
-<div class="outline-text-5" id="text-1-2-1-1">
+</div><ol class="org-ol"><li>variable-length content gets stored as nodes:<br/><div class="outline-text-5" id="text-1-2-1-1">
 <ul class="org-ul">
 <li>strings / text
 </li>
@@ -261,23 +234,16 @@ for the JavaScript code in this tag.
 </li>
 </ul>
 </div>
-</div>
+</li>
 
-<div id="outline-container-sec-1-2-1-2" class="outline-5">
-<h5 id="sec-1-2-1-2"><span class="section-number-5">1.2.1.2</span> fixed width tables are stored as relations</h5>
-<div class="outline-text-5" id="text-1-2-1-2">
-</div><ol class="org-ol"><li>really just a special kind of blob that grows<br/></li>
+<li>fixed width tables are stored as relations<br/><ol class="org-ol"><li>really just a special kind of blob that grows<br/></li>
 <li>each row is a fixed-size array of bytes<br/></li>
 <li>these can be converted to record structures when needed<br/></li>
 <li>booleans are stored as octets unless they can be bit packed.<br/></li></ol>
-</div>
+</li>
 
-<div id="outline-container-sec-1-2-1-3" class="outline-5">
-<h5 id="sec-1-2-1-3"><span class="section-number-5">1.2.1.3</span> default 3-column table (triplestore) for arbitrary graphs</h5>
-</div>
-<div id="outline-container-sec-1-2-1-4" class="outline-5">
-<h5 id="sec-1-2-1-4"><span class="section-number-5">1.2.1.4</span> semi-structured data can go either way</h5>
-<div class="outline-text-5" id="text-1-2-1-4">
+<li>default 3-column table (triplestore) for arbitrary graphs<br/></li>
+<li>semi-structured data can go either way<br/><div class="outline-text-5" id="text-1-2-1-4">
 <ul class="org-ul">
 <li>html files
 </li>
@@ -285,29 +251,21 @@ for the JavaScript code in this tag.
 </li>
 </ul>
 </div>
-</div>
+</li></ol>
 </div>
 
 <div id="outline-container-sec-1-2-2" class="outline-4">
 <h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> indexing the data</h4>
 <div class="outline-text-4" id="text-1-2-2">
-</div><div id="outline-container-sec-1-2-2-1" class="outline-5">
-<h5 id="sec-1-2-2-1"><span class="section-number-5">1.2.2.1</span> use a b+ tree to store locations of table/string descriptors</h5>
-</div>
-<div id="outline-container-sec-1-2-2-2" class="outline-5">
-<h5 id="sec-1-2-2-2"><span class="section-number-5">1.2.2.2</span> Individual columns can be indexed, just like strings.</h5>
-</div>
+</div><ol class="org-ol"><li>use a b+ tree to store locations of table/string descriptors<br/></li>
+<li>Individual columns can be indexed, just like strings.<br/></li></ol>
 </div>
 
 <div id="outline-container-sec-1-2-3" class="outline-4">
 <h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> paged model for database layout</h4>
 <div class="outline-text-4" id="text-1-2-3">
-</div><div id="outline-container-sec-1-2-3-1" class="outline-5">
-<h5 id="sec-1-2-3-1"><span class="section-number-5">1.2.3.1</span> linked list of pages</h5>
-</div>
-<div id="outline-container-sec-1-2-3-2" class="outline-5">
-<h5 id="sec-1-2-3-2"><span class="section-number-5">1.2.3.2</span> Links are stored in their own descriptor pages, separate from the pages.</h5>
-<div class="outline-text-5" id="text-1-2-3-2">
+</div><ol class="org-ol"><li>linked list of pages<br/></li>
+<li>Links are stored in their own descriptor pages, separate from the pages.<br/><div class="outline-text-5" id="text-1-2-3-2">
 <p>
 Mostly this just seems cleaner to me, but also:
 </p>
@@ -320,26 +278,20 @@ Mostly this just seems cleaner to me, but also:
 </li>
 </ul>
 </div>
-</div>
-<div id="outline-container-sec-1-2-3-3" class="outline-5">
-<h5 id="sec-1-2-3-3"><span class="section-number-5">1.2.3.3</span> These index pages are just sequences of integers.</h5>
-<div class="outline-text-5" id="text-1-2-3-3">
+</li>
+<li>These index pages are just sequences of integers.<br/><div class="outline-text-5" id="text-1-2-3-3">
 <p>
 These would act as a sort of parallel array to the pages themselves (the pages are contained a virtual "array" in that they're numbered sequentially within the database file). On the first index page, <code>item[0]</code> would contain the <code>.next</code> link for <code>page[0]</code>, and so on.
 </p>
 </div>
-</div>
-<div id="outline-container-sec-1-2-3-4" class="outline-5">
-<h5 id="sec-1-2-3-4"><span class="section-number-5">1.2.3.4</span> The link index can grow like any other table, and thus contains itself.</h5>
-<div class="outline-text-5" id="text-1-2-3-4">
+</li>
+<li>The link index can grow like any other table, and thus contains itself.<br/><div class="outline-text-5" id="text-1-2-3-4">
 <p>
 Suppose the index grows large enough that it needs to be extended, but the next block is already in use.
 </p>
 </div>
-</div>
-<div id="outline-container-sec-1-2-3-5" class="outline-5">
-<h5 id="sec-1-2-3-5"><span class="section-number-5">1.2.3.5</span> In the linked list, 0 reperesents null.</h5>
-<div class="outline-text-5" id="text-1-2-3-5">
+</li>
+<li>In the linked list, 0 reperesents null.<br/><div class="outline-text-5" id="text-1-2-3-5">
 <p>
 The pages are arranged in linked lists, or trees trees, but never in a loop. Therefore, there  would never be a back-link to page 0, and it's safe to use 0 to represent a link to null (and thus the end of a chain).
 </p>
@@ -352,16 +304,14 @@ Zero is a nice number to compare to because many CPUs make it eazy to branch whe
 Negative values might represent unused pages, or pages in need of cleanup.
 </p>
 </div>
-</div>
+</li>
 
-<div id="outline-container-sec-1-2-3-6" class="outline-5">
-<h5 id="sec-1-2-3-6"><span class="section-number-5">1.2.3.6</span> relations with fixed-width values always start on a page boundary</h5>
-<div class="outline-text-5" id="text-1-2-3-6">
+<li>relations with fixed-width values always start on a page boundary<br/><div class="outline-text-5" id="text-1-2-3-6">
 <p>
 this just makes it slightly simpler to do arithmetic
 </p>
 </div>
-</div>
+</li></ol>
 </div>
 <div id="outline-container-sec-1-2-4" class="outline-4">
 <h4 id="sec-1-2-4"><span class="section-number-4">1.2.4</span> correlating data in ram : the relational algebra</h4>
@@ -369,9 +319,7 @@ this just makes it slightly simpler to do arithmetic
 <div id="outline-container-sec-1-2-5" class="outline-4">
 <h4 id="sec-1-2-5"><span class="section-number-4">1.2.5</span> the ACID properties</h4>
 <div class="outline-text-4" id="text-1-2-5">
-</div><div id="outline-container-sec-1-2-5-1" class="outline-5">
-<h5 id="sec-1-2-5-1"><span class="section-number-5">1.2.5.1</span> For working in RAM, though, we may just want to append to entries to a temporary table. This should help with <a href="http://en.wikipedia.org/wiki/ACID">ACID</a>.</h5>
-</div>
+</div><ol class="org-ol"><li>For working in RAM, though, we may just want to append to entries to a temporary table. This should help with <a href="http://en.wikipedia.org/wiki/ACID">ACID</a>.<br/></li></ol>
 </div>
 </div>
 </div>
