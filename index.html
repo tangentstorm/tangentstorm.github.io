@@ -1,0 +1,39 @@
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1">hello world</h2>
+<div class="outline-text-2" id="text-1">
+
+<p>testing 123
+</p>
+
+
+
+<pre class="src src-elisp">(<span style="color: #00ffff;">require</span> '<span style="color: #7fffd4;">org-publish</span>)
+(setq org-publish-project-alist
+  '((<span style="color: #00ff00;">"b4-notes"</span>
+     <span style="color: #ff00ff; font-weight: bold;">:base-directory</span> <span style="color: #00ff00;">"~/b/web/"</span>
+     <span style="color: #ff00ff; font-weight: bold;">:base-extension</span> <span style="color: #00ff00;">"org"</span>
+
+     <span style="color: #ff00ff; font-weight: bold;">:publishing-directory</span> <span style="color: #00ff00;">"~/ver/tangenthome/"</span>
+     <span style="color: #ff00ff; font-weight: bold;">:publishing-function</span> org-publish-org-to-html
+     <span style="color: #ff00ff; font-weight: bold;">:htmlized-source</span> t
+     <span style="color: #ff00ff; font-weight: bold;">:headline-levels</span> 4  <span style="color: #66f;">; </span><span style="color: #66f;">Just the default for this project.</span>
+     <span style="color: #ff00ff; font-weight: bold;">:html-extension:</span> markdown
+     <span style="color: #ff00ff; font-weight: bold;">:octopress-extension:</span> markdown
+     <span style="color: #ff00ff; font-weight: bold;">:recursive</span> t
+     <span style="color: #ff00ff; font-weight: bold;">:body-only</span> t
+     )
+
+    (<span style="color: #00ff00;">"b4-static"</span>
+     <span style="color: #ff00ff; font-weight: bold;">:base-directory</span> <span style="color: #00ff00;">"~/b/web/"</span>
+     <span style="color: #ff00ff; font-weight: bold;">:base-extension</span> <span style="color: #00ff00;">"css</span><span style="color: #00ff00; font-weight: bold;">\\</span><span style="color: #00ff00; font-weight: bold;">|</span><span style="color: #00ff00;">js</span><span style="color: #00ff00; font-weight: bold;">\\</span><span style="color: #00ff00; font-weight: bold;">|</span><span style="color: #00ff00;">png</span><span style="color: #00ff00; font-weight: bold;">\\</span><span style="color: #00ff00; font-weight: bold;">|</span><span style="color: #00ff00;">jpg</span><span style="color: #00ff00; font-weight: bold;">\\</span><span style="color: #00ff00; font-weight: bold;">|</span><span style="color: #00ff00;">gif</span><span style="color: #00ff00; font-weight: bold;">\\</span><span style="color: #00ff00; font-weight: bold;">|</span><span style="color: #00ff00;">pdf</span><span style="color: #00ff00; font-weight: bold;">\\</span><span style="color: #00ff00; font-weight: bold;">|</span><span style="color: #00ff00;">mp3</span><span style="color: #00ff00; font-weight: bold;">\\</span><span style="color: #00ff00; font-weight: bold;">|</span><span style="color: #00ff00;">ogg</span><span style="color: #00ff00; font-weight: bold;">\\</span><span style="color: #00ff00; font-weight: bold;">|</span><span style="color: #00ff00;">swf"</span>
+     <span style="color: #ff00ff; font-weight: bold;">:publishing-directory</span> <span style="color: #00ff00;">"~/ver/tangenthome"</span>
+     <span style="color: #ff00ff; font-weight: bold;">:recursive</span> t
+     <span style="color: #ff00ff; font-weight: bold;">:publishing-function</span> org-publish-attachment
+     )
+
+    (<span style="color: #00ff00;">"b4"</span> <span style="color: #ff00ff; font-weight: bold;">:components</span> (<span style="color: #00ff00;">"b4-notes"</span> <span style="color: #00ff00;">"b4-static"</span>))))
+</pre>
+
+
+</div>
+</div>
