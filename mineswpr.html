@@ -1,0 +1,702 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>mineswpr : minesweeper for retro</title>
+<!-- 2013-05-05 Sun 08:39 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal j wallace"/>
+<link rel="stylesheet" type="text/css" href="etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">mineswpr : minesweeper for retro</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. language tweaks</a>
+<ul>
+<li><a href="#sec-1-1">1.1. misc</a></li>
+<li><a href="#sec-1-2">1.2. debug tools</a></li>
+<li><a href="#sec-1-3">1.3. imperative macros</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. the game</a>
+<ul>
+<li><a href="#sec-2-1">2.1. variables</a></li>
+<li><a href="#sec-2-2">2.2. grid-setup</a></li>
+<li><a href="#sec-2-3">2.3. point-methods</a></li>
+<li><a href="#sec-2-4">2.4. cell methods</a></li>
+<li><a href="#sec-2-5">2.5. grid methods</a></li>
+<li><a href="#sec-2-6">2.6. floodfill</a></li>
+<li><a href="#sec-2-7">2.7. event handlers</a></li>
+<li><a href="#sec-2-8">2.8. user actions</a></li>
+<li><a href="#sec-2-9">2.9. minefield words</a></li>
+<li><a href="#sec-2-10">2.10. draw the cells</a></li>
+<li><a href="#sec-2-11">2.11. draw the playing field</a></li>
+<li><a href="#sec-2-12">2.12. command parser</a></li>
+<li><a href="#sec-2-13">2.13. retro shell enhancements</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. OUTPUT</a></li>
+<li><a href="#sec-4">4. refile these</a>
+<ul>
+<li><a href="#sec-4-1">4.1. objects</a></li>
+<li><a href="#sec-4-2">4.2. virtual terminal words</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> language tweaks</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> misc</h3>
+<div class="outline-text-3" id="text-1-1">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="lang-tweaks"><span style="color: #66f;">( -- language tweaks --------------------------------------- )</span>
+
+<span style="color: #c63; font-weight: bold;">:</span> &#8805; <span style="color: #00ffff;">&gt;=</span> <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( xy-? ) tests for x &#8805; y . same as &gt;="</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> &#8804; <span style="color: #00ffff;">&lt;=</span> <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( xy-? ) tests for x &#8804; y . same as &lt;="</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> &#8800; != <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( xy-f ) just a fancy way to say !="</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> dec <span style="color: #66f;">( a- )</span> <span style="color: #00ffff;">--</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> inc <span style="color: #66f;">( a- )</span> <span style="color: #00ffff;">++</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> shl <span style="color: #00ffff;">&lt;&lt;</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> shr <span style="color: #00ffff;">&gt;&gt;</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> odd <span style="color: #32cd32;">1</span> <span style="color: #00ffff;">and</span> <span style="color: #32cd32;">0</span> != <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> vars| <span style="color: #c63; font-weight: bold;">`</span> <span style="color: #c63; font-weight: bold;">variables|</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> dup2 <span style="color: #66f;">( xy-xyxy )</span> <span style="color: #00ffff;">over</span> <span style="color: #00ffff;">over</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> recurse <span style="color: #66f;">(  -  )</span> @last @d-&gt;xt <span style="color: #c63; font-weight: bold;">,</span> <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #c63; font-weight: bold;">compile-only</span> <span style="color: #66f;">( from forth.rx )</span>
+<span style="color: #c63; font-weight: bold;">:</span> spaces <span style="color: #00ffff;">[</span> space <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">times</span> <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( n- ) emit n spaces"</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> deep <span style="color: #00ffff;">push</span> <span style="color: #00ffff;">over</span> <span style="color: #00ffff;">pop</span> <span style="color: #00ffff;">swap</span> <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( xyz-xyzx ) copies the 3rd item to the top of the stack. ( dup, over, deep... )"</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> cop <span style="color: #00ffff;">pop</span> <span style="color: #00ffff;">dup</span> <span style="color: #00ffff;">push</span> <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( -n ) copies a value from the return stack"</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> nor <span style="color: #00ffff;">or</span> <span style="color: #00ffff;">not</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> drop3 <span style="color: #00ffff;">drop</span> <span style="color: #00ffff;">drop</span> <span style="color: #00ffff;">drop</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">with</span> <span style="color: #ff6347;">math'</span>
+  <span style="color: #c63; font-weight: bold;">:</span> randint <span style="color: #66f;">( n-n )</span> random <span style="color: #00ffff;">swap</span> <span style="color: #00ffff;">mod</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">without</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> debug tools</h3>
+<div class="outline-text-3" id="text-1-2">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="lang-tweaks"><span style="color: #66f;">( -- debug tools ------------------------------------------- )</span>
+<span style="color: #c63; font-weight: bold;">with|</span> <span style="color: #ff6347;">vt'</span> <span style="color: #ff6347;">ng'</span> <span style="color: #c63; font-weight: bold;">|</span>
+<span style="color: #c63; font-weight: bold;">{{</span>
+  <span style="color: #c63; font-weight: bold;">:</span> .? <span style="color: #c63; font-weight: bold;">decimal</span> <span style="color: #00ffff;">push</span> |y .s <span style="color: #00ffff;">pop</span> |Y puts |w <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">variable</span> depth
+  <span style="color: #c63; font-weight: bold;">:</span> indent <span style="color: #32cd32;">2</span> <span style="color: #00ffff;">*</span> spaces <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> [context] last <span style="color: #00ffff;">@</span> d-&gt;name lit,, <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> { cr depth <span style="color: #00ffff;">dup</span> <span style="color: #00ffff;">++</span> <span style="color: #00ffff;">@</span> indent |M puts space '{ putc |w <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> } cr depth <span style="color: #00ffff;">dup</span> <span style="color: #00ffff;">@</span> indent <span style="color: #00ffff;">--</span> |M '} putc space puts |w <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">---reveal---</span>
+  <span style="color: #c63; font-weight: bold;">:</span> !! |R .s |r <span style="color: #00ff00;">"!!"</span> puts <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> ?{ [context] <span style="color: #c63; font-weight: bold;">`</span> { <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #c63; font-weight: bold;">immediate</span>
+  <span style="color: #c63; font-weight: bold;">:</span> }? [context] <span style="color: #c63; font-weight: bold;">`</span> } <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #c63; font-weight: bold;">immediate</span>
+  <span style="color: #c63; font-weight: bold;">:</span> ?? depth <span style="color: #00ffff;">@</span> spaces [context] <span style="color: #c63; font-weight: bold;">`</span> .? <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #c63; font-weight: bold;">immediate</span>
+    <span style="color: #00ff00;">"debug tool. at runtime, this will show the stack plus the name of the word in which it was used."</span> :doc
+<span style="color: #c63; font-weight: bold;">}}</span>
+2without
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> imperative macros</h3>
+<div class="outline-text-3" id="text-1-3">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="lang-tweaks"><span style="color: #66f;">( -- imperative flow control ------------------------------- )</span>
+<span style="color: #c63; font-weight: bold;">with</span> <span style="color: #ff6347;">ng'</span>
+<span style="color: #c63; font-weight: bold;">:</span> <span style="color: #c63; font-weight: bold;">;c</span>  <span style="color: #c63; font-weight: bold;">`</span> ?? <span style="color: #c63; font-weight: bold;">`</span> <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #c63; font-weight: bold;">`</span> <span style="color: #c63; font-weight: bold;">immediate</span> <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #c63; font-weight: bold;">immediate</span>
+<span style="color: #c63; font-weight: bold;">{{</span> <span style="color: #66f;">( these two should *not* be immediate. they're called by immediates )</span>
+  <span style="color: #c63; font-weight: bold;">:</span> .come-from <span style="color: #00ffff;">here</span> <span style="color: #00ffff;">swap</span> <span style="color: #00ffff;">!</span> <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> .else-ahead <span style="color: #32cd32;">0</span> lit,, <span style="color: #32cd32;">0</span> =jump,, <span style="color: #00ffff;">here</span> <span style="color: #00ffff;">1-</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">---reveal---</span>
+<span style="color: #c63; font-weight: bold;">:</span> .ifso .else-ahead  <span style="color: #c63; font-weight: bold;">;c</span>                <span style="color: #00ff00;">"c:  -a  | r:  f-   like IF in forth"</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> .else <span style="color: #ffd700; font-weight: bold;">ahead</span> <span style="color: #00ffff;">push</span> .come-from <span style="color: #00ffff;">pop</span> <span style="color: #c63; font-weight: bold;">;c</span>   <span style="color: #00ff00;">"c:  a-a | r:   -   forth-style ELSE"</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> .then   .come-from <span style="color: #c63; font-weight: bold;">;c</span>                <span style="color: #00ff00;">"c:  a-  | r:   -   like THEN in forth"</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> .repeat <span style="color: #00ffff;">here</span> <span style="color: #c63; font-weight: bold;">;c</span>
+<span style="color: #c63; font-weight: bold;">:</span> .while  <span style="color: #00ffff;">here</span> <span style="color: #c63; font-weight: bold;">;c</span>
+<span style="color: #c63; font-weight: bold;">:</span> .do  .else-ahead <span style="color: #c63; font-weight: bold;">;c</span>
+<span style="color: #c63; font-weight: bold;">:</span> .again
+    <span style="color: #00ffff;">push</span>       <span style="color: #66f;">( push the location of the jump from .do  )</span>
+      jump,,   <span style="color: #66f;">( compile a jump to the position marked by .while )</span>
+    <span style="color: #00ffff;">pop</span> .come-from <span style="color: #c63; font-weight: bold;">;c</span>
+<span style="color: #c63; font-weight: bold;">:</span> .until <span style="color: #32cd32;">0</span> lit,, =jump,, <span style="color: #c63; font-weight: bold;">;c</span>           <span style="color: #00ff00;">"compile the UNTIL part of a repeat loop"</span> :doc
+<span style="color: #c63; font-weight: bold;">}}</span>
+<span style="color: #c63; font-weight: bold;">without</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> the game</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> <span class="done DONE">DONE</span> variables</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="variables"><span style="color: #66f;">( -- variables --------------------------------------------- )</span>
+
+enum| &#183;mine &#183;cover &#183;flag <span style="color: #c63; font-weight: bold;">|</span>
+vars| gameOver? minefield flagCount active-cell <span style="color: #c63; font-weight: bold;">|</span>
+vars| allHints? flood-cursor <span style="color: #c63; font-weight: bold;">|</span> <span style="color: #66f;">( debug stuff )</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> <span class="done DONE">DONE</span> grid-setup</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="grid-setup"><span style="color: #32cd32;">16</span> <span style="color: #c63; font-weight: bold;">constant</span> W
+<span style="color: #32cd32;">16</span> <span style="color: #c63; font-weight: bold;">constant</span> H
+<span style="color: #32cd32;">24</span> <span style="color: #c63; font-weight: bold;">constant</span> mineCount
+<span style="color: #c63; font-weight: bold;">create</span> grid W H <span style="color: #00ffff;">*</span> <span style="color: #00ffff;">allot</span>
+
+<span style="color: #c63; font-weight: bold;">:</span> grid-size W H <span style="color: #00ffff;">*</span> <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> <span class="done DONE">DONE</span> point-methods</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="point-methods"><span style="color: #66f;">( point2d methods )</span>
+<span style="color: #c63; font-weight: bold;">:</span> nn <span style="color: #00ffff;">1-</span> <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( xy-xy ) north"</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> ss <span style="color: #00ffff;">1+</span> <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( xy-xy ) south"</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> ee <span style="color: #00ffff;">swap</span> <span style="color: #00ffff;">1+</span> <span style="color: #00ffff;">swap</span> <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( xy-xy ) east"</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> ww <span style="color: #00ffff;">swap</span> <span style="color: #00ffff;">1-</span> <span style="color: #00ffff;">swap</span> <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( xy-xy ) west"</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> ne nn ee <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( xy-xy ) north-east"</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> se ss ee <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( xy-xy ) south-east"</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> sw ss ww <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( xy-xy ) south-west"</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> nw nn ww <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( xy-xy ) north-west"</span> :doc
+<span style="color: #c63; font-weight: bold;">{{</span>
+  <span style="color: #c63; font-weight: bold;">:</span> xy deep deep <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> qq deep <span style="color: #c63; font-weight: bold;">do</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">---reveal---</span>
+
+  <span style="color: #c63; font-weight: bold;">:</span> cardinal-neighbors-do
+                xy nn qq
+    xy ww qq     <span style="color: #66f;">( xy )</span>     xy ee qq
+                xy ss qq               drop3 <span style="color: #c63; font-weight: bold;">;</span>
+   <span style="color: #00ff00;">"( xyq- ) invoke q { xy-?? } for points to n,w,e,s"</span> :doc
+
+   <span style="color: #c63; font-weight: bold;">:</span> ordinal-neighbors-do
+    xy nw qq                xy ne qq
+                 <span style="color: #66f;">( xy )</span>
+    xy sw qq                xy se qq   drop3 <span style="color: #c63; font-weight: bold;">;</span>
+   <span style="color: #00ff00;">"( xyq- ) invoke q { xy-?? } for points to nw,ne,sw,se"</span> :doc
+
+   <span style="color: #c63; font-weight: bold;">:</span> neighbors-do
+    xy nw qq    xy nn qq    xy ne qq
+    xy ww qq     <span style="color: #66f;">( xy )</span>     xy ee qq
+    xy sw qq    xy ss qq    xy se qq   drop3 <span style="color: #c63; font-weight: bold;">;</span>
+   <span style="color: #00ff00;">"( xyq- ) invoke q { xy-?? } for all eight neighboring points"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">}}</span>
+
+<span style="color: #c63; font-weight: bold;">:</span> cell <span style="color: #66f;">( xy-a )</span> W <span style="color: #00ffff;">*</span> <span style="color: #00ffff;">+</span> grid <span style="color: #00ffff;">+</span> <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( xy-a ) given coordinates, return the address of the cell"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> inbounds? <span style="color: #32cd32;">0</span> H <span style="color: #00ffff;">1-</span> <span style="color: #00ffff;">within</span> .ifso <span style="color: #32cd32;">0</span> W <span style="color: #00ffff;">1-</span> <span style="color: #00ffff;">within</span> .else <span style="color: #00ffff;">drop</span> <span style="color: #66f;">( W- )</span> <span style="color: #32cd32;">0</span> .then <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( xy-f ) is the point somewhere inside the minefield?"</span> :doc
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> <span class="done DONE">DONE</span> cell methods</h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="cell-methods"><span style="color: #66f;">( cell methods )</span>
+<span style="color: #c63; font-weight: bold;">:</span> has? <span style="color: #00ffff;">swap</span> <span style="color: #00ffff;">@</span> <span style="color: #00ffff;">swap</span> in? <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( ce- ) does cell c contain the element e?"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> uncover &#183;cover @excl! <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( c- ) remove the cover from cell c"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> armed-neighbor-count <span style="color: #00ffff;">@</span> <span style="color: #32cd32;">8</span> shr <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( c-n )  number of armed neighbors ( 0..8 )"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> armed-neighbor-add $100 <span style="color: #00ffff;">swap</span> <span style="color: #00ffff;">+!</span> <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( c- )  increment count of armed neighbors ( 0..8 )"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> c&gt;xy  grid <span style="color: #00ffff;">-</span> W <span style="color: #00ffff;">/mod</span> <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( c-xy ) given a cell, return its xy coordinates."</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> randcell W randint H randint cell <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( -a ) return a cell from the grid, at random"</span> :doc
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> <span class="done DONE">DONE</span> grid methods</h3>
+<div class="outline-text-3" id="text-2-5">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="grid-methods"><span style="color: #66f;">( grid methods )</span>
+<span style="color: #c63; font-weight: bold;">:</span> .fill <span style="color: #00ffff;">swap</span> W H <span style="color: #00ffff;">*</span> <span style="color: #00ffff;">fill</span> <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( gx- ) fill grid g with value x"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> grid-do grid-size <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">1-</span> grid <span style="color: #00ffff;">+</span> <span style="color: #00ffff;">over</span> <span style="color: #c63; font-weight: bold;">do</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">iterd</span> <span style="color: #00ffff;">drop</span> <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( q- ) for each cell in the grid, put the cell's address in tos and run q."</span> :doc
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-6" class="outline-3">
+<h3 id="sec-2-6"><span class="section-number-3">2.6</span> <span class="done DONE">DONE</span> floodfill</h3>
+<div class="outline-text-3" id="text-2-6">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="floodfill"><span style="color: #c63; font-weight: bold;">:</span> needs-visit? &#183;cover has? <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( c-f ) should we call flood-visit! on this cell?"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> keep-going? armed-neighbor-count <span style="color: #32cd32;">0</span> <span style="color: #00ffff;">=</span> <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( c-f )"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> flood-visit uncover <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( c- ) actually fill the cell."</span> :doc
+<span style="color: #c63; font-weight: bold;">:</span> flood-step-hook <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( - ) just a hook for debugging "</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> flood
+  <span style="color: #66f;">( check bounds before calling 'cell' b/c 'cell c&gt;xy' allows horizontal wrapping )</span>
+  dup2 inbounds?
+    .ifso cell
+    <span style="color: #00ffff;">dup</span> flood-cursor <span style="color: #00ffff;">!</span> flood-step-hook <span style="color: #66f;">( debug hook )</span>
+    <span style="color: #00ffff;">dup</span> needs-visit?
+      .ifso
+        <span style="color: #00ffff;">dup</span> flood-visit
+        <span style="color: #00ffff;">dup</span> keep-going?
+          .ifso c&gt;xy <span style="color: #00ffff;">[</span> flood <span style="color: #00ffff;">]</span> cardinal-neighbors-do
+          .else <span style="color: #00ffff;">drop</span>
+          .then
+      .else <span style="color: #00ffff;">drop</span>
+      .then
+    .else <span style="color: #00ffff;">2drop</span>
+    .then
+  <span style="color: #32cd32;">0</span> flood-cursor <span style="color: #00ffff;">!</span> <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( xy- ) runs the floodfill algorithm on the grid at the given cell"</span> :doc
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-7" class="outline-3">
+<h3 id="sec-2-7"><span class="section-number-3">2.7</span> <span class="done DONE">DONE</span> event handlers</h3>
+<div class="outline-text-3" id="text-2-7">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="events"><span style="color: #66f;">( -- event handlers ---------------------------------------------- )</span>
+
+  <span style="color: #c63; font-weight: bold;">:</span> &#171;dead&#187; gameOver? <span style="color: #00ffff;">on</span> <span style="color: #c63; font-weight: bold;">;</span>
+    <span style="color: #00ff00;">"( a- ) called after detonating cell a"</span> :doc
+
+  <span style="color: #c63; font-weight: bold;">:</span> mineswpr-exit-hook <span style="color: #66f;">( revectored )</span> <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-8" class="outline-3">
+<h3 id="sec-2-8"><span class="section-number-3">2.8</span> <span class="done DONE">DONE</span> user actions</h3>
+<div class="outline-text-3" id="text-2-8">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="user-actions"><span style="color: #66f;">( -- user actions ---------------------------------------------- )</span>
+
+<span style="color: #c63; font-weight: bold;">:</span> flaggable? <span style="color: #00ffff;">[</span> &#183;flag has? <span style="color: #00ffff;">not</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> &#183;cover has? <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">bi</span> <span style="color: #00ffff;">and</span> <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( a-f ) possible to put a flag on this cell?"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> flag+
+  <span style="color: #00ffff;">dup</span> flaggable?
+    .ifso &#183;flag @incl! flagCount <span style="color: #00ffff;">++</span>
+    .else <span style="color: #00ffff;">drop</span>
+  .then <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( a- ) place a flag on the cell"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> flag-
+  <span style="color: #00ffff;">dup</span> &#183;flag has?
+    .ifso
+      &#183;flag @excl!
+      flagCount <span style="color: #00ffff;">--</span>
+    .else <span style="color: #00ffff;">drop</span>
+  .then <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( a- ) remove the flag from the cell, if present"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> prod
+  <span style="color: #00ffff;">dup</span> flag-
+  <span style="color: #00ffff;">dup</span> &#183;mine has?
+    .ifso <span style="color: #00ffff;">drop</span> &#171;dead&#187;
+    .else c&gt;xy flood
+  .then <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( c- ) prod the cell for a mine, and see what happens... :)"</span> :doc
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-9" class="outline-3">
+<h3 id="sec-2-9"><span class="section-number-3">2.9</span> <span class="done DONE">DONE</span> minefield words</h3>
+<div class="outline-text-3" id="text-2-9">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="minefield-words"><span style="color: #66f;">( -- minefield words --------------------------------------- )</span>
+
+<span style="color: #c63; font-weight: bold;">:</span> hints-create
+  <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">dup</span> &#183;mine has?
+      .ifso
+        c&gt;xy
+        <span style="color: #00ffff;">[</span> dup2 inbounds?
+            .ifso cell armed-neighbor-add
+            .else <span style="color: #00ffff;">drop</span> <span style="color: #00ffff;">drop</span>
+          .then
+        <span style="color: #00ffff;">]</span> neighbors-do
+      .else <span style="color: #00ffff;">drop</span>
+    .then
+  <span style="color: #00ffff;">]</span> grid-do <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( - ) generate the armed-neighbor-count for each cell on the grid"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> mine-add
+  randcell
+  <span style="color: #00ffff;">dup</span> &#183;mine has?
+    .ifso <span style="color: #00ffff;">drop</span> recurse
+    .else &#183;mine @incl!
+  .then <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( - ) add a mine to a random cell that doesn't yet have one"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> game-new
+  &#183;cover as-bit grid .fill
+  mineCount <span style="color: #00ffff;">[</span> mine-add <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">times</span>
+  hints-create
+  <span style="color: #32cd32;">0</span> flagCount <span style="color: #00ffff;">!</span>
+  gameOver? <span style="color: #00ffff;">off</span> <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( - ) set up a new game"</span> :doc
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-10" class="outline-3">
+<h3 id="sec-2-10"><span class="section-number-3">2.10</span> <span class="done DONE">DONE</span> draw the cells</h3>
+<div class="outline-text-3" id="text-2-10">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="draw-cells"><span style="color: #c63; font-weight: bold;">with</span> <span style="color: #ff6347;">vt'</span> <span style="color: #c63; font-weight: bold;">with</span> <span style="color: #ff6347;">ng'</span>
+
+  <span style="color: #c63; font-weight: bold;">variable</span> set-bracket-color
+
+  <span style="color: #c63; font-weight: bold;">:</span> |? set-bracket-color <span style="color: #00ffff;">@</span> <span style="color: #c63; font-weight: bold;">do</span> <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> . putc <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #c63; font-weight: bold;">:</span> $ puts <span style="color: #c63; font-weight: bold;">;</span>
+
+  <span style="color: #c63; font-weight: bold;">:</span> show-flood-cursor
+    flood-cursor <span style="color: #00ffff;">@</span> <span style="color: #00ffff;">=</span> .ifso <span style="color: #00ffff;">[</span> |M <span style="color: #00ffff;">]</span> set-bracket-color <span style="color: #00ffff;">!</span> .then <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> show-active-cell
+    active-cell <span style="color: #00ffff;">@</span> <span style="color: #00ffff;">=</span>
+    .ifso
+      <span style="color: #00ffff;">[</span> |m <span style="color: #00ffff;">]</span> set-bracket-color <span style="color: #00ffff;">!</span>
+      <span style="color: #32cd32;">0</span> active-cell <span style="color: #00ffff;">!</span>
+    .then <span style="color: #c63; font-weight: bold;">;</span>
+
+  <span style="color: #c63; font-weight: bold;">:</span> |[ <span style="color: #00ffff;">[</span> show-active-cell <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> show-flood-cursor <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">bi</span> |? '[ putc <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> |] |? '] putc <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> hide-brackets <span style="color: #00ffff;">[</span> |k <span style="color: #00ffff;">]</span> set-bracket-color <span style="color: #00ffff;">!</span> <span style="color: #c63; font-weight: bold;">;</span>
+
+  <span style="color: #c63; font-weight: bold;">:</span> hint armed-neighbor-count <span style="color: #c63; font-weight: bold;">;</span>
+
+  <span style="color: #c63; font-weight: bold;">:</span> mine-draw hide-brackets  |[ |r 'X . |] <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> flag-draw                |[ |R '! . |] <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> hint-draw hide-brackets
+    <span style="color: #00ffff;">dup</span> hint <span style="color: #00ffff;">dup</span> <span style="color: #32cd32;">0</span> <span style="color: #00ffff;">=</span>
+    .ifso <span style="color: #00ffff;">drop</span>               |[ |b '- .   |]
+    .else <span style="color: #00ffff;">push</span>               |[ |B <span style="color: #00ffff;">pop</span> '0 <span style="color: #00ffff;">+</span> . |]
+    .then <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> cover-draw
+    allHints? <span style="color: #00ffff;">@</span>
+      .ifso    hint-draw
+      .else                  |[ |w '- . |] <span style="color: #c63; font-weight: bold;">;</span>
+    .then <span style="color: #c63; font-weight: bold;">;</span>
+
+  <span style="color: #c63; font-weight: bold;">:</span> make-striped
+    odd .ifso <span style="color: #00ffff;">[</span> |K <span style="color: #00ffff;">]</span> .else <span style="color: #00ffff;">[</span> |c <span style="color: #00ffff;">]</span> .then set-bracket-color <span style="color: #00ffff;">!</span> <span style="color: #c63; font-weight: bold;">;</span>
+    <span style="color: #00ff00;">"( y- ) assign set-bracket-color based on line number"</span> :doc
+
+  <span style="color: #c63; font-weight: bold;">:</span> (x,y) <span style="color: #00ffff;">dup</span> make-striped cell
+    <span style="color: #00ffff;">dup</span> show-flood-cursor
+    <span style="color: #00ffff;">dup</span> <span style="color: #00ffff;">@</span>
+    <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">[</span> &#183;mine in? gameOver? <span style="color: #00ffff;">@</span> <span style="color: #00ffff;">and</span> <span style="color: #00ffff;">]</span>   <span style="color: #00ffff;">[</span> mine-draw  <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+      <span style="color: #00ffff;">[</span> &#183;flag  in? <span style="color: #00ffff;">]</span>                  <span style="color: #00ffff;">[</span> flag-draw  <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+      <span style="color: #00ffff;">[</span> &#183;cover in? <span style="color: #00ffff;">]</span>                  <span style="color: #00ffff;">[</span> cover-draw <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+      <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">drop</span>   <span style="color: #32cd32;">-1</span>  <span style="color: #00ffff;">]</span>                  <span style="color: #00ffff;">[</span> hint-draw  <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">]</span> <span style="color: #c63; font-weight: bold;">do</span>
+   space <span style="color: #c63; font-weight: bold;">;</span>
+   <span style="color: #00ff00;">"( xy- ) output cell as a string"</span> :doc
+
+  <span style="color: #c63; font-weight: bold;">:</span> show cr |C
+    "     <span style="color: #32cd32;">0</span>   <span style="color: #32cd32;">1</span>   <span style="color: #32cd32;">2</span>   <span style="color: #32cd32;">3</span>   <span style="color: #32cd32;">4</span>   <span style="color: #32cd32;">5</span>   <span style="color: #32cd32;">6</span>   <span style="color: #32cd32;">7</span>   <span style="color: #32cd32;">8</span>   <span style="color: #32cd32;">9</span>   A   B   C   D   E   F   "
+    puts cr
+    H <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">dup</span> <span style="color: #32cd32;">2</span> spaces <span style="color: #c63; font-weight: bold;">hex</span> <span style="color: #00ffff;">dup</span> odd <span style="color: #00ffff;">[</span> |w <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> |C <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span> putn space
+          W <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">over</span> (x,y) <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">iter</span> cr <span style="color: #00ffff;">drop</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">iter</span> <span style="color: #c63; font-weight: bold;">;</span>
+    <span style="color: #00ff00;">"draw the minefield"</span> :doc
+
+2without
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-11" class="outline-3">
+<h3 id="sec-2-11"><span class="section-number-3">2.11</span> <span class="done DONE">DONE</span> draw the playing field</h3>
+<div class="outline-text-3" id="text-2-11">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="draw-field"><span style="color: #66f;">( -- display words -------------------------------------------- )</span>
+<span style="color: #c63; font-weight: bold;">with</span> <span style="color: #ff6347;">vt'</span>
+
+<span style="color: #c63; font-weight: bold;">:</span> draw clear
+  gameOver? <span style="color: #00ffff;">@</span>
+  .ifso |R
+    <span style="color: #00ff00;">"                              GAME OVER! "</span> $
+  .else |Y
+    <span style="color: #00ff00;">"                            MINESWPR.RXE"</span> $
+  .then |b cr
+    <span style="color: #00ff00;">"-------------------------------------------------------------------"</span> $ |w
+  show
+    cr |g <span style="color: #00ff00;">"type cmd at '"</span>
+     $ |w <span style="color: #00ff00;">"ok"</span>
+     $ |g <span style="color: #00ff00;">"':  "</span>
+     $ |Y '+ . |c <span style="color: #00ff00;">" = flag  "</span>
+     $ |Y '- . |c <span style="color: #00ff00;">" = unflag  "</span>
+     $ |Y '? . |c <span style="color: #00ff00;">" = prod for mine "</span>
+     $ |Y 'q . |c <span style="color: #00ff00;">" = quit"</span> $
+    cr |g <span style="color: #00ff00;">"cmd format: "</span>
+     $ |Y <span style="color: #00ff00;">"x y "</span>
+     $ |c '[
+     . |Y <span style="color: #00ff00;">"+-?"</span>
+     $ |c '] . <span style="color: #00ff00;">"   "</span>
+     $ |g <span style="color: #00ff00;">"examples: "</span>
+     $ |w <span style="color: #00ff00;">"5 C +"</span>
+     $ |y <span style="color: #00ff00;">" a b -"</span>
+     $ |W " <span style="color: #32cd32;">2</span> <span style="color: #32cd32;">9</span> ?"
+     $ |R <span style="color: #00ff00;">" q"</span>
+     $ |Y <span style="color: #00ff00;">"   r "</span>
+     $ |c <span style="color: #00ff00;">"= restart "</span>
+     $ |b cr
+    <span style="color: #00ff00;">"-------------------------------------------------------------------"</span> $ |K
+  .s gameOver? <span style="color: #00ffff;">@</span>
+  .ifso |R <span style="color: #00ff00;">"game over."</span>
+      $ |r <span style="color: #00ff00;">" type "</span>
+      $ |y 'r
+      . |r <span style="color: #00ff00;">"  to restart"</span> $
+  .then
+     cr |W <span style="color: #00ff00;">"ok "</span> $ |w
+  <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( - ) draw the mineswpr ui / prompt"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">without</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-12" class="outline-3">
+<h3 id="sec-2-12"><span class="section-number-3">2.12</span> <span class="done DONE">DONE</span> command parser</h3>
+<div class="outline-text-3" id="text-2-12">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="cmd-parser"><span style="color: #c63; font-weight: bold;">chain:</span> <span style="color: #ff6347;">mswp'</span> <span style="color: #00ff00;">"minesweeper parser"</span> :doc
+
+  <span style="color: #c63; font-weight: bold;">:</span> with-cell cell <span style="color: #00ffff;">dup</span> active-cell <span style="color: #00ffff;">!</span> <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> if-cell-ok <span style="color: #00ffff;">push</span>
+    depth <span style="color: #32cd32;">2</span> <span style="color: #00ffff;">&gt;=</span>
+    .ifso
+       dup2 inbounds?
+       .ifso with-cell <span style="color: #00ffff;">pop</span> <span style="color: #c63; font-weight: bold;">do</span>
+       .else <span style="color: #00ffff;">pop</span> drop3
+       .then
+    .then <span style="color: #c63; font-weight: bold;">;</span>
+
+  <span style="color: #66f;">( ui command syntax )</span>
+
+  <span style="color: #c63; font-weight: bold;">:</span> <span style="color: #00ffff;">+</span> <span style="color: #00ffff;">[</span> flag+ <span style="color: #00ffff;">]</span> if-cell-ok <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> <span style="color: #00ffff;">-</span> <span style="color: #00ffff;">[</span> flag- <span style="color: #00ffff;">]</span> if-cell-ok <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> ? <span style="color: #00ffff;">[</span> prod <span style="color: #00ffff;">]</span>  if-cell-ok <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> a $A <span style="color: #c63; font-weight: bold;">;</span>   <span style="color: #c63; font-weight: bold;">:</span> b $B <span style="color: #c63; font-weight: bold;">;</span>   <span style="color: #c63; font-weight: bold;">:</span> c $C <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> d $D <span style="color: #c63; font-weight: bold;">;</span>   <span style="color: #c63; font-weight: bold;">:</span> e $E <span style="color: #c63; font-weight: bold;">;</span>   <span style="color: #c63; font-weight: bold;">:</span> f $F <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> <span style="color: #00ffff;">r</span> game-new <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #c63; font-weight: bold;">:</span> q mineswpr-exit-hook <span style="color: #c63; font-weight: bold;">;</span>
+
+<span style="color: #c63; font-weight: bold;">;chain</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-13" class="outline-3">
+<h3 id="sec-2-13"><span class="section-number-3">2.13</span> <span class="done DONE">DONE</span> retro shell enhancements</h3>
+<div class="outline-text-3" id="text-2-13">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="shell-tweaks"><span style="color: #66f;">( -- retro shell enhancements ------------------------------ )</span>
+<span style="color: #c63; font-weight: bold;">with</span> <span style="color: #ff6347;">vt'</span> <span style="color: #c63; font-weight: bold;">with</span> <span style="color: #ff6347;">color'</span>
+<span style="color: #c63; font-weight: bold;">:</span> welcome
+  clear
+  |W <span style="color: #00ff00;">"Welcome to Retro!"</span> $ cr
+  |w <span style="color: #00ff00;">"Type "</span> $ |Y <span style="color: #00ff00;">"words "</span> $
+  |w "to see a <span style="color: #66f;">list</span> of words you can try, <span style="color: #00ffff;">or</span> " $
+  |Y <span style="color: #00ff00;">"play "</span> $ |w <span style="color: #00ff00;">"to play the game again."</span> $ |w cr <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"a rudimentary welcome message."</span> :doc
+<span style="color: #c63; font-weight: bold;">{{</span>
+  <span style="color: #c63; font-weight: bold;">:</span> mineswpr-play
+    &amp;draw &amp;ok <span style="color: #c63; font-weight: bold;">:is</span>
+    reset <span style="color: #c63; font-weight: bold;">hex</span>
+    game-new
+    <span style="color: #00ff00;">"mswp'"</span> <span style="color: #c63; font-weight: bold;">find</span> <span style="color: #00ffff;">[</span> d-&gt;xt <span style="color: #00ffff;">@</span> :with <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">ifTrue</span> <span style="color: #c63; font-weight: bold;">;</span>
+
+  <span style="color: #c63; font-weight: bold;">:</span> mineswpr-quit
+    <span style="color: #c63; font-weight: bold;">without</span>
+    reset <span style="color: #c63; font-weight: bold;">decimal</span>
+    &amp;grok &amp;ok <span style="color: #c63; font-weight: bold;">:is</span>
+    welcome <span style="color: #c63; font-weight: bold;">;</span>
+
+  &amp;mineswpr-quit &amp;mineswpr-exit-hook <span style="color: #c63; font-weight: bold;">:is</span>
+<span style="color: #c63; font-weight: bold;">---reveal---</span>
+
+  <span style="color: #c63; font-weight: bold;">:</span> play mineswpr-play <span style="color: #c63; font-weight: bold;">;</span>
+    <span style="color: #00ff00;">"( - ) play minesweeper"</span> :doc
+<span style="color: #c63; font-weight: bold;">}}</span>
+2without
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> OUTPUT</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">needs</span> <span style="color: #ff6347;">sets'</span> <span style="color: #c63; font-weight: bold;">needs</span> <span style="color: #ff6347;">vt'</span>  <span style="color: #c63; font-weight: bold;">needs</span> <span style="color: #ff6347;">math'</span>
+&lt;&lt;lang-tweaks&gt;&gt;
+
+<span style="color: #66f;">( == minesweeper game ====================================== )</span>
+<span style="color: #c63; font-weight: bold;">with</span> <span style="color: #ff6347;">sets'</span>
+&lt;&lt;variables&gt;&gt;
+&lt;&lt;grid-setup&gt;&gt;
+&lt;&lt;point-methods&gt;&gt;
+&lt;&lt;cell-methods&gt;&gt;
+&lt;&lt;grid-methods&gt;&gt;
+&lt;&lt;floodfill&gt;&gt;
+&lt;&lt;events&gt;&gt;
+&lt;&lt;user-actions&gt;&gt;
+&lt;&lt;minefield-words&gt;&gt;
+&lt;&lt;draw-cells&gt;&gt;
+&lt;&lt;draw-field&gt;&gt;
+&lt;&lt;cmd-parser&gt;&gt;
+&lt;&lt;shell-tweaks&gt;&gt;
+
+game-new
+
+<span style="color: #c63; font-weight: bold;">with</span> <span style="color: #ff6347;">vt'</span>
+<span style="color: #c63; font-weight: bold;">:</span> (xy) |c '( putc |g <span style="color: #00ffff;">swap</span> putn |c <span style="color: #00ff00;">", "</span> |g puts putn  |c ') putc |w <span style="color: #c63; font-weight: bold;">;</span>
+  <span style="color: #00ff00;">"( xy- ) output coordinate pair as a string"</span> :doc
+<span style="color: #c63; font-weight: bold;">without</span>
+
+<span style="color: #c63; font-weight: bold;">:</span> on-flood-step clear
+  !! space flood-cursor <span style="color: #00ffff;">@</span> c&gt;xy (xy)
+  show getc 'q <span style="color: #00ffff;">=</span> .ifso <span style="color: #c63; font-weight: bold;">bye</span> .then <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( - ) floodfill debugger"</span> :doc
+<span style="color: #66f;">( &amp;on-flood-step  &amp;flood-step-hook :is )</span>
+play
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> <span class="todo TODO">TODO</span> refile these</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> objects</h3>
+<div class="outline-text-3" id="text-4-1">
+<pre class="example">
+method push ;
+self pop dup push ;
+end pop drop ;
+</pre>
+</div>
+</div>
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> virtual terminal words</h3>
+<div class="outline-text-3" id="text-4-2">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">chain:</span> <span style="color: #ff6347;">vt'</span>
+
+ |!k <span style="color: #32cd32;">0</span> vt:bg <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #c63; font-weight: bold;">:</span> |!r <span style="color: #32cd32;">1</span> vt:bg <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #c63; font-weight: bold;">:</span> |!g <span style="color: #32cd32;">2</span> vt:bg <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #c63; font-weight: bold;">:</span> |!y <span style="color: #32cd32;">3</span> vt:bg <span style="color: #c63; font-weight: bold;">;</span>
+ |!b <span style="color: #32cd32;">4</span> vt:bg <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #c63; font-weight: bold;">:</span> |!m <span style="color: #32cd32;">5</span> vt:bg <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #c63; font-weight: bold;">:</span> |!c <span style="color: #32cd32;">6</span> vt:bg <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #c63; font-weight: bold;">:</span> |!w <span style="color: #32cd32;">7</span> vt:bg <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
