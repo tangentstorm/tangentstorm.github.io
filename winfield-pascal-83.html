@@ -1,0 +1,1401 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>pascal in forth ( excerpts from )</title>
+<!-- 2013-05-05 Sun 09:30 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="Allan Winfield"/>
+<link rel="stylesheet" type="text/css" href="etc/style.css">
+
+<script type="text/javascript" src="http://orgmode.org/org-info.js">
+/**
+ *
+ * @source: http://orgmode.org/org-info.js
+ *
+ * @licstart  The following is the entire license notice for the
+ *  JavaScript code in http://orgmode.org/org-info.js.
+ *
+ * Copyright (C) 2012-2013  Sebastian Rose
+ *
+ *
+ * The JavaScript code in this tag is free software: you can
+ * redistribute it and/or modify it under the terms of the GNU
+ * General Public License (GNU GPL) as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option)
+ * any later version.  The code is distributed WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+ *
+ * As additional permission under GNU GPL version 3 section 7, you
+ * may distribute non-source (e.g., minimized or compacted) forms of
+ * that code without the copy of the GNU GPL normally required by
+ * section 4, provided you include this license notice and a URL
+ * through which recipients can access the Corresponding Source.
+ *
+ * @licend  The above is the entire license notice
+ * for the JavaScript code in http://orgmode.org/org-info.js.
+ *
+ */
+</script>
+
+<script type="text/javascript">
+
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+
+<!--/*--><![CDATA[/*><!--*/
+org_html_manager.set("TOC_DEPTH", "3");
+org_html_manager.set("LINK_HOME", "");
+org_html_manager.set("LINK_UP", "");
+org_html_manager.set("LOCAL_TOC", "1");
+org_html_manager.set("VIEW_BUTTONS", "0");
+org_html_manager.set("MOUSE_HINT", "underline");
+org_html_manager.set("FIXED_TOC", "0");
+org_html_manager.set("TOC", "0");
+org_html_manager.set("VIEW", "info");
+org_html_manager.setup();  // activate after the parameters are set
+/*]]>*///-->
+</script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">pascal in forth ( excerpts from )</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Part 1</a>
+<ul>
+<li><a href="#sec-1-1">1.1. Pascal in Forth</a></li>
+<li><a href="#sec-1-2">1.2. Basic Ideas</a></li>
+<li><a href="#sec-1-3">1.3. The Algorithm</a></li>
+<li><a href="#sec-1-4">1.4. fig 4 ( railroad diagram )</a></li>
+<li><a href="#sec-1-5">1.5. <i>Fig 5.</i> the "begin" statement ( example outline only )</a></li>
+<li><a href="#sec-1-6">1.6. The Forth Basics</a></li>
+<li><a href="#sec-1-7">1.7. <code>[3/7]</code> { code for the tokenizer }</a>
+<ul>
+<li><a href="#sec-1-7-1">1.7.1. block 2000 - pascal extensions to forth</a></li>
+<li><a href="#sec-1-7-2">1.7.2. block 2001 - reseverd words</a></li>
+<li><a href="#sec-1-7-3">1.7.3. block 2002 - cfa table ( "code field address ")</a></li>
+<li><a href="#sec-1-7-4">1.7.4. block 2003</a></li>
+<li><a href="#sec-1-7-5">1.7.5. block 2004 variables for the parser</a></li>
+<li><a href="#sec-1-7-6">1.7.6. block 2005 - next ( parses for tokens )</a></li>
+<li><a href="#sec-1-7-7">1.7.7. block 2006 forth parser tweaks</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-8">1.8. The Expression Compiler</a></li>
+<li><a href="#sec-1-9">1.9. Infix Expressions</a></li>
+<li><a href="#sec-1-10">1.10. { code for expression compiler }</a>
+<ul>
+<li><a href="#sec-1-10-1">1.10.1. block 2009 number</a></li>
+<li><a href="#sec-1-10-2">1.10.2. block 2010 variables</a></li>
+<li><a href="#sec-1-10-3">1.10.3. block 2011 function calls</a></li>
+<li><a href="#sec-1-10-4">1.10.4. block 2012 factor</a></li>
+<li><a href="#sec-1-10-5">1.10.5. block 2013 - term</a></li>
+<li><a href="#sec-1-10-6">1.10.6. block 2014 - simple expressions</a></li>
+<li><a href="#sec-1-10-7">1.10.7. block 2015 - full expression compiler / interpreter</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-11">1.11. error handling</a>
+<ul>
+<li><a href="#sec-1-11-1">1.11.1. block 2007 - error handling</a></li>
+<li><a href="#sec-1-11-2">1.11.2. block 2008 compile / interpret</a></li>
+<li><a href="#sec-1-11-3">1.11.3. block 2016 ( resolve forward reference to expression )</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. PART 2 :</a>
+<ul>
+<li><a href="#sec-2-1">2.1. block 2017 assignment</a></li>
+<li><a href="#sec-2-2">2.2. block 2018 expression printer</a></li>
+<li><a href="#sec-2-3">2.3. block 2019 write statement</a></li>
+<li><a href="#sec-2-4">2.4. block 2020 block compiler</a></li>
+<li><a href="#sec-2-5">2.5. block 2021 if stmt compiler</a></li>
+<li><a href="#sec-2-6">2.6. block 2022 while and repeat loops</a></li>
+<li><a href="#sec-2-7">2.7. block 2023 for loop compiler</a></li>
+<li><a href="#sec-2-8">2.8. block 2024 ENDFOR</a></li>
+<li><a href="#sec-2-9">2.9. block 2025 pascal for loop</a></li>
+<li><a href="#sec-2-10">2.10. block 2026 &lt;statement&gt; rule compiler</a>
+<ul>
+<li><a href="#sec-2-10-1">2.10.1. block 2027 {pascal .. }</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-3">3. &#x2013; retroforth phrasebook --</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Part 1</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> Pascal in Forth</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+This is first of two articles describing a set of Pascal like extensions to Forth. The intention here is not for a full-blown Pascal compiler but to provide the Forth programmer with the option of writing those parts of a task which are best described with a Pascal like syntax in Pascal. The philosophy behind this idea is in the widely held view that, while most languages are good for some things few, if any, are good at everything and instead of trying to design new all embracing wonder-languages, it might be more productive to develop multilingual programming environments! Whether you hold this view or not, the extension of Forth into Pascal is still an interesting exercise and a worthy test of power and flexibility of Forth.
+</p>
+
+<p>
+Before going any further, perhaps I should givne an example of the way I see this amalgam of Forth and Pascal working in practice. Suppose that we need to sort a list of numbers into ascending order. A standard algorithm for doing this might be expressed very clearly in a Pascal/Forth hybrid as shown in <i>fig 1</i>.
+</p>
+
+<p>
+#+name fig1
+</p>
+<pre class="example">
+( Create a 100 element array 'list' )
+CREATE list 200 ALLOT
+
+( create some working variables ... )
+VARIABLE i VARIABLE j VARIABLE k
+VARIABLE noswops
+
+( and constants ... )
+1 CONSTANT true 0 CONSTANT false
+
+
+( Sort 'list' into ascending numerical order )
+: sortlist {pascal
+  repeat noswops := true ;
+    for i := 1 to 99 do
+    begin
+      j := list [ i ] ;
+      k := list [ i + 1 ] ;
+      if j &gt; k then
+      begin
+        noswops := false ;
+        list [ i ] := k ;
+        list [ i + 1 ] := j
+      end
+    end
+  until noswops
+} ;
+</pre>
+</div>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> Basic Ideas</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+Initially one of the principal requirements was for complete interchangeability between Forth and Pascal, so that Forth routines may call previously defined words written in Pascal and vice versa. It is particularly useful for Pascal to be able to make use of the large set of standard Forth words. As an example, suppose we need to print a number, right justified, from within a Pascal routine. A convenient way would be to call the Forth word <code>.R</code> as if it were a Pascal procedure, ie:
+</p>
+
+<pre class="example">
+.R( i, 5 );
+</pre>
+
+<p>
+to print the conents of variable <code>i</code>, in a field width of 5. This should work very well if we can arrange that the expressions enclosed by brackets leave their results on the stack at run time, which is precisely where the Forth word <code>.R</code> will expect to find its input parameters!
+</p>
+
+<p>
+Passing results back from Pascal defined words into Forth is not quite so straightforward, since a Pascal program cannot easily take values off (or leave them on) the stack. Pascal does all of its arithmetic with variables, so it would seem sensible to allow Pascal and Forth to share the same variables, and communicate results through them. In <i>id:fig1</i>, the array <code>list</code> was created in Forth, but manipulated in <code>sortlist</code> exactly as if it were a 1-dimensional Pascal <code>ARRAY</code>. A Forth definition to sort any list, whose address is supplied on the stack, might then be written as in <i>fig 2</i>:
+</p>
+
+<pre class="example">
+( sort any 100 element list into ascending order )
+: sort                   ( addr -&gt; )
+    DUP list 100 MOVE    ( Copy anylist into list )
+    sortlist             ( sort it )
+    list SWAP 100 MOVE   ( Copy it back into anylist ) ;
+
+( Generate two lists and sort them ... )
+CREATE list1 200 ALLOT list1 sort
+CREATE list2 200 ALLOT list2 sort
+</pre>
+
+<p>
+<i>Fig 3</i> summarises the structure of a colon definition incorporating both Forth and Pascal. The Pascal statements are enclosed by <code>{pascal</code> and <code>}</code> (the word <code>{pascal</code> is the new 'compiling' word which is really the subject of these articles). There may be any number of segments of Forth and Pascal in the same definition, although more than one or two might be confusing!
+</p>
+
+<pre class="example">
+: new-word
+          ... some FORTH words ...
+  {pascal ... some Pascal statements ... }
+          ... more FORTH words ...
+  etc. ;
+</pre>
+
+<p>
+Possibly the most demanding design constraint is that the compiled Pascal should be as close as possible to the equivalent compiled Forth, so that there is little or no compromise on execution speed for routines written in Pascal. Thus, as an example, the Pascal statement:
+</p>
+
+<pre class="example">
+IF a = 2 THEN i := j + k;
+</pre>
+
+<p>
+should, ideally, compile into the same internal form as the Forth phrase:
+</p>
+
+<pre class="example">
+a @ 2 = IF j @ k @ + i! THEN
+</pre>
+
+<p>
+Of course it is unlikely that a program written entirely in Forth would make such a heavy use of variables as this, but the ability to mix Pascal and Forth (and Assembler, on many Forth systems) should allow us plenty of opportunity for optimising any time-critical part of a program.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> The Algorithm</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+Readers of the two excellent articles in issue 1 of SOFT: 'Writing Compilers in Basic' and 'Infix Maths in Forth' will already be aware of the power and versatility of the technique known as 'recursive descent' and so I make no apology for using this here. In fact, structured languages like Pascal lend themselves particularly well to compilation by recursive descent, because their syntax is often highly recursive &#x2013; that is, defined in terms of itself. An example of this in pascal is that a 'statement' (amongst other things) might consist of the reserved word <code>BEGIN</code>, followed by any number of statements separated by <code>;</code>, and terminated by <code>END</code>. Thus, when the statement compiler encounters the word <code>BEGIN</code> it will simply call itself.
+</p>
+
+<p>
+This structure is difficult to describe in words, but very much easier to see when expressed as a 'syntax graph'. For example <i>fig 4</i> illustrates the syntax graph for <code>begin-statement</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> <span class="todo TODO">TODO</span> fig 4 ( railroad diagram )</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+The principle funciton of the syntax graph is to specify exactly the syntax of a programming language. That is its primary use to 'users' of the language. However, for compiler writers, syntax graphs do lead almost directly to a compilation algorithm to the extent that each syntax graph will normally have one subroutine associated with it in the compiler. Of course the syntax graph doesn't tell us what the output of the compiler should be &#x2013; that is a question of 'semantics' &#x2013; but it does dictate the fundimental structure of the compiler. To illustrate this <i>fig 5</i> show an outline colon-definition for <code>begin-statement</code>, which comes directly from the syntax graph in <i>fig 4</i>. This would be called by the statement routine whenever the reserved wourd <code>BEGIN</code> has been found.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-5" class="outline-3">
+<h3 id="sec-1-5"><span class="section-number-3">1.5</span> <i>Fig 5.</i> the "begin" statement ( example outline only )</h3>
+<div class="outline-text-3" id="text-1-5">
+<pre class="example">
+( begin-statement compiler )
+: begin
+    statement  ( must be at least one statement )
+    BEGIN
+      ...      ( test here for a semi-colon )
+    WHILE
+      statement
+    REPEAT
+    ...        ( test here for end )
+    NOT IF syntaxerror THEN ;
+</pre>
+</div>
+</div>
+<div id="outline-container-sec-1-6" class="outline-3">
+<h3 id="sec-1-6"><span class="section-number-3">1.6</span> The Forth Basics</h3>
+<div class="outline-text-3" id="text-1-6">
+<p>
+The total program splits very conveniently into two parts; the arithmetic expression compiler, and the statement compiler, so I shall describe the former here and the later in the <i>second part of this article</i>. Although I am at risk of re-inventing some wheels here (see the <i>second reference</i>!) it does turn out that the expression compiler is useful in its own right as an infix arithmetic compiler/interpreter, as I will show later.
+</p>
+
+<p>
+First, however, we must establish the basic routines for parsing the input stream and identifying Pascal reserved words. Given the design constraints outlined earlier, we can see that a Pascal program will contain five basic word types:
+</p>
+
+<ul class="org-ul">
+<li>Pascal reserved words
+</li>
+<li>Numbers
+</li>
+<li>References to Forth variables
+</li>
+<li>References to Forth constants
+</li>
+<li>Other words to be treated as Forth functions or procedures.
+</li>
+</ul>
+
+<p>
+What we require is a basic routine to 'fetch the next thing from the input stream' and classify it as one of these five basic types.
+</p>
+
+<p>
+Since the final three types (variable, constant, or function) will all be words in the dictionary when the Pascal program is compiled, it is clear that a dictionary search wil lbe needed somewhere in this routine. Why not, therefore, create a special vocabulary containing the Pascal reseverd words and let the Forth dictionary search word <code>FIND</code> do all the work for us?
+</p>
+
+<p>
+When <code>FIND</code> is executed it will fetch the next word from the input stream (delimited by <code>space</code>), and search the <code>CONTEXT</code> vocabulary for a matching word. If successful it returns the (unique) address of the dictionary entry for that word, or the value zero if not. (This is the Code Field Address or CFA). All that we need to do in our basic parsing routine (which I call <code>next</code>), is to arrange that the Pascal reserved word vocabulary is <code>CONTEXT</code> when <code>FIND</code> is executed. This will ensure that it is searched before the rest of the Forth dictionary, avoiding any conflict between similar Pascal and Forth words. We can then use the CFA to classify the word into one of the five types above.
+</p>
+
+<p>
+All of this happens in <i>blocks 2001-2006</i>, listed at the end of this article. The pascal reserved words are a set of empty definitions in the vocabulary <code>pascal-words</code>, in block 2001. The classification of reserved words is achieved by attempting to match the CFA returned by <code>FIND</code> with one of the entries in a special table containing the reserved words CFAs (<code>cfa-table</code>, <a href="#sec-1-7-4">1.7.4</a>), thena  value from 1 to 40 is returned, corresponding to the position of the reserved word in <code>cfa-table</code>. If no match is found then <code>next</code> (blocks <i>2005</i> and <i>2006</i>) compares the CFA with <code>vcode</code> and <code>ccode</code>, the CFAs for variable and constant, respectively. No further matching is necessary, since if all of these tests fail the word must have been either a number, or a Forth function or procedure call, and a value of zero returned by <code>FIND</code> will, of course, indicate a number (or a syntax error!)
+</p>
+
+<p>
+The final result of <code>next</code> is returned in the variable <code>type</code>; values 1-40 indicate Pascal reserved words, -2 constants, -1 variables, 0 numbers, or any other value for references to Forth words (defined by colon definitions). Thus, after loading blocks 2001-2006 into a Forth system, we may test these by typing:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-forth">next +      type ? <span style="color: #7fffd4;">1 </span> ok     (Pascal '+')
+<span style="color: #ffc0cb; font-weight: bold;">next </span>begin  type ? <span style="color: #7fffd4;">20 </span>ok     (and 'begin')
+<span style="color: #ffc0cb; font-weight: bold;">next </span>27     type ? <span style="color: #7fffd4;">0 </span> ok     (a number)
+<span style="color: #ff00ff;">VARIABLE </span><span style="color: #eedd82;">fred
+</span><span style="color: #7fffd4;">1 </span><span style="color: #ff00ff;">CONSTANT </span><span style="color: #eedd82;">true
+</span><span style="color: #ffc0cb; font-weight: bold;">next </span>fred   type ? <span style="color: #7fffd4;">-1 </span>ok     (a variable)
+<span style="color: #ffc0cb; font-weight: bold;">next </span>true   type ? <span style="color: #7fffd4;">-2 </span>ok     (a constant)
+<span style="color: #ffc0cb; font-weight: bold;">next </span>.R     type L 12524 ok  (the CFA <span style="color: #ffc0cb; font-weight: bold;">of </span>.R)
+</pre>
+</div>
+
+<p>
+Although it may come as a surprise, the development of the word <code>next</code> was one of the most difficult problems of this entire application. Everything else falls into place with remarkable ease!
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-7" class="outline-3">
+<h3 id="sec-1-7"><span class="section-number-3">1.7</span> <code>[3/7]</code> { code for the tokenizer }</h3>
+<div class="outline-text-3" id="text-1-7">
+</div><div id="outline-container-sec-1-7-1" class="outline-4">
+<h4 id="sec-1-7-1"><span class="section-number-4">1.7.1</span> <span class="done DONE">DONE</span> block 2000 - pascal extensions to forth</h4>
+<div class="outline-text-4" id="text-1-7-1">
+</div><ol class="org-ol"><li>forth<br/><div class="outline-text-5" id="text-1-7-1-1">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( Pascal extensions to FORTH
+  ---------------------------------------------------
+  The following blocks define two new compiling words, '{' and
+  '{pascal'. '{' allows infix expressions to be incorporated
+  into FORTH by writing '{ infix expression }' and '{pascal' 
+  allows Pascal statements to be included in a FORTH colon
+  definition, '{pascal ...Pascal statements... }'.
+
+  The FORTH conforms to the FORTH-79 standard with the common
+  extensions of a CASE structure, and MYSELF to allow a recursive
+  colon definition. Also &lt;= &gt;= &lt;&gt; and 2+.
+
+  Developed on sForth.   A.F.T. Winfield 1983 )</span>
+
+FORTH DEFINITIONS DECIMAL --&gt;
+</pre>
+</div>
+</div>
+</li>
+<li>retro<br/><div class="outline-text-5" id="text-1-7-1-2">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #66f;">( Pascal extensions to retro                                    )</span>
+<span style="color: #66f;">( ------------------------------------------------------------  )</span>
+<span style="color: #66f;">( The following blocks define two new compiling words, '{' and  )</span>
+<span style="color: #66f;">( '{pascal'. '{' allows infix expressions to be incorporated    )</span>
+<span style="color: #66f;">( into retro by writing '{ infix expression }' and '{pascal'    )</span>
+<span style="color: #66f;">( allows Pascal statements to be included in a retro colon      )</span>
+<span style="color: #66f;">( definition, '{pascal ...Pascal statements... }'.              )</span>
+
+<span style="color: #66f;">( The code is based on a pair of 1983 articles in SOFT magazine )</span>
+<span style="color: #66f;">( by [now Dr.] Alan Winfield, entitled "Pascal in Forth"        )</span>
+
+reset <span style="color: #c63; font-weight: bold;">global</span> <span style="color: #c63; font-weight: bold;">decimal</span>                <span style="color: #66f;">( normalize the environment )</span>
+<span style="color: #c63; font-weight: bold;">needs</span> <span style="color: #ff6347;">forth'</span> <span style="color: #c63; font-weight: bold;">with</span> <span style="color: #ff6347;">forth'</span>            <span style="color: #66f;">( forth-like vocabulary     )</span>
+</pre>
+</div>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-1-7-2" class="outline-4">
+<h4 id="sec-1-7-2"><span class="section-number-4">1.7.2</span> <span class="done DONE">DONE</span> block 2001 - reseverd words</h4>
+<div class="outline-text-4" id="text-1-7-2">
+</div><ol class="org-ol"><li>forth<br/><div class="outline-text-5" id="text-1-7-2-1">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( Define all Pascal reserved words. Keep these in a separate )</span>
+  <span style="color: #ff00ff;">vocabulary </span><span style="color: #eedd82;">to </span>avoid conflict with similar FORTH words. <span style="color: #ffc0cb; font-weight: bold;">)</span>
+<span style="color: #ff00ff;">VOCABULARY </span><span style="color: #eedd82;">pascal-words </span><span style="color: #00ffff;">IMMEDIATE </span>pascal-words DEFINITIONS
+
+:C <span style="color: #ff00ff;">CREATE </span><span style="color: #eedd82;">; </span>: F FIND ;             <span style="color: #66f;">( abbreviations to save )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">| </span>, ;     : ---&gt; [COMPILE] --&gt; ;  <span style="color: #66f;">( typing and conflicts )</span>
+
+<span style="color: #66f;">( Define as empty definitions so that FIND will work. )</span>
+<span style="color: #66f;">( NOTE: do not insert any comment until after next FORTH. )</span>
+
+C +     C -     C *       C /       C mod     C and
+C or    C xor   C &lt;       C &gt;       C &lt;=      C &gt;=
+C &lt;&gt;    C =     C <span style="color: #66f;">(       C )</span>       C <span style="color: #ffc0cb; font-weight: bold;">{ </span><span style="color: #eedd82;">      C }</span>
+C <span style="color: #00ffff;">; </span>    C begin C end     C if      C then    C <span style="color: #ffc0cb; font-weight: bold;">else</span>
+C <span style="color: #ffc0cb; font-weight: bold;">while </span>C do    C repeat  C <span style="color: #ffc0cb; font-weight: bold;">until </span>  C write   C writeln
+C "     C <span style="color: #ffc0cb; font-weight: bold;">for </span>  C to      C by      C [       C <span style="color: #00ffff;">]</span>
+C .     C not   C :=      C --&gt;
+
+---&gt;
+</pre>
+</div>
+</div>
+</li>
+
+<li>retro<br/><div class="outline-text-5" id="text-1-7-2-2">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #66f;">( Define all Pascal reserved words. Keep these in a separate )</span>
+<span style="color: #66f;">( vocabulary to avoid conflict with normal retro words       )</span>
+<span style="color: #c63; font-weight: bold;">chain:</span> pascal-words
+
+<span style="color: #c63; font-weight: bold;">:</span> C <span style="color: #c63; font-weight: bold;">create</span> <span style="color: #c63; font-weight: bold;">;</span>                        <span style="color: #66f;">( abbreviations to save  )</span>
+<span style="color: #c63; font-weight: bold;">:</span> <span style="color: #c63; font-weight: bold;">|</span> <span style="color: #c63; font-weight: bold;">,</span> <span style="color: #c63; font-weight: bold;">;</span>                             <span style="color: #66f;">( typing and conflicts   )</span>
+
+<span style="color: #66f;">( dr winfield had : F find ; here. looks like in forth 79,   )</span>
+<span style="color: #66f;">( 'find' read a token. so we'll do the same. )</span>
+<span style="color: #c63; font-weight: bold;">:</span> F  <span style="color: #c63; font-weight: bold;">`</span> getToken <span style="color: #c63; font-weight: bold;">find</span> 0= <span style="color: #ffd700; font-weight: bold;">if</span> <span style="color: #00ffff;">drop</span> <span style="color: #32cd32;">0</span> <span style="color: #ffd700; font-weight: bold;">then</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #00ff00;">"( '-a ) parse for word and return its address. zero if not found"</span> :doc
+
+<span style="color: #66f;">( Define as empty definitions so that FIND will work.        )</span>
+<span style="color: #66f;">( NOTE: do not insert any comment until after next FORTH.    )</span>
+
+C <span style="color: #00ffff;">+</span>     C <span style="color: #00ffff;">-</span>     C <span style="color: #00ffff;">*</span>       C <span style="color: #00ffff;">/</span>       C <span style="color: #00ffff;">mod</span>     C <span style="color: #00ffff;">and</span>
+C <span style="color: #00ffff;">or</span>    C <span style="color: #00ffff;">xor</span>   C <span style="color: #00ffff;">&lt;</span>       C <span style="color: #00ffff;">&gt;</span>       C <span style="color: #00ffff;">&lt;=</span>      C <span style="color: #00ffff;">&gt;=</span>
+C <span style="color: #00ffff;">&lt;&gt;</span>    C <span style="color: #00ffff;">=</span>     C <span style="color: #66f;">(       C )</span>       C {       C }
+C <span style="color: #c63; font-weight: bold;">;</span>     C begin C end     C <span style="color: #ffd700; font-weight: bold;">if</span>      C <span style="color: #ffd700; font-weight: bold;">then</span>    C <span style="color: #ffd700; font-weight: bold;">else</span>
+C <span style="color: #ffd700; font-weight: bold;">while</span> C <span style="color: #c63; font-weight: bold;">do</span>    C <span style="color: #ffd700; font-weight: bold;">repeat</span>  C until   C write   C writeln
+C "     C <span style="color: #ffd700; font-weight: bold;">for</span>   C to      C by      C <span style="color: #00ffff;">[</span>       C <span style="color: #00ffff;">]</span>
+C .     C <span style="color: #00ffff;">not</span>   C :=
+</pre>
+</div>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-1-7-3" class="outline-4">
+<h4 id="sec-1-7-3"><span class="section-number-4">1.7.3</span> <span class="done DONE">DONE</span> block 2002 - cfa table ( "code field address ")</h4>
+<div class="outline-text-4" id="text-1-7-3">
+</div><ol class="org-ol"><li>forth<br/><div class="outline-text-5" id="text-1-7-3-1">
+<div class="org-src-container">
+
+<pre class="src src-forth">C cfa-table
+F +     | F -     | F *      | F /      | F mod    | F and     |
+F or    | F xor   | F &lt;      | F &gt;      | F &lt;=     | F &gt;=      |
+F &lt;&gt;    | F =     | F <span style="color: #66f;">(      | F )</span>      | F <span style="color: #ffc0cb; font-weight: bold;">{ </span><span style="color: #eedd82;">     | F }</span>       |
+F <span style="color: #00ffff;">; </span>    | F begin | F end    | F if     | F then   | F <span style="color: #ffc0cb; font-weight: bold;">else </span>   |
+F <span style="color: #ffc0cb; font-weight: bold;">while </span>| F do    | F repeat | F <span style="color: #ffc0cb; font-weight: bold;">until </span> | F write  | F writeln |
+F "     | F <span style="color: #ffc0cb; font-weight: bold;">for </span>  | F to     | F by     | F [      | F <span style="color: #00ffff;">] </span>      |
+F .     | F not   | F :=     | F --&gt;    | ---&gt;
+
+FORTH DEFINITIONS <span style="color: #66f;">( Go back into forth )</span>
+
+<span style="color: #66f;">( 'cfa-table' is a table of the Code Field Addresses of the 
+  reserved word definitions in the previous block. Note that ','
+  is redefined as '|' to allow definition of the pascal ',' )</span>
+
+--&gt;
+</pre>
+</div>
+
+<p>
+Why repeat the list?
+</p>
+
+<p>
+In the first section, he's creating a bunch of empty definitions in the forth dictionary.
+</p>
+
+<p>
+Here, he redefined "|" to mean "," &#x2013; which means write to memory. So he's essentially creating an array of pointers to the empty dictionary entries.
+</p>
+</div>
+</li>
+<li>retro<br/><div class="outline-text-5" id="text-1-7-3-2">
+<div class="org-src-container">
+
+<pre class="src src-retro">C cfa-table
+F <span style="color: #00ffff;">+</span>     <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #00ffff;">-</span>     <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #00ffff;">*</span>      <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #00ffff;">/</span>      <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #00ffff;">mod</span>    <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #00ffff;">and</span>     <span style="color: #c63; font-weight: bold;">|</span>
+F <span style="color: #00ffff;">or</span>    <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #00ffff;">xor</span>   <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #00ffff;">&lt;</span>      <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #00ffff;">&gt;</span>      <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #00ffff;">&lt;=</span>     <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #00ffff;">&gt;=</span>      <span style="color: #c63; font-weight: bold;">|</span>
+F <span style="color: #00ffff;">&lt;&gt;</span>    <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #00ffff;">=</span>     <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #66f;">(      | F )</span>      <span style="color: #c63; font-weight: bold;">|</span> F {      <span style="color: #c63; font-weight: bold;">|</span> F }       <span style="color: #c63; font-weight: bold;">|</span>
+F <span style="color: #c63; font-weight: bold;">;</span>     <span style="color: #c63; font-weight: bold;">|</span> F begin <span style="color: #c63; font-weight: bold;">|</span> F end    <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #ffd700; font-weight: bold;">if</span>     <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #ffd700; font-weight: bold;">then</span>   <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #ffd700; font-weight: bold;">else</span>    <span style="color: #c63; font-weight: bold;">|</span>
+F <span style="color: #ffd700; font-weight: bold;">while</span> <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #c63; font-weight: bold;">do</span>    <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #ffd700; font-weight: bold;">repeat</span> <span style="color: #c63; font-weight: bold;">|</span> F until  <span style="color: #c63; font-weight: bold;">|</span> F write  <span style="color: #c63; font-weight: bold;">|</span> F writeln <span style="color: #c63; font-weight: bold;">|</span>
+F "     <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #ffd700; font-weight: bold;">for</span>   <span style="color: #c63; font-weight: bold;">|</span> F to     <span style="color: #c63; font-weight: bold;">|</span> F by     <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #00ffff;">[</span>      <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #00ffff;">]</span>       <span style="color: #c63; font-weight: bold;">|</span>
+F .     <span style="color: #c63; font-weight: bold;">|</span> F <span style="color: #00ffff;">not</span>   <span style="color: #c63; font-weight: bold;">|</span> F :=     <span style="color: #c63; font-weight: bold;">|</span>
+
+<span style="color: #c63; font-weight: bold;">;chain</span> <span style="color: #66f;">( Go back into retro )</span>
+
+<span style="color: #66f;">( 'cfa-table' is a table of the Code Field Addresses of the      )</span>
+<span style="color: #66f;">( reserved word definitions in the previous block. Note that ',' )</span>
+<span style="color: #66f;">( is redefined as '|' to allow definition of the pascal ','      )</span>
+</pre>
+</div>
+
+<p>
+Why repeat the list?
+</p>
+
+<p>
+In the first section, he's creating a bunch of empty definitions in the forth dictionary.
+</p>
+
+<p>
+Here, he redefined "|" to mean "," &#x2013; which means write to memory. So he's essentially creating an array of pointers to the empty dictionary entries.
+</p>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-1-7-4" class="outline-4">
+<h4 id="sec-1-7-4"><span class="section-number-4">1.7.4</span> <span class="todo TODO">TODO</span> block 2003</h4>
+<div class="outline-text-4" id="text-1-7-4">
+</div><ol class="org-ol"><li>forth<br/><div class="outline-text-5" id="text-1-7-4-1">
+<div class="org-src-container">
+
+<pre class="src src-forth">40 CONSTANT words <span style="color: #66f;">( total number of reserved words above )</span>
+
+<span style="color: #66f;">( Search the pascal CFA table for a match with the CFA on top  )</span>
+<span style="color: #66f;">( of the stack, return a value 1..words if found, or leave the )</span>
+<span style="color: #66f;">( input CFA on TOS if not )</span>
+
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">match-cfas
+</span>    words <span style="color: #7fffd4;">0 </span>do                     <span style="color: #66f;">( step through cfa-table )</span>
+      DUP
+      I 2*                                 <span style="color: #66f;">( fetch I'th cfa )</span>
+      pascal-words cfa-table FORTH + @
+      = <span style="color: #00ffff;">IF </span>                                <span style="color: #66f;">( if match found )</span>
+          DROP I 1+ <span style="color: #00ffff;">LEAVE </span>       <span style="color: #66f;">( exit, leaving I+1 on TOS )</span>
+        <span style="color: #00ffff;">THEN</span>
+      <span style="color: #00ffff;">LOOP </span>;                            <span style="color: #66f;">( else try next cfa )</span>
+
+--&gt;
+</pre>
+</div>
+</div>
+</li>
+<li>retro<br/><div class="outline-text-5" id="text-1-7-4-2">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #32cd32;">38</span> <span style="color: #c63; font-weight: bold;">constant</span> numTokens   <span style="color: #66f;">( total number of reserved words above )</span>
+
+<span style="color: #66f;">( Search the pascal CFA table for a match with the CFA on top  )</span>
+<span style="color: #66f;">( of the stack, return a value 1..words if found, or leave the )</span>
+<span style="color: #66f;">( input CFA on TOS if not )</span>
+
+<span style="color: #c63; font-weight: bold;">:</span> match-cfas <span style="color: #66f;">( a-t|a )</span>
+  numTokens <span style="color: #32cd32;">0</span> <span style="color: #c63; font-weight: bold;">do</span>                     <span style="color: #66f;">( step through cfa-table )</span>
+      <span style="color: #00ffff;">dup</span>
+      I 2* ^pascal-words'cfa-table <span style="color: #00ffff;">+</span> <span style="color: #00ffff;">@</span>       <span style="color: #66f;">( fetch I'th cfa )</span>
+      <span style="color: #00ffff;">=</span> <span style="color: #ffd700; font-weight: bold;">if</span>                                   <span style="color: #66f;">( if match found )</span>
+          <span style="color: #00ffff;">drop</span> I <span style="color: #00ffff;">1+</span> leave          <span style="color: #66f;">( exit, leaving I+1 on TOS )</span>
+        <span style="color: #ffd700; font-weight: bold;">then</span>
+      loop <span style="color: #c63; font-weight: bold;">;</span>                              <span style="color: #66f;">( else try next cfa )</span>
+</pre>
+</div>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-1-7-5" class="outline-4">
+<h4 id="sec-1-7-5"><span class="section-number-4">1.7.5</span> <span class="todo TODO">TODO</span> block 2004 variables for the parser</h4>
+<div class="outline-text-4" id="text-1-7-5">
+</div><ol class="org-ol"><li>forth<br/><div class="outline-text-5" id="text-1-7-5-1">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( parsing variables .. )</span>
+<span style="color: #ff00ff;">VARIABLE </span><span style="color: #eedd82;">&gt;in </span>   <span style="color: #66f;">( temporary storage of &gt;IN value )</span>
+<span style="color: #ff00ff;">VARIABLE </span><span style="color: #eedd82;">find </span>  <span style="color: #66f;">( result of FIND on next input word )</span>
+<span style="color: #ff00ff;">VARIABLE </span><span style="color: #eedd82;">type </span>  <span style="color: #66f;">( index of token as position in pascal cfa table )</span>
+                <span style="color: #66f;">( '+' = 1, '-' = 2, etc )</span>
+
+<span style="color: #66f;">( identify the value of the code pointers for variable / create )</span>
+<span style="color: #66f;">( and constant, so that 'next' will be able to differentiate )</span>
+
+FIND type  @ <span style="color: #ff00ff;">CONSTANT </span><span style="color: #eedd82;">vcode </span>  <span style="color: #66f;">( code pointer for variable )</span>
+FIND words @ <span style="color: #ff00ff;">CONSTANT </span><span style="color: #eedd82;">ccode </span>  <span style="color: #66f;">( code pointer for constant )</span>
+--&gt;
+</pre>
+</div>
+</div>
+</li>
+<li>retro<br/><div class="outline-text-5" id="text-1-7-5-2">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #66f;">( parsing variables .. )</span>
+VARIABLE &gt;in    <span style="color: #66f;">( temporary storage of &gt;IN value )</span>
+VARIABLE <span style="color: #c63; font-weight: bold;">find</span>   <span style="color: #66f;">( result of FIND on next input word )</span>
+VARIABLE type   <span style="color: #66f;">( index of token as position in pascal cfa table )</span>
+                <span style="color: #66f;">( '+' = 1, '-' = 2, etc )</span>
+
+<span style="color: #66f;">( identify the value of the code pointers for variable / create )</span>
+<span style="color: #66f;">( and constant, so that 'next' will be able to differentiate )</span>
+
+FIND type  <span style="color: #00ffff;">@</span> CONSTANT vcode   <span style="color: #66f;">( code pointer for variable )</span>
+FIND words <span style="color: #00ffff;">@</span> CONSTANT ccode   <span style="color: #66f;">( code pointer for constant )</span>
+</pre>
+</div>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-1-7-6" class="outline-4">
+<h4 id="sec-1-7-6"><span class="section-number-4">1.7.6</span> <span class="todo TODO">TODO</span> block 2005 - next ( parses for tokens )</h4>
+<div class="outline-text-4" id="text-1-7-6">
+</div><ol class="org-ol"><li>forth<br/><div class="outline-text-5" id="text-1-7-6-1">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( 'next' assigns a 'type' to the next word in the input stream )</span>
+<span style="color: #66f;">(  type = 1..words : pascal reserved word     )</span>
+<span style="color: #66f;">(         -1       : a variable               )</span>
+<span style="color: #66f;">(         -2       : a constant               )</span>
+<span style="color: #66f;">(  any other value is an existing forth word. )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">next-2 </span>&gt;IN @ &gt;in ! <span style="color: #66f;">( save &gt;IN in case we need to backtrack )</span>
+    <span style="color: #66f;">( try to find next word in pascal words at compile time )</span>
+    <span style="color: #00ffff;">[COMPILE] </span><span style="color: #ffffff; font-weight: bold;">pascal-words </span>FIND <span style="color: #00ffff;">[COMPILE] </span><span style="color: #ffffff; font-weight: bold;">FORTH
+</span>    DUP find !    <span style="color: #66f;">( save result of FIND in find )</span>
+    match-cfas    <span style="color: #66f;">( and search the cfa table for match )</span>
+    DUP type !    <span style="color: #66f;">( place the result in type )</span>
+    DUP words SWAP U&lt; <span style="color: #00ffff;">IF </span>  <span style="color: #66f;">( if no match was found ... )</span>
+       @ DUP vcode = <span style="color: #00ffff;">IF </span>-1 type ! THEN  <span style="color: #66f;">( test for var )</span>
+             ccode = <span style="color: #00ffff;">IF </span>-2 type ! THEN  <span style="color: #66f;">( test for const )</span>
+    <span style="color: #00ffff;">ELSE </span>DROP THEN ; --&gt;  <span style="color: #66f;">( leave stack empty )</span>
+</pre>
+</div>
+</div>
+</li>
+<li>retro<br/><div class="outline-text-5" id="text-1-7-6-2">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #66f;">( 'next' assigns a 'type' to the next word in the input stream )</span>
+<span style="color: #66f;">(  type = 1..words : pascal reserved word     )</span>
+<span style="color: #66f;">(         -1       : a variable               )</span>
+<span style="color: #66f;">(         -2       : a constant               )</span>
+<span style="color: #66f;">(  any other value is an existing forth word. )</span>
+<span style="color: #c63; font-weight: bold;">:</span> next-2 &gt;IN <span style="color: #00ffff;">@</span> &gt;in <span style="color: #00ffff;">!</span> <span style="color: #66f;">( save &gt;IN in case we need to backtrack )</span>
+    <span style="color: #66f;">( try to find next word in pascal words at compile time )</span>
+    [COMPILE] pascal-words FIND [COMPILE] FORTH
+    DUP <span style="color: #c63; font-weight: bold;">find</span> <span style="color: #00ffff;">!</span>    <span style="color: #66f;">( save result of FIND in find )</span>
+    match-cfas    <span style="color: #66f;">( and search the cfa table for match )</span>
+    DUP type <span style="color: #00ffff;">!</span>    <span style="color: #66f;">( place the result in type )</span>
+    DUP words SWAP U&lt; IF   <span style="color: #66f;">( if no match was found ... )</span>
+       <span style="color: #00ffff;">@</span> DUP vcode <span style="color: #00ffff;">=</span> IF <span style="color: #32cd32;">-1</span> type <span style="color: #00ffff;">!</span> THEN  <span style="color: #66f;">( test for var )</span>
+             ccode <span style="color: #00ffff;">=</span> IF <span style="color: #32cd32;">-2</span> type <span style="color: #00ffff;">!</span> THEN  <span style="color: #66f;">( test for const )</span>
+    ELSE DROP THEN <span style="color: #c63; font-weight: bold;">;</span> --&gt;  <span style="color: #66f;">( leave stack empty )</span>
+</pre>
+</div>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-1-7-7" class="outline-4">
+<h4 id="sec-1-7-7"><span class="section-number-4">1.7.7</span> <span class="todo TODO">TODO</span> block 2006 forth parser tweaks</h4>
+<div class="outline-text-4" id="text-1-7-7">
+</div><ol class="org-ol"><li>forth<br/><div class="outline-text-5" id="text-1-7-7-1">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( redefine 'next' to allow comment in pascal programs )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">next-1
+</span>  <span style="color: #00ffff;">BEGIN</span>
+    next-2 type @ <span style="color: #7fffd4;">17 </span>=   <span style="color: #66f;">( if next word is '(' .. )</span>
+  <span style="color: #00ffff;">WHILE</span>
+    <span style="color: #7fffd4;">125 </span>WORD DROP        ( skip input up to ')' <span style="color: #00ffff;">)</span>
+  <span style="color: #00ffff;">REPEAT </span>;               <span style="color: #66f;">( and fetch the next thing )</span>
+
+<span style="color: #66f;">( redefine again to allow pascal to go over more than one block )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">next
+</span>  <span style="color: #00ffff;">BEGIN</span>
+    next-1 type @ <span style="color: #7fffd4;">40 </span>=    <span style="color: #66f;">( if next word is '--&gt;' .. )</span>
+  <span style="color: #00ffff;">WHILE</span>
+    <span style="color: #7fffd4;">1 </span>BLK +! 0 &gt;IN !      <span style="color: #66f;">( go to start of next block )</span>
+  <span style="color: #00ffff;">REPEAT </span>;                <span style="color: #66f;">( and fetch the next thing )</span>
+
+--&gt;
+</pre>
+</div>
+</div>
+</li>
+<li>retro<br/><div class="outline-text-5" id="text-1-7-7-2">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #66f;">( redefine 'next' to allow comment in pascal programs )</span>
+<span style="color: #c63; font-weight: bold;">:</span> next-1
+  BEGIN
+    next-2 type <span style="color: #00ffff;">@</span> <span style="color: #32cd32;">17</span> <span style="color: #00ffff;">=</span>   <span style="color: #66f;">( if next word is '(' .. )</span>
+  WHILE
+    <span style="color: #32cd32;">125</span> WORD DROP        <span style="color: #66f;">( skip input up to ')' )</span>
+  REPEAT <span style="color: #c63; font-weight: bold;">;</span>               <span style="color: #66f;">( and fetch the next thing )</span>
+
+<span style="color: #66f;">( redefine again to allow pascal to go over more than one block )</span>
+<span style="color: #c63; font-weight: bold;">:</span> <span style="color: #ffd700; font-weight: bold;">next</span>
+  BEGIN
+    next-1 type <span style="color: #00ffff;">@</span> <span style="color: #32cd32;">40</span> <span style="color: #00ffff;">=</span>    <span style="color: #66f;">( if next word is '--&gt;' .. )</span>
+  WHILE
+    <span style="color: #32cd32;">1</span> BLK <span style="color: #00ffff;">+!</span> <span style="color: #32cd32;">0</span> &gt;IN <span style="color: #00ffff;">!</span>      <span style="color: #66f;">( go to start of next block )</span>
+  REPEAT <span style="color: #c63; font-weight: bold;">;</span>                <span style="color: #66f;">( and fetch the next thing )</span>
+</pre>
+</div>
+</div>
+</li></ol>
+</div>
+</div>
+
+<div id="outline-container-sec-1-8" class="outline-3">
+<h3 id="sec-1-8"><span class="section-number-3">1.8</span> The Expression Compiler</h3>
+<div class="outline-text-3" id="text-1-8">
+<p>
+Blocks <i>2009</i>-<i>2015</i> contain the arithmetic expression compiler starting, in usual Forth fashion, with the lowest level definitions: <code>number</code>, <code>variable</code>, etc, and working up to the highest level: <code>expression</code> in block 2015. These closely follow, both in name and structure, the corresponding syntax graphs of <i>fig 6</i> (A reasonably faithful subset of standard Pascal arithmetic syntax, as described in the <i>third reference</i>).
+</p>
+
+<p>
+Now, while I do not propose to examine in detail each of the colon definitions in these blocks, it is important at this stage to establish what the <code>output</code> of the compiler should be, and how to achieve it. If we consider as an example the simple arithmetic expression:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal">A * 2
+</pre>
+</div>
+
+<p>
+the compiler should translate this into the equivalent Forth expression:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-forth">A @ <span style="color: #7fffd4;">2 </span>*
+</pre>
+</div>
+
+<p>
+We notice straight away that when the compiler comes across a variable it should generate the code to 'push the value of the variable onto the stack' and, likewise, when a number appears in the input expression, the compiler should generate the code to 'push the number'. This is precisely what <code>variable</code> and <code>number</code> do (<code>variable</code> is complicated a little by single dimensonal array handling as well). Providing that <code>A</code> is a predefined Forth variable, then <code>A</code> and 2 are both syntactically correct 'factors' (see <i>fig 6</i>), and tracing a route through the syntax graphs, starting at <code>expression</code>, will eventuall arrive at the starred position in the graph for <code>term</code>. At this point we know that we must have had two valid factors, separated by <code>*</code> (otherwise this route would not have been followed) and the compiler may output the code for <code>*</code>.
+</p>
+
+<p>
+There is really very little structural difference between a compiler and an interpreter. The principle distinction is that an interpreter actually performs the operation indicated by the input expression during translation, whereas a compiler instead generates some code that will perform the same operation later, at run-time. Combining this observation (which was a revelation to me when I first realised it!), with the Forth convention that anything insidea colon definition is compiled, and anything else interpreted leads to the possibility of making the compiler into an interpreter as well! To make this happen we need only write, for example:
+</p>
+
+<pre class="example">
+STATE @ IF           ( if we are inside a colon definition... )
+          COMPILE *  ( then compile '*' )
+        ELSE         ( else we are not compiling )
+          *          ( so do it now )
+        THEN
+</pre>
+
+<p>
+in the <code>term</code> routine, after having picked up two 'factors' separated by <code>*</code>. Since this is rather long winded I have defined a new compiling word <code>comp/int *</code> with exactly the same effect.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-9" class="outline-3">
+<h3 id="sec-1-9"><span class="section-number-3">1.9</span> <span class="done DONE">DONE</span> Infix Expressions</h3>
+<div class="outline-text-3" id="text-1-9">
+<p>
+An unexpected and useful byproduct of this quest for Pascal in Forth is that the arithmetic expression compiler/interpreter may be used as a stand-alone utility enabling us to write arithmetic expressions &#x2013; in Forth &#x2013; in 'infix' notation rather than the usual Reverse Polish. To this end I have defined the <code>IMMEDIATE</code> word <code>{</code>, in block <i>2016</i>, which simply calls <code>expression</code>. Now <code>expression</code> will exit when a word is found that is recognised but is not syntactically correct (and oll of the <code>CASE</code> comparisions fail), thus <code>}</code> is a suitable terminator. So, to write an infix expression, just place it between curly brackets, as in the following examples:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-forth">VARIABLE A ok          <span style="color: #66f;">( Define A )</span>
+<span style="color: #ff00ff;">VARIABLE </span><span style="color: #eedd82;">B </span>ok          <span style="color: #66f;">( Define B )</span>
+<span style="color: #7fffd4;">10 </span>A ! 20 B ! ok       <span style="color: #66f;">( A=10, B=20 )</span>
+<span style="color: #ffc0cb; font-weight: bold;">{ </span><span style="color: #eedd82;">A + 2 * B }</span> . <span style="color: #7fffd4;">50 </span>ok
+<span style="color: #ffc0cb; font-weight: bold;">{ </span><span style="color: #eedd82;">( A + 2 ) * B ) . 240 ok
+</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">testA&lt;B </span>{ A &lt; B } IF ." yes" THEN <span style="color: #00ffff;">; </span>ok
+testA&lt;B yes ok
+
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">formula </span>{ A * A + B * B } ." =" . <span style="color: #00ffff;">; </span>ok
+formula = <span style="color: #7fffd4;">500 </span>ok
+</pre>
+</div>
+
+<p>
+Notice that the result of evaluating an infix expression remains on the stack where it may be used by subsequent Forth operation in the normal way.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-10" class="outline-3">
+<h3 id="sec-1-10"><span class="section-number-3">1.10</span> <span class="todo TODO">TODO</span> { code for expression compiler }</h3>
+<div class="outline-text-3" id="text-1-10">
+</div><div id="outline-container-sec-1-10-1" class="outline-4">
+<h4 id="sec-1-10-1"><span class="section-number-4">1.10.1</span> block 2009 number</h4>
+<div class="outline-text-4" id="text-1-10-1">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( convert the number in the input stream, pointed to by &gt;in    )</span>
+<span style="color: #66f;">( into binary and compile/interpret it. exit with error number )</span>
+<span style="color: #66f;">( zero if any non-numeric characters )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">number
+</span>    &gt;in @ &gt;IN !
+    <span style="color: #7fffd4;">0 </span>0 <span style="color: #7fffd4;">32 </span>WORD
+    CONVERT
+    C@ <span style="color: #7fffd4;">32 </span>= NOT IF &lt;&gt; perror <span style="color: #00ffff;">THEN</span>
+    DROP
+    STATE @ <span style="color: #00ffff;">IF</span>
+       <span style="color: #00ffff;">[compile] </span><span style="color: #ffffff; font-weight: bold;">LITERAL
+</span>    <span style="color: #00ffff;">THEN</span>
+    <span style="color: #00ffff;">next ;</span>
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-10-2" class="outline-4">
+<h4 id="sec-1-10-2"><span class="section-number-4">1.10.2</span> block 2010 variables</h4>
+<div class="outline-text-4" id="text-1-10-2">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( forward reference to 'expression' )</span>
+<span style="color: #ff00ff;">VARIABLE </span><span style="color: #eedd82;">expr
+</span><span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">callexpr </span>expr @ EXECUTE <span style="color: #00ffff;">;</span>
+
+<span style="color: #66f;">( variable handling )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">variable
+</span>    find @
+    STATE @ <span style="color: #00ffff;">IF </span>, ELSE 2+ <span style="color: #00ffff;">THEN</span>
+    <span style="color: #00ffff;">next </span>type @
+    <span style="color: #7fffd4;">35 </span>= IF <span style="color: #00ffff;">next </span>callexpr
+            <span style="color: #7fffd4;">36 </span>?error
+            comp/int 2*
+            comp/int +
+            <span style="color: #00ffff;">next</span>
+         <span style="color: #00ffff;">THEN </span>comp/int @ <span style="color: #00ffff;">;</span>
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-10-3" class="outline-4">
+<h4 id="sec-1-10-3"><span class="section-number-4">1.10.3</span> block 2011 function calls</h4>
+<div class="outline-text-4" id="text-1-10-3">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( function calls - use these to call forth routines )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">function
+</span>  find @ &gt;R
+  <span style="color: #00ffff;">IF</span>
+    <span style="color: #00ffff;">next </span>callexpr
+    <span style="color: #00ffff;">BEGIN</span>
+      type @ <span style="color: #7fffd4;">37 </span>=
+    <span style="color: #00ffff;">WHILE</span>
+      <span style="color: #00ffff;">next </span>callexpr
+    <span style="color: #00ffff;">REPEAT</span>
+    <span style="color: #7fffd4;">16 </span>?error
+    <span style="color: #00ffff;">next</span>
+  <span style="color: #00ffff;">THEN </span>R&gt;
+  STATE @ <span style="color: #00ffff;">IF </span>, ELSE EXECUTE THEN <span style="color: #00ffff;">;</span>
+
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-10-4" class="outline-4">
+<h4 id="sec-1-10-4"><span class="section-number-4">1.10.4</span> block 2012 factor</h4>
+<div class="outline-text-4" id="text-1-10-4">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( handle a constant )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">constant </span>find @
+  STATE @ <span style="color: #00ffff;">IF </span>, ELSE 2+ @ THEN next <span style="color: #00ffff;">;</span>
+
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">subexpr </span><span style="color: #00ffff;">next </span>callexpr
+  <span style="color: #7fffd4;">16 </span>?error next <span style="color: #00ffff;">;</span>
+
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">factor
+</span>  type @ <span style="color: #00ffff;">CASE</span>
+    <span style="color: #7fffd4;">15 </span>OF subexpr <span style="color: #00ffff;">ENDOF</span>
+     <span style="color: #7fffd4;">0 </span>OF number <span style="color: #00ffff;">ENDOF</span>
+    <span style="color: #7fffd4;">-1 </span>OF variable <span style="color: #00ffff;">ENDOF</span>
+    <span style="color: #7fffd4;">-2 </span>OF constant <span style="color: #00ffff;">ENDOF</span>
+    <span style="color: #7fffd4;">38 </span>OF next MYSELF comp/int NOT <span style="color: #00ffff;">ENDOF</span>
+    DEFAULT DROP function <span style="color: #00ffff;">ENDCASE ;</span>
+
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-10-5" class="outline-4">
+<h4 id="sec-1-10-5"><span class="section-number-4">1.10.5</span> block 2013 - term</h4>
+<div class="outline-text-4" id="text-1-10-5">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">term </span>factor
+  <span style="color: #00ffff;">BEGIN </span>type @
+    <span style="color: #00ffff;">CASE </span>3 OF next factor comp/int *   <span style="color: #00ffff;">ENDOF</span>
+         <span style="color: #7fffd4;">4 </span>OF next factor comp/int /   <span style="color: #00ffff;">ENDOF</span>
+         <span style="color: #7fffd4;">5 </span>OF next factor comp/int MOD <span style="color: #00ffff;">ENDOF</span>
+         <span style="color: #7fffd4;">6 </span>OF next factor comp/int AND <span style="color: #00ffff;">ENDOF</span>
+         DEFAULT DROP EXIT <span style="color: #00ffff;">ENDCASE</span>
+  <span style="color: #7fffd4;">0 </span>UNTIL <span style="color: #00ffff;">;</span>
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-10-6" class="outline-4">
+<h4 id="sec-1-10-6"><span class="section-number-4">1.10.6</span> block 2014 - simple expressions</h4>
+<div class="outline-text-4" id="text-1-10-6">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">simpleexpr
+</span>  type @ <span style="color: #00ffff;">CASE</span>
+    <span style="color: #7fffd4;">1 </span>OF next term ( ignore unary + ) <span style="color: #00ffff;">ENDOF</span>
+    <span style="color: #7fffd4;">2 </span>OF next term comp/int NEGATE <span style="color: #00ffff;">ENDOF</span>
+    DEFAULT DROP term
+  <span style="color: #00ffff;">ENDCASE</span>
+  <span style="color: #00ffff;">BEGIN</span>
+    type @ <span style="color: #00ffff;">CASE</span>
+      <span style="color: #7fffd4;">1 </span>OF next term comp/int +   <span style="color: #00ffff;">ENDOF</span>
+      <span style="color: #7fffd4;">2 </span>OF next term comp/int -   <span style="color: #00ffff;">ENDOF</span>
+      <span style="color: #7fffd4;">7 </span>OF next term comp/int OR  <span style="color: #00ffff;">ENDOF</span>
+      <span style="color: #7fffd4;">8 </span>OF next term comp/int XOR <span style="color: #00ffff;">ENDOF</span>
+      DEFAULT DROP EXIT
+    <span style="color: #00ffff;">ENDCASE</span>
+  <span style="color: #7fffd4;">0 </span>UNTIL <span style="color: #00ffff;">;</span>
+
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-10-7" class="outline-4">
+<h4 id="sec-1-10-7"><span class="section-number-4">1.10.7</span> block 2015 - full expression compiler / interpreter</h4>
+<div class="outline-text-4" id="text-1-10-7">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">expression </span>simpleexpr
+  <span style="color: #00ffff;">BEGIN </span>type @
+    <span style="color: #00ffff;">CASE </span>9 OF  next term comp/int &lt;  <span style="color: #00ffff;">ENDOF</span>
+        <span style="color: #7fffd4;">10 </span>OF  next term comp/int &gt;  <span style="color: #00ffff;">ENDOF</span>
+        <span style="color: #7fffd4;">11 </span>OF  next term comp/int &lt;= <span style="color: #00ffff;">ENDOF</span>
+        <span style="color: #7fffd4;">12 </span>OF  next term comp/int &gt;= <span style="color: #00ffff;">ENDOF</span>
+        <span style="color: #7fffd4;">13 </span>OF  next term comp/int &lt;&gt; <span style="color: #00ffff;">ENDOF</span>
+        <span style="color: #7fffd4;">14 </span>OF  next term comp/int =  <span style="color: #00ffff;">ENDOF</span>
+        DEFAULT DROP EXIT <span style="color: #00ffff;">ENDCASE</span>
+  <span style="color: #7fffd4;">0 </span>UNTIL <span style="color: #00ffff;">;</span>
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-11" class="outline-3">
+<h3 id="sec-1-11"><span class="section-number-3">1.11</span> error handling</h3>
+<div class="outline-text-3" id="text-1-11">
+</div><div id="outline-container-sec-1-11-1" class="outline-4">
+<h4 id="sec-1-11-1"><span class="section-number-4">1.11.1</span> block 2007 - error handling</h4>
+<div class="outline-text-4" id="text-1-11-1">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( error handler. print line, put BLOCK on TOS line # on NOS )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">.line </span>BLOCK <span style="color: #66f;">( fetch block number )</span>
+  SWAP <span style="color: #7fffd4;">64 </span>* + <span style="color: #66f;">( start address of line )</span>
+  <span style="color: #7fffd4;">63 </span>TYPE ;   <span style="color: #66f;">( print 63 characters )</span>
+
+<span style="color: #66f;">( print error message, error number TOS, and abandon )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">perror
+</span>  BLK @ <span style="color: #00ffff;">IF </span>CR <span style="color: #00ff00;">." pascal compilation error .."</span>
+           CR <span style="color: #00ff00;">." block - "</span> BLK ? ." Line - " &gt;in @ <span style="color: #7fffd4;">64 </span>/ DUP .
+           CR . BLK @ .line <span style="color: #00ffff;">THEN</span>
+        <span style="color: #66f;">( point to current pointer position )</span>
+        CR &gt;in @ <span style="color: #7fffd4;">64 </span>MOD SPACES <span style="color: #00ff00;">." ^ "</span>
+        CR <span style="color: #00ff00;">." Error number - "</span> . CR QUIT <span style="color: #00ffff;">;</span>
+
+<span style="color: #66f;">( Check if TOS equals current 'type', error if not )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">?error </span>DUP type @ &lt;&gt; <span style="color: #66f;">( not equal ? )</span>
+         <span style="color: #00ffff;">IF </span>perror ELSE DROP THEN <span style="color: #00ffff;">; </span>--&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-11-2" class="outline-4">
+<h4 id="sec-1-11-2"><span class="section-number-4">1.11.2</span> block 2008 compile / interpret</h4>
+<div class="outline-text-4" id="text-1-11-2">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( compile / execute, depending on state )</span>
+<span style="color: #66f;">( 'comp/int *' is same as 'STATE @ IF COMPILE * ELSE * THEN' . )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">(comp/int) </span>R&gt; DUP 2+ &gt;R
+             @
+             STATE @ <span style="color: #00ffff;">IF </span>, ELSE EXECUTE THEN <span style="color: #00ffff;">;</span>
+
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">comp/int </span>COMPILE (comp/int)   <span style="color: #66f;">( compile runtime code )</span>
+            FIND , <span style="color: #00ffff;">; </span>           <span style="color: #66f;">( and CFA iof next word )</span>
+
+<span style="color: #66f;">( do these things when 'comp/int word' is compiled )</span>
+<span style="color: #00ffff;">IMMEDIATE</span>
+
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-11-3" class="outline-4">
+<h4 id="sec-1-11-3"><span class="section-number-4">1.11.3</span> block 2016 ( resolve forward reference to expression )</h4>
+<div class="outline-text-4" id="text-1-11-3">
+<div class="org-src-container">
+
+<pre class="src src-forth">FIND expression expr
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">( </span>next expression ; <span style="color: #00ffff;">IMMEDIATE</span>
+
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">) </span>. " Improper termination " <span style="color: #00ffff;">;</span>
+
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> PART 2 :</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> block 2017 assignment</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( assignment statement )</span>
+:assign                 <span style="color: #66f;">( we've already found the variable )</span>
+  find @ ,              <span style="color: #66f;">( compile its address )</span>
+  <span style="color: #ffc0cb; font-weight: bold;">next </span>                 <span style="color: #66f;">( we might have [ next )</span>
+  type @ <span style="color: #7fffd4;">35 </span>= if           <span style="color: #66f;">( is it? if so... )</span>
+    <span style="color: #ffc0cb; font-weight: bold;">next </span>expression        <span style="color: #66f;">( read the expression )</span>
+    <span style="color: #7fffd4;">36 </span>?error              <span style="color: #66f;">( followed by ] )</span>
+    compile 2*             <span style="color: #66f;">( double it )</span>
+    compile +              <span style="color: #66f;">( add add to form addr )</span>
+    <span style="color: #ffc0cb; font-weight: bold;">next </span>                  <span style="color: #66f;">( next up should be := )</span>
+  <span style="color: #ffc0cb; font-weight: bold;">then </span>39 ?error        <span style="color: #66f;">( error if it isn't )</span>
+  <span style="color: #ffc0cb; font-weight: bold;">next </span>expression       <span style="color: #66f;">( get the rhs )</span>
+  compile swap          <span style="color: #66f;">( put address on top )</span>
+  compile !             <span style="color: #66f;">( and store it )</span>
+<span style="color: #00ffff;">;</span>
+
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> block 2018 expression printer</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( print out expression, or string )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">writex </span>type @ 31 = <span style="color: #66f;">( do we have a ' ? )</span>
+  <span style="color: #00ffff;">if</span>
+    <span style="color: #00ffff;">[compile] </span><span style="color: #ffffff; font-weight: bold;">." </span>    <span style="color: #66f;">( it's a string then )</span>
+    <span style="color: #00ffff;">next </span>            <span style="color: #66f;">( exit pointing to next )</span>
+  <span style="color: #00ffff;">else</span>
+    expression       <span style="color: #66f;">( an expression )</span>
+    compile .        <span style="color: #66f;">( print result )</span>
+  <span style="color: #00ffff;">then</span>
+<span style="color: #00ffff;">;</span>
+
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> block 2019 write statement</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( write statement )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">write </span>next type @ 15 =  <span style="color: #66f;">( followed by ( ? )</span>
+  <span style="color: #00ffff;">if</span>
+    <span style="color: #00ffff;">next </span>writer           <span style="color: #66f;">( we have an expression then )</span>
+    <span style="color: #00ffff;">begin</span>
+      type @ <span style="color: #7fffd4;">37 </span>=         <span style="color: #66f;">( and optionally another )</span>
+    <span style="color: #00ffff;">while</span>
+      <span style="color: #00ffff;">next </span>writex
+    <span style="color: #00ffff;">repeat</span>
+    <span style="color: #7fffd4;">16 </span>?error             <span style="color: #66f;">( must have a close bracket )</span>
+    <span style="color: #00ffff;">next</span>
+  <span style="color: #00ffff;">then ;</span>
+
+<span style="color: #66f;">( writeln )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">writeln </span>write COMPILE CR ; <span style="color: #66f;">( write and newline )</span>
+
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> block 2020 block compiler</h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( forward reference to statement )</span>
+<span style="color: #ff00ff;">VARIABLE </span><span style="color: #eedd82;">stmt </span>: stmtex stat @ EXECUTE <span style="color: #00ffff;">;</span>
+
+<span style="color: #66f;">( compile multiple statements separated by ; )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">mstat </span>statex   <span style="color: #66f;">( must be at least one statement )</span>
+    <span style="color: #00ffff;">begin</span>
+      type @ <span style="color: #7fffd4;">19 </span>=    <span style="color: #66f;">( is there a semi-colon? )</span>
+    <span style="color: #00ffff;">while</span>
+      stmtex         <span style="color: #66f;">( another statement then )</span>
+    <span style="color: #00ffff;">repeat ;</span>
+
+<span style="color: #66f;">( begin statement, enter after we've got 'begin' )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">begin </span>mstmt
+    <span style="color: #7fffd4;">21 </span>?error        <span style="color: #66f;">( should end with END )</span>
+    <span style="color: #00ffff;">next ;</span>
+
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> block 2021 if stmt compiler</h3>
+<div class="outline-text-3" id="text-2-5">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( if statement, enter after 'if' )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">if </span>next expression <span style="color: #66f;">( need an expression )</span>
+  <span style="color: #7fffd4;">23 </span>?error          <span style="color: #66f;">( followed by THEN )</span>
+  <span style="color: #00ffff;">[compile] </span><span style="color: #ffffff; font-weight: bold;">if </span>      <span style="color: #66f;">( generate IF, same as forth )</span>
+  stmtex
+  type @ <span style="color: #7fffd4;">24 </span>=        <span style="color: #66f;">( do we have an else? .. )</span>
+  <span style="color: #00ffff;">if</span>
+    <span style="color: #00ffff;">[compile] </span><span style="color: #ffffff; font-weight: bold;">else </span>  <span style="color: #66f;">( .. if so )</span>
+    stmtex           <span style="color: #66f;">( compile false statement )</span>
+  <span style="color: #00ffff;">then</span>
+  <span style="color: #00ffff;">[compile] </span><span style="color: #ffffff; font-weight: bold;">then </span>;   <span style="color: #66f;">( finish off total statement )</span>
+
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-6" class="outline-3">
+<h3 id="sec-2-6"><span class="section-number-3">2.6</span> block 2022 while and repeat loops</h3>
+<div class="outline-text-3" id="text-2-6">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( while .. do loop, enter after we've got the 'while' )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">while </span>[COMPILE] BEGIN   <span style="color: #66f;">( start the construct )</span>
+  <span style="color: #00ffff;">next </span>expression         <span style="color: #66f;">( need an expression )</span>
+  <span style="color: #7fffd4;">26 </span>?error               <span style="color: #66f;">( followed by 'do' )</span>
+  <span style="color: #00ffff;">[COMPILE] </span><span style="color: #ffffff; font-weight: bold;">WHILE </span>        <span style="color: #66f;">( forth while is ok )</span>
+  stmtex                  <span style="color: #66f;">( looped statement )</span>
+  <span style="color: #00ffff;">[COMPILE] </span><span style="color: #ffffff; font-weight: bold;">REPEAT </span>;      <span style="color: #66f;">( end the forth structure )</span>
+
+<span style="color: #66f;">( repeat .. until loop, enter here after 'repeat' )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">repeat </span>[COMPILE] BEGIN  <span style="color: #66f;">( start the loop )</span>
+  mstmt                   <span style="color: #66f;">( multiple statements )</span>
+  <span style="color: #7fffd4;">28 </span>?error               <span style="color: #66f;">( expect 'until' )</span>
+  <span style="color: #00ffff;">next </span>expression         <span style="color: #66f;">( need an expression now )</span>
+  <span style="color: #00ffff;">[compile] </span><span style="color: #ffffff; font-weight: bold;">UNTIL </span>;       <span style="color: #66f;">( followed by FORTH UNTIL )</span>
+
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-7" class="outline-3">
+<h3 id="sec-2-7"><span class="section-number-3">2.7</span> block 2023 for loop compiler</h3>
+<div class="outline-text-3" id="text-2-7">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( define a for loop, in forth, using a variable, i.e.
+  step end start variable FOR .. ENDFOR )</span>
+
+<span style="color: #66f;">( runtime FOR action .. )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">(FOR) </span>SWAP OVER !               <span style="color: #66f;">( set variable = start value )</span>
+        R&gt;                        <span style="color: #66f;">( fetch this return adddress )</span>
+        SWAP &gt;R SWAP &gt;R SWAP &gt;R   <span style="color: #66f;">( var, end, start -&gt;R stack  )</span>
+        &gt;R <span style="color: #00ffff;">; </span>                     <span style="color: #66f;">( and replace return address )</span>
+
+<span style="color: #66f;">( compile time FOR action )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">FOR </span>COMPILE (FOR)
+      HERE <span style="color: #00ffff;">; </span>IMMEDIATE            <span style="color: #66f;">( save HERE for ENDFOR )</span>
+
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-8" class="outline-3">
+<h3 id="sec-2-8"><span class="section-number-3">2.8</span> block 2024 ENDFOR</h3>
+<div class="outline-text-3" id="text-2-8">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( ENDFOR runtime action .. the hard part! )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">(ENDF) </span>R&gt;                             <span style="color: #66f;">( fetch return address )</span>
+         R&gt; R&gt;                          <span style="color: #66f;">( step then end values )</span>
+         SWAP DUP R@ +!         <span style="color: #66f;">( add step value into variable )</span>
+         OVER OVER R@ @ SWAP       <span style="color: #66f;">( some stack rearrangement! )</span>
+         0&lt;                 <span style="color: #66f;">( sign of step value determines... )</span>
+         <span style="color: #00ffff;">IF </span>&gt; ELSE &lt; THEN              <span style="color: #66f;">( ..which test to apply )</span>
+         <span style="color: #00ffff;">IF </span>                          <span style="color: #66f;">( has the loop finished? )</span>
+           R&gt; DROP 2DROP           <span style="color: #66f;">( drop everything if it has )</span>
+           2+ &gt;R                 <span style="color: #66f;">( and skip the branch address )</span>
+         <span style="color: #00ffff;">ELSE</span>
+           SWAP &gt;R &gt;R               <span style="color: #66f;">( else resave end and step )</span>
+           @ &gt;R                                     <span style="color: #66f;">( and loop )</span>
+         <span style="color: #00ffff;">THEN </span>;                                        <span style="color: #66f;">( phew! )</span>
+
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">ENDFOR </span>COMPILE (ENDF)                  <span style="color: #66f;">( compile time action )</span>
+         , <span style="color: #00ffff;">; </span>IMMEDIATE --&gt;            <span style="color: #66f;">( compile branch address )</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-9" class="outline-3">
+<h3 id="sec-2-9"><span class="section-number-3">2.9</span> block 2025 pascal for loop</h3>
+<div class="outline-text-3" id="text-2-9">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( now define pascal for loop )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">for </span>next -1 ? error        <span style="color: #66f;">( need a variable name )</span>
+      find @                 <span style="color: #66f;">( save its address on stack )</span>
+      <span style="color: #00ffff;">next </span>39 ?error         <span style="color: #66f;">( next we need := )</span>
+      <span style="color: #00ffff;">next </span>expression        <span style="color: #66f;">( the start value expression )</span>
+      <span style="color: #7fffd4;">33 </span>?error              <span style="color: #66f;">( the next word must be 'to' )</span>
+      <span style="color: #00ffff;">next </span>expression        <span style="color: #66f;">( then end expression )</span>
+      type @ <span style="color: #7fffd4;">34 </span>=            <span style="color: #66f;">( optionally followed by 'by' )</span>
+      <span style="color: #00ffff;">IF </span>next expression     <span style="color: #66f;">( and a step expression )</span>
+      <span style="color: #00ffff;">ELSE </span>COMPILE ! THEN    <span style="color: #66f;">( otherwise step value of +! )</span>
+      <span style="color: #7fffd4;">26 </span>?error              <span style="color: #66f;">( must have 'do' next )</span>
+      COMPILE ROT COMPILE ROT COMPILE SWAP <span style="color: #66f;">( rearrange )</span>
+      ,                      <span style="color: #66f;">( compile variable address )</span>
+      <span style="color: #00ffff;">[COMPILE] </span><span style="color: #ffffff; font-weight: bold;">FOR </span>         <span style="color: #66f;">( then forth for )</span>
+      statex                 <span style="color: #66f;">( a looped statement )</span>
+      <span style="color: #00ffff;">[COMPILE] </span><span style="color: #ffffff; font-weight: bold;">ENDFOR </span>;     <span style="color: #66f;">( and we've finished )</span>
+--&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-10" class="outline-3">
+<h3 id="sec-2-10"><span class="section-number-3">2.10</span> block 2026 &lt;statement&gt; rule compiler</h3>
+<div class="outline-text-3" id="text-2-10">
+<div class="org-src-container">
+
+<pre class="src src-forth"><span style="color: #66f;">( statement compiler )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">statement </span>next   <span style="color: #66f;">( get the first thing )</span>
+  type @
+  <span style="color: #00ffff;">CASE </span>-1 OF assign   <span style="color: #00ffff;">ENDOF</span>
+       <span style="color: #7fffd4;">20 </span>OF begin    <span style="color: #00ffff;">ENDOF</span>
+       <span style="color: #7fffd4;">22 </span>OF if       <span style="color: #00ffff;">ENDOF</span>
+       <span style="color: #7fffd4;">25 </span>OF while    <span style="color: #00ffff;">ENDOF</span>
+       <span style="color: #7fffd4;">27 </span>OF repeat   <span style="color: #00ffff;">ENDOF</span>
+       <span style="color: #7fffd4;">29 </span>OF write    <span style="color: #00ffff;">ENDOF</span>
+       <span style="color: #7fffd4;">30 </span>OF writeln  <span style="color: #00ffff;">ENDOF</span>
+       <span style="color: #7fffd4;">-2 </span>OF 1 perror ENDOF <span style="color: #66f;">( cannot be a constant )</span>
+     DEFAULT words swap U&lt;  <span style="color: #66f;">( is it a forth word? )</span>
+        <span style="color: #00ffff;">IF </span>function ELSE    <span style="color: #66f;">( treat as a function call )</span>
+           <span style="color: #7fffd4;">1 </span>perror THEN    <span style="color: #66f;">( else a syntax error )</span>
+     <span style="color: #00ffff;">ENDCASE</span>
+<span style="color: #00ffff;">; </span>--&gt;
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2-10-1" class="outline-4">
+<h4 id="sec-2-10-1"><span class="section-number-4">2.10.1</span> block 2027 {pascal .. }</h4>
+<div class="outline-text-4" id="text-2-10-1">
+<div class="org-src-container">
+
+<pre class="src src-forth">FIND statement stmt !  <span style="color: #ffc0cb; font-weight: bold;">{ </span><span style="color: #eedd82;">resolve forward reference }</span>
+
+<span style="color: #66f;">( compile pascal statement in forth colon definition )</span>
+<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">{pascal </span>STATE @ 0= IF <span style="color: #00ff00;">." not available outside colon "</span>
+                        <span style="color: #00ff00;">." definition "</span> CR QUIT <span style="color: #00ffff;">THEN</span>
+          statement     <span style="color: #66f;">( call the compiler )</span>
+          <span style="color: #7fffd4;">18 </span>?error     <span style="color: #66f;">( exit on curly bracket )</span>
+<span style="color: #00ffff;">; IMMEDIATE</span>
+
+<span style="color: #66f;">( ------ end of pascal extensions -------------------- )</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> &#x2013; retroforth phrasebook --</h2>
+<div class="outline-text-2" id="text-3">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left"/>
+
+<col class="left"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="left">CREATE</td>
+<td class="left">create</td>
+</tr>
+
+<tr>
+<td class="left">FIND</td>
+<td class="left">find</td>
+</tr>
+
+<tr>
+<td class="left">&#xa0;</td>
+<td class="left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</body>
+</html>

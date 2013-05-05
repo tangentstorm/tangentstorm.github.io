@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>bled : a dvorak-oriented fork of the retro editor</title>
+<!-- 2013-05-05 Sun 09:30 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal"/>
+<link rel="stylesheet" type="text/css" href="etc/style.css">
+
+<script type="text/javascript" src="http://orgmode.org/org-info.js">
+/**
+ *
+ * @source: http://orgmode.org/org-info.js
+ *
+ * @licstart  The following is the entire license notice for the
+ *  JavaScript code in http://orgmode.org/org-info.js.
+ *
+ * Copyright (C) 2012-2013  Sebastian Rose
+ *
+ *
+ * The JavaScript code in this tag is free software: you can
+ * redistribute it and/or modify it under the terms of the GNU
+ * General Public License (GNU GPL) as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option)
+ * any later version.  The code is distributed WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+ *
+ * As additional permission under GNU GPL version 3 section 7, you
+ * may distribute non-source (e.g., minimized or compacted) forms of
+ * that code without the copy of the GNU GPL normally required by
+ * section 4, provided you include this license notice and a URL
+ * through which recipients can access the Corresponding Source.
+ *
+ * @licend  The above is the entire license notice
+ * for the JavaScript code in http://orgmode.org/org-info.js.
+ *
+ */
+</script>
+
+<script type="text/javascript">
+
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+
+<!--/*--><![CDATA[/*><!--*/
+org_html_manager.set("TOC_DEPTH", "3");
+org_html_manager.set("LINK_HOME", "");
+org_html_manager.set("LINK_UP", "");
+org_html_manager.set("LOCAL_TOC", "1");
+org_html_manager.set("VIEW_BUTTONS", "0");
+org_html_manager.set("MOUSE_HINT", "underline");
+org_html_manager.set("FIXED_TOC", "0");
+org_html_manager.set("TOC", "0");
+org_html_manager.set("VIEW", "info");
+org_html_manager.setup();  // activate after the parameters are set
+/*]]>*///-->
+</script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">bled : a dvorak-oriented fork of the retro editor</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. keymap</a></li>
+<li><a href="#sec-2">2. implementation</a>
+<ul>
+<li><a href="#sec-2-1">2.1. variables, etc.</a></li>
+<li><a href="#sec-2-2">2.2. check boundaries</a></li>
+<li><a href="#sec-2-3">2.3. display a block</a></li>
+<li><a href="#sec-2-4">2.4. input processing</a></li>
+<li><a href="#sec-2-5">2.5. various support bits</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. public interface</a></li>
+<li><a href="#sec-4">4. keymap</a></li>
+<li><a href="#sec-5">5. OUTPUT bled.rx</a></li>
+<li><a href="#sec-6">6. <code>[0/0]</code> issues list</a>
+<ul>
+<li><a href="#sec-6-1">6.1. note the TAB&rarr; ESC change in main retro docs..</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> keymap</h2>
+<div class="outline-text-2" id="text-1">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left"/>
+
+<col class="left"/>
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">Key</th>
+<th scope="col" class="left">Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">c</td>
+<td class="left">Move cursor up</td>
+</tr>
+
+<tr>
+<td class="left">h</td>
+<td class="left">Move cursor left</td>
+</tr>
+
+<tr>
+<td class="left">t</td>
+<td class="left">Move cursor down</td>
+</tr>
+
+<tr>
+<td class="left">r</td>
+<td class="left">Move cursor right</td>
+</tr>
+
+<tr>
+<td class="left">e</td>
+<td class="left">Evaluate current block</td>
+</tr>
+
+<tr>
+<td class="left">E</td>
+<td class="left">Evaluate all blocks</td>
+</tr>
+
+<tr>
+<td class="left">m</td>
+<td class="left">Move cursor to start of next line</td>
+</tr>
+
+<tr>
+<td class="left">C</td>
+<td class="left">Move cursor to top line of block</td>
+</tr>
+
+<tr>
+<td class="left">H</td>
+<td class="left">Move cursor to start of current line</td>
+</tr>
+
+<tr>
+<td class="left">T</td>
+<td class="left">Move cursor to last line of block</td>
+</tr>
+
+<tr>
+<td class="left">S</td>
+<td class="left">Move cursor to end of current line</td>
+</tr>
+
+<tr>
+<td class="left">M</td>
+<td class="left">Center cursor on current line</td>
+</tr>
+
+<tr>
+<td class="left">z</td>
+<td class="left">Exit RxE</td>
+</tr>
+
+<tr>
+<td class="left">Esc</td>
+<td class="left">Switch between edit and command mode</td>
+</tr>
+
+<tr>
+<td class="left">{</td>
+<td class="left">Load "blocks"</td>
+</tr>
+
+<tr>
+<td class="left">}</td>
+<td class="left">Save "blocks"</td>
+</tr>
+
+<tr>
+<td class="left">[</td>
+<td class="left">Switch to previous block</td>
+</tr>
+
+<tr>
+<td class="left">]</td>
+<td class="left">Switch to next block</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> implementation</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> variables, etc.</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="private"><span style="color: #c63; font-weight: bold;">:</span> 2/ <span style="color: #32cd32;">1</span> <span style="color: #00ffff;">&gt;&gt;</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #32cd32;">64</span> <span style="color: #c63; font-weight: bold;">constant</span> cols
+<span style="color: #32cd32;">16</span> <span style="color: #c63; font-weight: bold;">constant</span> rows
+cols rows <span style="color: #00ffff;">*</span> <span style="color: #c63; font-weight: bold;">constant</span> blksz
+
+<span style="color: #c63; font-weight: bold;">variables|</span> buffer count <span style="color: #c63; font-weight: bold;">|</span>
+<span style="color: #c63; font-weight: bold;">:</span> restore <span style="color: #66f;">( -   )</span> &amp;getc <span style="color: #c63; font-weight: bold;">:devector</span> ok <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> get     <span style="color: #66f;">( -c  )</span> @buffer <span style="color: #00ffff;">@</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> <span style="color: #ffd700; font-weight: bold;">next</span>    <span style="color: #66f;">( -c  )</span> @count <span style="color: #00ffff;">[</span> count <span style="color: #00ffff;">--</span> get buffer <span style="color: #00ffff;">++</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> <span style="color: #32cd32;">32</span> restore <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> replace <span style="color: #66f;">( -   )</span> &amp;next &amp;getc <span style="color: #c63; font-weight: bold;">:is</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> <span style="color: #c63; font-weight: bold;">eval</span>    <span style="color: #66f;">( an- )</span> !count !buffer replace <span style="color: #c63; font-weight: bold;">;</span>
+
+<span style="color: #c63; font-weight: bold;">variables|</span> #blocks offset blk line column mode active <span style="color: #c63; font-weight: bold;">|</span>
+<span style="color: #c63; font-weight: bold;">:</span> toBlock   blksz <span style="color: #00ffff;">*</span> @offset <span style="color: #00ffff;">+</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> thisBlock @blk toBlock <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> toLine    cols <span style="color: #00ffff;">*</span> thisBlock <span style="color: #00ffff;">+</span> <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> check boundaries</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="private"><span style="color: #66f;">( check boundaries ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ )</span>
+<span style="color: #c63; font-weight: bold;">:</span> top <span style="color: #66f;">( - )</span>  <span style="color: #32cd32;">0</span> !line <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> bot <span style="color: #66f;">( - )</span> rows <span style="color: #00ffff;">1-</span> !line <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> beg <span style="color: #66f;">( - )</span>  <span style="color: #32cd32;">0</span> !column <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> end <span style="color: #66f;">( - )</span> cols <span style="color: #00ffff;">1-</span> !column <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> mid <span style="color: #66f;">( - )</span> rows 2/ !column <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> 1st <span style="color: #66f;">( - )</span>  <span style="color: #32cd32;">0</span> !blk <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> bounds <span style="color: #66f;">( - )</span>
+  @column <span style="color: #32cd32;">-1</span> <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> end line <span style="color: #00ffff;">--</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">ifTrue</span>
+  @column cols <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> beg line <span style="color: #00ffff;">++</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">ifTrue</span>
+  @line   <span style="color: #32cd32;">-1</span> <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> top blk  <span style="color: #00ffff;">--</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">ifTrue</span>
+  @line   rows <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> bot blk  <span style="color: #00ffff;">++</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">ifTrue</span>
+  @blk    <span style="color: #32cd32;">-1</span> <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> 1st         <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">ifTrue</span>
+  @blk    @#blocks <span style="color: #00ffff;">&gt;=</span> <span style="color: #00ffff;">[</span> blk <span style="color: #00ffff;">--</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">ifTrue</span> <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> display a block</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="private"><span style="color: #66f;">( display a block ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ )</span>
+<span style="color: #c63; font-weight: bold;">:</span> ds/rows rows <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">dup</span> cols <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">@</span> putc <span style="color: #00ffff;">]</span> ^types'BUFFER <span style="color: #00ffff;">each@</span> cols <span style="color: #00ffff;">+</span> cr <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">times</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> mode?   @mode <span style="color: #00ffff;">[</span> <span style="color: #00ff00;">"INS"</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> <span style="color: #00ff00;">"CMD"</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> .block  @column @line @blk mode? <span style="color: #00ff00;">"(%s) #%d - %d:%d  "</span> puts <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> bar     cols <span style="color: #00ffff;">[</span> '- putc <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">times</span> cr <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> vb      @blk toBlock ds/rows <span style="color: #00ffff;">drop</span> bar .block <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #66f;">( visualize block ? )</span>
+<span style="color: #c63; font-weight: bold;">:</span> (v)     <span style="color: #66f;">(   -   )</span> clear vb <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> pos     <span style="color: #66f;">(   -cl )</span> @column @line <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> get     <span style="color: #66f;">( cl-a  )</span> toLine <span style="color: #00ffff;">+</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> va      <span style="color: #66f;">(  a-va )</span> <span style="color: #00ffff;">dup</span> <span style="color: #00ffff;">@</span> <span style="color: #00ffff;">swap</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> c!      <span style="color: #66f;">(  a-   )</span> '* <span style="color: #00ffff;">swap</span> <span style="color: #00ffff;">!</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> show    <span style="color: #66f;">( va-   )</span> <span style="color: #00ffff;">dup</span> c! (v) <span style="color: #00ffff;">!</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> display <span style="color: #66f;">(   -   )</span> bounds pos get va show <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> input processing</h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="private"><span style="color: #66f;">( input processing ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ )</span>
+
+<span style="color: #32cd32;">27</span> <span style="color: #c63; font-weight: bold;">constant</span> Esc
+
+<span style="color: #c63; font-weight: bold;">:</span> advance? <span style="color: #66f;">(  -  )</span> line <span style="color: #00ffff;">++</span> @line rows <span style="color: #00ffff;">&gt;=</span> <span style="color: #00ffff;">[</span> <span style="color: #32cd32;">0</span> !line blk <span style="color: #00ffff;">++</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">ifTrue</span> <span style="color: #32cd32;">0</span> !column <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> del <span style="color: #66f;">( - )</span>
+  @column <span style="color: #00ffff;">dup</span>
+  <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">dup</span> cols <span style="color: #00ffff;">=</span>
+    <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">drop</span> !column display    <span style="color: #32cd32;">0</span> <span style="color: #00ffff;">]</span>
+    <span style="color: #00ffff;">[</span> <span style="color: #32cd32;">32</span> <span style="color: #00ffff;">over</span> @line get <span style="color: #00ffff;">!</span> <span style="color: #00ffff;">1+</span> <span style="color: #32cd32;">-1</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span>
+  <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">while</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> remap    <span style="color: #66f;">( c-c )</span>
+  <span style="color: #00ffff;">dup</span>  <span style="color: #32cd32;">9</span> <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">drop</span> Esc <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">ifTrue</span>
+  <span style="color: #00ffff;">dup</span> <span style="color: #32cd32;">13</span> <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">drop</span>  <span style="color: #32cd32;">0</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">ifTrue</span>
+  <span style="color: #00ffff;">dup</span> <span style="color: #32cd32;">10</span> <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">drop</span>  <span style="color: #32cd32;">0</span> advance? display <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">ifTrue</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> input    <span style="color: #66f;">(  -  )</span>
+  <span style="color: #ffd700; font-weight: bold;">repeat</span>
+    display
+    @mode <span style="color: #ffd700; font-weight: bold;">0;</span> <span style="color: #00ffff;">drop</span>
+    getc <span style="color: #ffd700; font-weight: bold;">0;</span>
+    <span style="color: #00ffff;">dup</span> Esc <span style="color: #00ffff;">&lt;&gt;</span> <span style="color: #ffd700; font-weight: bold;">0;</span> <span style="color: #00ffff;">drop</span>
+    <span style="color: #00ffff;">dup</span>  <span style="color: #32cd32;">8</span> <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">drop</span> column <span style="color: #00ffff;">--</span> display <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> pos get <span style="color: #00ffff;">!</span> column <span style="color: #00ffff;">++</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span>
+  <span style="color: #ffd700; font-weight: bold;">again</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> rxe.in   <span style="color: #66f;">(  -c )</span> mode <span style="color: #00ffff;">on</span> remapping <span style="color: #00ffff;">[</span> remapping <span style="color: #00ffff;">off</span> input <span style="color: #00ffff;">]</span> preserve mode <span style="color: #00ffff;">off</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> match    <span style="color: #66f;">( c-  )</span> <span style="color: #00ff00;">"$$_"</span> <span style="color: #00ffff;">dup</span> <span style="color: #00ffff;">[</span> <span style="color: #32cd32;">2</span> <span style="color: #00ffff;">+</span> <span style="color: #00ffff;">!</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">dip</span> <span style="color: #c63; font-weight: bold;">find</span> <span style="color: #00ffff;">[</span> @d-&gt;xt <span style="color: #c63; font-weight: bold;">do</span> <span style="color: #00ffff;">]</span> &amp;drop <span style="color: #ffd700; font-weight: bold;">if</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> edit?    <span style="color: #66f;">( c-c )</span> <span style="color: #00ffff;">dup</span> Esc <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> rxe.in <span style="color: #00ffff;">drop</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">ifTrue</span> <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> various support bits</h3>
+<div class="outline-text-3" id="text-2-5">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="private"><span style="color: #66f;">( various support bits  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ )</span>
+<span style="color: #c63; font-weight: bold;">:</span> new        <span style="color: #66f;">(  - )</span> @offset <span style="color: #32cd32;">32</span> blksz @#blocks <span style="color: #00ffff;">*</span> <span style="color: #00ffff;">fill</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> e          <span style="color: #66f;">(  - )</span> thisBlock blksz <span style="color: #c63; font-weight: bold;">eval</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> ea         <span style="color: #66f;">(  - )</span> @offset @#blocks blksz <span style="color: #00ffff;">*</span> <span style="color: #c63; font-weight: bold;">eval</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> run        <span style="color: #66f;">(  - )</span>
+  active <span style="color: #00ffff;">on</span> &amp;remap &amp;remapKeys <span style="color: #c63; font-weight: bold;">:is</span> clear
+  <span style="color: #00ffff;">[</span> display getc edit? match @active <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">while</span> &amp;remapKeys <span style="color: #c63; font-weight: bold;">:devector</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> min-wh     <span style="color: #66f;">( -nn )</span> rows <span style="color: #32cd32;">2</span> <span style="color: #00ffff;">+</span> cols <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> public interface</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="public"><span style="color: #c63; font-weight: bold;">:</span> setBlocks <span style="color: #66f;">( n- )</span> !#blocks <span style="color: #00ffff;">here</span> blksz @#blocks <span style="color: #00ffff;">*</span> <span style="color: #00ffff;">allot</span> !offset new <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> edit <span style="color: #66f;">( - )</span>
+  min-wh <span style="color: #00ffff;">push</span> <span style="color: #00ffff;">push</span>     @ch <span style="color: #00ffff;">pop</span> <span style="color: #00ffff;">&gt;=</span> @cw <span style="color: #00ffff;">pop</span> <span style="color: #00ffff;">&gt;=</span> <span style="color: #00ffff;">and</span>
+  &amp;run <span style="color: #00ffff;">[</span> min-wh <span style="color: #00ffff;">swap</span> <span style="color: #00ff00;">"requires an "</span> puts putn <span style="color: #00ff00;">"x"</span> puts putn
+         <span style="color: #00ff00;">"or greater display, sorry!\n"</span> puts <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span> <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> keymap</h2>
+<div class="outline-text-2" id="text-4">
+<div class="org-src-container">
+
+<pre class="src src-retro" id="public"><span style="color: #66f;">( dvorak keymap )</span>
+<span style="color: #c63; font-weight: bold;">:</span> $$c line <span style="color: #00ffff;">--</span> <span style="color: #c63; font-weight: bold;">;</span>      <span style="color: #c63; font-weight: bold;">:</span> $$C top <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> $$h column <span style="color: #00ffff;">--</span> <span style="color: #c63; font-weight: bold;">;</span>    <span style="color: #c63; font-weight: bold;">:</span> $$H beg <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> $$t line <span style="color: #00ffff;">++</span> <span style="color: #c63; font-weight: bold;">;</span>      <span style="color: #c63; font-weight: bold;">:</span> $$T bot <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> $$n column <span style="color: #00ffff;">++</span> <span style="color: #c63; font-weight: bold;">;</span>    <span style="color: #c63; font-weight: bold;">:</span> $$N end <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> $$m $$t beg <span style="color: #c63; font-weight: bold;">;</span>      <span style="color: #c63; font-weight: bold;">:</span> $$M mid <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> $$d del <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> $$[ blk <span style="color: #00ffff;">--</span> <span style="color: #c63; font-weight: bold;">;</span>       <span style="color: #c63; font-weight: bold;">:</span> $$] blk <span style="color: #00ffff;">++</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> $${ @offset <span style="color: #00ff00;">"blocks"</span> ^files'slurp <span style="color: #00ffff;">drop</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> $$} @offset @#blocks @blksz <span style="color: #00ffff;">*</span> <span style="color: #00ff00;">"blocks"</span> ^files'spew <span style="color: #00ffff;">drop</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> $$e active <span style="color: #00ffff;">off</span>  e <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> $$E active <span style="color: #00ffff;">off</span> ea <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> $$z active <span style="color: #00ffff;">off</span>    <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> OUTPUT bled.rx</h2>
+<div class="outline-text-2" id="text-5">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">needs</span> <span style="color: #ff6347;">files'</span>
+<span style="color: #c63; font-weight: bold;">chain:</span> <span style="color: #ff6347;">editor'</span>
+<span style="color: #c63; font-weight: bold;">{{</span>
+  &lt;&lt;private&gt;&gt;
+<span style="color: #c63; font-weight: bold;">---reveal---</span>
+  &lt;&lt;public&gt;&gt;
+<span style="color: #c63; font-weight: bold;">}}</span>
+  <span style="color: #32cd32;">128</span> setBlocks
+<span style="color: #c63; font-weight: bold;">;chain</span>
+
+<span style="color: #c63; font-weight: bold;">global</span>
+<span style="color: #c63; font-weight: bold;">with</span> <span style="color: #ff6347;">editor'</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> <code>[0/0]</code> issues list</h2>
+<div class="outline-text-2" id="text-6">
+</div><div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><span class="section-number-3">6.1</span> <span class="todo TODO">TODO</span> note the TAB&rarr; ESC change in main retro docs..</h3>
+</div>
+</div>
+</div>
+</body>
+</html>

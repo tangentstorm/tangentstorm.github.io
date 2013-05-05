@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>retro pascal</title>
+<!-- 2013-05-05 Sun 09:30 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal"/>
+<link rel="stylesheet" type="text/css" href="etc/style.css">
+
+<script type="text/javascript" src="http://orgmode.org/org-info.js">
+/**
+ *
+ * @source: http://orgmode.org/org-info.js
+ *
+ * @licstart  The following is the entire license notice for the
+ *  JavaScript code in http://orgmode.org/org-info.js.
+ *
+ * Copyright (C) 2012-2013  Sebastian Rose
+ *
+ *
+ * The JavaScript code in this tag is free software: you can
+ * redistribute it and/or modify it under the terms of the GNU
+ * General Public License (GNU GPL) as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option)
+ * any later version.  The code is distributed WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+ *
+ * As additional permission under GNU GPL version 3 section 7, you
+ * may distribute non-source (e.g., minimized or compacted) forms of
+ * that code without the copy of the GNU GPL normally required by
+ * section 4, provided you include this license notice and a URL
+ * through which recipients can access the Corresponding Source.
+ *
+ * @licend  The above is the entire license notice
+ * for the JavaScript code in http://orgmode.org/org-info.js.
+ *
+ */
+</script>
+
+<script type="text/javascript">
+
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+
+<!--/*--><![CDATA[/*><!--*/
+org_html_manager.set("TOC_DEPTH", "3");
+org_html_manager.set("LINK_HOME", "");
+org_html_manager.set("LINK_UP", "");
+org_html_manager.set("LOCAL_TOC", "1");
+org_html_manager.set("VIEW_BUTTONS", "0");
+org_html_manager.set("MOUSE_HINT", "underline");
+org_html_manager.set("FIXED_TOC", "0");
+org_html_manager.set("TOC", "0");
+org_html_manager.set("VIEW", "info");
+org_html_manager.setup();  // activate after the parameters are set
+/*]]>*///-->
+</script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">retro pascal</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. DRAFT retro pascal</a>
+<ul>
+<li><a href="#sec-1-1">1.1. the pascal stack</a></li>
+<li><a href="#sec-1-2">1.2. pascal "registers"</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. the ngaro vm doesn't offer any special registers, so 'registers' would just be fixed locations in ram.</a></li>
+<li><a href="#sec-1-2-2">1.2.2. special purpose registers</a></li>
+<li><a href="#sec-1-2-3">1.2.3. general purpose registers for variables? : <i>maybe</i></a></li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. calling conventions</a></li>
+<li><a href="#sec-1-4">1.4. integration with retroforth ( for interactive code )</a>
+<ul>
+<li><a href="#sec-1-4-1">1.4.1. calling pascal code from retro</a></li>
+<li><a href="#sec-1-4-2">1.4.2. calling retro from pascal</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> DRAFT retro pascal</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+A small pascal implementation that works with retro and runs on the ngaro virtual machine.
+</p>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> the pascal stack</h3>
+<div class="outline-text-3" id="text-1-1">
+<ul class="org-ul">
+<li>the pascal stack starts at end of ram and grows backward
+</li>
+<li>special variable <code>BASE</code> works like <code>HERE</code> but but gets smaller
+</li>
+<li><code>STACK</code> &lt; <code>HERE</code> indicates a potential stack or heap overflow
+</li>
+<li>if the halting problem is unanswerable for the pascal code <i>and</i> it can grow dynamically, then the stack manager needs to check for overflows on each call.
+</li>
+<li>else we can precompute up front and not worry about it ( In theory, anyway. it would require some analysis to actually do it of course. )
+</li>
+<li>if using retro routines inside pascal, then retro needs to check for heap overflows too.
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> pascal "registers"</h3>
+<div class="outline-text-3" id="text-1-2">
+</div><div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> the ngaro vm doesn't offer any special registers, so 'registers' would just be fixed locations in ram.</h4>
+</div>
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> special purpose registers</h4>
+<div class="outline-text-4" id="text-1-2-2">
+<dl class="org-dl">
+<dt> <code>STACK</code> </dt><dd>holds the depth of the stack
+</dd>
+<dt> (no term) </dt><dd>maybe also:
+<dl class="org-dl">
+<dt> <code>BASE</code> </dt><dd>stores old value of <code>STACK</code> during procedure
+</dd>
+<dt> <code>RESV</code> </dt><dd>holds the result variable?
+</dd>
+<dt> <code>SELF</code> </dt><dd>hold a reference to <code>self</code> in object methods
+</dd>
+</dl>
+</dd>
+</dl>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-3" class="outline-4">
+<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> general purpose registers for variables? : <i>maybe</i></h4>
+<div class="outline-text-4" id="text-1-2-3">
+</div><ol class="org-ol"><li>argument for using registers:<br/><div class="outline-text-5" id="text-1-2-3-1">
+<ul class="org-ul">
+<li>Using ram to store variables probably makes sense, compared to doing a bunch of shuffling on retro's data stack.
+</li>
+<li>Using a <i>fixed location</i> in ram (a register) would prevent the need for a lot of pointer arithmetic when looking things up in the pascal stack.
+</li>
+</ul>
+</div>
+</li>
+
+<li>argument against:<br/><div class="outline-text-5" id="text-1-2-3-2">
+<ul class="org-ul">
+<li>Register values would need to be pushed and popped to call subroutines anyway, though a smart compiler could probably minimize this.
+</li>
+</ul>
+</div>
+</li></ol>
+</div>
+</div>
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> calling conventions</h3>
+<div class="outline-text-3" id="text-1-3">
+<ul class="org-ul">
+<li>return stack is used as normal
+</li>
+<li>first argument goes in TOS, second argument goes in NOS
+( TOS and NOS refer to the normal retro data stack )
+</li>
+<li>further arguments are moved to the pascal stack
+</li>
+<li>local variables use the pascal stack
+</li>
+<li>arguments are consumed and result ( if any ) will be on TOS
+<ul class="org-ul">
+<li>this means the effect on the retro data stack is always <code>( arg\ast - )</code> or <code>( arg\ast - result )</code>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> integration with retroforth ( for interactive code )</h3>
+<div class="outline-text-3" id="text-1-4">
+</div><div id="outline-container-sec-1-4-1" class="outline-4">
+<h4 id="sec-1-4-1"><span class="section-number-4">1.4.1</span> calling pascal code from retro</h4>
+<div class="outline-text-4" id="text-1-4-1">
+<ul class="org-ul">
+<li>in retro's dict, when calling procedures, maybe have <code>NAME</code> to pull args directly from stack and <code>NAME(</code> to precompile arguments separated by commas and ending with <code>)</code>.
+</li>
+<li>use word <code>PASCAL</code> to parse and execute a single pascal statement
+<ul class="org-ul">
+<li><code>PASCAL INC(x);</code>
+</li>
+<li><code>PASCAL BEGIN</code> &#x2026; <code>END;</code>
+</li>
+</ul>
+</li>
+<li>use <code>PASCAL MODULE</code> &#x2026; <code>END</code> to define a module ( <code>chain</code> and <code>{{</code> &#x2026; <code>}}</code> in retro )
+</li>
+<li>use <code>PASCAL PROGRAM</code> &#x2026; <code>END</code> to define a module and <i>also</i> a single word to trigger execution of the module's <code>BEGIN</code> &#x2026; <code>END</code> block.
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-4-2" class="outline-4">
+<h4 id="sec-1-4-2"><span class="section-number-4">1.4.2</span> calling retro from pascal</h4>
+<div class="outline-text-4" id="text-1-4-2">
+<ul class="org-ul">
+<li>call any retro word as a procedure or function with pascal syntax, provided it's a valid pascal identifier.
+<ul class="org-ul">
+<li>probably would not be type checked?
+</li>
+</ul>
+</li>
+<li>allow arbitrary retro code (using retro syntax) via <code>RETRO</code> &#x2026; <code>END;</code> statement ( any retro code would be valid, except of course a word called <code>END</code> )
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

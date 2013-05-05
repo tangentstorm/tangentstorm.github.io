@@ -1,0 +1,710 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>retro from the top down</title>
+<!-- 2013-05-05 Sun 09:30 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="charles childers (??) ( bottom-up commentary )"/>
+<link rel="stylesheet" type="text/css" href="etc/style.css">
+
+<script type="text/javascript" src="http://orgmode.org/org-info.js">
+/**
+ *
+ * @source: http://orgmode.org/org-info.js
+ *
+ * @licstart  The following is the entire license notice for the
+ *  JavaScript code in http://orgmode.org/org-info.js.
+ *
+ * Copyright (C) 2012-2013  Sebastian Rose
+ *
+ *
+ * The JavaScript code in this tag is free software: you can
+ * redistribute it and/or modify it under the terms of the GNU
+ * General Public License (GNU GPL) as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option)
+ * any later version.  The code is distributed WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+ *
+ * As additional permission under GNU GPL version 3 section 7, you
+ * may distribute non-source (e.g., minimized or compacted) forms of
+ * that code without the copy of the GNU GPL normally required by
+ * section 4, provided you include this license notice and a URL
+ * through which recipients can access the Corresponding Source.
+ *
+ * @licend  The above is the entire license notice
+ * for the JavaScript code in http://orgmode.org/org-info.js.
+ *
+ */
+</script>
+
+<script type="text/javascript">
+
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+
+<!--/*--><![CDATA[/*><!--*/
+org_html_manager.set("TOC_DEPTH", "3");
+org_html_manager.set("LINK_HOME", "");
+org_html_manager.set("LINK_UP", "");
+org_html_manager.set("LOCAL_TOC", "1");
+org_html_manager.set("VIEW_BUTTONS", "0");
+org_html_manager.set("MOUSE_HINT", "underline");
+org_html_manager.set("FIXED_TOC", "0");
+org_html_manager.set("TOC", "0");
+org_html_manager.set("VIEW", "info");
+org_html_manager.setup();  // activate after the parameters are set
+/*]]>*///-->
+</script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">retro from the top down</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. part 1 : overview</a>
+<ul>
+<li><a href="#sec-1-1">1.1. quick intro to retro</a></li>
+<li><a href="#sec-1-2">1.2. the listener</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. <code>listen</code> the word that does what you ask it to</a></li>
+<li><a href="#sec-1-2-2">1.2.2. What do all those words mean?</a></li>
+<li><a href="#sec-1-2-3">1.2.3. Understanding the stack comment.</a></li>
+<li><a href="#sec-1-2-4">1.2.4. Summary of <code>listen</code></a></li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. stepwise refinement and recursive descent</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. part 2 : recursive descent</a>
+<ul>
+<li><a href="#sec-2-1">2.1. <code>listen</code> &gt; <code>: ("colon")</code> the word that makes new words</a>
+<ul>
+<li><a href="#sec-2-1-1">2.1.1. summary</a></li>
+<li><a href="#sec-2-1-2">2.1.2. breakdown</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-2">2.2. <code>:</code> &gt; <code>t:</code> the compiler's compiler</a></li>
+<li><a href="#sec-2-3">2.3. <code>t:</code> &gt; <code>label:</code> </a></li>
+<li><a href="#sec-2-4">2.4. <code>t:</code> &gt; <code>&amp;m,</code> </a></li>
+<li><a href="#sec-2-5">2.5. <code>t:</code> &gt; <code>reclass</code></a></li>
+<li><a href="#sec-2-6">2.6. <code>listen</code> &gt; <code>( ("paren")</code> the word that doesn't care what you say</a></li>
+<li><a href="#sec-2-7">2.7. <code>:</code> &gt; <code>create</code> </a></li>
+<li><a href="#sec-2-8">2.8. <code>:</code> &gt; =' the quote</a></li>
+<li><a href="#sec-2-9">2.9. <code>listen</code> &gt; <code>.word</code> </a></li>
+<li><a href="#sec-2-10">2.10. <code>listen</code> &gt; <code>#</code> proto literals</a></li>
+<li><a href="#sec-2-11">2.11. <code>listen</code> &gt; <code>last</code> at <code>last</code>, you find the words</a></li>
+<li><a href="#sec-2-12">2.12. <code>listen</code> &gt; <code>@,=</code> assemble and follow me</a></li>
+<li><a href="#sec-2-13">2.13. <code>listen</code> &gt; <code>d-&gt;class</code> pointer arithmetic</a></li>
+<li><a href="#sec-2-14">2.14. <code>listen</code> &gt; =!, take that, NOS!</a></li>
+<li><a href="#sec-2-15">2.15. <code>listen</code> &gt; <code>]]</code> </a></li>
+<li><a href="#sec-2-16">2.16. <code>listen</code> &gt; <code>vector?</code>  <code>vector?</code> <del>I hardly know her.</del></a></li>
+<li><a href="#sec-2-17">2.17. <code>listen</code> &gt; <code>;</code> STOP THE PRESS!</a></li>
+<li><a href="#sec-2-18">2.18. <code>listen</code> &gt; ( paren ) # should have been done by this point</a></li>
+<li><a href="#sec-2-19">2.19. <code>listen</code> &gt; <code>repeat</code> the word that's just getting started</a></li>
+<li><a href="#sec-2-20">2.20. <code>listen</code> &gt; <code>ok</code> the word that lets you know everything is ok</a></li>
+<li><a href="#sec-2-21">2.21. <code>listen</code> &gt; <code>32</code> the word that wasn't here</a></li>
+<li><a href="#sec-2-22">2.22. <code>listen</code> &gt; <code>accept</code> the word that wants you to show some character</a></li>
+<li><a href="#sec-2-23">2.23. <code>listen</code> &gt; <code>tib</code> the word that holds what <code>listen</code> heard</a></li>
+<li><a href="#sec-2-24">2.24. <code>listen</code> &gt; <code>find</code> the word that reads the dictionary</a></li>
+<li><a href="#sec-2-25">2.25. <code>listen</code> &gt; <code>process</code> the hidden word that makes the whole thing work</a></li>
+<li><a href="#sec-2-26">2.26. <code>listen</code> &gt; <code>again</code> the word that picks up after <code>repeat</code></a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. scraps (put these in the right place as we go along)</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> part 1 : overview</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> quick intro to retro</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Retro is a concatenative programming language, related to forth, factor, and joy. Retro runs on a portable virtual machine called ngaro, and is self hosting, meaning it is written in itself.
+</p>
+
+<p>
+The retro documentation includes a file, <code>docs/Commentary.txt</code>, which describes the process of building a new image from the bottom up. The actual code is in the following files:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left"/>
+
+<col class="left"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="left"><code>image/meta.rx</code></td>
+<td class="left">the assembler and metacompiler</td>
+</tr>
+
+<tr>
+<td class="left"><code>image/meta-alt.rx</code></td>
+<td class="left">same thing, but from vm primitives</td>
+</tr>
+
+<tr>
+<td class="left"><code>image/kernel.rx</code></td>
+<td class="left">the core retro commands</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+All code in the present file is taken from these sources, as they existed in October of 2012. 
+</p>
+
+<p>
+This is a top-down view of the bootstrap process, which means that the code will not actually compile in the order presented here. Rather, the point here is to see how all the parts fit together into a unified whole.
+</p>
+
+<p>
+We will start at the "top" of the retro user interface, with the listener (the "ok" prompt), briefly discuss each word we encounter, then perform a recursive descent into <i>its</i> definition. The words will be introduced in breadth first order, but the definitions will be presented depth-first, so that we are implementing each word "just in time" for execution in the level above.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> the listener</h3>
+<div class="outline-text-3" id="text-1-2">
+</div><div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> <code>listen</code> the word that does what you ask it to</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">t:</span> listen  <span style="color: #66f;">(   - )</span> <span style="color: #ffd700; font-weight: bold;">repeat</span> ok <span style="color: #32cd32;">32</span> # <span style="color: #00ffff;">accept</span> <span style="color: #00ffff;">tib</span> <span style="color: #c63; font-weight: bold;">find</span> process <span style="color: #ffd700; font-weight: bold;">again</span> <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+
+<p>
+This is the main loop of the retro interpreter, taken from line 246 of <code>kernel.rx</code>, just under halfway through the file. After this point, the code generates a fresh dictionary, copies the newly-generated image over the original, and performs a virtual reboot of the system.
+</p>
+
+<p>
+Once we understand how the listener works, we can simply follow the <code>Commentary.txt</code> file from the heading "Stage 3: Extend the Language" on line 1000. Therefore, we will only concern ourselves here with this the first two phases.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> What do all those words mean?</h4>
+<div class="outline-text-4" id="text-1-2-2">
+<p>
+First, note that word <code>t:</code> is simply the standard word <code>:</code> ("colon"), which begins a definition, except that the definition gets stored in the target image. Since <code>t:</code> is the first word of a definition, it should be the first sub-node that we visit, but we will treat it as <code>:</code> and visit that instead.
+</p>
+
+<p>
+So. What do the other words mean? The following definitions are taken from <code>doc/Core_Functions.rst</code>, except for <i>#</i> and <i>process</i>, which are invisible after the reboot, and not part of standard retro.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left"/>
+
+<col class="left"/>
+
+<col class="left"/>
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">:</th>
+<th scope="col" class="left">"-</th>
+<th scope="col" class="left">Calls <code>create</code>, changes class to <code>.word</code>, and turns <code>compiler</code> on</th>
+</tr>
+
+<tr>
+<th scope="col" class="left">listen</th>
+<th scope="col" class="left">-</th>
+<th scope="col" class="left">Top level interpreter. Reads and process input</th>
+</tr>
+
+<tr>
+<th scope="col" class="left">(</th>
+<th scope="col" class="left">"-</th>
+<th scope="col" class="left">Parse for ) and ignore everything it reads</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">repeat</td>
+<td class="left">-</td>
+<td class="left">Start an unconditional loop</td>
+</tr>
+
+<tr>
+<td class="left">ok</td>
+<td class="left">-</td>
+<td class="left">Displays the "ok" prompt</td>
+</tr>
+
+<tr>
+<td class="left">32</td>
+<td class="left">-n</td>
+<td class="left"><i>not found, so parsed as integer and pushed to data stack</i></td>
+</tr>
+
+<tr>
+<td class="left"><i>#</i></td>
+<td class="left">n-</td>
+<td class="left"><i>meta.rx: compile a literal (unnecssary after stage 3)</i></td>
+</tr>
+
+<tr>
+<td class="left">accept</td>
+<td class="left">c-</td>
+<td class="left">Read a string, ending with the specified character. The string is returned in <code>tib</code></td>
+</tr>
+
+<tr>
+<td class="left">tib</td>
+<td class="left">-a</td>
+<td class="left">Returns address of text input buffer</td>
+</tr>
+
+<tr>
+<td class="left">find</td>
+<td class="left">$-af</td>
+<td class="left">Search for a name in the dictionary. Returns a dictionary header and a flag</td>
+</tr>
+
+<tr>
+<td class="left"><i>process</i></td>
+<td class="left">af-</td>
+<td class="left"><i>kernel.rx: run the word's class handler if found, otherwise parse as number</i></td>
+</tr>
+
+<tr>
+<td class="left">again</td>
+<td class="left">-</td>
+<td class="left">Jump to the code following the most recent <code>repeat</code></td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="left">;</td>
+<td class="left">-</td>
+<td class="left">Compile an exit into a function and stop the compiler</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+We will not show the lines for <code>:</code>, <code>;</code>, or <code>(&#x2026;)</code> in other definitions, but will repeat the internal definitions.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-2-3" class="outline-4">
+<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> Understanding the stack comment.</h4>
+<div class="outline-text-4" id="text-1-2-3">
+<p>
+The second column shows the <i>stack comment</i> for each word. The following symbols are used:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left"/>
+
+<col class="left"/>
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">"</th>
+<th scope="col" class="left">indicates that the word reads input from the user or script</th>
+</tr>
+
+<tr>
+<th scope="col" class="left">-</th>
+<th scope="col" class="left">separates the input (on the left) from the output (on the right)</th>
+</tr>
+
+<tr>
+<th scope="col" class="left">#</th>
+<th scope="col" class="left"><i>beats me.</i> :(</th>
+</tr>
+
+<tr>
+<th scope="col" class="left">n</th>
+<th scope="col" class="left">a number</th>
+</tr>
+
+<tr>
+<th scope="col" class="left">c</th>
+<th scope="col" class="left">a character</th>
+</tr>
+
+<tr>
+<th scope="col" class="left">a</th>
+<th scope="col" class="left">an address</th>
+</tr>
+
+<tr>
+<th scope="col" class="left">$</th>
+<th scope="col" class="left">a string</th>
+</tr>
+
+<tr>
+<th scope="col" class="left">f</th>
+<th scope="col" class="left">a flag (boolean)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">others</td>
+<td class="left">it's just a comment, so sometimes ad-hoc names are used</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The topmost item is always on the right, so for example <code>( ca-nf )</code> means "take an address, then a character off the stack, give back a number and then a flag". (Flags are almost always returned on top, so they can be easily tested with <code>if</code> .)
+</p>
+</div>
+
+
+<ol class="org-ol"><li><span class="todo TODO">TODO</span> what does # mean ? ( number? counted string? )<br/></li></ol>
+</div>
+
+<div id="outline-container-sec-1-2-4" class="outline-4">
+<h4 id="sec-1-2-4"><span class="section-number-4">1.2.4</span> Summary of <code>listen</code></h4>
+<div class="outline-text-4" id="text-1-2-4">
+<p>
+Let's take another look at <code>listen</code> then, and put it in our own words:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">t:</span> listen  <span style="color: #66f;">(   - )</span> <span style="color: #ffd700; font-weight: bold;">repeat</span> ok <span style="color: #32cd32;">32</span> # <span style="color: #00ffff;">accept</span> <span style="color: #00ffff;">tib</span> <span style="color: #c63; font-weight: bold;">find</span> process <span style="color: #ffd700; font-weight: bold;">again</span> <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+
+<p>
+The listener is an <b>infinite loop</b> ( <code>repeat</code> .. <code>again</code> ) that shows a prompt ( <code>ok</code> ), reads characters from input until encountering a space ( <code>32 # accept</code> , where 32 is the ASCII code for the space character ), looks the word up in the dictionary ( <code>tib find</code> ), and then performs various possible actions, depending on whether the word was found or not, and if so, what class handler is associated with it ( <code>process</code> ).
+</p>
+
+<p>
+We will now explore each of these words in detail.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> stepwise refinement and recursive descent</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+Having investigated the word <code>listen</code> and briefly described its component words, we are now going to give each of those words the same treatment in turn.
+</p>
+
+<p>
+We will proceed depth first and left to right. Note that it's possible that a word is used in multiple places, and we may therefore need to define it earlier than the order in which we expected.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> part 2 : recursive descent</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> <code>listen</code> &gt; <code>: ("colon")</code> the word that makes new words</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">t:</span> <span style="color: #c63; font-weight: bold;">:</span>        <span style="color: #66f;">( "-  )</span>  <span style="color: #c63; font-weight: bold;">create</span> <span style="color: #c63; font-weight: bold;">'</span> <span style="color: #c63; font-weight: bold;">.word</span> # last # <span style="color: #00ff00;">@,</span> d-&gt;class <span style="color: #00ff00;">!,</span> <span style="color: #00ffff;">]]</span> vector? <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+</div>
+<div id="outline-container-sec-2-1-1" class="outline-4">
+<h4 id="sec-2-1-1"><span class="section-number-4">2.1.1</span> <span class="todo TODO">TODO</span> summary</h4>
+</div>
+<div id="outline-container-sec-2-1-2" class="outline-4">
+<h4 id="sec-2-1-2"><span class="section-number-4">2.1.2</span> breakdown</h4>
+<div class="outline-text-4" id="text-2-1-2">
+<table id="listener" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left"/>
+
+<col class="left"/>
+
+<col class="left"/>
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">:</th>
+<th scope="col" class="left">"-</th>
+<th scope="col" class="left">Calls <code>create</code>, changes class to <code>.word</code>, and turns <code>compiler</code> on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">t:</td>
+<td class="left">"-</td>
+<td class="left"><i>meta.rx: compile to target image ( bootstrap version of</i> <code>:</code> <i>)</i></td>
+</tr>
+
+<tr>
+<td class="left">create</td>
+<td class="left">"-</td>
+<td class="left">Parse for a name and call <code>header</code></td>
+</tr>
+
+<tr>
+<td class="left">'</td>
+<td class="left">n-</td>
+<td class="left">Place TOS <code>here</code> and increment <code>heap</code> by 1</td>
+</tr>
+
+<tr>
+<td class="left">.word</td>
+<td class="left">a-</td>
+<td class="left">Class for normal functions</td>
+</tr>
+
+<tr>
+<td class="left"><i>#</i></td>
+<td class="left">&#xa0;</td>
+<td class="left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="left">last</td>
+<td class="left">-a</td>
+<td class="left">Variable; pointer to most recent dictionary header</td>
+</tr>
+
+<tr>
+<td class="left">@,</td>
+<td class="left">-</td>
+<td class="left"><i>meta.rx: assembler for @ (which fetches a value from the address at TOS)</i></td>
+</tr>
+
+<tr>
+<td class="left">d-&gt;class</td>
+<td class="left">a-a</td>
+<td class="left">Given a dictionary header, return the address of the class handler. Use <code>@</code> to get the class handler.</td>
+</tr>
+
+<tr>
+<td class="left">!,</td>
+<td class="left">-</td>
+<td class="left"><i>meta.rx: assembler for ! (which stores a value to the address at TOS)</i></td>
+</tr>
+
+<tr>
+<td class="left">]]</td>
+<td class="left">-</td>
+<td class="left">Turn compiler on</td>
+</tr>
+
+<tr>
+<td class="left"><i>vector?</i></td>
+<td class="left">-</td>
+<td class="left"><i>kernel.rx: either revectors the word immediately or writes two NOPs for revectoring later</i></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> <span class="todo TODO">TODO</span> <code>:</code> &gt; <code>t:</code> the compiler's compiler</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">:</span> <span style="color: #c63; font-weight: bold;">t:</span> <span style="color: #66f;">( "- )</span> <span style="color: #c63; font-weight: bold;">label:</span> <span style="color: #00ff00;">nop,</span> <span style="color: #00ff00;">nop,</span> &amp;m, reclass <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> <span class="todo TODO">TODO</span> <code>t:</code> &gt; <code>label:</code> </h3>
+</div>
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> <span class="todo TODO">TODO</span> <code>t:</code> &gt; <code>&amp;m,</code> </h3>
+</div>
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> <span class="todo TODO">TODO</span> <code>t:</code> &gt; <code>reclass</code></h3>
+</div>
+<div id="outline-container-sec-2-6" class="outline-3">
+<h3 id="sec-2-6"><span class="section-number-3">2.6</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>( ("paren")</code> the word that doesn't care what you say</h3>
+</div>
+<div id="outline-container-sec-2-7" class="outline-3">
+<h3 id="sec-2-7"><span class="section-number-3">2.7</span> <span class="todo TODO">TODO</span> <code>:</code> &gt; <code>create</code> </h3>
+</div>
+<div id="outline-container-sec-2-8" class="outline-3">
+<h3 id="sec-2-8"><span class="section-number-3">2.8</span> <span class="todo TODO">TODO</span> <code>:</code> &gt; =' the quote</h3>
+</div>
+<div id="outline-container-sec-2-9" class="outline-3">
+<h3 id="sec-2-9"><span class="section-number-3">2.9</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>.word</code> </h3>
+</div>
+<div id="outline-container-sec-2-10" class="outline-3">
+<h3 id="sec-2-10"><span class="section-number-3">2.10</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>#</code> proto literals</h3>
+</div>
+<div id="outline-container-sec-2-11" class="outline-3">
+<h3 id="sec-2-11"><span class="section-number-3">2.11</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>last</code> at <code>last</code>, you find the words</h3>
+</div>
+<div id="outline-container-sec-2-12" class="outline-3">
+<h3 id="sec-2-12"><span class="section-number-3">2.12</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>@,=</code> assemble and follow me</h3>
+</div>
+<div id="outline-container-sec-2-13" class="outline-3">
+<h3 id="sec-2-13"><span class="section-number-3">2.13</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>d-&gt;class</code> pointer arithmetic</h3>
+</div>
+<div id="outline-container-sec-2-14" class="outline-3">
+<h3 id="sec-2-14"><span class="section-number-3">2.14</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; =!, take that, NOS!</h3>
+</div>
+<div id="outline-container-sec-2-15" class="outline-3">
+<h3 id="sec-2-15"><span class="section-number-3">2.15</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>]]</code> </h3>
+</div>
+<div id="outline-container-sec-2-16" class="outline-3">
+<h3 id="sec-2-16"><span class="section-number-3">2.16</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>vector?</code>  <code>vector?</code> <del>I hardly know her.</del></h3>
+</div>
+<div id="outline-container-sec-2-17" class="outline-3">
+<h3 id="sec-2-17"><span class="section-number-3">2.17</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>;</code> STOP THE PRESS!</h3>
+</div>
+
+<div id="outline-container-sec-2-18" class="outline-3">
+<h3 id="sec-2-18"><span class="section-number-3">2.18</span> <code>listen</code> &gt; ( paren ) # should have been done by this point</h3>
+</div>
+<div id="outline-container-sec-2-19" class="outline-3">
+<h3 id="sec-2-19"><span class="section-number-3">2.19</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>repeat</code> the word that's just getting started</h3>
+<div class="outline-text-3" id="text-2-19">
+</div>
+</div>
+<div id="outline-container-sec-2-20" class="outline-3">
+<h3 id="sec-2-20"><span class="section-number-3">2.20</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>ok</code> the word that lets you know everything is ok</h3>
+<div class="outline-text-3" id="text-2-20">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">t:</span> ok      <span style="color: #66f;">(   - )</span> compiler # <span style="color: #00ff00;">@,</span> <span style="color: #00ffff;">not</span> <span style="color: #ffd700; font-weight: bold;">0;</span> <span style="color: #00ff00;">drop,</span> cr okmsg # puts <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-21" class="outline-3">
+<h3 id="sec-2-21"><span class="section-number-3">2.21</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>32</code> the word that wasn't here</h3>
+<div class="outline-text-3" id="text-2-21">
+</div>
+</div>
+<div id="outline-container-sec-2-22" class="outline-3">
+<h3 id="sec-2-22"><span class="section-number-3">2.22</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>accept</code> the word that wants you to show some character</h3>
+</div>
+<div id="outline-container-sec-2-23" class="outline-3">
+<h3 id="sec-2-23"><span class="section-number-3">2.23</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>tib</code> the word that holds what <code>listen</code> heard</h3>
+<div class="outline-text-3" id="text-2-23">
+</div>
+</div>
+<div id="outline-container-sec-2-24" class="outline-3">
+<h3 id="sec-2-24"><span class="section-number-3">2.24</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>find</code> the word that reads the dictionary</h3>
+<div class="outline-text-3" id="text-2-24">
+</div>
+</div>
+
+<div id="outline-container-sec-2-25" class="outline-3">
+<h3 id="sec-2-25"><span class="section-number-3">2.25</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>process</code> the hidden word that makes the whole thing work</h3>
+<div class="outline-text-3" id="text-2-25">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">i:</span> process <span style="color: #66f;">( af- )</span> <span style="color: #32cd32;">0</span> # <span style="color: #ffd700; font-weight: bold;">!if</span> xt:class <span style="color: #c63; font-weight: bold;">jump:</span> withClass <span style="color: #ffd700; font-weight: bold;">then</span> <span style="color: #00ffff;">drop</span> <span style="color: #c63; font-weight: bold;">jump:</span> number
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-26" class="outline-3">
+<h3 id="sec-2-26"><span class="section-number-3">2.26</span> <span class="todo TODO">TODO</span> <code>listen</code> &gt; <code>again</code> the word that picks up after <code>repeat</code></h3>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> <span class="todo TODO">TODO</span> scraps (put these in the right place as we go along)</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">i:</span> number  <span style="color: #66f;">(   - )</span> <span style="color: #00ffff;">tib</span> isNumber? <span style="color: #32cd32;">0</span> # <span style="color: #ffd700; font-weight: bold;">!if</span> <span style="color: #c63; font-weight: bold;">jump:</span> build# <span style="color: #ffd700; font-weight: bold;">then</span> <span style="color: #c63; font-weight: bold;">jump:</span> notFound
+<span style="color: #c63; font-weight: bold;">i:</span> build#  <span style="color: #66f;">(   - )</span> <span style="color: #00ffff;">tib</span> toNumber <span style="color: #c63; font-weight: bold;">'</span> <span style="color: #c63; font-weight: bold;">.data</span> # <span style="color: #c63; font-weight: bold;">jump:</span> withClass
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
