@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title></title>
-<!-- 2013-05-05 Sun 04:53 -->
+<!-- 2013-05-06 Mon 04:36 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -58,6 +58,76 @@ for the JavaScript code in this tag.
 <body>
 <div id="content">
 <h1 class="title"></h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. block storage</a></li>
+<li><a href="#sec-2">2. triple store</a></li>
+<li><a href="#sec-3">3. tuple lookup</a></li>
+<li><a href="#sec-4">4. text lookp</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> block storage</h2>
+<div class="outline-text-2" id="text-1">
+<ul class="org-ul">
+<li>tdrive/tblock: <code>sd.pas</code> / <code>sd_fpc.inc</code> / <code>test_sd.pas</code>
+</li>
+<li><a href="file:///home/michal/go/bed.pas">file:///home/michal/go/bed.pas</a> shows the usage
+</li>
+<li>arrange in chunks in a list with ll modue
+</li>
+<li>need an extra id to hold the blockid
+</li>
+</ul>
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span>
+  TRamBlock = <span style="color: #ff00ff;">class</span>
+    number : cardinal;
+    block : TBlock;
+  <span style="color: #00ffff;">end</span>;
+  TRamChain = specialize li.list&lt;TRamBlock&gt;;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> triple store</h2>
+<div class="outline-text-2" id="text-2">
+<ul class="org-ul">
+<li><a href="bplus.html">bplus.html</a> already has the basics
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> tuple lookup</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Hopefully, rows are pretty small so there isn't really much wasted space. A block size with a lot of different prime factors would probably help things fit.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">FindBlockForTuple</span>;
+<span style="color: #00ffff;">begin</span>
+  DivMod(rowSize, blockSize, rowsPerBlock, extraSpace);
+  DivMod(rowsPerBlock, rowToFind, result, plusRows);
+  <span style="color: #00ffff;">if</span> plusRows &gt; 0 <span style="color: #00ffff;">then</span> inc(result);
+  <span style="color: #66f;">{ </span><span style="color: #66f;">then just follow the chain for that many blocks </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> text lookp</h2>
+<div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">FindText</span>( key : TNid );
@@ -77,6 +147,8 @@ for the JavaScript code in this tag.
     calcNumberOfBlocks;
   <span style="color: #00ffff;">end</span>;
 </pre>
+</div>
+</div>
 </div>
 </div>
 </body>
