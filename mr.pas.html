@@ -2,12 +2,84 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title></title>
-<!-- 2013-05-07 Tue 13:55 -->
+<title>minrel : a small relational graph database</title>
+<!-- 2013-05-07 Tue 16:02 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
 <link rel="stylesheet" type="text/css" href="etc/style.css">
+
+<script type="text/javascript" src="http://orgmode.org/org-info.js">
+/**
+ *
+ * @source: http://orgmode.org/org-info.js
+ *
+ * @licstart  The following is the entire license notice for the
+ *  JavaScript code in http://orgmode.org/org-info.js.
+ *
+ * Copyright (C) 2012-2013  Sebastian Rose
+ *
+ *
+ * The JavaScript code in this tag is free software: you can
+ * redistribute it and/or modify it under the terms of the GNU
+ * General Public License (GNU GPL) as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option)
+ * any later version.  The code is distributed WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+ *
+ * As additional permission under GNU GPL version 3 section 7, you
+ * may distribute non-source (e.g., minimized or compacted) forms of
+ * that code without the copy of the GNU GPL normally required by
+ * section 4, provided you include this license notice and a URL
+ * through which recipients can access the Corresponding Source.
+ *
+ * @licend  The above is the entire license notice
+ * for the JavaScript code in http://orgmode.org/org-info.js.
+ *
+ */
+</script>
+
+<script type="text/javascript">
+
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+
+<!--/*--><![CDATA[/*><!--*/
+org_html_manager.set("TOC_DEPTH", "3");
+org_html_manager.set("LINK_HOME", "");
+org_html_manager.set("LINK_UP", "");
+org_html_manager.set("LOCAL_TOC", "1");
+org_html_manager.set("VIEW_BUTTONS", "0");
+org_html_manager.set("MOUSE_HINT", "underline");
+org_html_manager.set("FIXED_TOC", "0");
+org_html_manager.set("TOC", "0");
+org_html_manager.set("VIEW", "info");
+org_html_manager.setup();  // activate after the parameters are set
+/*]]>*///-->
+</script>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -57,7 +129,7 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title"></h1>
+<h1 class="title">minrel : a small relational graph database</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
@@ -65,28 +137,33 @@ for the JavaScript code in this tag.
 <li><a href="#sec-1">1. IArray Interface</a></li>
 <li><a href="#sec-2">2. Block Array Layers</a>
 <ul>
-<li><a href="#sec-2-1">2.1. TBlockFile</a></li>
-<li><a href="#sec-2-2">2.2. types and constants</a></li>
-<li><a href="#sec-2-3">2.3. <code>[1/4]</code> TYPE TRamChain to fetch and store blocks</a>
+<li><a href="#sec-2-1">2.1. types and constants</a></li>
+<li><a href="#sec-2-2">2.2. <code>[0/0]</code> TYPE TBlockFile</a></li>
+<li><a href="#sec-2-3">2.3. <code>[0/0]</code> TYPE TBlockTree</a>
 <ul>
-<li><a href="#sec-2-3-1">2.3.1. About</a></li>
-<li><a href="#sec-2-3-2">2.3.2. interface and component types</a></li>
-<li><a href="#sec-2-3-3">2.3.3. constructor</a></li>
-<li><a href="#sec-2-3-4">2.3.4. GetItem</a></li>
-<li><a href="#sec-2-3-5">2.3.5. mark changed blocks as dirty</a></li>
+<li><a href="#sec-2-3-1">2.3.1. TBlockTree.GetItem</a></li>
 </ul>
 </li>
-<li><a href="#sec-2-4">2.4. <code>[4/5]</code> TYPE TArrayList for storing data inside a TRamChain</a>
+<li><a href="#sec-2-4">2.4. <code>[1/4]</code> TYPE TRamChain to fetch and store blocks</a>
 <ul>
 <li><a href="#sec-2-4-1">2.4.1. About</a></li>
-<li><a href="#sec-2-4-2">2.4.2. TArrayList interface</a></li>
-<li><a href="#sec-2-4-3">2.4.3. TArrayList.Create</a></li>
-<li><a href="#sec-2-4-4">2.4.4. TArrayList.locate</a></li>
-<li><a href="#sec-2-4-5">2.4.5. TArrayList.GetItem</a></li>
-<li><a href="#sec-2-4-6">2.4.6. TArrayList.SetItem</a></li>
+<li><a href="#sec-2-4-2">2.4.2. interface and component types</a></li>
+<li><a href="#sec-2-4-3">2.4.3. constructor</a></li>
+<li><a href="#sec-2-4-4">2.4.4. TBlockChain</a></li>
+<li><a href="#sec-2-4-5">2.4.5. mark changed blocks as dirty</a></li>
 </ul>
 </li>
-<li><a href="#sec-2-5">2.5. block allocation : <code>NextInChain</code> / <code>NextFreeBlock</code></a></li>
+<li><a href="#sec-2-5">2.5. <code>[4/5]</code> TYPE TArrayList for storing data inside a TRamChain</a>
+<ul>
+<li><a href="#sec-2-5-1">2.5.1. About</a></li>
+<li><a href="#sec-2-5-2">2.5.2. TArrayList interface</a></li>
+<li><a href="#sec-2-5-3">2.5.3. TArrayList.Create</a></li>
+<li><a href="#sec-2-5-4">2.5.4. TArrayList.locate</a></li>
+<li><a href="#sec-2-5-5">2.5.5. TArrayList.GetItem</a></li>
+<li><a href="#sec-2-5-6">2.5.6. TArrayList.SetItem</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-6">2.6. block allocation : <code>NextInChain</code> / <code>NextFreeBlock</code></a></li>
 </ul>
 </li>
 <li><a href="#sec-3">3. The database interface(s)</a>
@@ -117,6 +194,7 @@ for the JavaScript code in this tag.
 </ul>
 </div>
 </div>
+
 <div id="outline-container-sec-1" class="outline-2">
 <h2 id="sec-1"><span class="section-number-2">1</span> IArray Interface</h2>
 <div class="outline-text-2" id="text-1">
@@ -157,19 +235,8 @@ Probably there's nothing block-specific about the first two, so they may wind up
 </div>
 
 <div id="outline-container-sec-2-1" class="outline-3">
-<h3 id="sec-2-1"><span class="section-number-3">2.1</span> <span class="todo TODO">TODO</span> TBlockFile</h3>
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> types and constants</h3>
 <div class="outline-text-3" id="text-2-1">
-<ul class="org-ul">
-<li>tdrive/tblock: <code>sd.pas</code> / <code>sd_fpc.inc</code> / <code>test_sd.pas</code>
-</li>
-<li><a href="https://github.com/sabren/b4/blob/master/go/bed.pas">bed.pas</a> shows the usage
-</li>
-</ul>
-</div>
-</div>
-<div id="outline-container-sec-2-2" class="outline-3">
-<h3 id="sec-2-2"><span class="section-number-3">2.2</span> types and constants</h3>
-<div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #ff00ff;">const</span>
@@ -186,12 +253,40 @@ Probably there's nothing block-specific about the first two, so they may wind up
 </div>
 </div>
 </div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> <code>[0/0]</code> TYPE TBlockFile</h3>
+<div class="outline-text-3" id="text-2-2">
+<ul class="org-ul">
+<li>tdrive/tblock: <code>sd.pas</code> / <code>sd_fpc.inc</code> / <code>test_sd.pas</code>
+</li>
+<li><a href="https://github.com/sabren/b4/blob/master/go/bed.pas">bed.pas</a> shows the usage
+</li>
+</ul>
+</div>
+</div>
+
 <div id="outline-container-sec-2-3" class="outline-3">
-<h3 id="sec-2-3"><span class="section-number-3">2.3</span> <code>[1/4]</code> TYPE TRamChain to fetch and store blocks</h3>
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> <code>[0/0]</code> TYPE TBlockTree</h3>
 <div class="outline-text-3" id="text-2-3">
 </div><div id="outline-container-sec-2-3-1" class="outline-4">
-<h4 id="sec-2-3-1"><span class="section-number-4">2.3.1</span> About</h4>
+<h4 id="sec-2-3-1"><span class="section-number-4">2.3.1</span> <span class="todo TODO">TODO</span> TBlockTree.GetItem</h4>
 <div class="outline-text-4" id="text-2-3-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TBlockTree.GetItem</span>( ix : cardinal ) : TBlock;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> <code>[1/4]</code> TYPE TRamChain to fetch and store blocks</h3>
+<div class="outline-text-3" id="text-2-4">
+</div><div id="outline-container-sec-2-4-1" class="outline-4">
+<h4 id="sec-2-4-1"><span class="section-number-4">2.4.1</span> About</h4>
+<div class="outline-text-4" id="text-2-4-1">
 <p>
 In storing our database, we have a couple of goals that at first glance might seem to be in conflict:
 </p>
@@ -212,9 +307,9 @@ Chains resolve the conflict by allowing us to break tables into chunks.
 </p>
 </div>
 </div>
-<div id="outline-container-sec-2-3-2" class="outline-4">
-<h4 id="sec-2-3-2"><span class="section-number-4">2.3.2</span> <span class="done DONE">DONE</span> interface and component types</h4>
-<div class="outline-text-4" id="text-2-3-2">
+<div id="outline-container-sec-2-4-2" class="outline-4">
+<h4 id="sec-2-4-2"><span class="section-number-4">2.4.2</span> <span class="done DONE">DONE</span> interface and component types</h4>
+<div class="outline-text-4" id="text-2-4-2">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #ff00ff;">type</span>
@@ -236,26 +331,43 @@ Chains resolve the conflict by allowing us to break tables into chunks.
 </div>
 </div>
 </div>
-<div id="outline-container-sec-2-3-3" class="outline-4">
-<h4 id="sec-2-3-3"><span class="section-number-4">2.3.3</span> <span class="todo TODO">TODO</span> constructor</h4>
+<div id="outline-container-sec-2-4-3" class="outline-4">
+<h4 id="sec-2-4-3"><span class="section-number-4">2.4.3</span> <span class="todo TODO">TODO</span> constructor</h4>
+<div class="outline-text-4" id="text-2-4-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal"></pre>
 </div>
-<div id="outline-container-sec-2-3-4" class="outline-4">
-<h4 id="sec-2-3-4"><span class="section-number-4">2.3.4</span> <span class="todo TODO">TODO</span> GetItem</h4>
 </div>
-<div id="outline-container-sec-2-3-5" class="outline-4">
-<h4 id="sec-2-3-5"><span class="section-number-4">2.3.5</span> <span class="todo TODO">TODO</span> mark changed blocks as dirty</h4>
-<div class="outline-text-4" id="text-2-3-5">
+</div>
+
+<div id="outline-container-sec-2-4-4" class="outline-4">
+<h4 id="sec-2-4-4"><span class="section-number-4">2.4.4</span> <span class="todo TODO">TODO</span> TBlockChain</h4>
+<div class="outline-text-4" id="text-2-4-4">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TBlockTree.GetItem</span>( ix : cardinal ) : TBlock;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-4-5" class="outline-4">
+<h4 id="sec-2-4-5"><span class="section-number-4">2.4.5</span> <span class="todo TODO">TODO</span> mark changed blocks as dirty</h4>
+<div class="outline-text-4" id="text-2-4-5">
 <pre class="example">
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-sec-2-4" class="outline-3">
-<h3 id="sec-2-4"><span class="section-number-3">2.4</span> <code>[4/5]</code> TYPE TArrayList for storing data inside a TRamChain</h3>
-<div class="outline-text-3" id="text-2-4">
-</div><div id="outline-container-sec-2-4-1" class="outline-4">
-<h4 id="sec-2-4-1"><span class="section-number-4">2.4.1</span> About</h4>
-<div class="outline-text-4" id="text-2-4-1">
+
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> <code>[4/5]</code> TYPE TArrayList for storing data inside a TRamChain</h3>
+<div class="outline-text-3" id="text-2-5">
+</div><div id="outline-container-sec-2-5-1" class="outline-4">
+<h4 id="sec-2-5-1"><span class="section-number-4">2.5.1</span> About</h4>
+<div class="outline-text-4" id="text-2-5-1">
 <p>
 It seems like we ought to have a type that would represent strings in-block.
 Perhaps even something that would represent arbitrary data structures as they were spread out over a linked list. Something like an ArrayList in java.
@@ -263,9 +375,9 @@ Perhaps even something that would represent arbitrary data structures as they we
 </div>
 </div>
 
-<div id="outline-container-sec-2-4-2" class="outline-4">
-<h4 id="sec-2-4-2"><span class="section-number-4">2.4.2</span> <span class="done DONE">DONE</span> TArrayList interface</h4>
-<div class="outline-text-4" id="text-2-4-2">
+<div id="outline-container-sec-2-5-2" class="outline-4">
+<h4 id="sec-2-5-2"><span class="section-number-4">2.5.2</span> <span class="done DONE">DONE</span> TArrayList interface</h4>
+<div class="outline-text-4" id="text-2-5-2">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #ff00ff;">type</span>
@@ -293,12 +405,12 @@ Perhaps even something that would represent arbitrary data structures as they we
 </div>
 </div>
 </div>
-<div id="outline-container-sec-2-4-3" class="outline-4">
-<h4 id="sec-2-4-3"><span class="section-number-4">2.4.3</span> <span class="todo TODO">TODO</span> TArrayList.Create</h4>
+<div id="outline-container-sec-2-5-3" class="outline-4">
+<h4 id="sec-2-5-3"><span class="section-number-4">2.5.3</span> <span class="todo TODO">TODO</span> TArrayList.Create</h4>
 </div>
-<div id="outline-container-sec-2-4-4" class="outline-4">
-<h4 id="sec-2-4-4"><span class="section-number-4">2.4.4</span> <span class="done DONE">DONE</span> TArrayList.locate</h4>
-<div class="outline-text-4" id="text-2-4-4">
+<div id="outline-container-sec-2-5-4" class="outline-4">
+<h4 id="sec-2-5-4"><span class="section-number-4">2.5.4</span> <span class="done DONE">DONE</span> TArrayList.locate</h4>
+<div class="outline-text-4" id="text-2-5-4">
 <p>
 This calculates the location of a particular entry within the list and returns a reference.
 </p>
@@ -319,9 +431,9 @@ This calculates the location of a particular entry within the list and returns a
 </div>
 </div>
 </div>
-<div id="outline-container-sec-2-4-5" class="outline-4">
-<h4 id="sec-2-4-5"><span class="section-number-4">2.4.5</span> <span class="done DONE">DONE</span> TArrayList.GetItem</h4>
-<div class="outline-text-4" id="text-2-4-5">
+<div id="outline-container-sec-2-5-5" class="outline-4">
+<h4 id="sec-2-5-5"><span class="section-number-4">2.5.5</span> <span class="done DONE">DONE</span> TArrayList.GetItem</h4>
+<div class="outline-text-4" id="text-2-5-5">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetItem</span>( ix : cardinal ) : T;
@@ -332,9 +444,9 @@ This calculates the location of a particular entry within the list and returns a
 </div>
 </div>
 </div>
-<div id="outline-container-sec-2-4-6" class="outline-4">
-<h4 id="sec-2-4-6"><span class="section-number-4">2.4.6</span> <span class="done DONE">DONE</span> TArrayList.SetItem</h4>
-<div class="outline-text-4" id="text-2-4-6">
+<div id="outline-container-sec-2-5-6" class="outline-4">
+<h4 id="sec-2-5-6"><span class="section-number-4">2.5.6</span> <span class="done DONE">DONE</span> TArrayList.SetItem</h4>
+<div class="outline-text-4" id="text-2-5-6">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetItem</span>( ix : cardinal; val : T );
@@ -346,9 +458,9 @@ This calculates the location of a particular entry within the list and returns a
 </div>
 </div>
 </div>
-<div id="outline-container-sec-2-5" class="outline-3">
-<h3 id="sec-2-5"><span class="section-number-3">2.5</span> <span class="todo TODO">TODO</span> block allocation : <code>NextInChain</code> / <code>NextFreeBlock</code></h3>
-<div class="outline-text-3" id="text-2-5">
+<div id="outline-container-sec-2-6" class="outline-3">
+<h3 id="sec-2-6"><span class="section-number-3">2.6</span> <span class="todo TODO">TODO</span> block allocation : <code>NextInChain</code> / <code>NextFreeBlock</code></h3>
+<div class="outline-text-3" id="text-2-6">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">NextInChain</span>( block : TBlockID ) : TBlockID;
