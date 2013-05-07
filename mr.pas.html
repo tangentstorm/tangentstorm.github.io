@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title></title>
-<!-- 2013-05-07 Tue 11:15 -->
+<!-- 2013-05-07 Tue 13:55 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -62,58 +62,114 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. block storage</a></li>
-<li><a href="#sec-2">2. types and constants</a></li>
-<li><a href="#sec-3">3. <code>[1/4]</code> TYPE TRamChain to fetch and store blocks</a>
+<li><a href="#sec-1">1. IArray Interface</a></li>
+<li><a href="#sec-2">2. Block Array Layers</a>
 <ul>
-<li><a href="#sec-3-1">3.1. About</a></li>
-<li><a href="#sec-3-2">3.2. interface and component types</a></li>
-<li><a href="#sec-3-3">3.3. constructor</a></li>
-<li><a href="#sec-3-4">3.4. GetItem</a></li>
-<li><a href="#sec-3-5">3.5. mark changed blocks as dirty</a></li>
+<li><a href="#sec-2-1">2.1. TBlockFile</a></li>
+<li><a href="#sec-2-2">2.2. types and constants</a></li>
+<li><a href="#sec-2-3">2.3. <code>[1/4]</code> TYPE TRamChain to fetch and store blocks</a>
+<ul>
+<li><a href="#sec-2-3-1">2.3.1. About</a></li>
+<li><a href="#sec-2-3-2">2.3.2. interface and component types</a></li>
+<li><a href="#sec-2-3-3">2.3.3. constructor</a></li>
+<li><a href="#sec-2-3-4">2.3.4. GetItem</a></li>
+<li><a href="#sec-2-3-5">2.3.5. mark changed blocks as dirty</a></li>
 </ul>
 </li>
-<li><a href="#sec-4">4. <code>[4/5]</code> TYPE TArrayList for storing data inside a TRamChain</a>
+<li><a href="#sec-2-4">2.4. <code>[4/5]</code> TYPE TArrayList for storing data inside a TRamChain</a>
 <ul>
-<li><a href="#sec-4-1">4.1. About</a></li>
-<li><a href="#sec-4-2">4.2. TArrayList interface</a></li>
-<li><a href="#sec-4-3">4.3. TArrayList.Create</a></li>
-<li><a href="#sec-4-4">4.4. TArrayList.locate</a></li>
-<li><a href="#sec-4-5">4.5. TArrayList.GetItem</a></li>
-<li><a href="#sec-4-6">4.6. TArrayList.SetItem</a></li>
+<li><a href="#sec-2-4-1">2.4.1. About</a></li>
+<li><a href="#sec-2-4-2">2.4.2. TArrayList interface</a></li>
+<li><a href="#sec-2-4-3">2.4.3. TArrayList.Create</a></li>
+<li><a href="#sec-2-4-4">2.4.4. TArrayList.locate</a></li>
+<li><a href="#sec-2-4-5">2.4.5. TArrayList.GetItem</a></li>
+<li><a href="#sec-2-4-6">2.4.6. TArrayList.SetItem</a></li>
 </ul>
 </li>
-<li><a href="#sec-5">5. The database interface(s)</a></li>
-<li><a href="#sec-6">6. block allocation : <code>NextInChain</code> / <code>NextFreeBlock</code></a></li>
-<li><a href="#sec-7">7. auto-increments : <code>TNextID</code></a></li>
-<li><a href="#sec-8">8. text storage</a></li>
-<li><a href="#sec-9">9. text lookup</a></li>
-<li><a href="#sec-10">10. triple store : extract a module from <code>bp.pas</code></a></li>
-<li><a href="#sec-11">11. tuple lookup</a></li>
-<li><a href="#sec-12">12. grab the hash method from di.pas</a></li>
-<li><a href="#sec-13">13. format of the first block (metadata)</a></li>
-<li><a href="#sec-14">14. store/fetch strings</a></li>
-<li><a href="#sec-15">15. store/fetch arrays</a></li>
-<li><a href="#sec-16">16. store/fetch tuples</a></li>
-<li><a href="#sec-17">17. store/fetch edges</a></li>
-<li><a href="#sec-18">18. store/fetch nodes</a></li>
+<li><a href="#sec-2-5">2.5. block allocation : <code>NextInChain</code> / <code>NextFreeBlock</code></a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. The database interface(s)</a>
+<ul>
+<li><a href="#sec-3-1">3.1. auto-increments : <code>TNextID</code></a></li>
+<li><a href="#sec-3-2">3.2. DataStore Interface (for strings and arrays of numbers)</a>
+<ul>
+<li><a href="#sec-3-2-1">3.2.1. text storage</a></li>
+<li><a href="#sec-3-2-2">3.2.2. text lookup</a></li>
+<li><a href="#sec-3-2-3">3.2.3. grab the hash method from di.pas</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-3">3.3. Relational Interface</a>
+<ul>
+<li><a href="#sec-3-3-1">3.3.1. tuple store : extract a module from <code>bp.pas</code></a></li>
+<li><a href="#sec-3-3-2">3.3.2. tuple lookup</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-4">3.4. GraphStore interface for general data.</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. format of the first block (metadata)</a></li>
+<li><a href="#sec-5">5. store/fetch strings</a></li>
+<li><a href="#sec-6">6. store/fetch arrays</a></li>
+<li><a href="#sec-7">7. store/fetch tuples</a></li>
+<li><a href="#sec-8">8. store/fetch edges</a></li>
+<li><a href="#sec-9">9. store/fetch nodes</a></li>
 </ul>
 </div>
 </div>
 <div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> block storage</h2>
+<h2 id="sec-1"><span class="section-number-2">1</span> IArray Interface</h2>
 <div class="outline-text-2" id="text-1">
+<p>
+This is just an interface that describes how array-like structures work. We're going to build a few layers that all implement this same interface.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span> IArray&lt;t&gt; = <span style="color: #00ffff;">interface</span>
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">Count</span> : cardinal;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetItem</span>( ix : cardinal ) : T;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetItem</span>( ix : cardinal; val : T );
+  <span style="color: #00ffff;">property</span> item[ ix : cardinal ] : TBlock; <span style="color: #00ffff;">default</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Block Array Layers</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Next, we will build up a series of layers, all of which implement <code>IArray&lt;TBlock&gt;</code>:
+</p>
+
+<dl class="org-dl">
+<dt> <code>TBlockFile</code> </dt><dd>raw sequences on disk (file of TBlock). This is optional, because we can also use in-memory databases.
+</dd>
+<dt> <code>TBlockTree</code> </dt><dd>A sparse array of blocks in RAM (using a B+ tree for fast access)
+</dd>
+<dt> <code>TBlockChain</code> </dt><dd>Wraps a linked list of non-contiguous blocks from any <code>IArray&lt;TBlock&gt;</code>, and makes it appear contiguous. (The links are stored in their own <code>TBlockChain</code>, of course.)
+</dd>
+</dl>
+
+<p>
+Probably there's nothing block-specific about the first two, so they may wind up being generic.
+</p>
+</div>
+
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> <span class="todo TODO">TODO</span> TBlockFile</h3>
+<div class="outline-text-3" id="text-2-1">
 <ul class="org-ul">
 <li>tdrive/tblock: <code>sd.pas</code> / <code>sd_fpc.inc</code> / <code>test_sd.pas</code>
 </li>
-<li><a href="file:///home/michal/go/bed.pas">file:///home/michal/go/bed.pas</a> shows the usage
+<li><a href="https://github.com/sabren/b4/blob/master/go/bed.pas">bed.pas</a> shows the usage
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> types and constants</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> types and constants</h3>
+<div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #ff00ff;">const</span>
@@ -130,12 +186,12 @@ for the JavaScript code in this tag.
 </div>
 </div>
 </div>
-<div id="outline-container-sec-3" class="outline-2">
-<h2 id="sec-3"><span class="section-number-2">3</span> <code>[1/4]</code> TYPE TRamChain to fetch and store blocks</h2>
-<div class="outline-text-2" id="text-3">
-</div><div id="outline-container-sec-3-1" class="outline-3">
-<h3 id="sec-3-1"><span class="section-number-3">3.1</span> About</h3>
-<div class="outline-text-3" id="text-3-1">
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> <code>[1/4]</code> TYPE TRamChain to fetch and store blocks</h3>
+<div class="outline-text-3" id="text-2-3">
+</div><div id="outline-container-sec-2-3-1" class="outline-4">
+<h4 id="sec-2-3-1"><span class="section-number-4">2.3.1</span> About</h4>
+<div class="outline-text-4" id="text-2-3-1">
 <p>
 In storing our database, we have a couple of goals that at first glance might seem to be in conflict:
 </p>
@@ -148,7 +204,7 @@ In storing our database, we have a couple of goals that at first glance might se
 </ul>
 
 <p>
-Chains resolve the conflict by allowing is to break tables into chunks.
+Chains resolve the conflict by allowing us to break tables into chunks.
 </p>
 
 <p>
@@ -156,9 +212,9 @@ Chains resolve the conflict by allowing is to break tables into chunks.
 </p>
 </div>
 </div>
-<div id="outline-container-sec-3-2" class="outline-3">
-<h3 id="sec-3-2"><span class="section-number-3">3.2</span> <span class="done DONE">DONE</span> interface and component types</h3>
-<div class="outline-text-3" id="text-3-2">
+<div id="outline-container-sec-2-3-2" class="outline-4">
+<h4 id="sec-2-3-2"><span class="section-number-4">2.3.2</span> <span class="done DONE">DONE</span> interface and component types</h4>
+<div class="outline-text-4" id="text-2-3-2">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #ff00ff;">type</span>
@@ -180,26 +236,26 @@ Chains resolve the conflict by allowing is to break tables into chunks.
 </div>
 </div>
 </div>
-<div id="outline-container-sec-3-3" class="outline-3">
-<h3 id="sec-3-3"><span class="section-number-3">3.3</span> <span class="todo TODO">TODO</span> constructor</h3>
+<div id="outline-container-sec-2-3-3" class="outline-4">
+<h4 id="sec-2-3-3"><span class="section-number-4">2.3.3</span> <span class="todo TODO">TODO</span> constructor</h4>
 </div>
-<div id="outline-container-sec-3-4" class="outline-3">
-<h3 id="sec-3-4"><span class="section-number-3">3.4</span> <span class="todo TODO">TODO</span> GetItem</h3>
+<div id="outline-container-sec-2-3-4" class="outline-4">
+<h4 id="sec-2-3-4"><span class="section-number-4">2.3.4</span> <span class="todo TODO">TODO</span> GetItem</h4>
 </div>
-<div id="outline-container-sec-3-5" class="outline-3">
-<h3 id="sec-3-5"><span class="section-number-3">3.5</span> <span class="todo TODO">TODO</span> mark changed blocks as dirty</h3>
-<div class="outline-text-3" id="text-3-5">
+<div id="outline-container-sec-2-3-5" class="outline-4">
+<h4 id="sec-2-3-5"><span class="section-number-4">2.3.5</span> <span class="todo TODO">TODO</span> mark changed blocks as dirty</h4>
+<div class="outline-text-4" id="text-2-3-5">
 <pre class="example">
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-sec-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> <code>[4/5]</code> TYPE TArrayList for storing data inside a TRamChain</h2>
-<div class="outline-text-2" id="text-4">
-</div><div id="outline-container-sec-4-1" class="outline-3">
-<h3 id="sec-4-1"><span class="section-number-3">4.1</span> About</h3>
-<div class="outline-text-3" id="text-4-1">
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> <code>[4/5]</code> TYPE TArrayList for storing data inside a TRamChain</h3>
+<div class="outline-text-3" id="text-2-4">
+</div><div id="outline-container-sec-2-4-1" class="outline-4">
+<h4 id="sec-2-4-1"><span class="section-number-4">2.4.1</span> About</h4>
+<div class="outline-text-4" id="text-2-4-1">
 <p>
 It seems like we ought to have a type that would represent strings in-block.
 Perhaps even something that would represent arbitrary data structures as they were spread out over a linked list. Something like an ArrayList in java.
@@ -207,9 +263,9 @@ Perhaps even something that would represent arbitrary data structures as they we
 </div>
 </div>
 
-<div id="outline-container-sec-4-2" class="outline-3">
-<h3 id="sec-4-2"><span class="section-number-3">4.2</span> <span class="done DONE">DONE</span> TArrayList interface</h3>
-<div class="outline-text-3" id="text-4-2">
+<div id="outline-container-sec-2-4-2" class="outline-4">
+<h4 id="sec-2-4-2"><span class="section-number-4">2.4.2</span> <span class="done DONE">DONE</span> TArrayList interface</h4>
+<div class="outline-text-4" id="text-2-4-2">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #ff00ff;">type</span>
@@ -237,12 +293,12 @@ Perhaps even something that would represent arbitrary data structures as they we
 </div>
 </div>
 </div>
-<div id="outline-container-sec-4-3" class="outline-3">
-<h3 id="sec-4-3"><span class="section-number-3">4.3</span> <span class="todo TODO">TODO</span> TArrayList.Create</h3>
+<div id="outline-container-sec-2-4-3" class="outline-4">
+<h4 id="sec-2-4-3"><span class="section-number-4">2.4.3</span> <span class="todo TODO">TODO</span> TArrayList.Create</h4>
 </div>
-<div id="outline-container-sec-4-4" class="outline-3">
-<h3 id="sec-4-4"><span class="section-number-3">4.4</span> <span class="done DONE">DONE</span> TArrayList.locate</h3>
-<div class="outline-text-3" id="text-4-4">
+<div id="outline-container-sec-2-4-4" class="outline-4">
+<h4 id="sec-2-4-4"><span class="section-number-4">2.4.4</span> <span class="done DONE">DONE</span> TArrayList.locate</h4>
+<div class="outline-text-4" id="text-2-4-4">
 <p>
 This calculates the location of a particular entry within the list and returns a reference.
 </p>
@@ -263,9 +319,9 @@ This calculates the location of a particular entry within the list and returns a
 </div>
 </div>
 </div>
-<div id="outline-container-sec-4-5" class="outline-3">
-<h3 id="sec-4-5"><span class="section-number-3">4.5</span> <span class="done DONE">DONE</span> TArrayList.GetItem</h3>
-<div class="outline-text-3" id="text-4-5">
+<div id="outline-container-sec-2-4-5" class="outline-4">
+<h4 id="sec-2-4-5"><span class="section-number-4">2.4.5</span> <span class="done DONE">DONE</span> TArrayList.GetItem</h4>
+<div class="outline-text-4" id="text-2-4-5">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetItem</span>( ix : cardinal ) : T;
@@ -276,9 +332,9 @@ This calculates the location of a particular entry within the list and returns a
 </div>
 </div>
 </div>
-<div id="outline-container-sec-4-6" class="outline-3">
-<h3 id="sec-4-6"><span class="section-number-3">4.6</span> <span class="done DONE">DONE</span> TArrayList.SetItem</h3>
-<div class="outline-text-3" id="text-4-6">
+<div id="outline-container-sec-2-4-6" class="outline-4">
+<h4 id="sec-2-4-6"><span class="section-number-4">2.4.6</span> <span class="done DONE">DONE</span> TArrayList.SetItem</h4>
+<div class="outline-text-4" id="text-2-4-6">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetItem</span>( ix : cardinal; val : T );
@@ -290,35 +346,9 @@ This calculates the location of a particular entry within the list and returns a
 </div>
 </div>
 </div>
-<div id="outline-container-sec-5" class="outline-2">
-<h2 id="sec-5"><span class="section-number-2">5</span> The database interface(s)</h2>
-<div class="outline-text-2" id="text-5">
-<div class="org-src-container">
-
-<pre class="src src-pascal"><span style="color: #ff00ff;">type</span>
-  IDataStore = <span style="color: #00ffff;">interface</span>
-    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">StoreString</span>( <span style="color: #ff00ff;">const</span> s : <span style="color: #ff00ff;">string</span> ) : TTupleID;
-    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">FetchString</span>( <span style="color: #ff00ff;">const</span> i : TStringID ) : <span style="color: #ff00ff;">string</span>;
-    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">StoreArray</span>( <span style="color: #ff00ff;">const</span> s : <span style="color: #ff00ff;">string</span> ) : TTArrayID;
-    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">FetchArray</span>( <span style="color: #ff00ff;">const</span> i : TTArrayID ) : TArray;
-  <span style="color: #00ffff;">end</span>;
-  IRelStore = <span style="color: #00ffff;">interface</span>
-    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">StoreTuple</span>( <span style="color: #ff00ff;">const</span> r : TRelation; <span style="color: #ff00ff;">const</span> t : TTuple ) : TTupleID;
-    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">FetchTuple</span>( <span style="color: #ff00ff;">const</span> r : TRelation; <span style="color: #ff00ff;">const</span> i : TTupleID ) : TTuple;
-  <span style="color: #00ffff;">end</span>;
-  IGraphStore = <span style="color: #00ffff;">interface</span>
-    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">StoreEdge</span>( <span style="color: #ff00ff;">const</span> e : TEdge ) : TEID;
-    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">FetchEdge</span>( <span style="color: #ff00ff;">const</span> i : TEID ) : TEdge;
-    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">StoreNode</span>( <span style="color: #ff00ff;">const</span> n : TNode ) : TNID;
-    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">FetchNode</span>( <span style="color: #ff00ff;">const</span> i : TNID ) : TNode;
-  <span style="color: #00ffff;">end</span>;
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-sec-6" class="outline-2">
-<h2 id="sec-6"><span class="section-number-2">6</span> <span class="todo TODO">TODO</span> block allocation : <code>NextInChain</code> / <code>NextFreeBlock</code></h2>
-<div class="outline-text-2" id="text-6">
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> <span class="todo TODO">TODO</span> block allocation : <code>NextInChain</code> / <code>NextFreeBlock</code></h3>
+<div class="outline-text-3" id="text-2-5">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">NextInChain</span>( block : TBlockID ) : TBlockID;
@@ -335,9 +365,14 @@ This calculates the location of a particular entry within the list and returns a
 </div>
 </div>
 </div>
-<div id="outline-container-sec-7" class="outline-2">
-<h2 id="sec-7"><span class="section-number-2">7</span> <span class="todo TODO">TODO</span> auto-increments : <code>TNextID</code></h2>
-<div class="outline-text-2" id="text-7">
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> The database interface(s)</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> <span class="todo TODO">TODO</span> auto-increments : <code>TNextID</code></h3>
+<div class="outline-text-3" id="text-3-1">
 <div class="org-src-container">
 
 <pre class="src src-delphi"><span style="color: #00ffff;">function</span> TNextID( tableID  );
@@ -349,9 +384,23 @@ This calculates the location of a particular entry within the list and returns a
 </div>
 </div>
 
-<div id="outline-container-sec-8" class="outline-2">
-<h2 id="sec-8"><span class="section-number-2">8</span> text storage</h2>
-<div class="outline-text-2" id="text-8">
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> DataStore Interface (for strings and arrays of numbers)</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span> IDataStore = <span style="color: #00ffff;">interface</span>
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">StoreString</span>( <span style="color: #ff00ff;">const</span> s : <span style="color: #ff00ff;">string</span> ) : TTupleID;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">FetchString</span>( <span style="color: #ff00ff;">const</span> i : TStringID ) : <span style="color: #ff00ff;">string</span>;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">StoreArray</span>( <span style="color: #ff00ff;">const</span> s : <span style="color: #ff00ff;">string</span> ) : TTArrayID;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">FetchArray</span>( <span style="color: #ff00ff;">const</span> i : TTArrayID ) : TArray;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+<div id="outline-container-sec-3-2-1" class="outline-4">
+<h4 id="sec-3-2-1"><span class="section-number-4">3.2.1</span> <span class="todo TODO">TODO</span> text storage</h4>
+<div class="outline-text-4" id="text-3-2-1">
 <div class="org-src-container">
 
 <pre class="src src-delphi">type
@@ -370,9 +419,10 @@ procedure StoreText( txt : string );
 </div>
 </div>
 </div>
-<div id="outline-container-sec-9" class="outline-2">
-<h2 id="sec-9"><span class="section-number-2">9</span> text lookup</h2>
-<div class="outline-text-2" id="text-9">
+
+<div id="outline-container-sec-3-2-2" class="outline-4">
+<h4 id="sec-3-2-2"><span class="section-number-4">3.2.2</span> <span class="todo TODO">TODO</span> text lookup</h4>
+<div class="outline-text-4" id="text-3-2-2">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">FindText</span>( key : TNid );
@@ -395,18 +445,38 @@ procedure StoreText( txt : string );
 </div>
 </div>
 </div>
-<div id="outline-container-sec-10" class="outline-2">
-<h2 id="sec-10"><span class="section-number-2">10</span> triple store : extract a module from <code>bp.pas</code></h2>
-<div class="outline-text-2" id="text-10">
+
+<div id="outline-container-sec-3-2-3" class="outline-4">
+<h4 id="sec-3-2-3"><span class="section-number-4">3.2.3</span> <span class="todo TODO">TODO</span> grab the hash method from di.pas</h4>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> Relational Interface</h3>
+<div class="outline-text-3" id="text-3-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span> IRelStore = <span style="color: #00ffff;">interface</span>
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">StoreTuple</span>( <span style="color: #ff00ff;">const</span> r : TRelation; <span style="color: #ff00ff;">const</span> t : TTuple ) : TTupleID;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">FetchTuple</span>( <span style="color: #ff00ff;">const</span> r : TRelation; <span style="color: #ff00ff;">const</span> i : TTupleID ) : TTuple;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3-1" class="outline-4">
+<h4 id="sec-3-3-1"><span class="section-number-4">3.3.1</span> tuple store : extract a module from <code>bp.pas</code></h4>
+<div class="outline-text-4" id="text-3-3-1">
 <ul class="org-ul">
 <li><a href="bplus.html">bplus.html</a> already has the basics
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-11" class="outline-2">
-<h2 id="sec-11"><span class="section-number-2">11</span> tuple lookup</h2>
-<div class="outline-text-2" id="text-11">
+
+<div id="outline-container-sec-3-3-2" class="outline-4">
+<h4 id="sec-3-3-2"><span class="section-number-4">3.3.2</span> tuple lookup</h4>
+<div class="outline-text-4" id="text-3-3-2">
 <p>
 Hopefully, rows are pretty small so there isn't really much wasted space. A block size with a lot of different prime factors would probably help things fit.
 </p>
@@ -424,26 +494,41 @@ Hopefully, rows are pretty small so there isn't really much wasted space. A bloc
 </div>
 </div>
 </div>
-<div id="outline-container-sec-12" class="outline-2">
-<h2 id="sec-12"><span class="section-number-2">12</span> <span class="todo TODO">TODO</span> grab the hash method from di.pas</h2>
 </div>
-<div id="outline-container-sec-13" class="outline-2">
-<h2 id="sec-13"><span class="section-number-2">13</span> <span class="todo TODO">TODO</span> format of the first block (metadata)</h2>
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> GraphStore interface for general data.</h3>
+<div class="outline-text-3" id="text-3-4">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span> IGraphStore = <span style="color: #00ffff;">interface</span>
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">StoreEdge</span>( <span style="color: #ff00ff;">const</span> e : TEdge ) : TEID;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">FetchEdge</span>( <span style="color: #ff00ff;">const</span> i : TEID ) : TEdge;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">StoreNode</span>( <span style="color: #ff00ff;">const</span> n : TNode ) : TNID;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">FetchNode</span>( <span style="color: #ff00ff;">const</span> i : TNID ) : TNode;
+<span style="color: #00ffff;">end</span>;
+</pre>
 </div>
-<div id="outline-container-sec-14" class="outline-2">
-<h2 id="sec-14"><span class="section-number-2">14</span> <span class="todo TODO">TODO</span> store/fetch strings</h2>
 </div>
-<div id="outline-container-sec-15" class="outline-2">
-<h2 id="sec-15"><span class="section-number-2">15</span> <span class="todo TODO">TODO</span> store/fetch arrays</h2>
 </div>
-<div id="outline-container-sec-16" class="outline-2">
-<h2 id="sec-16"><span class="section-number-2">16</span> <span class="todo TODO">TODO</span> store/fetch tuples</h2>
 </div>
-<div id="outline-container-sec-17" class="outline-2">
-<h2 id="sec-17"><span class="section-number-2">17</span> <span class="todo TODO">TODO</span> store/fetch edges</h2>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> <span class="todo TODO">TODO</span> format of the first block (metadata)</h2>
 </div>
-<div id="outline-container-sec-18" class="outline-2">
-<h2 id="sec-18"><span class="section-number-2">18</span> <span class="todo TODO">TODO</span> store/fetch nodes</h2>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> <span class="todo TODO">TODO</span> store/fetch strings</h2>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> <span class="todo TODO">TODO</span> store/fetch arrays</h2>
+</div>
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> <span class="todo TODO">TODO</span> store/fetch tuples</h2>
+</div>
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> <span class="todo TODO">TODO</span> store/fetch edges</h2>
+</div>
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> <span class="todo TODO">TODO</span> store/fetch nodes</h2>
 </div>
 </div>
 </body>
