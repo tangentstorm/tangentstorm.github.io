@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>ar.pas : Array interface</title>
-<!-- 2013-05-07 Tue 23:12 -->
+<!-- 2013-05-07 Tue 23:13 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -161,15 +161,17 @@ for the JavaScript code in this tag.
 Previously, we looked at the <a href="https://github.com/tangentstorm/xpl/blob/master/code/sq.pas">sq unit</a>, in which we defined a generic sequence type, whose interface looked like this:
 </p>
 
-<pre class="example">
-type generic ISequence&lt;tKey, tVal&gt; = interface
-  function Length : cardinal;
-  function GetItem( i : tKey ) : tVal;
-  procedure SetItem( i : tKey; value : tVal );
-  property item[ i : tKey ] : tVal
-    read GetItem write SetItem; default;
-end;
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span> generic ISequence&lt;tKey, tVal&gt; = <span style="color: #00ffff;">interface</span>
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">Length</span> : cardinal;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetItem</span>( i : tKey ) : tVal;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetItem</span>( i : tKey; value : tVal );
+  <span style="color: #00ffff;">property</span> item[ i : tKey ] : tVal
+    <span style="color: #00ffff;">read</span> GetItem <span style="color: #00ffff;">write</span> SetItem; <span style="color: #00ffff;">default</span>;
+<span style="color: #00ffff;">end</span>;
 </pre>
+</div>
 
 <p>
 We further provided an abstract class, <code>GSeq&lt;tKey,tVal&gt;</code>, which provides an enumerator for classes implementing <code>ISequence</code>. This allows us to loop through the values of a sequence with pascal's <code>for &#x2026; in &#x2026; do</code> syntax.
