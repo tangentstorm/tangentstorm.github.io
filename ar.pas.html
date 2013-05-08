@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>ar.pas : Array interface</title>
-<!-- 2013-05-07 Tue 23:21 -->
+<!-- 2013-05-08 Wed 02:14 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -140,16 +140,17 @@ for the JavaScript code in this tag.
 <ul>
 <li><a href="#sec-3-1">3.1. GAbstractArray</a></li>
 <li><a href="#sec-3-2">3.2. GDynArray</a></li>
+<li><a href="#sec-3-3">3.3. GFileArray</a></li>
+<li><a href="#sec-3-4">3.4. GBPlusArray</a></li>
+<li><a href="#sec-3-5">3.5. GEmbeddedArray</a></li>
 </ul>
 </li>
-<li><a href="#sec-4">4. </a>
+<li><a href="#sec-4">4. Appendix: Templates for Generated Files</a>
 <ul>
-<li><a href="#sec-4-1">4.1. GFileArray</a></li>
-<li><a href="#sec-4-2">4.2. GBPlusArray</a></li>
-<li><a href="#sec-4-3">4.3. GEmbeddedArray</a></li>
+<li><a href="#sec-4-1">4.1. template for UNIT <code>ar</code></a></li>
+<li><a href="#sec-4-2">4.2. template for test suite</a></li>
 </ul>
 </li>
-<li><a href="#sec-5">5. Appendix: Complete interface for UNIT <code>ar</code></a></li>
 </ul>
 </div>
 </div>
@@ -191,7 +192,7 @@ However, most of the time, it's sufficient to range from zero to some maximum va
 
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="IArray"><span style="color: #ff00ff;">type</span>
+<pre class="src src-pascal" id="type:IArray"><span style="color: #ff00ff;">type</span>
   generic IArray&lt;T&gt; = <span style="color: #00ffff;">interface</span> (specialize ISequence&lt;cardinal, T&gt;)
     <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Resize</span>( newLength : cardinal );
     <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Append</span>( value : T );
@@ -212,7 +213,7 @@ Object pascal offers dynamic arrays, which are basically the same as static arra
 </p>
 
 <p>
-Since keys in an array are a contiguous sequence of values, arrays generally store their values in a single contiguous block of RAM. This allows the compiler to use simple pointer arithmetic under the hood to 
+Since keys in an array are a contiguous sequence of values, arrays generally store their values in a single contiguous block of RAM. This allows the compiler to use simple pointer arithmetic under the hood to
 allow very fast access to the data.
 </p>
 
@@ -229,7 +230,7 @@ The compiler will check that each of our array classes provides the necessary me
 </p>
 
 <p>
-Actually, nothing short of a formal proof can guarantee that our software is correct (and then only if we trust both the compiler and our logic), but we can at least provide evidence that it's probably doing the right thing. 
+Actually, nothing short of a formal proof can guarantee that our software is correct (and then only if we trust both the compiler and our logic), but we can at least provide evidence that it's probably doing the right thing.
 </p>
 
 <p>
@@ -238,11 +239,31 @@ To that end, we will run each class through the following test suite, which simp
 
 <div class="org-src-container">
 
-<pre class="src src-pascal"><span style="color: #ff00ff;">type</span>
-  StringArray : specialize IArray&lt;<span style="color: #ff00ff;">string</span>&gt;;
+<pre class="src src-pascal" id="check_array"><span style="color: #ff00ff;">type</span>
+  ICardinalArray = <span style="color: #00ffff;">interface</span>( specialize IArray&lt;cardinal&gt;)
+  <span style="color: #00ffff;">end</span>;
 
-<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">check_array</span>( IArray : <span style="color: #ff00ff;">string</span> );
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">check_array</span>( a : ICardinalArray );
+  <span style="color: #ff00ff;">var</span> i : byte;
   <span style="color: #00ffff;">begin</span>
+    <span style="color: #66f;">{ </span><span style="color: #66f;">test that we can grow the array with append: </span><span style="color: #66f;">}</span>
+    chk.equal( 0, a.length );
+    <span style="color: #00ffff;">for</span> i := 0 <span style="color: #00ffff;">to</span> 127 <span style="color: #00ffff;">do</span> a.append( i * i );
+
+    <span style="color: #66f;">{ </span><span style="color: #66f;">now resize and make sure we can both read the</span>
+<span style="color: #66f;">      old values and write the new slots </span><span style="color: #66f;">}</span>
+    a.resize( 256 );
+    <span style="color: #00ffff;">for</span> i := 255 <span style="color: #00ffff;">downto</span> 128 <span style="color: #00ffff;">do</span> a[ i ] := round(sqrt( a[ 128 - i ]));
+
+    <span style="color: #66f;">{ </span><span style="color: #66f;">do a few spot tests to make sure it worked right. </span><span style="color: #66f;">}</span>
+    chk.equal( a[   0 ],     0 );
+    chk.equal( a[  64 ],  4096 );
+    chk.equal( a[ 126 ], 15876 );
+    chk.equal( a[ 127 ], 16129 );
+    chk.equal( a[ 128 ],   127 );
+    chk.equal( a[ 129 ],   126 );
+    chk.equal( a[ 192 ],  4096 );
+    chk.equal( a[ 255 ],     0 );
   <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
@@ -256,7 +277,22 @@ To that end, we will run each class through the following test suite, which simp
 <div class="outline-text-3" id="text-3-1">
 <div class="org-src-container">
 
-<pre class="src src-pascal"></pre>
+<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GAbstractArray.CheckRange</span>( ix : cardinal );
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GAbstractArray.Resize</span>( length : cardinal );
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GAbstractArray.Append</span>( value : t );
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GAbstractArray.Create</span>( length : cardinal );
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
 </div>
 </div>
 </div>
@@ -265,7 +301,15 @@ To that end, we will run each class through the following test suite, which simp
 <div class="outline-text-3" id="text-3-2">
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GDynArray.Create</span>;
+<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GDynArray.Create</span>( length : cardinal );
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GDynArray.GetItem</span>( ix : cardinal ) : T;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GDynArray.SetItem</span>( ix : cardinal; val : T );
   <span style="color: #00ffff;">begin</span>
   <span style="color: #00ffff;">end</span>;
 
@@ -276,16 +320,12 @@ To that end, we will run each class through the following test suite, which simp
 </div>
 </div>
 </div>
-</div>
-<div id="outline-container-sec-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> </h2>
-<div class="outline-text-2" id="text-4">
-</div><div id="outline-container-sec-4-1" class="outline-3">
-<h3 id="sec-4-1"><span class="section-number-3">4.1</span> <span class="todo TODO">TODO</span> GFileArray</h3>
-<div class="outline-text-3" id="text-4-1">
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> <span class="todo TODO">TODO</span> GFileArray</h3>
+<div class="outline-text-3" id="text-3-3">
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GFileArray.Create</span>;
+<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GFileArray.Create</span>( <span style="color: #ff00ff;">var</span> f : FileOfT );
   <span style="color: #00ffff;">begin</span>
   <span style="color: #00ffff;">end</span>;
 
@@ -304,12 +344,12 @@ To that end, we will run each class through the following test suite, which simp
 </div>
 </div>
 </div>
-<div id="outline-container-sec-4-2" class="outline-3">
-<h3 id="sec-4-2"><span class="section-number-3">4.2</span> <span class="todo TODO">TODO</span> GBPlusArray</h3>
-<div class="outline-text-3" id="text-4-2">
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> <span class="todo TODO">TODO</span> GBPlusArray</h3>
+<div class="outline-text-3" id="text-3-4">
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GBPlusArray.Create</span>;
+<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GBPlusArray.Create</span>( length : cardinal );
   <span style="color: #00ffff;">begin</span>
   <span style="color: #00ffff;">end</span>;
 
@@ -328,12 +368,12 @@ To that end, we will run each class through the following test suite, which simp
 </div>
 </div>
 </div>
-<div id="outline-container-sec-4-3" class="outline-3">
-<h3 id="sec-4-3"><span class="section-number-3">4.3</span> <span class="todo TODO">TODO</span> GEmbeddedArray</h3>
-<div class="outline-text-3" id="text-4-3">
+<div id="outline-container-sec-3-5" class="outline-3">
+<h3 id="sec-3-5"><span class="section-number-3">3.5</span> <span class="todo TODO">TODO</span> GEmbeddedArray</h3>
+<div class="outline-text-3" id="text-3-5">
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GEmbeddedArray.Create</span>;
+<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GEmbeddedArray.Create</span>( a : IArrayOfT; length : cardinal );
   <span style="color: #00ffff;">begin</span>
   <span style="color: #00ffff;">end</span>;
 
@@ -354,64 +394,63 @@ To that end, we will run each class through the following test suite, which simp
 </div>
 </div>
 
-
-
-<div id="outline-container-sec-5" class="outline-2">
-<h2 id="sec-5"><span class="section-number-2">5</span> Appendix: Complete interface for UNIT <code>ar</code></h2>
-<div class="outline-text-2" id="text-5">
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Appendix: Templates for Generated Files</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> template for UNIT <code>ar</code></h3>
+<div class="outline-text-3" id="text-4-1">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$i xpc.inc</span><span style="color: #66f;">}</span>
 <span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">ar</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">Array interface </span><span style="color: #66f;">}</span>
-<span style="color: #00ffff;">interface</span>
+<span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">uses</span> sq;
+
+  &lt;&lt;<span style="color: #ff00ff;">type</span>:IArray&gt;&gt;
 
   <span style="color: #ff00ff;">type</span>
-    generic IArray&lt;T&gt; = <span style="color: #00ffff;">interface</span>
-      &lt;&lt;SizeMethods&gt;&gt;
-      &lt;&lt;AccessMethods&gt;&gt;
-      &lt;&lt;ItemProperty&gt;&gt;
-    <span style="color: #00ffff;">end</span>;
-
-    generic GAbstractArray&lt;T&gt; = <span style="color: #ff00ff;">class</span> <span style="color: #00ffff;">abstract</span> (TInterfacedObject, IArray&lt;T&gt;)
+    generic GAbstractArray&lt;T&gt; = <span style="color: #ff00ff;">class</span> ( TInterfacedObject,
+                                        specialize IArray&lt;T&gt; )
       <span style="color: #00ffff;">protected</span>
-        _count = cardinal;
+        _count : cardinal;
         <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">CheckRange</span>( ix : cardinal );
       <span style="color: #00ffff;">public</span>
         <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( length : cardinal ); <span style="color: #00ffff;">virtual</span>;
         <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Resize</span>( length : cardinal ); <span style="color: #00ffff;">virtual</span>;
         <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Append</span>( value : t ); <span style="color: #00ffff;">virtual</span>;
-        <span style="color: #00ffff;">property</span> Count : cardinal <span style="color: #00ffff;">read</span> _count;
       <span style="color: #00ffff;">end</span>;
 
-    generic GDynArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( GAbstractArray&lt;T&gt; )
+    generic GDynArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( specialize GAbstractArray&lt;T&gt; )
       <span style="color: #00ffff;">protected</span>
-        _array = <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> T;
+        _array : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> T;
       <span style="color: #00ffff;">public</span>
         &lt;&lt;AccessMethods&gt;&gt;
         <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( length : cardinal );
         <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">Destroy</span>;
       <span style="color: #00ffff;">end</span>;
 
-    generic GFileArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( GAbstractArray&lt;T&gt; )
+    generic GFileArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( specialize GAbstractArray&lt;T&gt; )
+      <span style="color: #00ffff;">private</span> <span style="color: #ff00ff;">type</span> FileOfT = <span style="color: #ff00ff;">file</span> <span style="color: #00ffff;">of</span> t;
       <span style="color: #00ffff;">protected</span>
-        _file = <span style="color: #ff00ff;">file</span> <span style="color: #00ffff;">of</span> T;
+        _file : FileOfT;
       <span style="color: #00ffff;">public</span>
         &lt;&lt;AccessMethods&gt;&gt;
-        <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( <span style="color: #ff00ff;">var</span> f : <span style="color: #ff00ff;">file</span> <span style="color: #00ffff;">of</span> T );
+        <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( <span style="color: #ff00ff;">var</span> f : FileOfT );
         <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">Destroy</span>;
       <span style="color: #00ffff;">end</span>;
 
-    generic GBPlusArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( GAbstractArray&lt;T&gt; )
+    generic GBPlusArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( specialize GAbstractArray&lt;T&gt; )
       <span style="color: #00ffff;">public</span>
         &lt;&lt;AccessMethods&gt;&gt;
         <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( length : cardinal );
         <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">Destroy</span>;
       <span style="color: #00ffff;">end</span>;
 
-    generic GEmbeddedArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( GAbstractArray&lt;T&gt; )
+    generic GEmbeddedArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( specialize GAbstractArray&lt;T&gt; )
+      <span style="color: #00ffff;">private</span> <span style="color: #ff00ff;">type</span> IArrayOfT = specialize IArray&lt;T&gt;;
       <span style="color: #00ffff;">public</span>
         &lt;&lt;AccessMethods&gt;&gt;
-        <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( a : IArray&lt;T&gt;; length : cardinal );
+        <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( a : IArrayOfT; length : cardinal );
         <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">Destroy</span>;
       <span style="color: #00ffff;">end</span>;
 
@@ -419,6 +458,49 @@ To that end, we will run each class through the following test suite, which simp
   &lt;&lt;ar:imp&gt;&gt;
 <span style="color: #00ffff;">end</span>.
 </pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> template for test suite</h3>
+<div class="outline-text-3" id="text-4-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$i test_ar.def</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">implementation</span>
+<span style="color: #00ffff;">uses</span> ar;
+
+&lt;&lt;check_array&gt;&gt;
+<span style="color: #ff00ff;">type</span>
+  TDynArray      = specialize GDynArray&lt;Cardinal&gt;;
+  TFileArray     = specialize GFileArray&lt;Cardinal&gt;;
+  TBPlusArray    = specialize GBPlusArray&lt;Cardinal&gt;;
+  TEmbeddedArray = specialize GEmbeddedArray&lt;Cardinal&gt;;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">test_dinarray</span>;
+  <span style="color: #00ffff;">begin</span>
+    check_array( TDynArray.Create( 0 ));
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">test_filearray</span>;
+  <span style="color: #00ffff;">begin</span>
+    check_array( TFileArray.Create( <span style="color: #00ff00;">'test_ar.b4sd'</span> ));
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">test_bplusarray</span>;
+  <span style="color: #00ffff;">begin</span>
+    check_array( TBPlusArray.Create( 0 ));
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">test_embeddedarray</span>;
+  <span style="color: #00ffff;">begin</span>
+    check_array( TEmbeddedArray( TDynArray.Create( 1024 )));
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">begin</span>
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
 </div>
 </div>
 </div>
