@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>ia.pas : IArray interface</title>
+<!-- 2013-05-07 Tue 21:05 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal"/>
+<link rel="stylesheet" type="text/css" href="etc/style.css">
+
+<script type="text/javascript" src="http://orgmode.org/org-info.js">
+/**
+ *
+ * @source: http://orgmode.org/org-info.js
+ *
+ * @licstart  The following is the entire license notice for the
+ *  JavaScript code in http://orgmode.org/org-info.js.
+ *
+ * Copyright (C) 2012-2013  Sebastian Rose
+ *
+ *
+ * The JavaScript code in this tag is free software: you can
+ * redistribute it and/or modify it under the terms of the GNU
+ * General Public License (GNU GPL) as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option)
+ * any later version.  The code is distributed WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+ *
+ * As additional permission under GNU GPL version 3 section 7, you
+ * may distribute non-source (e.g., minimized or compacted) forms of
+ * that code without the copy of the GNU GPL normally required by
+ * section 4, provided you include this license notice and a URL
+ * through which recipients can access the Corresponding Source.
+ *
+ * @licend  The above is the entire license notice
+ * for the JavaScript code in http://orgmode.org/org-info.js.
+ *
+ */
+</script>
+
+<script type="text/javascript">
+
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+
+<!--/*--><![CDATA[/*><!--*/
+org_html_manager.set("TOC_DEPTH", "3");
+org_html_manager.set("LINK_HOME", "");
+org_html_manager.set("LINK_UP", "");
+org_html_manager.set("LOCAL_TOC", "1");
+org_html_manager.set("VIEW_BUTTONS", "0");
+org_html_manager.set("MOUSE_HINT", "underline");
+org_html_manager.set("FIXED_TOC", "0");
+org_html_manager.set("TOC", "0");
+org_html_manager.set("VIEW", "plain");
+org_html_manager.setup();  // activate after the parameters are set
+/*]]>*///-->
+</script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">ia.pas : IArray interface</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. The Interface</a></li>
+<li><a href="#sec-2">2. The Classes</a>
+<ul>
+<li><a href="#sec-2-1">2.1. GDynArray</a></li>
+<li><a href="#sec-2-2">2.2. GFileArray</a></li>
+<li><a href="#sec-2-3">2.3. GBPlusArray</a></li>
+<li><a href="#sec-2-4">2.4. GEmbeddedArray</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. Appendix: Complete interface for UNIT <code>ia</code></a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> The Interface</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Arrays are simply sequences of values. Generally arrays store their values in sequential memory slots, allowing for very fast interactions thanks to pointer arithmetic under the hood.
+</p>
+
+<p>
+Sometimes, though, we prefer something that looks and feels like an array, but uses some other kind of storage system under the hood.
+</p>
+
+<p>
+In particular, we will concern ourselves here with <i>dynamic</i> arrays, which can grow and shrink at runtime, rather than having fixed bounds. To that end, we will provide the following two methods for all of our array types:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="SizeMethods"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">Count</span> : cardinal;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Resize</span>( newLength : cardinal );
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Append</span>( value : T );
+</pre>
+</div>
+
+<p>
+Above, <code>T</code> is a type variable, indicating some particular but as-yet unspecified type.
+</p>
+
+<p>
+Of course, at the most basic level, arrays let us get and set items of some type at a particular index, so we must provide methods for these as well:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="AccessMethods"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetItem</span>( ix : cardinal ) : T;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetItem</span>( ix : cardinal; val : T );
+</pre>
+</div>
+
+<p>
+The four methods define the generic <code>IArray&lt;T&gt;</code> interface. The only thing left is to declare a default susbscripted property, <code>item</code>, which allows us to use the handy square-bracket syntax for our containers, just like a real array.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="ItemProperty"><span style="color: #00ffff;">property</span> item[ ix : cardinal ] : T
+  <span style="color: #00ffff;">read</span> GetItem <span style="color: #00ffff;">write</span> SetItem; <span style="color: #00ffff;">default</span>;
+</pre>
+</div>
+
+<p>
+Next, we're going to build a few classes that all implement this same interface.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> The Classes</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> <span class="todo TODO">TODO</span> GDynArray</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="ia:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GDynArray.Create</span>;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">GDynArray.Destroy</span>;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> <span class="todo TODO">TODO</span> GFileArray</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="ia:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GFileArray.Create</span>;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GFileArray.GetItem</span>( ix : cardinal ) : T;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GFileArray.SetItem</span>( ix : cardinal; val : T );
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">GFileArray.Destroy</span>;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> <span class="todo TODO">TODO</span> GBPlusArray</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="ia:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GBPlusArray.Create</span>;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GBPlusArray.GetItem</span>( ix : cardinal ) : T;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GBPlusArray.SetItem</span>( ix : cardinal; val : T );
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">GBPlusArray.Destroy</span>;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> <span class="todo TODO">TODO</span> GEmbeddedArray</h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="ia:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GEmbeddedArray.Create</span>;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GEmbeddedArray.GetItem</span>( ix : cardinal ) : T;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GEmbeddedArray.SetItem</span>( ix : cardinal; val : T );
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">GEmbeddedArray.Destroy</span>;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+
+
+
+<p>
+Object pascal offers dynamic arrays, which are basically the same as static arrays, except they're allocated on the heap. You can resize them with <code>SetLength</code>, but since this can copy the entire array each time you resize it, it's not always efficient to grow the array.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Appendix: Complete interface for UNIT <code>ia</code></h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$i xpc.inc</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">ia</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">IArray interface </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">interface</span>
+
+  <span style="color: #ff00ff;">type</span>
+
+    generic IArray&lt;T&gt; = <span style="color: #00ffff;">interface</span>
+      &lt;&lt;SizeMethods&gt;&gt;
+      &lt;&lt;AccessMethods&gt;&gt;
+      &lt;&lt;ItemProperty&gt;&gt;
+    <span style="color: #00ffff;">end</span>;
+
+    generic GAbstractArray&lt;T&gt; = <span style="color: #ff00ff;">class</span> <span style="color: #00ffff;">abstract</span> (TInterfacedObject, IArray&lt;T&gt;)
+      <span style="color: #00ffff;">protected</span>
+        _count = cardinal;
+        <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">CheckRange</span>( ix : cardinal );
+      <span style="color: #00ffff;">public</span>
+        <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( length : cardinal ); <span style="color: #00ffff;">virtual</span>;
+        <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Resize</span>( length : cardinal ); <span style="color: #00ffff;">virtual</span>;
+        <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Append</span>( value : t ); <span style="color: #00ffff;">virtual</span>;
+        <span style="color: #00ffff;">property</span> Count : cardinal <span style="color: #00ffff;">read</span> _count;
+      <span style="color: #00ffff;">end</span>;
+
+    generic GDynArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( GAbstractArray&lt;T&gt; )
+      <span style="color: #00ffff;">protected</span>
+        _array = <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> T;
+      <span style="color: #00ffff;">public</span>
+        &lt;&lt;AccessMethods&gt;&gt;
+        <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( length : cardinal );
+        <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">Destroy</span>;
+      <span style="color: #00ffff;">end</span>;
+
+    generic GFileArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( GAbstractArray&lt;T&gt; )
+      <span style="color: #00ffff;">protected</span>
+        _file = <span style="color: #ff00ff;">file</span> <span style="color: #00ffff;">of</span> T;
+      <span style="color: #00ffff;">public</span>
+        &lt;&lt;AccessMethods&gt;&gt;
+        <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( <span style="color: #ff00ff;">var</span> f : <span style="color: #ff00ff;">file</span> <span style="color: #00ffff;">of</span> T );
+        <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">Destroy</span>;
+      <span style="color: #00ffff;">end</span>;
+
+    generic GBPlusArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( GAbstractArray&lt;T&gt; )
+      <span style="color: #00ffff;">public</span>
+        &lt;&lt;AccessMethods&gt;&gt;
+        <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( length : cardinal );
+        <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">Destroy</span>;
+      <span style="color: #00ffff;">end</span>;
+
+    generic GEmbeddedArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( GAbstractArray&lt;T&gt; )
+      <span style="color: #00ffff;">public</span>
+        &lt;&lt;AccessMethods&gt;&gt;
+        <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( a : IArray&lt;T&gt;; length : cardinal );
+        <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">Destroy</span>;
+      <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">implementation</span>
+  &lt;&lt;ia:imp&gt;&gt;
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
