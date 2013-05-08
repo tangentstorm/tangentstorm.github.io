@@ -2,8 +2,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title>ia.pas : IArray interface</title>
-<!-- 2013-05-07 Tue 21:06 -->
+<title>ar.pas : Array interface</title>
+<!-- 2013-05-07 Tue 23:09 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -76,7 +76,7 @@ org_html_manager.set("VIEW_BUTTONS", "0");
 org_html_manager.set("MOUSE_HINT", "underline");
 org_html_manager.set("FIXED_TOC", "0");
 org_html_manager.set("TOC", "0");
-org_html_manager.set("VIEW", "info");
+org_html_manager.set("VIEW", "content");
 org_html_manager.setup();  // activate after the parameters are set
 /*]]>*///-->
 </script>
@@ -129,88 +129,155 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">ia.pas : IArray interface</h1>
+<h1 class="title">ar.pas : Array interface</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. The Interface</a></li>
-<li><a href="#sec-2">2. The Classes</a>
+<li><a href="#sec-1">1. The IArray Interface</a></li>
+<li><a href="#sec-2">2. A simple test suite.</a></li>
+<li><a href="#sec-3">3. Passing the Tests</a>
 <ul>
-<li><a href="#sec-2-1">2.1. GDynArray</a></li>
-<li><a href="#sec-2-2">2.2. GFileArray</a></li>
-<li><a href="#sec-2-3">2.3. GBPlusArray</a></li>
-<li><a href="#sec-2-4">2.4. GEmbeddedArray</a></li>
+<li><a href="#sec-3-1">3.1. GAbstractArray</a></li>
+<li><a href="#sec-3-2">3.2. GDynArray</a></li>
 </ul>
 </li>
-<li><a href="#sec-3">3. Appendix: Complete interface for UNIT <code>ia</code></a></li>
+<li><a href="#sec-4">4. </a>
+<ul>
+<li><a href="#sec-4-1">4.1. GFileArray</a></li>
+<li><a href="#sec-4-2">4.2. GBPlusArray</a></li>
+<li><a href="#sec-4-3">4.3. GEmbeddedArray</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. Appendix: Complete interface for UNIT <code>ar</code></a></li>
 </ul>
 </div>
 </div>
 
 <div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> The Interface</h2>
+<h2 id="sec-1"><span class="section-number-2">1</span> The IArray Interface</h2>
 <div class="outline-text-2" id="text-1">
 <p>
-Arrays are simply sequences of values. Generally arrays store their values in sequential memory slots, allowing for very fast interactions thanks to pointer arithmetic under the hood.
+Previously, we looked at the <a href="https://github.com/tangentstorm/xpl/blob/master/code/sq.pas">sq unit</a>, in which we defined a generic sequence type, whose interface looked like this:
+</p>
+
+<pre class="example">
+type generic ISequence&lt;tKey, tVal&gt; = interface
+  function Length : cardinal;
+  function GetItem( i : tKey ) : tVal;
+  procedure SetItem( i : tKey; value : tVal );
+  property item[ i : tKey ] : tVal
+    read GetItem write SetItem; default;
+end;
+</pre>
+
+<p>
+We further provided an abstract class, <code>GSeq&lt;tKey,tVal&gt;</code>, which provides an enumerator for classes implementing <code>ISequence</code>. This allows us to loop through the values of a sequence with pascal's <code>for &#x2026; in &#x2026; do</code> syntax.
 </p>
 
 <p>
-Sometimes, though, we prefer something that looks and feels like an array, but uses some other kind of storage system under the hood.
+An array is a specific type of sequence that uses a continuous range of values for its keys.
 </p>
 
 <p>
-In particular, we will concern ourselves here with <i>dynamic</i> arrays, which can grow and shrink at runtime, rather than having fixed bounds. To that end, we will provide the following two methods for all of our array types:
+Arrays in standard pascal can have arbitrary start and end indices (that is, you can declare an <code>array[ -5 .. 237 ]</code> if you like, or <code>array['a'..'z']</code>, or even <code>array[byte]</code>, which translates to <code>array[0..255]</code>, the range of the <code>byte</code> type.
+</p>
+
+<p>
+However, most of the time, it's sufficient to range from zero to some maximum value, and in fact this is how dynamic arrays work in object pascal, thus we can define an interface that works very much like a dynamic array simply by specializing <code>ISequence</code> and using <code>cardinal</code> as the key type:
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="SizeMethods"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">Count</span> : cardinal;
-<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Resize</span>( newLength : cardinal );
-<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Append</span>( value : T );
+<pre class="src src-pascal" id="IArray"><span style="color: #ff00ff;">type</span>
+  generic IArray&lt;T&gt; = <span style="color: #00ffff;">interface</span> (specialize ISequence&lt;cardinal, T&gt;)
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Resize</span>( newLength : cardinal );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Append</span>( value : T );
+  <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
 
 <p>
-Above, <code>T</code> is a type variable, indicating some particular but as-yet unspecified type.
+Remember, <code>T</code> is a type variable, indicating some particular but as-yet unspecified type, as if we'd declared an <code>array of T</code>.
 </p>
 
 <p>
-Of course, at the most basic level, arrays let us get and set items of some type at a particular index, so we must provide methods for these as well:
+The two additional methods we've added indicate that we will concern ourselves here with <i>dynamic</i> arrays, which can grow and shrink at runtime, rather than having fixed bounds.
 </p>
 
-<div class="org-src-container">
-
-<pre class="src src-pascal" id="AccessMethods"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetItem</span>( ix : cardinal ) : T;
-<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetItem</span>( ix : cardinal; val : T );
-</pre>
-</div>
-
 <p>
-The four methods define the generic <code>IArray&lt;T&gt;</code> interface. The only thing left is to declare a default susbscripted property, <code>item</code>, which allows us to use the handy square-bracket syntax for our containers, just like a real array.
+Object pascal offers dynamic arrays, which are basically the same as static arrays, except they're allocated on the heap. You can resize them with <code>SetLength</code>, but since this can copy the entire array each time you resize it, it's not always efficient to grow the array.
 </p>
 
-<div class="org-src-container">
-
-<pre class="src src-pascal" id="ItemProperty"><span style="color: #00ffff;">property</span> item[ ix : cardinal ] : T
-  <span style="color: #00ffff;">read</span> GetItem <span style="color: #00ffff;">write</span> SetItem; <span style="color: #00ffff;">default</span>;
-</pre>
-</div>
+<p>
+Since keys in an array are a contiguous sequence of values, arrays generally store their values in a single contiguous block of RAM. This allows the compiler to use simple pointer arithmetic under the hood to 
+allow very fast access to the data.
+</p>
 
 <p>
-Next, we're going to build a few classes that all implement this same interface.
+Sometimes, though, we prefer something that looks and feels like an array, but uses some other kind of storage system underneath. In this unit, we'll explore several classes that all implement this same interface, but have very different implementations under the hood.
 </p>
 </div>
 </div>
 <div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> The Classes</h2>
+<h2 id="sec-2"><span class="section-number-2">2</span> A simple test suite.</h2>
 <div class="outline-text-2" id="text-2">
-</div><div id="outline-container-sec-2-1" class="outline-3">
-<h3 id="sec-2-1"><span class="section-number-3">2.1</span> <span class="todo TODO">TODO</span> GDynArray</h3>
-<div class="outline-text-3" id="text-2-1">
+<p>
+The compiler will check that each of our array classes provides the necessary methods to implement <code>IArray</code>, but it can't guarantee that the implementation actually does what we want.
+</p>
+
+<p>
+Actually, nothing short of a formal proof can guarantee that our software is correct (and then only if we trust both the compiler and our logic), but we can at least provide evidence that it's probably doing the right thing. 
+</p>
+
+<p>
+To that end, we will run each class through the following test suite, which simply creates and populates an array.
+</p>
+
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="ia:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GDynArray.Create</span>;
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span>
+  StringArray : specialize IArray&lt;<span style="color: #ff00ff;">string</span>&gt;;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">check_array</span>( IArray : <span style="color: #ff00ff;">string</span> );
+  <span style="color: #00ffff;">begin</span>
+    StringArray : specialize IArray&lt;<span style="color: #ff00ff;">string</span>&gt;;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Passing the Tests</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> <span class="todo TODO">TODO</span> GAbstractArray</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal">#+end_src
+
+** TODO GDynArray
+ #+<span style="color: #00ffff;">name</span>: ar:imp
+ #+begin_src <span style="color: #00ffff;">pascal</span>
+
+   <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GDynArray.Create</span>;
+     <span style="color: #00ffff;">begin</span>
+     <span style="color: #00ffff;">end</span>;
+
+   <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">GDynArray.Destroy</span>;
+     <span style="color: #00ffff;">begin</span>
+     <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> <span class="todo TODO">TODO</span> GDynArray</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GDynArray.Create</span>;
   <span style="color: #00ffff;">begin</span>
   <span style="color: #00ffff;">end</span>;
 
@@ -221,12 +288,16 @@ Next, we're going to build a few classes that all implement this same interface.
 </div>
 </div>
 </div>
-<div id="outline-container-sec-2-2" class="outline-3">
-<h3 id="sec-2-2"><span class="section-number-3">2.2</span> <span class="todo TODO">TODO</span> GFileArray</h3>
-<div class="outline-text-3" id="text-2-2">
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> </h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> <span class="todo TODO">TODO</span> GFileArray</h3>
+<div class="outline-text-3" id="text-4-1">
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="ia:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GFileArray.Create</span>;
+<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GFileArray.Create</span>;
   <span style="color: #00ffff;">begin</span>
   <span style="color: #00ffff;">end</span>;
 
@@ -245,12 +316,12 @@ Next, we're going to build a few classes that all implement this same interface.
 </div>
 </div>
 </div>
-<div id="outline-container-sec-2-3" class="outline-3">
-<h3 id="sec-2-3"><span class="section-number-3">2.3</span> <span class="todo TODO">TODO</span> GBPlusArray</h3>
-<div class="outline-text-3" id="text-2-3">
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> <span class="todo TODO">TODO</span> GBPlusArray</h3>
+<div class="outline-text-3" id="text-4-2">
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="ia:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GBPlusArray.Create</span>;
+<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GBPlusArray.Create</span>;
   <span style="color: #00ffff;">begin</span>
   <span style="color: #00ffff;">end</span>;
 
@@ -269,12 +340,12 @@ Next, we're going to build a few classes that all implement this same interface.
 </div>
 </div>
 </div>
-<div id="outline-container-sec-2-4" class="outline-3">
-<h3 id="sec-2-4"><span class="section-number-3">2.4</span> <span class="todo TODO">TODO</span> GEmbeddedArray</h3>
-<div class="outline-text-3" id="text-2-4">
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> <span class="todo TODO">TODO</span> GEmbeddedArray</h3>
+<div class="outline-text-3" id="text-4-3">
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="ia:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GEmbeddedArray.Create</span>;
+<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GEmbeddedArray.Create</span>;
   <span style="color: #00ffff;">begin</span>
   <span style="color: #00ffff;">end</span>;
 
@@ -291,28 +362,22 @@ Next, we're going to build a few classes that all implement this same interface.
   <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
-
-
-
-
-<p>
-Object pascal offers dynamic arrays, which are basically the same as static arrays, except they're allocated on the heap. You can resize them with <code>SetLength</code>, but since this can copy the entire array each time you resize it, it's not always efficient to grow the array.
-</p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-sec-3" class="outline-2">
-<h2 id="sec-3"><span class="section-number-2">3</span> Appendix: Complete interface for UNIT <code>ia</code></h2>
-<div class="outline-text-2" id="text-3">
+
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Appendix: Complete interface for UNIT <code>ar</code></h2>
+<div class="outline-text-2" id="text-5">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$i xpc.inc</span><span style="color: #66f;">}</span>
-<span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">ia</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">IArray interface </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">ar</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">Array interface </span><span style="color: #66f;">}</span>
 <span style="color: #00ffff;">interface</span>
 
   <span style="color: #ff00ff;">type</span>
-
     generic IArray&lt;T&gt; = <span style="color: #00ffff;">interface</span>
       &lt;&lt;SizeMethods&gt;&gt;
       &lt;&lt;AccessMethods&gt;&gt;
@@ -363,7 +428,7 @@ Object pascal offers dynamic arrays, which are basically the same as static arra
       <span style="color: #00ffff;">end</span>;
 
 <span style="color: #00ffff;">implementation</span>
-  &lt;&lt;ia:imp&gt;&gt;
+  &lt;&lt;ar:imp&gt;&gt;
 <span style="color: #00ffff;">end</span>.
 </pre>
 </div>
