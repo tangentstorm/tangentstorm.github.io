@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>minrel, part 0</title>
-<!-- 2013-05-10 Fri 02:12 -->
+<!-- 2013-05-10 Fri 04:20 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -67,17 +67,17 @@ for the JavaScript code in this tag.
 <li><a href="#sec-3">3. Implementation</a>
 <ul>
 <li><a href="#sec-3-1">3.1. A simple database for bookmarks.</a></li>
-<li><a href="#sec-3-2">3.2. The program skeleton.</a></li>
+<li><a href="#sec-3-2">3.2. program <code>urldb0</code></a></li>
 <li><a href="#sec-3-3">3.3. Walkthrough</a></li>
 <li><a href="#sec-3-4">3.4. --------------------</a></li>
 <li><a href="#sec-3-5">3.5. type <code>TUrlRec</code></a></li>
 <li><a href="#sec-3-6">3.6. procedure <code>MakeDatabase</code></a></li>
-<li><a href="#sec-3-7">3.7. procedures <code>ShowHeader</code> and <code>ShowRecord</code></a></li>
-<li><a href="#sec-3-8">3.8. procedure <code>ShowRecord</code></a></li>
-<li><a href="#sec-3-9">3.9. procedure <code>ShowAllRecords</code></a></li>
-<li><a href="#sec-3-10">3.10. procedure <code>ShowQueryResults</code></a></li>
+<li><a href="#sec-3-7">3.7. procedures <code>ShowHeader</code></a></li>
+<li><a href="#sec-3-8">3.8. procedure <code>ShowAllRecords</code></a></li>
+<li><a href="#sec-3-9">3.9. procedure <code>ShowQueryResults</code></a></li>
 </ul>
 </li>
+<li><a href="#sec-4">4. results</a></li>
 </ul>
 </div>
 </div>
@@ -245,7 +245,7 @@ The example code in these articles is all written in object pascal, using the cr
 </div>
 </div>
 <div id="outline-container-sec-3-2" class="outline-3">
-<h3 id="sec-3-2"><span class="section-number-3">3.2</span> The program skeleton.</h3>
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> program <code>urldb0</code></h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 We will start with a simple command line program that lets us create, update, and delete records in our database.
@@ -275,15 +275,18 @@ Here's the rough outline of of the code:
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="urldb0"><span style="color: #00ffff;">program</span> <span style="color: #ffffff; font-weight: bold;">urldb0</span>;
+<span style="color: #00ffff;">uses</span> strutils;
 
 &lt;&lt;TUrlRec&gt;&gt;
+<span style="color: #ff00ff;">type</span> TUrlFile = <span style="color: #ff00ff;">file</span> <span style="color: #00ffff;">of</span> TUrlRec;
+
 &lt;&lt;routines&gt;&gt;
 
-<span style="color: #ff00ff;">var</span> f : <span style="color: #ff00ff;">file</span> <span style="color: #00ffff;">of</span> TUrlRec;
+<span style="color: #ff00ff;">var</span> f : TUrlFile;
 <span style="color: #00ffff;">begin</span>
   MakeDatabase( f );
-  WriteLn(<span style="color: #00ff00;">'All records:'</span>);   ShowAllRecords( f );
-  WriteLn(<span style="color: #00ff00;">'Query results:'</span>); ShowQueryResults( f );
+  ShowHeader(<span style="color: #00ff00;">'All records'</span>);   ShowAllRecords( f );
+  ShowHeader(<span style="color: #00ff00;">'Query results'</span>); ShowQueryResults( f );
 <span style="color: #00ffff;">end</span>.
 </pre>
 </div>
@@ -348,7 +351,6 @@ Here, <code>MakeDatabase</code>, <code>ShowHeader</code>, <code>ShowAllRecords</
 </p>
 </div>
 </div>
-
 <div id="outline-container-sec-3-4" class="outline-3">
 <h3 id="sec-3-4"><span class="section-number-3">3.4</span> <span class="todo TODO">TODO</span> --------------------</h3>
 <div class="outline-text-3" id="text-3-4">
@@ -357,7 +359,6 @@ Here, <code>MakeDatabase</code>, <code>ShowHeader</code>, <code>ShowAllRecords</
 </p>
 </div>
 </div>
-
 <div id="outline-container-sec-3-5" class="outline-3">
 <h3 id="sec-3-5"><span class="section-number-3">3.5</span> type <code>TUrlRec</code></h3>
 <div class="outline-text-3" id="text-3-5">
@@ -378,9 +379,9 @@ Here, <code>MakeDatabase</code>, <code>ShowHeader</code>, <code>ShowAllRecords</
 <div class="outline-text-3" id="text-3-6">
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="routines"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">MakeDatabase</span>( f : <span style="color: #ff00ff;">file</span> <span style="color: #00ffff;">of</span> TUrlRec );
+<pre class="src src-pascal" id="routines"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">MakeDatabase</span>( <span style="color: #ff00ff;">var</span> f : TUrlFile );
   <span style="color: #ff00ff;">var</span> rec : TUrlRec;
-  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">store</span>( id: cardinal; url: <span style="color: #ff00ff;">string</span>[36]; title : <span style="color: #ff00ff;">string</span>[24] ) : TUrlRec;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">store</span>( id: cardinal; url: <span style="color: #ff00ff;">string</span>; title : <span style="color: #ff00ff;">string</span> );
     <span style="color: #00ffff;">begin</span>
       rec.id    := id;
       rec.url   := url;
@@ -402,7 +403,7 @@ Here, <code>MakeDatabase</code>, <code>ShowHeader</code>, <code>ShowAllRecords</
 </div>
 </div>
 <div id="outline-container-sec-3-7" class="outline-3">
-<h3 id="sec-3-7"><span class="section-number-3">3.7</span> procedures <code>ShowHeader</code> and <code>ShowRecord</code></h3>
+<h3 id="sec-3-7"><span class="section-number-3">3.7</span> procedures <code>ShowHeader</code></h3>
 <div class="outline-text-3" id="text-3-7">
 <p>
 We saw that <code>Write</code> can be used to write records to a typed file.
@@ -421,9 +422,11 @@ In particular, these special routines can take a variable number of parameters, 
 <pre class="src src-pascal" id="routines"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ShowHeader</span>( header : <span style="color: #ff00ff;">string</span> );
   <span style="color: #ff00ff;">var</span> i : cardinal;
   <span style="color: #00ffff;">begin</span>
-    <span style="color: #00ffff;">Write</span>( <span style="color: #00ff00;">'--| '</span>, header, <span style="color: #00ff00;">' |'</span> );
-    <span style="color: #00ffff;">for</span> i := 64 <span style="color: #00ffff;">downto</span> (64 - length(header) - length(<span style="color: #00ff00;">'--| '</span>+ <span style="color: #00ff00;">' |'</span>)) <span style="color: #00ffff;">do</span>
-      <span style="color: #00ffff;">write</span>( <span style="color: #00ff00;">'-'</span> );
+    WriteLn;
+    <span style="color: #00ffff;">Write</span>( <span style="color: #00ff00;">'##| '</span>, header, <span style="color: #00ff00;">' |'</span> );
+    <span style="color: #00ffff;">for</span> i := length(header) + length(<span style="color: #00ff00;">'##| '</span>+ <span style="color: #00ff00;">' |'</span>) <span style="color: #00ffff;">to</span> 64 <span style="color: #00ffff;">do</span>
+      <span style="color: #00ffff;">write</span>( <span style="color: #00ff00;">'#'</span> );
+    WriteLn;
     WriteLn;
   <span style="color: #00ffff;">end</span>;
 </pre>
@@ -431,63 +434,115 @@ In particular, these special routines can take a variable number of parameters, 
 </div>
 </div>
 <div id="outline-container-sec-3-8" class="outline-3">
-<h3 id="sec-3-8"><span class="section-number-3">3.8</span> procedure <code>ShowRecord</code></h3>
+<h3 id="sec-3-8"><span class="section-number-3">3.8</span> procedure <code>ShowAllRecords</code></h3>
 <div class="outline-text-3" id="text-3-8">
 <p>
-Here we see a <code>for</code> loop.
+To reopen a file for reaing, we use <code>Reset</code>, then loop through and <code>Read</code> records from the file until we reach the end of the file (which we test by calling <code>Eof</code> before each read).
+</p>
+
+<p>
+As we print each record with <code>WriteLn</code> you can see the special string justification syntax using the colon character. For example, <code>rec.id : 3</code> tells <code>WriteLn</code> to use at least 3 characters to display the numbers in that column.
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="routines"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ShowRecord</span>( <span style="color: #ff00ff;">var</span> rec : TUrlRec );
+<pre class="src src-pascal" id="routines"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ShowAllRecords</span>( <span style="color: #ff00ff;">var</span> f : TUrlFile );
+  <span style="color: #ff00ff;">var</span> rec : TUrlRec; i : byte;
   <span style="color: #00ffff;">begin</span>
-    WriteLn( rec.id : 3, <span style="color: #00ff00;">' '</span>, rec.url : 36, <span style="color: #00ff00;">' '</span>, rec.title : 24 );
+    Reset( f );
+    Writeln( <span style="color: #00ff00;">'id'</span> : 3, <span style="color: #00ff00;">' '</span>,
+            PadRight( <span style="color: #00ff00;">'url'</span>, 36 ), <span style="color: #00ff00;">' '</span>,
+            PadRight( <span style="color: #00ff00;">'title'</span>, 24 ));
+    <span style="color: #00ffff;">for</span> i := 1 <span style="color: #00ffff;">to</span> 64 <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">write</span>( <span style="color: #00ff00;">'-'</span> );
+    writeln;
+    <span style="color: #00ffff;">while</span> <span style="color: #00ffff;">not</span> Eof( f ) <span style="color: #00ffff;">do</span>
+      <span style="color: #00ffff;">begin</span>
+        <span style="color: #00ffff;">Read</span>( f, rec );
+        WriteLn( rec.id : 3, <span style="color: #00ff00;">' '</span>,
+                 PadRight( rec.url, 36 ), <span style="color: #00ff00;">' '</span>,
+                 PadRight( rec.title, 24 ));
+      <span style="color: #00ffff;">end</span>
   <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
 </div>
 </div>
 <div id="outline-container-sec-3-9" class="outline-3">
-<h3 id="sec-3-9"><span class="section-number-3">3.9</span> procedure <code>ShowAllRecords</code></h3>
+<h3 id="sec-3-9"><span class="section-number-3">3.9</span> procedure <code>ShowQueryResults</code></h3>
 <div class="outline-text-3" id="text-3-9">
+<p>
+The only differences between <code>ShowAllRecords</code> and <code>ShowQueryResults</code> are:
+</p>
+
+<ul class="org-ul">
+<li>we use an <code>if &#x2026; then</code> statement to check the record's <code>.id</code> field, and only print the record if the id is less than 5
+</li>
+<li>we don't print the url
+</li>
+</ul>
+
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="routines"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ShowAllRecords</span>( f : <span style="color: #ff00ff;">file</span> <span style="color: #00ffff;">of</span> TUrlRec );
-  <span style="color: #ff00ff;">var</span> rec : TUrlRec;
+<pre class="src src-pascal" id="routines"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ShowQueryResults</span>( <span style="color: #ff00ff;">var</span> f : TUrlFile );
+<span style="color: #ff00ff;">var</span> rec : TUrlRec; i : byte;
   <span style="color: #00ffff;">begin</span>
     Reset( f );
+
+    Writeln( <span style="color: #00ff00;">'id'</span> : 3, <span style="color: #00ff00;">' '</span>,
+            PadRight( <span style="color: #00ff00;">'title'</span>, 24 ));
+    <span style="color: #00ffff;">for</span> i := 1 <span style="color: #00ffff;">to</span> 64 <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">write</span>( <span style="color: #00ff00;">'-'</span> );
+    writeln;
+
     <span style="color: #00ffff;">while</span> <span style="color: #00ffff;">not</span> eof( f ) <span style="color: #00ffff;">do</span>
       <span style="color: #00ffff;">begin</span>
         <span style="color: #00ffff;">Read</span>( f, rec );
-        ShowRecord( rec )
-      <span style="color: #00ffff;">end</span>
+        <span style="color: #00ffff;">if</span> rec.id &lt; 5 <span style="color: #00ffff;">then</span>
+          WriteLn( rec.id : 3, <span style="color: #00ff00;">' '</span>, PadRight( rec.title, 24 ));
+      <span style="color: #00ffff;">end</span>;
+    Writeln;
   <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> results</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+To compile and run the program, use the following commands:
+</p>
+
+<pre class="example">
+fpc urldb0.pas
+./urldb0
+</pre>
 
 <p>
-Note that this has to come <i>after</i> <code>ShowRecord</code>, because it calls it.
+You should see the following output:
 </p>
-</div>
-</div>
-<div id="outline-container-sec-3-10" class="outline-3">
-<h3 id="sec-3-10"><span class="section-number-3">3.10</span> procedure <code>ShowQueryResults</code></h3>
-<div class="outline-text-3" id="text-3-10">
-<div class="org-src-container">
 
-<pre class="src src-pascal" id="routines"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ShowAllRecords</span>( f : <span style="color: #ff00ff;">file</span> <span style="color: #00ffff;">of</span> TUrlRec );
-  <span style="color: #ff00ff;">var</span> rec : TUrlRec;
-  <span style="color: #00ffff;">begin</span>
-    Reset( f );
-    <span style="color: #00ffff;">while</span> <span style="color: #00ffff;">not</span> eof( f ) <span style="color: #00ffff;">do</span>
-      <span style="color: #00ffff;">begin</span>
-        <span style="color: #00ffff;">Read</span>( f, rec );
-        ShowRecord( rec )
-      <span style="color: #00ffff;">end</span>
-  <span style="color: #00ffff;">end</span>;
+<pre class="example">
+##| All records |################################################
+
+ id url                                  title
+----------------------------------------------------------------
+  7 http://reddit.com/r/learnprogramming learn programming
+  4 http://sourceforge.net/              SourceForge
+  8 http://stackoverflow.com/            Stack Overflow
+  2 https://github.com/                  GitHub
+ 13 http://c2.com/cgi/wiki?WikiWikiWeb   Wiki Wiki Web
+  6 http://reddit.com/r/programming      programming
+
+##| Query results |##############################################
+
+ id title
+----------------------------------------------------------------
+  4 SourceForge
+  2 GitHub
 </pre>
-</div>
-</div>
 </div>
 </div>
 </div>
