@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>minrel, part 1 : you only need two tables</title>
+<!-- 2013-05-10 Fri 02:09 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal"/>
+<link rel="stylesheet" type="text/css" href="etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">minrel, part 1 : you only need two tables</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Introduction</a></li>
+<li><a href="#sec-2">2. Relations</a></li>
+<li><a href="#sec-3">3. Implementation</a>
+<ul>
+<li><a href="#sec-3-1">3.1. A simple database for bookmarks.</a></li>
+<li><a href="#sec-3-2">3.2. The program skeleton.</a></li>
+<li><a href="#sec-3-3">3.3. Walkthrough</a></li>
+<li><a href="#sec-3-4">3.4. --------------------</a></li>
+<li><a href="#sec-3-5">3.5. type <code>TUrlRec</code></a></li>
+<li><a href="#sec-3-6">3.6. procedure <code>MakeDatabase</code></a></li>
+<li><a href="#sec-3-7">3.7. procedures <code>ShowHeader</code> and <code>ShowRecord</code></a></li>
+<li><a href="#sec-3-8">3.8. procedure <code>ShowRecord</code></a></li>
+<li><a href="#sec-3-9">3.9. procedure <code>ShowAllRecords</code></a></li>
+<li><a href="#sec-3-10">3.10. procedure <code>ShowQueryResults</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+We're going to write a little relational database here. It's called <i>minrel</i>, both because it's a rather minimalistic relational database, and because it's meant to serve as the relational component for a slightly larger project called minneron.
+</p>
+
+<p>
+We're going to start with a very naive implementation, and it's going to be pretty slow compared to things like PostGresQL, MySQL and SQLite &#x2013; although perhaps not nearly as slow as you might expect.
+</p>
+
+<p>
+Once we have it running, we're going to start introducing optimizations, swapping out algorithms, perhaps even dropping down to assembly language, until we have a very fast system, on par with those other databases.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Relations</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+In database terminology, a <i>relation</i> is a table-like data structure.
+</p>
+
+<p>
+Relations are un-ordered collections of <i>tuples</i>, which are ordered collections of values. All the tuples in a relation have the same structure, meaning they all have the same slots in the same order.
+</p>
+
+<p>
+Generally, when drawing relations, the tuples are depicted as rows, and the columns are given meaningful labels, called <i>keys</i>.
+</p>
+
+<p>
+Here's a simple example of a relation that lists a few popular programming-related websites, along with their titles.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="right"/>
+
+<col class="left"/>
+
+<col class="left"/>
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="right">id</th>
+<th scope="col" class="left">URL</th>
+<th scope="col" class="left">title</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="right">7</td>
+<td class="left"><a href="http://reddit.com/r/learnprogramming">http://reddit.com/r/learnprogramming</a></td>
+<td class="left">learn programming</td>
+</tr>
+
+<tr>
+<td class="right">4</td>
+<td class="left"><a href="http://sourceforge.net/">http://sourceforge.net/</a></td>
+<td class="left">SourceForge</td>
+</tr>
+
+<tr>
+<td class="right">8</td>
+<td class="left"><a href="http://stackoverflow.com/">http://stackoverflow.com/</a></td>
+<td class="left">Stack Overflow</td>
+</tr>
+
+<tr>
+<td class="right">2</td>
+<td class="left"><a href="https://github.com/">https://github.com/</a></td>
+<td class="left">GitHub</td>
+</tr>
+
+<tr>
+<td class="right">13</td>
+<td class="left"><a href="http://c2.com/cgi/wiki?WikiWikiWeb">http://c2.com/cgi/wiki?WikiWikiWeb</a></td>
+<td class="left">Wiki Wiki Web</td>
+</tr>
+
+<tr>
+<td class="right">6</td>
+<td class="left"><a href="http://reddit.com/r/programming">http://reddit.com/r/programming</a></td>
+<td class="left">programming</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Notice that each tuple conforms to the same structure, but the tuples themselves aren't in any particular order.
+</p>
+
+<p>
+Also note the <i>id</i> column. It's good practice when designing a database to make sure that there's a set of keys that, together, can uniquely identify a particular tuple within the relation. Preferably, only a single key is required, and we call this the <i>primary key</i>.
+</p>
+
+<p>
+In this particular case, the URL could serve this purpose, but as we will see, it's generally more convenient to use a number. Generally, we will  restrict ourselves to positive integers.
+</p>
+
+<p>
+A relational database can contain any number of relations, and produces new relations dynamically as it responds to queries. For example, if you were to request the id and title values from the above table but only where the ID is less than five, then the result would also be a relation:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="right"/>
+
+<col class="left"/>
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="right">id</th>
+<th scope="col" class="left">title</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="right">2</td>
+<td class="left">GitHub</td>
+</tr>
+
+<tr>
+<td class="right">4</td>
+<td class="left">SourceForge</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The relational model is rigorously defined in the mathematical sense, and provides a number of convenient operations for combining, filtering, and transforming relations in various ways. Most database provide some non-relational utilities as well, such as sorting and stored procedures.
+</p>
+
+<p>
+We will explore these features in depth as we go along, but first we're going to look at how we can implement our one-table database in software.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Implementation</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> A simple database for bookmarks.</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+Let's write a program to implement our one-table relational database for bookmarks, and perform the above query.
+</p>
+
+<p>
+The example code in these articles is all written in object pascal, using the cross platform, open source compiler from <a href="http://freepascal.org/">http://freepascal.org/</a> (version 2.6.2). Pascal is a fun, easy-to-understand language that's been around a long time, and object pascal is a modern dialact with all kinds of nice features like interfaces and generics.
+</p>
+
+<p>
+<b>Don't worry if you don't know pascal</b>. I will assume that most people reading this are <i>not</i> already familiar with it (or at least, not with the modern version), and will introduce each new construct as we go along.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> The program skeleton.</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+We will start with a simple command line program that lets us create, update, and delete records in our database.
+</p>
+
+<p>
+Basically, what our program does is this:
+</p>
+
+<ul class="org-ul">
+<li>define <code>TUrlRec</code>, a <code>record</code> type to hold our data.
+</li>
+<li>define a <code>file</code> variable to store records of this type.
+</li>
+<li>store our bookmarks in the file (using hard coded values for now)
+</li>
+<li>show the unfiltered table
+</li>
+<li>execute our example query and display the results
+</li>
+</ul>
+
+<p>
+Here's the rough outline of of the code:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="urldb0"><span style="color: #00ffff;">program</span> <span style="color: #ffffff; font-weight: bold;">urldb0</span>;
+
+&lt;&lt;TUrlRec&gt;&gt;
+&lt;&lt;routines&gt;&gt;
+
+<span style="color: #ff00ff;">var</span> f : <span style="color: #ff00ff;">file</span> <span style="color: #00ffff;">of</span> TUrlRec;
+<span style="color: #00ffff;">begin</span>
+  MakeDatabase( f );
+  WriteLn(<span style="color: #00ff00;">'All records:'</span>);   ShowAllRecords( f );
+  WriteLn(<span style="color: #00ff00;">'Query results:'</span>); ShowQueryResults( f );
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> Walkthrough</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+Let's walk through that code line by line:
+</p>
+
+<pre class="example">
+program urldb0;
+</pre>
+
+<p>
+This line simply gives a name to the program. It's not strictly required, but it's good practice.
+</p>
+
+<pre class="example">
+&lt;&lt;TUrlRec&gt;&gt;
+&lt;&lt;routines&gt;&gt;
+</pre>
+
+<p>
+These two lines aren't actually pascal source, but rather a placeholder for code we'll write later. (The double angle-bracket syntax is used by the literate programming tool I'm using to edit this code.)
+</p>
+
+<p>
+<code>TUrlRec</code> is the name we will use for the type that holds our url-related tuple. The "T" doesn't mean "tuple" though. It stands for "type" and it's just part of a naming convention that the object pascal community uses.
+</p>
+
+<pre class="example">
+var f : file of TUrlRec;
+</pre>
+
+<p>
+The word <code>var</code> tells the pascal compiler that we're going to introduce one or more variables. In this case, the variable is called <code>f</code> and its type is <code>file of TUrlRec</code>.
+</p>
+
+<p>
+Typed files are a feature of pascal that you don't often see in other languages. These are binary files on disk that contain fixed-size records, making them a good match for tabular data. (Probably one reason you don't see typed files in modern languages is the emergence of relational databases.)
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">begin</span>
+  MakeDatabase( f );
+  ShowHeader(<span style="color: #00ff00;">'All Records'</span>);   ShowAllRecords( f );
+  ShowHeader(<span style="color: #00ff00;">'Query results'</span>); ShowQueryResults( f );
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+
+<p>
+This is the main code of the program. You can always tell you're looking at the end of a pascal program because the <code>end</code> keyword is followed by a period. (Any text that appears in the file after the period is ignored.)
+</p>
+
+<p>
+Here, <code>MakeDatabase</code>, <code>ShowHeader</code>, <code>ShowAllRecords</code>, and <code>ShowQueryResults</code> are all procedures that we're about to define.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> <span class="todo TODO">TODO</span> --------------------</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+<i>That's all I've got so far. Still working on the code and commentary past this point</i>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3-5" class="outline-3">
+<h3 id="sec-3-5"><span class="section-number-3">3.5</span> type <code>TUrlRec</code></h3>
+<div class="outline-text-3" id="text-3-5">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="TUrlRec"><span style="color: #ff00ff;">type</span>
+  TUrlRec = <span style="color: #ff00ff;">record</span>
+              id    : cardinal;
+              url   : <span style="color: #ff00ff;">string</span>[ 36 ];
+              title : <span style="color: #ff00ff;">string</span>[ 24 ];
+            <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-6" class="outline-3">
+<h3 id="sec-3-6"><span class="section-number-3">3.6</span> procedure <code>MakeDatabase</code></h3>
+<div class="outline-text-3" id="text-3-6">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="routines"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">MakeDatabase</span>( f : <span style="color: #ff00ff;">file</span> <span style="color: #00ffff;">of</span> TUrlRec );
+  <span style="color: #ff00ff;">var</span> rec : TUrlRec;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">store</span>( id: cardinal; url: <span style="color: #ff00ff;">string</span>[36]; title : <span style="color: #ff00ff;">string</span>[24] ) : TUrlRec;
+    <span style="color: #00ffff;">begin</span>
+      rec.id    := id;
+      rec.url   := url;
+      rec.title := title;
+      <span style="color: #00ffff;">Write</span>( f, rec );
+    <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">begin</span>
+    Assign( f, <span style="color: #00ff00;">'urldb0.db'</span> );
+    ReWrite( f );
+    store(   7 , <span style="color: #00ff00;">'http://reddit.com/r/learnprogramming'</span> , <span style="color: #00ff00;">'learn programming'</span> );
+    store(   4 , <span style="color: #00ff00;">'http://sourceforge.net/'</span>              , <span style="color: #00ff00;">'SourceForge'</span>       );
+    store(   8 , <span style="color: #00ff00;">'http://stackoverflow.com/'</span>            , <span style="color: #00ff00;">'Stack Overflow'</span>    );
+    store(   2 , <span style="color: #00ff00;">'https://github.com/'</span>                  , <span style="color: #00ff00;">'GitHub'</span>            );
+    store(  13 , <span style="color: #00ff00;">'http://c2.com/cgi/wiki?WikiWikiWeb'</span>   , <span style="color: #00ff00;">'Wiki Wiki Web'</span>     );
+    store(   6 , <span style="color: #00ff00;">'http://reddit.com/r/programming'</span>      , <span style="color: #00ff00;">'programming'</span>       );
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-7" class="outline-3">
+<h3 id="sec-3-7"><span class="section-number-3">3.7</span> procedures <code>ShowHeader</code> and <code>ShowRecord</code></h3>
+<div class="outline-text-3" id="text-3-7">
+<p>
+We saw that <code>Write</code> can be used to write records to a typed file.
+</p>
+
+<p>
+There is also a special type of file called <code>Text</code>, and for these, pascal provides some syntactic sugar for <code>Write</code>, and also for a related procedure called <code>WriteLn</code>, which adds a newline at the end.
+</p>
+
+<p>
+In particular, these special routines can take a variable number of parameters, know how to format numbers as strings and allow using a special syntax for aligning text (provided you're using a monospaced font).
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="routines"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ShowHeader</span>( header : <span style="color: #ff00ff;">string</span> );
+  <span style="color: #ff00ff;">var</span> i : cardinal;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">Write</span>( <span style="color: #00ff00;">'--| '</span>, header, <span style="color: #00ff00;">' |'</span> );
+    <span style="color: #00ffff;">for</span> i := 64 <span style="color: #00ffff;">downto</span> (64 - length(header) - length(<span style="color: #00ff00;">'--| '</span>+ <span style="color: #00ff00;">' |'</span>)) <span style="color: #00ffff;">do</span>
+      <span style="color: #00ffff;">write</span>( <span style="color: #00ff00;">'-'</span> );
+    WriteLn;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-8" class="outline-3">
+<h3 id="sec-3-8"><span class="section-number-3">3.8</span> procedure <code>ShowRecord</code></h3>
+<div class="outline-text-3" id="text-3-8">
+<p>
+Here we see a <code>for</code> loop.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="routines"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ShowRecord</span>( <span style="color: #ff00ff;">var</span> rec : TUrlRec );
+  <span style="color: #00ffff;">begin</span>
+    WriteLn( rec.id : 3, <span style="color: #00ff00;">' '</span>, rec.url : 36, <span style="color: #00ff00;">' '</span>, rec.title : 24 );
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-9" class="outline-3">
+<h3 id="sec-3-9"><span class="section-number-3">3.9</span> procedure <code>ShowAllRecords</code></h3>
+<div class="outline-text-3" id="text-3-9">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="routines"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ShowAllRecords</span>( f : <span style="color: #ff00ff;">file</span> <span style="color: #00ffff;">of</span> TUrlRec );
+  <span style="color: #ff00ff;">var</span> rec : TUrlRec;
+  <span style="color: #00ffff;">begin</span>
+    Reset( f );
+    <span style="color: #00ffff;">while</span> <span style="color: #00ffff;">not</span> eof( f ) <span style="color: #00ffff;">do</span>
+      <span style="color: #00ffff;">begin</span>
+        <span style="color: #00ffff;">Read</span>( f, rec );
+        ShowRecord( rec )
+      <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+Note that this has to come <i>after</i> <code>ShowRecord</code>, because it calls it.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3-10" class="outline-3">
+<h3 id="sec-3-10"><span class="section-number-3">3.10</span> procedure <code>ShowQueryResults</code></h3>
+<div class="outline-text-3" id="text-3-10">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="routines"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ShowAllRecords</span>( f : <span style="color: #ff00ff;">file</span> <span style="color: #00ffff;">of</span> TUrlRec );
+  <span style="color: #ff00ff;">var</span> rec : TUrlRec;
+  <span style="color: #00ffff;">begin</span>
+    Reset( f );
+    <span style="color: #00ffff;">while</span> <span style="color: #00ffff;">not</span> eof( f ) <span style="color: #00ffff;">do</span>
+      <span style="color: #00ffff;">begin</span>
+        <span style="color: #00ffff;">Read</span>( f, rec );
+        ShowRecord( rec )
+      <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
