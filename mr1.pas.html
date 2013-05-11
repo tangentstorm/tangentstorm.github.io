@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>mr1 : reification</title>
-<!-- 2013-05-11 Sat 03:03 -->
+<!-- 2013-05-11 Sat 04:15 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -260,6 +260,22 @@ Examining the hex dump gives some clues to how the data is laid out in ram.
 </tr>
 </tbody>
 </table>
+
+<p>
+It's a little surprising that a string of 36 1-byte characters takes up 38 bytes.
+</p>
+
+<p>
+As an old turbo pascal user, I personally expected the <code>url</code> field to use up 37 bytes. That's because a <code>ShortString</code> uses the first byte to record the length. The longest <code>ShortString</code> is therefore <code>string[255]</code>, which contains room for 255 characters, plus the length byte.
+</p>
+
+<p>
+You can see this in action in the hex dump. If you look at the link for the c2 wiki, you'll see how the URL and title fields contain leftover characters 'n' and 'g' from the /r/learnprogramming link. This indicates that the same area in ram was reused each for pass through the loop, and then copied to disk each time. The double-quote character at the start is ascii character number 34 (<code>$22</code> in hex). This indicates that the uses 34 of the 36 alloted characters. The extra two characters stick around in ram, but pascal ignores them.
+</p>
+
+<p>
+But why does <code>url</code> contain <i>38</i> bytes, instead of 37? Basically, it's because free pascal is a multi-platform compiler, and on some platforms, loading data that doesn't fall cleanly on word boundaries can have unpleasant consequences. So by default, fpc alligns all fields to a multiple of 2 bytes. (You can change this behavior with the <a href="http://www.freepascal.org/docs-html/prog/progsu60.html">$PACKRECORDS directive</a>.)
+</p>
 </div>
 </div>
 </div>
