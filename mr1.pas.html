@@ -2,8 +2,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title>mr1 : reification</title>
-<!-- 2013-05-11 Sat 13:19 -->
+<title></title>
+<!-- 2013-05-11 Sat 17:01 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -57,7 +57,7 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">mr1 : reification</h1>
+<h1 class="title"></h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
@@ -65,37 +65,38 @@ for the JavaScript code in this tag.
 <li><a href="#sec-1">1. Introduction</a></li>
 <li><a href="#sec-2">2. The Binary Record Format</a>
 <ul>
-<li><a href="#sec-2-1">2.1. Hex Dump</a></li>
-<li><a href="#sec-2-2">2.2. Interpretation</a></li>
+<li><a href="#sec-2-1">2.1. Recap</a></li>
+<li><a href="#sec-2-2">2.2. Hex Dump</a></li>
+<li><a href="#sec-2-3">2.3. Interpretation</a></li>
 </ul>
 </li>
-<li><a href="#sec-3">3. step : manually assign the fields in order</a></li>
-<li><a href="#sec-4">4. step : use an array of variants for printing</a></li>
-<li><a href="#sec-5">5. step : replace the record with an array of variants</a></li>
-<li><a href="#sec-6">6. step : reify the type system</a>
+<li><a href="#sec-3">3. Escaping the Type System</a></li>
+<li><a href="#sec-4">4. step : manually assign the fields in order</a></li>
+<li><a href="#sec-5">5. step : use an array of variants for printing</a></li>
+<li><a href="#sec-6">6. step : replace the record with an array of variants</a></li>
+<li><a href="#sec-7">7. step : reify the type system</a>
 <ul>
-<li><a href="#sec-6-1">6.1. Records are fixed width. replace with arrays of bytes.</a></li>
-<li><a href="#sec-6-2">6.2. Track the width of the column in bytes.</a></li>
-<li><a href="#sec-6-3">6.3. The schema is described with arrays of type variables.</a></li>
-<li><a href="#sec-6-4">6.4. Define a Database meta-model.</a></li>
+<li><a href="#sec-7-1">7.1. Records are fixed width. replace with arrays of bytes.</a></li>
+<li><a href="#sec-7-2">7.2. Track the width of the column in bytes.</a></li>
+<li><a href="#sec-7-3">7.3. The schema is described with arrays of type variables.</a></li>
+<li><a href="#sec-7-4">7.4. Define a Database meta-model.</a></li>
 </ul>
 </li>
-<li><a href="#sec-7">7. step : replace hand-sequenced parser &rarr; array of scanners</a>
+<li><a href="#sec-8">8. step : replace hand-sequenced parser &rarr; array of scanners</a>
 <ul>
-<li><a href="#sec-7-1">7.1. Use the first row to learn the width of the table.</a></li>
-<li><a href="#sec-7-2">7.2. While not Eof, use <code>SetLength</code> to generate each new array.</a></li>
-<li><a href="#sec-7-3">7.3. Create an Array of parsers.</a></li>
+<li><a href="#sec-8-1">8.1. Use the first row to learn the width of the table.</a></li>
+<li><a href="#sec-8-2">8.2. While not Eof, use <code>SetLength</code> to generate each new array.</a></li>
+<li><a href="#sec-8-3">8.3. Create an Array of parsers.</a></li>
 </ul>
 </li>
-<li><a href="#sec-8">8. Use TClass / RTTI published fields for tool integration.</a></li>
-<li><a href="#sec-9">9. Make the separator character configurable.</a></li>
-<li><a href="#sec-10">10. Load tables of variants without a particular schema.</a></li>
-<li><a href="#sec-11">11. Results</a></li>
-<li><a href="#sec-12">12. Summary</a></li>
+<li><a href="#sec-9">9. Use TClass / RTTI published fields for tool integration.</a></li>
+<li><a href="#sec-10">10. Make the separator character configurable.</a></li>
+<li><a href="#sec-11">11. Load tables of variants without a particular schema.</a></li>
+<li><a href="#sec-12">12. Results</a></li>
+<li><a href="#sec-13">13. Summary</a></li>
 </ul>
 </div>
 </div>
-
 <div id="outline-container-sec-1" class="outline-2">
 <h2 id="sec-1"><span class="section-number-2">1</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
@@ -123,6 +124,9 @@ We'll start by examining what the pascal compiler already does when we use the <
 <div id="outline-container-sec-2" class="outline-2">
 <h2 id="sec-2"><span class="section-number-2">2</span> The Binary Record Format</h2>
 <div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Recap</h3>
+<div class="outline-text-3" id="text-2-1">
 <p>
 In <a href="mr0.pas.html">lesson 0</a>, we defined the <code>TUrlRec</code> type:
 </p>
@@ -161,11 +165,10 @@ We then created a <code>file of TUrlRec</code>, and populated it with some recor
 Since pascal handled the file for us, we didn't spend much time looking at what it was actually doing. Let address that now, by creating a hex dump of the generated <code>urldb0.db</code> file.
 </p>
 </div>
-
-
-<div id="outline-container-sec-2-1" class="outline-3">
-<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Hex Dump</h3>
-<div class="outline-text-3" id="text-2-1">
+</div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Hex Dump</h3>
+<div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
 
 <pre class="src src-text">$ hexdump -C urldb0.db
@@ -203,9 +206,9 @@ $ du -b *.db # size in bytes
 </div>
 </div>
 </div>
-<div id="outline-container-sec-2-2" class="outline-3">
-<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Interpretation</h3>
-<div class="outline-text-3" id="text-2-2">
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> Interpretation</h3>
+<div class="outline-text-3" id="text-2-3">
 <p>
 Examining the hex dump gives some clues to how the data is laid out in ram.
 </p>
@@ -268,23 +271,74 @@ Examining the hex dump gives some clues to how the data is laid out in ram.
 </table>
 
 <p>
-It might be a little surprising that a string of 36 1-byte characters takes up 37 bytes, but that's because a <code>ShortString</code> uses an extra byte at the stort to record the length. The longest <code>ShortString</code> is therefore <code>string[255]</code>, which contains 256 bytes: enough room for 255 characters, plus the length byte.
+It might be surprising that a string of 36 1-byte characters takes up 37 bytes, but that's because a <code>ShortString</code> uses an extra byte at the beginning to store the length. The longest <code>ShortString</code> is therefore <code>string[255]</code>, which takes up 256 bytes: enough room for 255 characters, plus the extra byte to store the length.
 </p>
 
 <p>
-You can see this in action in the hex dump. If you look at the link for the c2 wiki, you'll see how the URL and title fields contain leftover characters 'n' and 'g' from the /r/learnprogramming link. This indicates that the same area in ram was reused each for pass through the loop, and then copied to disk each time. The double-quote character at the start is ascii character number 34 (<code>$22</code> in hex). This indicates that the uses 34 of the 36 alloted characters. The extra two characters stick around in ram, but pascal ignores them.
+You can see this in action in the hex dump. If you look at the link for the c2 wiki, you'll see how the URL and title fields contain leftover characters 'n' and 'g' from the /r/learnprogramming link. This indicates that the same area in ram was reused each for pass through the loop, and then copied to disk each time. The double-quote character at the start is ascii character number 34 (<code>$22</code> in hex). This indicates that the uses 34 of the 36 alloted characters. The extra two characters stick around in ram (and get copied to the disk), but pascal ignores them.
 </p>
 
 <p>
-Why the extra 2 bytes at the end? Basically, it's because free pascal is a multi-platform compiler, and on some platforms, loading data that doesn't fall cleanly on word boundaries can have unpleasant consequences. By default, fpc aligns fields to a multiple of 4 bytes<sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup>.
+Why the extra 2 bytes at the end? Basically, it's because free pascal is a multi-platform compiler, and on some platforms, loading data that doesn't fall cleanly on word boundaries can have unpleasant consequences. By default, fpc aligns records to a multiple of 4 bytes<sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup>.
 </p>
 </div>
 </div>
 </div>
-
 <div id="outline-container-sec-3" class="outline-2">
-<h2 id="sec-3"><span class="section-number-2">3</span> <span class="todo TODO">TODO</span> step : manually assign the fields in order</h2>
+<h2 id="sec-3"><span class="section-number-2">3</span> Escaping the Type System</h2>
 <div class="outline-text-2" id="text-3">
+<p>
+Since we know our records are 68 bytes long, we can choose to represent them as a simple array of bytes. We could still create a (<code>file of TUrlBuf</code>) we'll just use an untyped (<code>file</code>) just us
+</p>
+
+<p>
+The following program shows an example:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">program</span> <span style="color: #ffffff; font-weight: bold;">urldb1a</span>;
+<span style="color: #ff00ff;">const</span>
+  kRecSize = 68;
+  kLenPos  = 4; <span style="color: #66f;">// </span><span style="color: #66f;">position of url length byte (numbering from 0)</span>
+<span style="color: #ff00ff;">var</span>
+  f : <span style="color: #ff00ff;">file</span>;                        <span style="color: #66f;">// </span><span style="color: #66f;">untyped file</span>
+  a : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> byte;               <span style="color: #66f;">// </span><span style="color: #66f;">dynamic array</span>
+  i : byte;                        <span style="color: #66f;">// </span><span style="color: #66f;">loop counter</span>
+<span style="color: #00ffff;">begin</span>
+  SetLength( a, kRecSize );        <span style="color: #66f;">// </span><span style="color: #66f;">allocate 68 bytes for the array</span>
+  Assign( f, <span style="color: #00ff00;">'urldb0.db'</span> );        <span style="color: #66f;">// </span><span style="color: #66f;">same file from last lesson</span>
+  Reset( f, kRecSize );            <span style="color: #66f;">// </span><span style="color: #66f;">untyped files need to know the size</span>
+  <span style="color: #00ffff;">while</span> <span style="color: #00ffff;">not</span> eof(f) <span style="color: #00ffff;">do</span>
+    <span style="color: #00ffff;">begin</span>
+      BlockRead( f, a[0], 1 );     <span style="color: #66f;">// </span><span style="color: #66f;">load 1*kRecSize bytes from f into a</span>
+      <span style="color: #00ffff;">for</span> i := 1 <span style="color: #00ffff;">to</span> a[kLenPos] <span style="color: #00ffff;">do</span>
+        <span style="color: #00ffff;">write</span>(chr(a[ kLenPos + i ]));
+      writeln;
+    <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+
+<p>
+Compiling and running this program produces the following output:
+</p>
+
+<pre class="example">
+$ fpc urldb1a.pas &amp;&amp; ./urldb1a
+http://reddit.com/r/learnprogramming
+http://sourceforge.net/
+http://stackoverflow.com/
+https://github.com/
+http://c2.com/cgi/wiki?WikiWikiWeb
+http://reddit.com/r/programming
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> <span class="todo TODO">TODO</span> step : manually assign the fields in order</h2>
+<div class="outline-text-2" id="text-4">
 <p>
 id   = nextInteger
 col2 = nextString
@@ -292,38 +346,38 @@ col3 = nextInteger
 </p>
 </div>
 </div>
-<div id="outline-container-sec-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> <span class="todo TODO">TODO</span> step : use an array of variants for printing</h2>
-</div>
 <div id="outline-container-sec-5" class="outline-2">
-<h2 id="sec-5"><span class="section-number-2">5</span> <span class="todo TODO">TODO</span> step : replace the record with an array of variants</h2>
+<h2 id="sec-5"><span class="section-number-2">5</span> <span class="todo TODO">TODO</span> step : use an array of variants for printing</h2>
 </div>
 <div id="outline-container-sec-6" class="outline-2">
-<h2 id="sec-6"><span class="section-number-2">6</span> <span class="todo TODO">TODO</span> step : reify the type system</h2>
-<div class="outline-text-2" id="text-6">
+<h2 id="sec-6"><span class="section-number-2">6</span> <span class="todo TODO">TODO</span> step : replace the record with an array of variants</h2>
+</div>
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> <span class="todo TODO">TODO</span> step : reify the type system</h2>
+<div class="outline-text-2" id="text-7">
 <p>
 Replace the array of variants an array of bytes.
 Field name, type name
 </p>
 </div>
-<div id="outline-container-sec-6-1" class="outline-3">
-<h3 id="sec-6-1"><span class="section-number-3">6.1</span> <span class="todo TODO">TODO</span> Records are fixed width. replace with arrays of bytes.</h3>
+<div id="outline-container-sec-7-1" class="outline-3">
+<h3 id="sec-7-1"><span class="section-number-3">7.1</span> <span class="todo TODO">TODO</span> Records are fixed width. replace with arrays of bytes.</h3>
 </div>
-<div id="outline-container-sec-6-2" class="outline-3">
-<h3 id="sec-6-2"><span class="section-number-3">6.2</span> <span class="todo TODO">TODO</span> Track the width of the column in bytes.</h3>
+<div id="outline-container-sec-7-2" class="outline-3">
+<h3 id="sec-7-2"><span class="section-number-3">7.2</span> <span class="todo TODO">TODO</span> Track the width of the column in bytes.</h3>
 </div>
-<div id="outline-container-sec-6-3" class="outline-3">
-<h3 id="sec-6-3"><span class="section-number-3">6.3</span> <span class="todo TODO">TODO</span> The schema is described with arrays of type variables.</h3>
-<div class="outline-text-3" id="text-6-3">
+<div id="outline-container-sec-7-3" class="outline-3">
+<h3 id="sec-7-3"><span class="section-number-3">7.3</span> <span class="todo TODO">TODO</span> The schema is described with arrays of type variables.</h3>
+<div class="outline-text-3" id="text-7-3">
 <p>
 You could either load the schema directly from the table's file, or you could have some number of schema tables.
 </p>
 </div>
 </div>
 
-<div id="outline-container-sec-6-4" class="outline-3">
-<h3 id="sec-6-4"><span class="section-number-3">6.4</span> <span class="todo TODO">TODO</span> Define a Database meta-model.</h3>
-<div class="outline-text-3" id="text-6-4">
+<div id="outline-container-sec-7-4" class="outline-3">
+<h3 id="sec-7-4"><span class="section-number-3">7.4</span> <span class="todo TODO">TODO</span> Define a Database meta-model.</h3>
+<div class="outline-text-3" id="text-7-4">
 <ul class="org-ul">
 <li>tables
 </li>
@@ -336,34 +390,34 @@ You could either load the schema directly from the table's file, or you could ha
 </div>
 </div>
 
-<div id="outline-container-sec-7" class="outline-2">
-<h2 id="sec-7"><span class="section-number-2">7</span> <span class="todo TODO">TODO</span> step : replace hand-sequenced parser &rarr; array of scanners</h2>
-<div class="outline-text-2" id="text-7">
-</div><div id="outline-container-sec-7-1" class="outline-3">
-<h3 id="sec-7-1"><span class="section-number-3">7.1</span> <span class="todo TODO">TODO</span> Use the first row to learn the width of the table.</h3>
-</div>
-
-<div id="outline-container-sec-7-2" class="outline-3">
-<h3 id="sec-7-2"><span class="section-number-3">7.2</span> <span class="todo TODO">TODO</span> While not Eof, use <code>SetLength</code> to generate each new array.</h3>
-</div>
-
-<div id="outline-container-sec-7-3" class="outline-3">
-<h3 id="sec-7-3"><span class="section-number-3">7.3</span> <span class="todo TODO">TODO</span> Create an Array of parsers.</h3>
-</div>
-</div>
-
 <div id="outline-container-sec-8" class="outline-2">
-<h2 id="sec-8"><span class="section-number-2">8</span> <span class="todo TODO">TODO</span> Use TClass / RTTI published fields for tool integration.</h2>
+<h2 id="sec-8"><span class="section-number-2">8</span> <span class="todo TODO">TODO</span> step : replace hand-sequenced parser &rarr; array of scanners</h2>
+<div class="outline-text-2" id="text-8">
+</div><div id="outline-container-sec-8-1" class="outline-3">
+<h3 id="sec-8-1"><span class="section-number-3">8.1</span> <span class="todo TODO">TODO</span> Use the first row to learn the width of the table.</h3>
 </div>
+
+<div id="outline-container-sec-8-2" class="outline-3">
+<h3 id="sec-8-2"><span class="section-number-3">8.2</span> <span class="todo TODO">TODO</span> While not Eof, use <code>SetLength</code> to generate each new array.</h3>
+</div>
+
+<div id="outline-container-sec-8-3" class="outline-3">
+<h3 id="sec-8-3"><span class="section-number-3">8.3</span> <span class="todo TODO">TODO</span> Create an Array of parsers.</h3>
+</div>
+</div>
+
 <div id="outline-container-sec-9" class="outline-2">
-<h2 id="sec-9"><span class="section-number-2">9</span> <span class="todo TODO">TODO</span> Make the separator character configurable.</h2>
+<h2 id="sec-9"><span class="section-number-2">9</span> <span class="todo TODO">TODO</span> Use TClass / RTTI published fields for tool integration.</h2>
 </div>
 <div id="outline-container-sec-10" class="outline-2">
-<h2 id="sec-10"><span class="section-number-2">10</span> <span class="todo TODO">TODO</span> Load tables of variants without a particular schema.</h2>
+<h2 id="sec-10"><span class="section-number-2">10</span> <span class="todo TODO">TODO</span> Make the separator character configurable.</h2>
 </div>
 <div id="outline-container-sec-11" class="outline-2">
-<h2 id="sec-11"><span class="section-number-2">11</span> Results</h2>
-<div class="outline-text-2" id="text-11">
+<h2 id="sec-11"><span class="section-number-2">11</span> <span class="todo TODO">TODO</span> Load tables of variants without a particular schema.</h2>
+</div>
+<div id="outline-container-sec-12" class="outline-2">
+<h2 id="sec-12"><span class="section-number-2">12</span> Results</h2>
+<div class="outline-text-2" id="text-12">
 <p>
 To compile and run the program, use the following commands:
 </p>
@@ -381,8 +435,8 @@ You should see the following output:
 </pre>
 </div>
 </div>
-<div id="outline-container-sec-12" class="outline-2">
-<h2 id="sec-12"><span class="section-number-2">12</span> Summary</h2>
+<div id="outline-container-sec-13" class="outline-2">
+<h2 id="sec-13"><span class="section-number-2">13</span> Summary</h2>
 </div>
 <div id="footnotes">
 <h2 class="footnotes">Footnotes: </h2>
