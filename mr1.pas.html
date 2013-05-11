@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>mr $01 : reification</title>
-<!-- 2013-05-11 Sat 17:06 -->
+<!-- 2013-05-11 Sat 17:13 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -289,7 +289,7 @@ Why the extra 2 bytes at the end? Basically, it's because free pascal is a multi
 <h2 id="sec-3"><span class="section-number-2">3</span> Escaping the Type System</h2>
 <div class="outline-text-2" id="text-3">
 <p>
-Since we know our records are 68 bytes long, we can choose to represent them as a simple array of bytes. We could still create a (<code>file of TUrlBuf</code>) we'll just use an untyped (<code>file</code>) just us
+Since we know our records are 68 bytes long, we can choose to represent them as a simple array of bytes. We could create another typed file (<code>file of TUrlBuf</code>) but there's no real need to do this, so we'll just use an untyped (<code>file</code>) instead.
 </p>
 
 <p>
@@ -322,7 +322,11 @@ The following program shows an example:
 </div>
 
 <p>
-Compiling and running this program produces the following output:
+With untyped files, we add an extra parameter to <code>Reset</code> that tells pascal how big to make the "chunks" it reads from the file. Then we call <code>BlockRead</code> instead of <code>Read</code>. This allows us to read an arbitrary number of chunks into ram at a given address. Above, we're reading 1 68-byte chunk, but we could have just as easily read 68 1-byte chunks, or 2 34-byte chunks, etc.
+</p>
+
+<p>
+Compiling and running the program produces the following output:
 </p>
 
 <pre class="example">
