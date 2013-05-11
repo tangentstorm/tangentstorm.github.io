@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>mr1 : reification</title>
-<!-- 2013-05-11 Sat 02:03 -->
+<!-- 2013-05-11 Sat 03:03 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -63,7 +63,12 @@ for the JavaScript code in this tag.
 <div id="text-table-of-contents">
 <ul>
 <li><a href="#sec-1">1. Introduction</a></li>
-<li><a href="#sec-2">2. The Binary Record Format</a></li>
+<li><a href="#sec-2">2. The Binary Record Format</a>
+<ul>
+<li><a href="#sec-2-1">2.1. Hex Dump</a></li>
+<li><a href="#sec-2-2">2.2. Interpretation</a></li>
+</ul>
+</li>
 <li><a href="#sec-3">3. step : manually assign the fields in order</a></li>
 <li><a href="#sec-4">4. step : use an array of variants for printing</a></li>
 <li><a href="#sec-5">5. step : replace the record with an array of variants</a></li>
@@ -155,13 +160,15 @@ We then created a <code>file of TUrlRec</code>, and populated it with some recor
 <p>
 Since pascal handled the file for us, we didn't spend much time looking at what it was actually doing. Let address that now, by creating a hex dump of the generated <code>urldb0.db</code> file.
 </p>
+</div>
 
+
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Hex Dump</h3>
+<div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
 
-<pre class="src src-text">$ du -h *.db
-4.0K    urldb0.db
-$
-$ hexdump -v -C urldb0.db
+<pre class="src src-text">$ hexdump -C urldb0.db
 00000000  07 00 00 00 24 68 74 74  70 3a 2f 2f 72 65 64 64  |....$http://redd|
 00000010  69 74 2e 63 6f 6d 2f 72  2f 6c 65 61 72 6e 70 72  |it.com/r/learnpr|
 00000020  6f 67 72 61 6d 6d 69 6e  67 11 6c 65 61 72 6e 20  |ogramming.learn |
@@ -189,10 +196,74 @@ $ hexdump -v -C urldb0.db
 00000180  6f 67 72 61 6d 6d 69 6e  67 65 62 77 69 6e 67 00  |ogrammingebwing.|
 00000190  00 00 00 00 00 00 00 00                           |........|
 00000198
+
+$ du -b *.db # size in bytes
+408     urldb0.db
 </pre>
 </div>
 </div>
 </div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Interpretation</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+Examining the hex dump gives some clues to how the data is laid out in ram.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left"/>
+
+<col class="left"/>
+
+<col class="right"/>
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">column</th>
+<th scope="col" class="left">type</th>
+<th scope="col" class="right">bytes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">id</td>
+<td class="left"><code>cardinal</code></td>
+<td class="right">4</td>
+</tr>
+
+<tr>
+<td class="left">url</td>
+<td class="left"><code>string[36]</code></td>
+<td class="right">38</td>
+</tr>
+
+<tr>
+<td class="left">title</td>
+<td class="left"><code>string[24]</code></td>
+<td class="right">26</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="left">&#xa0;</td>
+<td class="left"><b>total:</b></td>
+<td class="right">68</td>
+</tr>
+
+<tr>
+<td class="left">&#xa0;</td>
+<td class="left"><b>&times; 6 rows</b>:</td>
+<td class="right">408</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
 
 
 
