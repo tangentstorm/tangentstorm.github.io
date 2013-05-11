@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>mr1 : reification</title>
-<!-- 2013-05-11 Sat 04:15 -->
+<!-- 2013-05-11 Sat 13:15 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -237,13 +237,19 @@ Examining the hex dump gives some clues to how the data is laid out in ram.
 <tr>
 <td class="left">url</td>
 <td class="left"><code>string[36]</code></td>
-<td class="right">38</td>
+<td class="right">37</td>
 </tr>
 
 <tr>
 <td class="left">title</td>
 <td class="left"><code>string[24]</code></td>
-<td class="right">26</td>
+<td class="right">25</td>
+</tr>
+
+<tr>
+<td class="left">&#xa0;</td>
+<td class="left">(padding)</td>
+<td class="right">2</td>
 </tr>
 </tbody>
 <tbody>
@@ -262,11 +268,7 @@ Examining the hex dump gives some clues to how the data is laid out in ram.
 </table>
 
 <p>
-It's a little surprising that a string of 36 1-byte characters takes up 38 bytes.
-</p>
-
-<p>
-As an old turbo pascal user, I personally expected the <code>url</code> field to use up 37 bytes. That's because a <code>ShortString</code> uses the first byte to record the length. The longest <code>ShortString</code> is therefore <code>string[255]</code>, which contains room for 255 characters, plus the length byte.
+It might be a little surprising that a string of 36 1-byte characters takes up 37 bytes, but that's because a <code>ShortString</code> uses an extra byte at the stort to record the length. The longest <code>ShortString</code> is therefore <code>string[255]</code>, which contains 256 bytes: enough room for 255 characters, plus the length byte.
 </p>
 
 <p>
@@ -274,13 +276,11 @@ You can see this in action in the hex dump. If you look at the link for the c2 w
 </p>
 
 <p>
-But why does <code>url</code> contain <i>38</i> bytes, instead of 37? Basically, it's because free pascal is a multi-platform compiler, and on some platforms, loading data that doesn't fall cleanly on word boundaries can have unpleasant consequences. So by default, fpc alligns all fields to a multiple of 2 bytes. (You can change this behavior with the <a href="http://www.freepascal.org/docs-html/prog/progsu60.html">$PACKRECORDS directive</a>.)
+Why the extra 2 bytes at the end? Basically, it's because free pascal is a multi-platform compiler, and on some platforms, loading data that doesn't fall cleanly on word boundaries can have unpleasant consequences. So by default, fpc alligns all fields to a multiple of 4 bytes<sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup>.
 </p>
 </div>
 </div>
 </div>
-
-
 
 
 <div id="outline-container-sec-3" class="outline-2">
@@ -384,7 +384,19 @@ You should see the following output:
 </div>
 <div id="outline-container-sec-12" class="outline-2">
 <h2 id="sec-12"><span class="section-number-2">12</span> Summary</h2>
+<div class="outline-text-2" id="text-12">
 </div>
 </div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
+You can change this behavior with the <a href="http://www.freepascal.org/docs-html/prog/progsu60.html">$PACKRECORDS directive</a>. That page claims that the default alignment is 2 bytes, but that doesn't appear to be the case. Hopefully <a href="http://bugs.freepascal.org/view.php?id=24418">#24418</a> in the FPC bug tracker will lead to some clarification soon.
+</p></div>
+
+
+</div>
+</div></div>
 </body>
 </html>
