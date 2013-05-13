@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>mr $01 : reification</title>
-<!-- 2013-05-11 Sat 17:15 -->
+<!-- 2013-05-13 Mon 04:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -71,7 +71,14 @@ for the JavaScript code in this tag.
 </ul>
 </li>
 <li><a href="#sec-3">3. Escaping the Type System</a></li>
-<li><a href="#sec-4">4. Summary</a></li>
+<li><a href="#sec-4">4. Refactoring : extract procedure <code>WriteTuple</code></a></li>
+<li><a href="#sec-5">5. MetaData</a></li>
+<li><a href="#sec-6">6. Adding a Header</a>
+<ul>
+<li><a href="#sec-6-1">6.1. Results</a></li>
+</ul>
+</li>
+<li><a href="#sec-7">7. Summary and Next Steps</a></li>
 </ul>
 </div>
 </div>
@@ -318,10 +325,191 @@ http://reddit.com/r/programming
 </pre>
 </div>
 </div>
-
-
 <div id="outline-container-sec-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> Summary</h2>
+<h2 id="sec-4"><span class="section-number-2">4</span> Refactoring : extract procedure <code>WriteTuple</code></h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Let's refactor a bit, and extract a function for the innermost loop:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">WriteTuple</span>( a : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> bytes );
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">for</span> i := 1 <span style="color: #00ffff;">to</span> a[kLenPos] <span style="color: #00ffff;">do</span>
+      <span style="color: #00ffff;">write</span>(chr(a[ kLenPos + i ]));
+    writeln;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+Now our innermost loop becomes:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">while</span> <span style="color: #00ffff;">not</span> eof(f) <span style="color: #00ffff;">do</span>
+  <span style="color: #00ffff;">begin</span>
+    BlockRead( f, a[0], 1 );     <span style="color: #66f;">// </span><span style="color: #66f;">load 1*kRecSize bytes from f into a</span>
+    WriteTuple( a );
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+Now that we've isolated that code, let's generalize it to print arbitrary relations.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> MetaData</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+If we want to display arbitrary relations with a single procedure, we need to find a way to describe the structure of the tuples.
+</p>
+
+<p>
+The table we made earlier with the label, type, and size in bytes for each field was sufficient to let us figure out where to start reading the <code>url</code> field, so why not give our program a table like that too?
+</p>
+
+<p>
+It's easy. First, we create a <code>TKeyDef</code> type:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span>
+  TKeyType = ( ktPadding, ktCardinal, ktString );
+  TKeyDef  = <span style="color: #ff00ff;">record</span>
+               keyName : <span style="color: #ff00ff;">string</span>[31];
+               keyType : TKeyType;
+               keySize : cardinal;
+             <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+The syntax for the <code>TKeyType</code> type is new. It's called an <i>enumerated type</i>, which basically means that we're creating a bunch of identifiers that are associated with the numbers 0, 1, 2, 3&#x2026; These values aren't numbers themselves (<code>Write(ktString)</code> will output 'ktString' rather than '2') but they're <i>associated</i> with numbers: <code>Write(Ord(ktPadding))</code> produces '0', just as <code>Write(Ord(#0))</code> or <code>Write(Ord(false))</code> does, because all of these are the first possible value of their respective type.
+</p>
+
+<p>
+We can now translate our table to pascal as literal array of <code>TKeyDef</code> records:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">const</span>
+  keys : <span style="color: #ff00ff;">array</span> [0..3] <span style="color: #00ffff;">of</span> TKeyDef =
+         (( keyName: <span style="color: #00ff00;">'id'</span>;    keyType : ktCardinal; keySize : 4 ),
+          ( keyName: <span style="color: #00ff00;">'url'</span>;   keyType : ktString;   keySize: 37 ),
+          ( keyName: <span style="color: #00ff00;">'title'</span>; keyType : ktString;   keySize: 25 ),
+          ( keyName: <span style="color: #00ff00;">''</span>;      keyType : ktPadding;  keySize:  2 ));
+</pre>
+</div>
+
+<p>
+We can rewrite our <code>WriteTuple</code> routine, using pascal's <a href="http://www.freepascal.org/docs-html/ref/refsu50.html">case statement</a> to dispatch on the <code>keyType</code>. (Normally we'd write <code>key.keyType</code>, but adding a <a href="http://www.freepascal.org/docs-html/ref/refsu56.html">with statement</a> to our for loop lets us be a little more concise.)
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">const</span>  kSep = #9; <span style="color: #66f;">// </span><span style="color: #66f;">tab character</span>
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">WriteTuple</span>( a : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> byte );
+  <span style="color: #ff00ff;">var</span>
+    offs : byte = 0;                      <span style="color: #66f;">// </span><span style="color: #66f;">current offset into the record</span>
+    key  : TKeyDef;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">for</span> key <span style="color: #00ffff;">in</span> keys <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">with</span> key <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">begin</span>
+      <span style="color: #00ffff;">case</span> keyType <span style="color: #00ffff;">of</span>
+        ktCardinal : <span style="color: #00ffff;">write</span>(cardinal( a[offs]) : 5);
+        ktString   : <span style="color: #00ffff;">begin</span>
+                       <span style="color: #00ffff;">for</span> i := 1 <span style="color: #00ffff;">to</span> a[offs] <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">write</span>(chr(a[offs + i]));
+                       <span style="color: #00ffff;">for</span> i := i <span style="color: #00ffff;">to</span> keySize <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">write</span>(<span style="color: #00ff00;">' '</span>); <span style="color: #66f;">// </span><span style="color: #66f;">padding</span>
+                     <span style="color: #00ffff;">end</span>;
+        <span style="color: #66f;">// </span><span style="color: #66f;">otherwise do nothing</span>
+      <span style="color: #00ffff;">end</span>;
+      <span style="color: #00ffff;">write</span>( kSep );
+      inc(offs, keySize);
+    <span style="color: #00ffff;">end</span>;
+    writeln;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> Adding a Header</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+A nicely formatted header is really just more of the same:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">WriteHeader</span>;
+  <span style="color: #ff00ff;">var</span> key : TKeyDef;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #66f;">{ </span><span style="color: #66f;">write the the field names </span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">for</span> key <span style="color: #00ffff;">in</span> keys <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">with</span> key <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">begin</span>
+      <span style="color: #00ffff;">case</span> keyType <span style="color: #00ffff;">of</span>
+        ktCardinal : <span style="color: #00ffff;">write</span>( PadLeft( keyname, 5 ));
+        ktString   : <span style="color: #00ffff;">write</span>( PadRight( keyname, keySize ));
+      <span style="color: #00ffff;">end</span>;
+      <span style="color: #00ffff;">write</span>( kSep );
+    <span style="color: #00ffff;">end</span>;
+    writeln;
+    <span style="color: #66f;">{ </span><span style="color: #66f;">show the separator line </span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">for</span> key <span style="color: #00ffff;">in</span> keys <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">with</span> key <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">begin</span>
+      <span style="color: #00ffff;">case</span> keyType <span style="color: #00ffff;">of</span>
+        ktCardinal : <span style="color: #00ffff;">write</span>( <span style="color: #00ff00;">'-----'</span>);
+        ktString   : <span style="color: #00ffff;">write</span>( AddChar( <span style="color: #00ff00;">'-'</span>, <span style="color: #00ff00;">''</span>, keySize ));
+      <span style="color: #00ffff;">end</span>;
+      <span style="color: #00ffff;">write</span>( kSep );
+    <span style="color: #00ffff;">end</span>;
+    writeln;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+The only new addition is <code>[[http://www.freepascal.org/docs-html/rtl/strutils/addchar.html][strutils.AddChar( s, c, n ):String]]</code>, which appends <code>n</code> copies of character <code>c</code> to string <code>s</code>.
+</p>
+</div>
+
+
+<div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><span class="section-number-3">6.1</span> Results</h3>
+<div class="outline-text-3" id="text-6-1">
+<p>
+Running the program produces the following output:
+</p>
+
+<pre class="example">
+   id   url                                     title
+-----   -------------------------------------   -------------------------
+    7   http://reddit.com/r/learnprogramming    learn programming
+    4   http://sourceforge.net/                 SourceForge
+    8   http://stackoverflow.com/               Stack Overflow
+    2   https://github.com/                     GitHub
+   13   http://c2.com/cgi/wiki?WikiWikiWeb      Wiki Wiki Web
+    6   http://reddit.com/r/programming         programming
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> Summary and Next Steps</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+In this lesson, we saw how to reify (make concrete) the structure of our relations, by creating a new record type to hold metadata.
+</p>
+
+<p>
+We will use this same concept later to make our database self-describing, but first we need a way to create tables, records without relying on hex editors, pre-existing binary files, or hard-coded pascal syntax. Therefore, in our next lesson, we will look at how to create a simple command interpreter.
+</p>
+</div>
 </div>
 <div id="footnotes">
 <h2 class="footnotes">Footnotes: </h2>
