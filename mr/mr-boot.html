@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>minrel : bootstrap</title>
+<!-- 2013-05-14 Tue 07:15 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal"/>
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">minrel : bootstrap</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. intro</a></li>
+<li><a href="#sec-2">2. tab reader</a></li>
+<li><a href="#sec-3">3. polymorphism</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> intro</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+We've shown how to reify our types so we can write generalized routines that work with user defined relations, but we haven't actually given our users a way to declare relations and keys.
+</p>
+
+<p>
+Except&#x2026; We have a database. Wouldn't it be nice if the data that described our database could be <i>stored</i> in the database?
+</p>
+
+<p>
+Let's start simple, and build a routine to import tab delimited text files. This probably won't be the primary way to get data into the system but it's a common data format that's easy to parse, easy to generate and already has decent tool support. It's also ready to write by hand in any text editor.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> tab reader</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+<code>ReadTuple</code> is a lot like <code>WriteTuple</code> from before:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ReadTuple</span>( buf : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> byte );
+  <span style="color: #00ffff;">for</span> key <span style="color: #00ffff;">in</span> keys <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">with</span> key <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">case</span> keyType <span style="color: #00ffff;">of</span>
+      ktCardinal : ;
+      ktString : ;
+    <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> polymorphism</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Now we have <code>WriteTuple</code> and <code>WriteHeader</code> for text formatting but what about computer readable?
+</p>
+
+<ul class="org-ul">
+<li>interfaces : IRowReader , IRowWriter
+</li>
+</ul>
+</div>
+</div>
+</div>
+</body>
+</html>
