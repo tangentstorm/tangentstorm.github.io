@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>generalized sets for pascal</title>
+<!-- 2013-05-17 Fri 14:05 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal j. wallace"/>
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">generalized sets for pascal</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Pascal's Native <code>SET</code> Type</a></li>
+<li><a href="#sec-2">2. Limitations of Native Sets</a></li>
+<li><a href="#sec-3">3. A Generic Interface for Sets</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Pascal's Native <code>SET</code> Type</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+A distinguishing feature of Pascal and its sucessors is the <code>set</code> type. 
+</p>
+
+<p>
+For example, you might declare an enumerated type <code>day</code> to represent the days of the week, and then a set type called <code>days</code> to hold multiple values of this type:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span>
+  Day  = (mon, tue, wed, thu, fri, sat, sun);
+  Days = <span style="color: #ff00ff;">set</span> <span style="color: #00ffff;">of</span> Day;
+</pre>
+</div>
+
+<p>
+You can then declare literal values of this type, either as constants or as variables:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">const</span>
+  weekdays = [ mon .. fri ]; <span style="color: #66f;">// </span><span style="color: #66f;">literal range</span>
+
+<span style="color: #ff00ff;">var</span>
+  mwf : Days = [ mon, wed, fri ]; <span style="color: #66f;">// </span><span style="color: #66f;">literal set</span>
+</pre>
+</div>
+
+<p>
+Note that unlike a mathematical set, pascal sets are ordered.
+</p>
+
+<p>
+These sets can be passed as parameters, traversed with a <code>for</code> &#x2026; <code>in</code> loop. The underlying enumerated type can be parsed with <code>read</code> and printed <code>write</code> and <code>writeln</code>, so printing the contents of a set is a simple matter of looping:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">writedays</span>( title : <span style="color: #ff00ff;">string</span>; whichdays : Days );
+  <span style="color: #ff00ff;">var</span> d : Day;
+  <span style="color: #00ffff;">begin</span>
+    writeln( title );
+    <span style="color: #00ffff;">for</span> d <span style="color: #00ffff;">in</span> whichdays <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">write</span>( <span style="color: #00ff00;">'  '</span>, d );
+    writeln;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+Most importantly, pascal offers a rich variety of set operations:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">var</span> w, s : <span style="color: #ff00ff;">set</span> <span style="color: #00ffff;">of</span> days;
+<span style="color: #00ffff;">begin</span>
+  w := weekdays;              <span style="color: #66f;">// </span><span style="color: #66f;">weekdays</span>
+  s := mwf + [sat, sun];      <span style="color: #66f;">// </span><span style="color: #66f;">arbitrary set of days</span>
+  writedays( <span style="color: #00ff00;">'s:'</span>, s);
+  writedays( <span style="color: #00ff00;">'w:'</span>, w);
+  writeln;
+  writedays( <span style="color: #00ff00;">' w + s:'</span>,  w + s ); <span style="color: #66f;">// </span><span style="color: #66f;">union</span>
+  writedays( <span style="color: #00ff00;">' w * s:'</span>,  w * s ); <span style="color: #66f;">// </span><span style="color: #66f;">intersection</span>
+  writedays( <span style="color: #00ff00;">' w - s:'</span>,  w - s ); <span style="color: #66f;">// </span><span style="color: #66f;">difference</span>
+  writedays( <span style="color: #00ff00;">' s - w:'</span>,  s - w ); <span style="color: #66f;">// </span><span style="color: #66f;">difference</span>
+  writedays( <span style="color: #00ff00;">'w &gt;&lt; s:'</span>, w&gt;&lt;s );   <span style="color: #66f;">// </span><span style="color: #66f;">symmetric difference</span>
+  writeln;
+  writeln( <span style="color: #00ff00;">'  w   &lt;= s: '</span>, w &lt;= s );    <span style="color: #66f;">// </span><span style="color: #66f;">subset?</span>
+  writeln( <span style="color: #00ff00;">'  mwf &lt;= w: '</span>, mwf &lt;= w );  <span style="color: #66f;">// </span><span style="color: #66f;">subset?</span>
+  writeln( <span style="color: #00ff00;">'  w   &gt;= s: '</span>, w &gt;= s );    <span style="color: #66f;">// </span><span style="color: #66f;">superset?</span>
+  writeln( <span style="color: #00ff00;">'  w    = s: '</span>, w = s );     <span style="color: #66f;">// </span><span style="color: #66f;">equal</span>
+  writeln( <span style="color: #00ff00;">'  w   &lt;&gt; s: '</span>, w &lt;&gt; s );    <span style="color: #66f;">// </span><span style="color: #66f;">not-equal</span>
+  writeln( <span style="color: #00ff00;">'mon in mwf: '</span>, mon <span style="color: #00ffff;">in</span> mwf); <span style="color: #66f;">// </span><span style="color: #66f;">element-of?</span>
+  writeln( <span style="color: #00ff00;">'tue in mwf: '</span>, tue <span style="color: #00ffff;">in</span> mwf); <span style="color: #66f;">// </span><span style="color: #66f;">element-of?</span>
+  writeln;
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+
+<p>
+Here is the output of the above program:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-example">s: [ mon wed fri sat sun ]
+w: [ mon tue wed thu fri ]
+
+ w + s: [ mon tue wed thu fri sat sun ]
+ w * s: [ mon wed fri ]
+ w - s: [ tue thu ]
+ s - w: [ sat sun ]
+w &gt;&lt; s: [ tue thu sat sun ]
+
+  w   &lt;= s: FALSE
+  mwf &lt;= w: TRUE
+  w   &gt;= s: FALSE
+  w    = s: FALSE
+  w   &lt;&gt; s: TRUE
+mon in mwf: TRUE
+tue in mwf: FALSE
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Limitations of Native Sets</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Traditionally, pascal sets are implemented as bitmaps - usually 32-bit values - where each member of a set is represented by a single bit. This means that the underlying enumerated type is limited to ranges of 32 values.
+</p>
+
+<p>
+With the <a href="http://freepascal.org/">free pascal</a> compiler, sets can be arbitrarily large, allowing you to create sets of characters or or other numbers, but they're still limited to simple underlying types.
+</p>
+
+<p>
+Bitmapped sets are incredibly useful, but occasionally it's convenient to work work with sets of more complex objects, that may not even map to a spefic ordinal number.
+</p>
+
+<p>
+For example, there's no easy way to create a set of strings or real numbers in pascal, or sets of arbitrary records, as you'd want in a database application. The best you can do is create some kind of container structure that keeps its contents sorted. Then when you add a value to the container, you just check to make sure it's not already there, and if so, discard it.
+</p>
+
+<p>
+In fact, there are a number of <a href="http://wiki.freepascal.org/Data_Structures,_Containers,_Collections">container libraries for pascal</a>, and some of them offer set types based on trees, (<a href="http://svn.freepascal.org/cgi-bin/viewvc.cgi/trunk/packages/fcl-stl/src/gset.pp?revision=17310&view=markup">gset.pp</a> in the free pascal component library, for example). As far as I could tell, though, none of them actually provide the basic operations that you get with pascal's native sets.
+</p>
+
+<p>
+Most of the time, that's okay. Often when you reach for a set of, what you really want is a collection of unique values. But since I'm making a database that supports relational algebra, I need a <code>set</code> in the mathematical sense, with support for unions and intersections and so on.
+</p>
+
+<p>
+So&#x2026; Let's make one.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> A Generic Interface for Sets</h2>
+</div>
+</div>
+</body>
+</html>
