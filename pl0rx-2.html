@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>pl0rx : a pl/0 → retro compiler , part 2</title>
-<!-- 2013-06-06 Thu 03:07 -->
+<!-- 2013-06-06 Thu 05:45 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -68,6 +68,7 @@ for the JavaScript code in this tag.
 <li><a href="#sec-1-2">1.2. lexer</a></li>
 <li><a href="#sec-1-3">1.3. helper routine: <code>in-range?</code></a></li>
 <li><a href="#sec-1-4">1.4. now the tokenizer</a></li>
+<li><a href="#sec-1-5">1.5. notes</a></li>
 </ul>
 </li>
 </ul>
@@ -93,7 +94,7 @@ We'll use the <code>enum</code> library to generate a set of constants to identi
 enum| `. `const `= `, `; `var `procedure `:=
       `call `! `begin `end `if `then `while `do
       `odd `# `&lt; `&lt;= `&gt; `&gt;= `+ `- `* `/ `( `) `{ `}
-      `&lt;name&gt; <span style="color: #c63; font-weight: bold;">|</span>
+      `&lt;name&gt; `&lt;number&gt; <span style="color: #c63; font-weight: bold;">|</span>
 </pre>
 </div>
 </div>
@@ -141,35 +142,94 @@ We can use <code>whend</code> (retro's equivalent of a <code>case</code> or <cod
 
 <div class="org-src-container">
 
-<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">:</span> consume next-ch <span style="color: #00ffff;">drop</span> <span style="color: #c63; font-weight: bold;">;</span>
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">:</span> skip-whitespace <span style="color: #00ffff;">[</span> ch <span style="color: #32cd32;">32</span> <span style="color: #00ffff;">&gt;</span> <span style="color: #00ffff;">dup</span> <span style="color: #00ffff;">[</span> next-ch <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">ifFalse</span> <span style="color: #00ffff;">]</span> until
+<span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( - ) discard whitespace"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> skip-comment <span style="color: #00ffff;">[</span> next-ch '} <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> until
+<span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( - ) called when { is matched. discards the comment."</span> :doc
+
+<span style="color: #c63; font-weight: bold;">;</span> read-word <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">]</span>
+<span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( -?n ) Reads a word. TOS=token id. For identifiers, NOS=name."</span> :doc
+
+&lt;&lt;read-num&gt;&gt;
+
+<span style="color: #c63; font-weight: bold;">:</span> err <span style="color: #00ff00;">"error: '"</span> puts ch putc <span style="color: #00ff00;">"' is not allowed here."</span> puts <span style="color: #c63; font-weight: bold;">;</span> 
+
 <span style="color: #c63; font-weight: bold;">:</span> next-tok
   <span style="color: #00ffff;">[</span> ch
-    <span style="color: #66f;">( these characters /are/ tokens )</span>
-    <span style="color: #66f;">( !! TODO: simplify this table! )</span>
-    <span style="color: #00ffff;">[</span> '. <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `. <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> ', <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `, <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
-    <span style="color: #00ffff;">[</span> '; <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `; <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> '# <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `# <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> 
-    <span style="color: #00ffff;">[</span> '+ <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `+ <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> '- <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `- <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
-    <span style="color: #00ffff;">[</span> '* <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `* <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> '/ <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `/ <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
-    <span style="color: #00ffff;">[</span> '! <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `! <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+    <span style="color: #66f;">( these characters /are/ tokens, and we can use a jump table: )</span>
+    ch <span style="color: #32cd32;">33</span> <span style="color: #32cd32;">47</span> in-range? <span style="color: #00ffff;">[</span> <span style="color: #32cd32;">-33</span> <span style="color: #00ffff;">+</span>
+       <span style="color: #00ffff;">[</span> `! `" `# err err err err `( `) `* `+ `, `- `. `/ <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">@</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">ifTrue</span>
 
     <span style="color: #66f;">( these immediately trigger a parse rule )</span>
-    <span style="color: #00ffff;">[</span> '( <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span>    <span style="color: #00ffff;">[</span> read-subexpr <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
     <span style="color: #00ffff;">[</span> '{ <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span>    <span style="color: #00ffff;">[</span> read-comment <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
     <span style="color: #00ffff;">[</span> digit? <span style="color: #00ffff;">]</span>  <span style="color: #00ffff;">[</span> read-num  <span style="color: #00ffff;">]</span>    <span style="color: #ffd700; font-weight: bold;">whend</span>
     <span style="color: #00ffff;">[</span> letter? <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> read-word <span style="color: #00ffff;">]</span>    <span style="color: #ffd700; font-weight: bold;">whend</span>
 
     <span style="color: #66f;">( these require reading a second char first )</span>
-    <span style="color: #66f;">( !! TODO: refactor this too )</span>
+    <span style="color: #66f;">( !! TODO: refactor this )</span>
     <span style="color: #00ffff;">[</span> '&lt; <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> next-ch '=
                <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> `&lt;= <span style="color: #66f;">( TODO: consume )</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `&lt; <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
     <span style="color: #00ffff;">[</span> '&gt; <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> next-ch '=
                <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> `&gt;= <span style="color: #66f;">( TODO: consume )</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `&gt; <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
     <span style="color: #00ffff;">[</span> ': <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> next-ch '= <span style="color: #66f;">( TODO: expect )</span>
-               <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> `:= <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> error <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+               <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> `:= <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> err <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
   <span style="color: #00ffff;">]</span> <span style="color: #c63; font-weight: bold;">do</span>
 <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( -t ) return the next token"</span>
 </pre>
 </div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-5" class="outline-3">
+<h3 id="sec-1-5"><span class="section-number-3">1.5</span> notes</h3>
+<div class="outline-text-3" id="text-1-5">
+<p>
+My original take on the singe-character tokens:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #00ffff;">[</span> '. <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `. <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> ', <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `, <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+<span style="color: #00ffff;">[</span> '; <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `; <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> '# <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `# <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> 
+<span style="color: #00ffff;">[</span> '+ <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `+ <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> '- <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `- <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+<span style="color: #00ffff;">[</span> '* <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `* <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> '/ <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `/ <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+<span style="color: #00ffff;">[</span> '( <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `( <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> ') <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `) <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+<span style="color: #00ffff;">[</span> '! <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `! <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+</pre>
+</div>
+
+<p>
+But KipIngram on #forth pointed out that I could use a jump table.
+</p>
+
+<p>
+Looking at the ASCII character set, the characters I needed to match
+were almost all in the range #32 - #47:
+</p>
+
+<pre class="example">
+#32 - #47
+  ! " # $ % &amp; ' ( ) * + , - . /
+</pre>
+
+<pre class="example">
+#48 - #63
+0 1 2 3 4 5 6 7 8 9 : ; &lt; = &gt; ?
+</pre>
+
+<pre class="example">
+#64 - #95
+@ A B C D E F G H I J K L M N O
+P Q R S T U V W X Y Z [ \ ] ^ _
+</pre>
+
+<pre class="example">
+#96 - #127 (DELETE)
+` a b c d e f g h i j k l m n o
+p q r s t u v w x y z { | } ~
+</pre>
 </div>
 </div>
 </div>
