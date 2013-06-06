@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>pl0rx : a pl/0 → retro compiler , part 2</title>
-<!-- 2013-06-06 Thu 05:45 -->
+<!-- 2013-06-06 Thu 06:32 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -68,7 +68,7 @@ for the JavaScript code in this tag.
 <li><a href="#sec-1-2">1.2. lexer</a></li>
 <li><a href="#sec-1-3">1.3. helper routine: <code>in-range?</code></a></li>
 <li><a href="#sec-1-4">1.4. now the tokenizer</a></li>
-<li><a href="#sec-1-5">1.5. notes</a></li>
+<li><a href="#sec-1-5">1.5. Notes</a></li>
 </ul>
 </li>
 </ul>
@@ -103,7 +103,7 @@ enum| `. `const `= `, `; `var `procedure `:=
 <h3 id="sec-1-2"><span class="section-number-3">1.2</span> lexer</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
-We will fetch one token at a time, by way of fetching one character at a time. This works for PL/0 because the grammar is designed so that everything is tagged on the left. You only have to look ahead ad one token to know what should come next.
+We will fetch one token at a time, by way of fetching one character at a time. This works for PL/0 because the grammar is designed so that everything is tagged on the left. You only have to look ahead one token to know what should come next.
 </p>
 
 <div class="org-src-container">
@@ -136,10 +136,6 @@ We will fetch one token at a time, by way of fetching one character at a time. T
 <div id="outline-container-sec-1-4" class="outline-3">
 <h3 id="sec-1-4"><span class="section-number-3">1.4</span> now the tokenizer</h3>
 <div class="outline-text-3" id="text-1-4">
-<p>
-We can use <code>whend</code> (retro's equivalent of a <code>case</code> or <code>switch</code> statement) to dispatch the tokens:
-</p>
-
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">:</span> skip-whitespace <span style="color: #00ffff;">[</span> ch <span style="color: #32cd32;">32</span> <span style="color: #00ffff;">&gt;</span> <span style="color: #00ffff;">dup</span> <span style="color: #00ffff;">[</span> next-ch <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">ifFalse</span> <span style="color: #00ffff;">]</span> until
@@ -148,12 +144,30 @@ We can use <code>whend</code> (retro's equivalent of a <code>case</code> or <cod
 <span style="color: #c63; font-weight: bold;">:</span> skip-comment <span style="color: #00ffff;">[</span> next-ch '} <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> until
 <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( - ) called when { is matched. discards the comment."</span> :doc
 
-<span style="color: #c63; font-weight: bold;">;</span> read-word <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">]</span>
+<span style="color: #66f;">( borrowing a trick from Alan Winfield: let dictionaries do the work )</span>
+<span style="color: #c63; font-weight: bold;">:</span> C: <span style="color: #c63; font-weight: bold;">constant</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">chain:</span> keywords
+  C:  const      `const           C:  var    `var
+  C:  procedure  `procedure       C:  call   `call
+  C:  begin      `begin           C:  end    `end
+  C:  <span style="color: #ffd700; font-weight: bold;">if</span>         `if              C:  <span style="color: #ffd700; font-weight: bold;">then</span>   `then
+  C:  <span style="color: #ffd700; font-weight: bold;">while</span>      `while           C:  <span style="color: #c63; font-weight: bold;">do</span>     `do
+  C:  odd        `odd
+<span style="color: #c63; font-weight: bold;">;chain</span>
+
+<span style="color: #66f;">( this implements a fixed-width character buffer/string )</span>
+C: bufsize <span style="color: #32cd32;">32</span>   <span style="color: #c63; font-weight: bold;">variable</span> left
+<span style="color: #c63; font-weight: bold;">create</span> buffer bufsize <span style="color: #00ffff;">allot</span> <span style="color: #66f;">( and write a 0 to mark the end of the string: )</span> <span style="color: #32cd32;">0</span> <span style="color: #c63; font-weight: bold;">,</span>
+<span style="color: #c63; font-weight: bold;">:</span> buf[ bufsize negate left <span style="color: #00ffff;">!</span> <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #66f;">( reset the buffer )</span>
+<span style="color: #c63; font-weight: bold;">:</span> buf+ <span style="color: #66f;">( c- )</span> left <span style="color: #ffd700; font-weight: bold;">0;</span> <span style="color: #00ffff;">++</span> buf left <span style="color: #00ffff;">+</span> bufsize <span style="color: #00ffff;">+</span> <span style="color: #00ffff;">!</span> <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #66f;">( write up to 32 chars to the buffer )</span>
+<span style="color: #c63; font-weight: bold;">:</span> buf] <span style="color: #66f;">( -$ )</span> <span style="color: #32cd32;">0</span> buf+ buf <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #66f;">( cap the buffer and put its address on the stack )</span>
+
+<span style="color: #c63; font-weight: bold;">;</span> read    left ---word
 <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( -?n ) Reads a word. TOS=token id. For identifiers, NOS=name."</span> :doc
 
 &lt;&lt;read-num&gt;&gt;
 
-<span style="color: #c63; font-weight: bold;">:</span> err <span style="color: #00ff00;">"error: '"</span> puts ch putc <span style="color: #00ff00;">"' is not allowed here."</span> puts <span style="color: #c63; font-weight: bold;">;</span> 
+<span style="color: #c63; font-weight: bold;">:</span> err <span style="color: #00ff00;">"error: '"</span> puts ch putc <span style="color: #00ff00;">"' is not allowed here."</span> puts <span style="color: #c63; font-weight: bold;">;</span>
 
 <span style="color: #c63; font-weight: bold;">:</span> next-tok
   <span style="color: #00ffff;">[</span> ch
@@ -183,7 +197,7 @@ We can use <code>whend</code> (retro's equivalent of a <code>case</code> or <cod
 
 
 <div id="outline-container-sec-1-5" class="outline-3">
-<h3 id="sec-1-5"><span class="section-number-3">1.5</span> notes</h3>
+<h3 id="sec-1-5"><span class="section-number-3">1.5</span> Notes</h3>
 <div class="outline-text-3" id="text-1-5">
 <p>
 My original take on the singe-character tokens:
@@ -192,7 +206,7 @@ My original take on the singe-character tokens:
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #00ffff;">[</span> '. <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `. <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> ', <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `, <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
-<span style="color: #00ffff;">[</span> '; <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `; <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> '# <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `# <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> 
+<span style="color: #00ffff;">[</span> '; <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `; <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> '# <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `# <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
 <span style="color: #00ffff;">[</span> '+ <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `+ <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> '- <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `- <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
 <span style="color: #00ffff;">[</span> '* <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `* <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> '/ <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `/ <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
 <span style="color: #00ffff;">[</span> '( <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `( <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> ') <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `) <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
