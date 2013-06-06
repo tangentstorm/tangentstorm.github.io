@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>minrel trail</title>
-<!-- 2013-05-14 Tue 07:15 -->
+<!-- 2013-05-15 Wed 13:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -104,53 +104,56 @@ for the JavaScript code in this tag.
 </li>
 </ul>
 </li>
-<li><a href="#sec-4">4. implement a command shell</a></li>
-<li><a href="#sec-5">5. forth like dictionary</a></li>
-<li><a href="#sec-6">6. &#x2014; later ----</a>
+<li><a href="#sec-4">4. parsetable</a></li>
+<li><a href="#sec-5">5. later: replace case statement with dynamic lookup</a></li>
+<li><a href="#sec-6">6. NOTE . how to escape from pascal</a></li>
+<li><a href="#sec-7">7. implement a command shell</a></li>
+<li><a href="#sec-8">8. forth like dictionary</a></li>
+<li><a href="#sec-9">9. &#x2014; later ----</a>
 <ul>
-<li><a href="#sec-6-1">6.1. the relational algebra  (maybe split this up over time, add to appendix?)</a>
+<li><a href="#sec-9-1">9.1. the relational algebra  (maybe split this up over time, add to appendix?)</a>
 <ul>
-<li><a href="#sec-6-1-1">6.1.1. implement union (OR)</a></li>
-<li><a href="#sec-6-1-2">6.1.2. implement intersection (AND)</a></li>
-<li><a href="#sec-6-1-3">6.1.3. implement filter (given a predicate function)</a></li>
-<li><a href="#sec-6-1-4">6.1.4. implement inner join</a></li>
-<li><a href="#sec-6-1-5">6.1.5. implement natural join</a></li>
-<li><a href="#sec-6-1-6">6.1.6. implement outer join</a></li>
-<li><a href="#sec-6-1-7">6.1.7. implement sorting</a></li>
-<li><a href="#sec-6-1-8">6.1.8. implement selection</a></li>
-<li><a href="#sec-6-1-9">6.1.9. implement projection</a></li>
+<li><a href="#sec-9-1-1">9.1.1. implement union (OR)</a></li>
+<li><a href="#sec-9-1-2">9.1.2. implement intersection (AND)</a></li>
+<li><a href="#sec-9-1-3">9.1.3. implement filter (given a predicate function)</a></li>
+<li><a href="#sec-9-1-4">9.1.4. implement inner join</a></li>
+<li><a href="#sec-9-1-5">9.1.5. implement natural join</a></li>
+<li><a href="#sec-9-1-6">9.1.6. implement outer join</a></li>
+<li><a href="#sec-9-1-7">9.1.7. implement sorting</a></li>
+<li><a href="#sec-9-1-8">9.1.8. implement selection</a></li>
+<li><a href="#sec-9-1-9">9.1.9. implement projection</a></li>
 </ul>
 </li>
-<li><a href="#sec-6-2">6.2. relational extensions</a>
+<li><a href="#sec-9-2">9.2. relational extensions</a>
 <ul>
-<li><a href="#sec-6-2-1">6.2.1. implement left join</a></li>
-<li><a href="#sec-6-2-2">6.2.2. hierarchical queries (transitive closure)</a></li>
+<li><a href="#sec-9-2-1">9.2.1. implement left join</a></li>
+<li><a href="#sec-9-2-2">9.2.2. hierarchical queries (transitive closure)</a></li>
 </ul>
 </li>
-<li><a href="#sec-6-3">6.3. compact file vs room to grow -&gt; page model</a></li>
-<li><a href="#sec-6-4">6.4. show the conversion to triple store</a></li>
-<li><a href="#sec-6-5">6.5. files vs arrays -&gt; unify with IArray interface</a></li>
-<li><a href="#sec-6-6">6.6. read multiple datatypes from untyped files using BlockRead/BlockWrite</a></li>
-<li><a href="#sec-6-7">6.7. the virtual machine</a></li>
-<li><a href="#sec-6-8">6.8. "relational methods"</a>
+<li><a href="#sec-9-3">9.3. compact file vs room to grow -&gt; page model</a></li>
+<li><a href="#sec-9-4">9.4. show the conversion to triple store</a></li>
+<li><a href="#sec-9-5">9.5. files vs arrays -&gt; unify with IArray interface</a></li>
+<li><a href="#sec-9-6">9.6. read multiple datatypes from untyped files using BlockRead/BlockWrite</a></li>
+<li><a href="#sec-9-7">9.7. the virtual machine</a></li>
+<li><a href="#sec-9-8">9.8. "relational methods"</a>
 <ul>
-<li><a href="#sec-6-8-1">6.8.1. This is the old idea from arlo that the query language should exist <i>atop</i> the object model, with all its behaviors and whatnot.</a></li>
-<li><a href="#sec-6-8-2">6.8.2. I think a relation could be treated much like a class.</a></li>
-<li><a href="#sec-6-8-3">6.8.3. relational methods would produce relations&#x2026; it would depend on class methods.</a></li>
-<li><a href="#sec-6-8-4">6.8.4. views would be a type of relational method</a></li>
+<li><a href="#sec-9-8-1">9.8.1. This is the old idea from arlo that the query language should exist <i>atop</i> the object model, with all its behaviors and whatnot.</a></li>
+<li><a href="#sec-9-8-2">9.8.2. I think a relation could be treated much like a class.</a></li>
+<li><a href="#sec-9-8-3">9.8.3. relational methods would produce relations&#x2026; it would depend on class methods.</a></li>
+<li><a href="#sec-9-8-4">9.8.4. views would be a type of relational method</a></li>
 </ul>
 </li>
-<li><a href="#sec-6-9">6.9. query planning/optimization</a></li>
-<li><a href="#sec-6-10">6.10. model a petri net</a></li>
-<li><a href="#sec-6-11">6.11. write a parser for ascii-delimited data</a></li>
-<li><a href="#sec-6-12">6.12. parse org-mode tables</a></li>
-<li><a href="#sec-6-13">6.13. implement some kindof user interface for tables</a>
+<li><a href="#sec-9-9">9.9. query planning/optimization</a></li>
+<li><a href="#sec-9-10">9.10. model a petri net</a></li>
+<li><a href="#sec-9-11">9.11. write a parser for ascii-delimited data</a></li>
+<li><a href="#sec-9-12">9.12. parse org-mode tables</a></li>
+<li><a href="#sec-9-13">9.13. implement some kindof user interface for tables</a>
 <ul>
-<li><a href="#sec-6-13-1">6.13.1. implement a spreadsheet-like gui in lazarus</a></li>
+<li><a href="#sec-9-13-1">9.13.1. implement a spreadsheet-like gui in lazarus</a></li>
 </ul>
 </li>
-<li><a href="#sec-6-14">6.14. csv/tab import</a></li>
-<li><a href="#sec-6-15">6.15. full text search</a></li>
+<li><a href="#sec-9-14">9.14. csv/tab import</a></li>
+<li><a href="#sec-9-15">9.15. full text search</a></li>
 </ul>
 </li>
 </ul>
@@ -283,120 +286,180 @@ This basically involves lifting records up into the data model.
 </div>
 
 
+
+
 <div id="outline-container-sec-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> implement a command shell</h2>
+<h2 id="sec-4"><span class="section-number-2">4</span> parsetable</h2>
+<div class="outline-text-2" id="text-4">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">parsetable</span>;
+  <span style="color: #00ffff;">begin</span>
+    createTempBuf;
+    <span style="color: #00ffff;">for</span> key <span style="color: #00ffff;">in</span> keys <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">with</span> key <span style="color: #00ffff;">do</span>
+      <span style="color: #00ffff;">case</span> keytype <span style="color: #00ffff;">of</span>
+        ktString : readstring( keysize, result );
+        ktCardinal : readNumber( keysize, result );
+      <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
 </div>
 <div id="outline-container-sec-5" class="outline-2">
-<h2 id="sec-5"><span class="section-number-2">5</span> forth like dictionary</h2>
+<h2 id="sec-5"><span class="section-number-2">5</span> later: replace case statement with dynamic lookup</h2>
+<div class="outline-text-2" id="text-5">
+<div class="org-src-container">
+
+<pre class="src src-wejal">: linearlookup
+for h in handlers where h.key ~ msg.type do  !  ~ means 'matches', which could change based on type
+    h.handle( msg );
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><a id="jsqbem7034g0" name="jsqbem7034g0"></a><span class="section-number-2">6</span> NOTE . how to escape from pascal</h2>
+<div class="outline-text-2" id="text-6">
+<ul class="org-ul">
+<li>procedure signatures are essentially records
+</li>
+<li>records are just arrays that conform to a schema
+</li>
+<li>so procedures could just take arrays
+<ul class="org-ul">
+<li>to find the nth field, take the nth offset
+</li>
+<li>these can be interpreted on the fly or compiled
+</li>
+<li>for variable length data, use a reference
+</li>
+<li>references also help minimize data transfer
+<ul class="org-ul">
+<li>but watch out for paging and the cpu cache
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
 </div>
 
-<div id="outline-container-sec-6" class="outline-2">
-<h2 id="sec-6"><span class="section-number-2">6</span> &#x2014; later ----</h2>
-<div class="outline-text-2" id="text-6">
-</div><div id="outline-container-sec-6-1" class="outline-3">
-<h3 id="sec-6-1"><span class="section-number-3">6.1</span> the relational algebra  (maybe split this up over time, add to appendix?)</h3>
-<div class="outline-text-3" id="text-6-1">
-</div><div id="outline-container-sec-6-1-1" class="outline-4">
-<h4 id="sec-6-1-1"><span class="section-number-4">6.1.1</span> implement union (OR)</h4>
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> implement a command shell</h2>
 </div>
-<div id="outline-container-sec-6-1-2" class="outline-4">
-<h4 id="sec-6-1-2"><span class="section-number-4">6.1.2</span> implement intersection (AND)</h4>
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> forth like dictionary</h2>
 </div>
-<div id="outline-container-sec-6-1-3" class="outline-4">
-<h4 id="sec-6-1-3"><span class="section-number-4">6.1.3</span> implement filter (given a predicate function)</h4>
+
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> &#x2014; later ----</h2>
+<div class="outline-text-2" id="text-9">
+</div><div id="outline-container-sec-9-1" class="outline-3">
+<h3 id="sec-9-1"><span class="section-number-3">9.1</span> the relational algebra  (maybe split this up over time, add to appendix?)</h3>
+<div class="outline-text-3" id="text-9-1">
+</div><div id="outline-container-sec-9-1-1" class="outline-4">
+<h4 id="sec-9-1-1"><span class="section-number-4">9.1.1</span> implement union (OR)</h4>
 </div>
-<div id="outline-container-sec-6-1-4" class="outline-4">
-<h4 id="sec-6-1-4"><span class="section-number-4">6.1.4</span> implement inner join</h4>
+<div id="outline-container-sec-9-1-2" class="outline-4">
+<h4 id="sec-9-1-2"><span class="section-number-4">9.1.2</span> implement intersection (AND)</h4>
 </div>
-<div id="outline-container-sec-6-1-5" class="outline-4">
-<h4 id="sec-6-1-5"><span class="section-number-4">6.1.5</span> implement natural join</h4>
+<div id="outline-container-sec-9-1-3" class="outline-4">
+<h4 id="sec-9-1-3"><span class="section-number-4">9.1.3</span> implement filter (given a predicate function)</h4>
 </div>
-<div id="outline-container-sec-6-1-6" class="outline-4">
-<h4 id="sec-6-1-6"><span class="section-number-4">6.1.6</span> implement outer join</h4>
+<div id="outline-container-sec-9-1-4" class="outline-4">
+<h4 id="sec-9-1-4"><span class="section-number-4">9.1.4</span> implement inner join</h4>
 </div>
-<div id="outline-container-sec-6-1-7" class="outline-4">
-<h4 id="sec-6-1-7"><span class="section-number-4">6.1.7</span> implement sorting</h4>
+<div id="outline-container-sec-9-1-5" class="outline-4">
+<h4 id="sec-9-1-5"><span class="section-number-4">9.1.5</span> implement natural join</h4>
 </div>
-<div id="outline-container-sec-6-1-8" class="outline-4">
-<h4 id="sec-6-1-8"><span class="section-number-4">6.1.8</span> implement selection</h4>
+<div id="outline-container-sec-9-1-6" class="outline-4">
+<h4 id="sec-9-1-6"><span class="section-number-4">9.1.6</span> implement outer join</h4>
 </div>
-<div id="outline-container-sec-6-1-9" class="outline-4">
-<h4 id="sec-6-1-9"><span class="section-number-4">6.1.9</span> implement projection</h4>
+<div id="outline-container-sec-9-1-7" class="outline-4">
+<h4 id="sec-9-1-7"><span class="section-number-4">9.1.7</span> implement sorting</h4>
+</div>
+<div id="outline-container-sec-9-1-8" class="outline-4">
+<h4 id="sec-9-1-8"><span class="section-number-4">9.1.8</span> implement selection</h4>
+</div>
+<div id="outline-container-sec-9-1-9" class="outline-4">
+<h4 id="sec-9-1-9"><span class="section-number-4">9.1.9</span> implement projection</h4>
 </div>
 </div>
-<div id="outline-container-sec-6-2" class="outline-3">
-<h3 id="sec-6-2"><span class="section-number-3">6.2</span> relational extensions</h3>
-<div class="outline-text-3" id="text-6-2">
-</div><div id="outline-container-sec-6-2-1" class="outline-4">
-<h4 id="sec-6-2-1"><span class="section-number-4">6.2.1</span> <span class="todo TODO">TODO</span> implement left join</h4>
-<div class="outline-text-4" id="text-6-2-1">
+<div id="outline-container-sec-9-2" class="outline-3">
+<h3 id="sec-9-2"><span class="section-number-3">9.2</span> relational extensions</h3>
+<div class="outline-text-3" id="text-9-2">
+</div><div id="outline-container-sec-9-2-1" class="outline-4">
+<h4 id="sec-9-2-1"><span class="section-number-4">9.2.1</span> <span class="todo TODO">TODO</span> implement left join</h4>
+<div class="outline-text-4" id="text-9-2-1">
 </div><ol class="org-ol"><li>1:*<br/></li>
 <li>1:1<br/></li>
 <li>*:1<br/></li></ol>
 </div>
 
-<div id="outline-container-sec-6-2-2" class="outline-4">
-<h4 id="sec-6-2-2"><span class="section-number-4">6.2.2</span> hierarchical queries (transitive closure)</h4>
+<div id="outline-container-sec-9-2-2" class="outline-4">
+<h4 id="sec-9-2-2"><span class="section-number-4">9.2.2</span> hierarchical queries (transitive closure)</h4>
 </div>
 </div>
 
-<div id="outline-container-sec-6-3" class="outline-3">
-<h3 id="sec-6-3"><span class="section-number-3">6.3</span> compact file vs room to grow -&gt; page model&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cloud">cloud</span></span></h3>
+<div id="outline-container-sec-9-3" class="outline-3">
+<h3 id="sec-9-3"><span class="section-number-3">9.3</span> compact file vs room to grow -&gt; page model&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cloud">cloud</span></span></h3>
 </div>
-<div id="outline-container-sec-6-4" class="outline-3">
-<h3 id="sec-6-4"><span class="section-number-3">6.4</span> show the conversion to triple store</h3>
+<div id="outline-container-sec-9-4" class="outline-3">
+<h3 id="sec-9-4"><span class="section-number-3">9.4</span> show the conversion to triple store</h3>
 </div>
-<div id="outline-container-sec-6-5" class="outline-3">
-<h3 id="sec-6-5"><span class="section-number-3">6.5</span> files vs arrays -&gt; unify with IArray interface&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cloud">cloud</span></span></h3>
+<div id="outline-container-sec-9-5" class="outline-3">
+<h3 id="sec-9-5"><span class="section-number-3">9.5</span> files vs arrays -&gt; unify with IArray interface&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cloud">cloud</span></span></h3>
 </div>
-<div id="outline-container-sec-6-6" class="outline-3">
-<h3 id="sec-6-6"><span class="section-number-3">6.6</span> read multiple datatypes from untyped files using BlockRead/BlockWrite</h3>
+<div id="outline-container-sec-9-6" class="outline-3">
+<h3 id="sec-9-6"><span class="section-number-3">9.6</span> read multiple datatypes from untyped files using BlockRead/BlockWrite</h3>
 </div>
-<div id="outline-container-sec-6-7" class="outline-3">
-<h3 id="sec-6-7"><span class="section-number-3">6.7</span> the virtual machine</h3>
+<div id="outline-container-sec-9-7" class="outline-3">
+<h3 id="sec-9-7"><span class="section-number-3">9.7</span> the virtual machine</h3>
 </div>
-<div id="outline-container-sec-6-8" class="outline-3">
-<h3 id="sec-6-8"><span class="section-number-3">6.8</span> "relational methods"&#xa0;&#xa0;&#xa0;<span class="tag"><span class="arlo">arlo</span></span></h3>
-<div class="outline-text-3" id="text-6-8">
-</div><div id="outline-container-sec-6-8-1" class="outline-4">
-<h4 id="sec-6-8-1"><span class="section-number-4">6.8.1</span> This is the old idea from arlo that the query language should exist <i>atop</i> the object model, with all its behaviors and whatnot.</h4>
+<div id="outline-container-sec-9-8" class="outline-3">
+<h3 id="sec-9-8"><span class="section-number-3">9.8</span> "relational methods"&#xa0;&#xa0;&#xa0;<span class="tag"><span class="arlo">arlo</span></span></h3>
+<div class="outline-text-3" id="text-9-8">
+</div><div id="outline-container-sec-9-8-1" class="outline-4">
+<h4 id="sec-9-8-1"><span class="section-number-4">9.8.1</span> This is the old idea from arlo that the query language should exist <i>atop</i> the object model, with all its behaviors and whatnot.</h4>
 </div>
-<div id="outline-container-sec-6-8-2" class="outline-4">
-<h4 id="sec-6-8-2"><span class="section-number-4">6.8.2</span> I think a relation could be treated much like a class.</h4>
+<div id="outline-container-sec-9-8-2" class="outline-4">
+<h4 id="sec-9-8-2"><span class="section-number-4">9.8.2</span> I think a relation could be treated much like a class.</h4>
 </div>
-<div id="outline-container-sec-6-8-3" class="outline-4">
-<h4 id="sec-6-8-3"><span class="section-number-4">6.8.3</span> relational methods would produce relations&#x2026; it would depend on class methods.</h4>
+<div id="outline-container-sec-9-8-3" class="outline-4">
+<h4 id="sec-9-8-3"><span class="section-number-4">9.8.3</span> relational methods would produce relations&#x2026; it would depend on class methods.</h4>
 </div>
-<div id="outline-container-sec-6-8-4" class="outline-4">
-<h4 id="sec-6-8-4"><span class="section-number-4">6.8.4</span> views would be a type of relational method</h4>
-</div>
-</div>
-
-<div id="outline-container-sec-6-9" class="outline-3">
-<h3 id="sec-6-9"><span class="section-number-3">6.9</span> query planning/optimization</h3>
-</div>
-<div id="outline-container-sec-6-10" class="outline-3">
-<h3 id="sec-6-10"><span class="section-number-3">6.10</span> model a petri net</h3>
-</div>
-<div id="outline-container-sec-6-11" class="outline-3">
-<h3 id="sec-6-11"><span class="section-number-3">6.11</span> write a parser for ascii-delimited data</h3>
-</div>
-<div id="outline-container-sec-6-12" class="outline-3">
-<h3 id="sec-6-12"><span class="section-number-3">6.12</span> parse org-mode tables</h3>
-</div>
-<div id="outline-container-sec-6-13" class="outline-3">
-<h3 id="sec-6-13"><span class="section-number-3">6.13</span> implement some kindof user interface for tables</h3>
-<div class="outline-text-3" id="text-6-13">
-</div><div id="outline-container-sec-6-13-1" class="outline-4">
-<h4 id="sec-6-13-1"><span class="section-number-4">6.13.1</span> implement a spreadsheet-like gui in lazarus</h4>
+<div id="outline-container-sec-9-8-4" class="outline-4">
+<h4 id="sec-9-8-4"><span class="section-number-4">9.8.4</span> views would be a type of relational method</h4>
 </div>
 </div>
 
-<div id="outline-container-sec-6-14" class="outline-3">
-<h3 id="sec-6-14"><span class="section-number-3">6.14</span> csv/tab import</h3>
+<div id="outline-container-sec-9-9" class="outline-3">
+<h3 id="sec-9-9"><span class="section-number-3">9.9</span> query planning/optimization</h3>
 </div>
-<div id="outline-container-sec-6-15" class="outline-3">
-<h3 id="sec-6-15"><span class="section-number-3">6.15</span> full text search</h3>
+<div id="outline-container-sec-9-10" class="outline-3">
+<h3 id="sec-9-10"><span class="section-number-3">9.10</span> model a petri net</h3>
+</div>
+<div id="outline-container-sec-9-11" class="outline-3">
+<h3 id="sec-9-11"><span class="section-number-3">9.11</span> write a parser for ascii-delimited data</h3>
+</div>
+<div id="outline-container-sec-9-12" class="outline-3">
+<h3 id="sec-9-12"><span class="section-number-3">9.12</span> parse org-mode tables</h3>
+</div>
+<div id="outline-container-sec-9-13" class="outline-3">
+<h3 id="sec-9-13"><span class="section-number-3">9.13</span> implement some kindof user interface for tables</h3>
+<div class="outline-text-3" id="text-9-13">
+</div><div id="outline-container-sec-9-13-1" class="outline-4">
+<h4 id="sec-9-13-1"><span class="section-number-4">9.13.1</span> implement a spreadsheet-like gui in lazarus</h4>
+</div>
+</div>
+
+<div id="outline-container-sec-9-14" class="outline-3">
+<h3 id="sec-9-14"><span class="section-number-3">9.14</span> csv/tab import</h3>
+</div>
+<div id="outline-container-sec-9-15" class="outline-3">
+<h3 id="sec-9-15"><span class="section-number-3">9.15</span> full text search</h3>
 </div>
 </div>
 </div>

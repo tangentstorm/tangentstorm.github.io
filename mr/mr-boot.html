@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>minrel : bootstrap</title>
-<!-- 2013-05-14 Tue 07:15 -->
+<!-- 2013-05-15 Wed 13:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -64,7 +64,8 @@ for the JavaScript code in this tag.
 <ul>
 <li><a href="#sec-1">1. intro</a></li>
 <li><a href="#sec-2">2. tab reader</a></li>
-<li><a href="#sec-3">3. polymorphism</a></li>
+<li><a href="#sec-3">3. dynamic arrays</a></li>
+<li><a href="#sec-4">4. polymorphism</a></li>
 </ul>
 </div>
 </div>
@@ -90,26 +91,75 @@ Let's start simple, and build a routine to import tab delimited text files. This
 <h2 id="sec-2"><span class="section-number-2">2</span> tab reader</h2>
 <div class="outline-text-2" id="text-2">
 <p>
-<code>ReadTuple</code> is a lot like <code>WriteTuple</code> from before:
+<code>ReadTuple</code> is a lot like <code>WriteTuple</code> from Last time:
 </p>
 
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ReadTuple</span>( buf : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> byte );
-  <span style="color: #00ffff;">for</span> key <span style="color: #00ffff;">in</span> keys <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">with</span> key <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">begin</span>
-    <span style="color: #00ffff;">case</span> keyType <span style="color: #00ffff;">of</span>
-      ktCardinal : ;
-      ktString : ;
-    <span style="color: #00ffff;">end</span>
+  <span style="color: #ff00ff;">var</span>
+    key : TKeyDef;
+    c   : cardinal; pos : cardinal = 0;
+    ch  : <span style="color: #ff00ff;">char</span>;
+    s   : <span style="color: #ff00ff;">string</span>[255];
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">for</span> key <span style="color: #00ffff;">in</span> keys <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">with</span> key <span style="color: #00ffff;">do</span>
+      <span style="color: #00ffff;">begin</span>
+        <span style="color: #00ffff;">case</span> keyType <span style="color: #00ffff;">of</span>
+          ktPadding  : inc( pos, keySize );
+          ktCardinal : <span style="color: #00ffff;">begin</span>
+                         <span style="color: #00ffff;">read</span>( c );
+                         move( c, buf( pos ), keySize );
+                       <span style="color: #00ffff;">end</span>;
+          ktString   : <span style="color: #00ffff;">begin</span>
+                         s := <span style="color: #00ff00;">''</span>; c := 0; ch := #0;
+                         <span style="color: #00ffff;">while</span> c &lt; keyLength 
+                           <span style="color: #00ffff;">and</span> ch &lt;&gt; kSep <span style="color: #00ffff;">and</span> <span style="color: #00ffff;">not</span> eof <span style="color: #00ffff;">do</span>
+                         <span style="color: #00ffff;">begin</span>
+                           <span style="color: #00ffff;">read</span>( ch );
+                           s := s + ch;
+                           inc( c );
+                         <span style="color: #00ffff;">end</span>
+                       <span style="color: #00ffff;">end</span>
+        <span style="color: #00ffff;">end</span>;
+        move( c, buf( pos ), keySize );
+      <span style="color: #00ffff;">end</span>
   <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
 </div>
 </div>
 
+
 <div id="outline-container-sec-3" class="outline-2">
-<h2 id="sec-3"><span class="section-number-2">3</span> polymorphism</h2>
+<h2 id="sec-3"><span class="section-number-2">3</span> dynamic arrays</h2>
 <div class="outline-text-2" id="text-3">
+<p>
+Reading the whole table is no big deal, but we do need to know how to make it happen.
+</p>
+
+
+<p>
+Now to read the table:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ReadData</span>( def : TRelDef );
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">while</span> <span style="color: #00ffff;">not</span> eof <span style="color: #00ffff;">do</span>
+      <span style="color: #00ffff;">begin</span>
+      <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> polymorphism</h2>
+<div class="outline-text-2" id="text-4">
 <p>
 Now we have <code>WriteTuple</code> and <code>WriteHeader</code> for text formatting but what about computer readable?
 </p>

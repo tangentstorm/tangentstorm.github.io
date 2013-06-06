@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>generalized sets for pascal</title>
-<!-- 2013-05-17 Fri 17:15 -->
+<!-- 2013-06-06 Thu 00:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal j. wallace"/>
@@ -272,7 +272,6 @@ The only slight downside to interfaces in pascal is that (unlike in java or c#) 
 </p>
 </div>
 </div>
-
 <div id="outline-container-sec-4" class="outline-2">
 <h2 id="sec-4"><span class="section-number-2">4</span> Using this document as a tutorial.</h2>
 <div class="outline-text-2" id="text-4">
@@ -307,9 +306,14 @@ If you'd prefer to follow along yourself and treat this document as a tutorial, 
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #ff00ff;">type</span> GSet&lt;t&gt; = <span style="color: #ff00ff;">class</span> <span style="color: #66f;">// </span><span style="color: #66f;">( TInterfacedObject, ISet&lt;T&gt; )</span>
+<span style="color: #00ffff;">private</span>
+  <span style="color: #ff00ff;">type</span> TRBTree = TRBMap&lt;T,byte&gt;;
+<span style="color: #00ffff;">private</span>
+  _tree : TRBTree;
+<span style="color: #00ffff;">public</span>
   <span style="color: #66f;">// </span><span style="color: #66f;">constructor Create;</span>
   <span style="color: #66f;">// </span><span style="color: #66f;">destructor Destroy; override;</span>
-  <span style="color: #66f;">{ </span><span style="color: #66f;">stateful operations </span><span style="color: #66f;">}</span> 
+  <span style="color: #66f;">{ </span><span style="color: #66f;">stateful operations </span><span style="color: #66f;">}</span>
   <span style="color: #66f;">// </span><span style="color: #66f;">procedure include( val : T ); virtual;</span>
   <span style="color: #66f;">// </span><span style="color: #66f;">procedure exclude( val : T ); virtual;</span>
   <span style="color: #66f;">{ </span><span style="color: #66f;">predicates, comparisons, and queries </span><span style="color: #66f;">}</span>
@@ -353,11 +357,10 @@ This repository includes both the finished <code>test_sets.pas</code> and (if yo
 </p>
 
 <p>
-There is currently a small python dependency used to generate boilerplate code for the tests.
+There is currently a small python dependency used to generate the boilerplate code for the tests. (hopefully this will be ported to pascal soon).
 </p>
 </div>
 </div>
-
 <div id="outline-container-sec-6" class="outline-2">
 <h2 id="sec-6"><span class="section-number-2">6</span> Implementation : GSet&lt;T&gt;</h2>
 <div class="outline-text-2" id="text-6">
@@ -368,11 +371,13 @@ There is currently a small python dependency used to generate boilerplate code f
 
 <pre class="src src-pascal" id="class:GSet"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GSet</span>&lt;t&gt;.Create;
 <span style="color: #00ffff;">begin</span>
-  <span style="color: #00ffff;">inherited</span>
+  <span style="color: #00ffff;">inherited</span>;
+  _tree := TRBTree.Create;
 <span style="color: #00ffff;">end</span>;
 
 <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">GSet</span>&lt;T&gt;.Destroy;
 <span style="color: #00ffff;">begin</span>
+  _tree.Free;
 <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
@@ -390,6 +395,10 @@ There is currently a small python dependency used to generate boilerplate code f
 <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GSet</span>&lt;T&gt;.exclude( val : T );
 <span style="color: #00ffff;">begin</span>
 <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GSet</span>&lt;T&gt;.contains( val : T ) : <span style="color: #ff00ff;">boolean</span>;
+<span style="color: #00ffff;">begin</span>
+<span style="color: #00ffff;">end</span>;
 </pre>
 </div>
 </div>
@@ -402,17 +411,68 @@ There is currently a small python dependency used to generate boilerplate code f
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$mode delphi</span><span style="color: #66f;">}</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$i test_sets.def </span><span style="color: #66f;">}{</span><span style="color: #66f;">$h+</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">implementation</span> <span style="color: #00ffff;">uses</span> sets;
+
+  <span style="color: #ff00ff;">type</span>
+    TStringSet = GSet&lt;<span style="color: #ff00ff;">string</span>&gt;;
+    TCharSet   = <span style="color: #ff00ff;">set</span> <span style="color: #00ffff;">of</span> <span style="color: #ff00ff;">char</span>;
+
+  <span style="color: #ff00ff;">const</span> <span style="color: #66f;">{ </span><span style="color: #66f;">these are built-in (set of char), tested with bits </span><span style="color: #66f;">}</span>
+    hexits = [<span style="color: #00ff00;">'0'</span>..<span style="color: #00ff00;">'9'</span>,<span style="color: #00ff00;">'a'</span>..<span style="color: #00ff00;">'f'</span>];
+    vowels = [<span style="color: #00ff00;">'a'</span>,<span style="color: #00ff00;">'e'</span>,<span style="color: #00ff00;">'i'</span>,<span style="color: #00ff00;">'o'</span>,<span style="color: #00ff00;">'u'</span>];
+
+  <span style="color: #ff00ff;">var</span> <span style="color: #66f;">{ </span><span style="color: #66f;">these use the custom implementation </span><span style="color: #66f;">}</span>
+    h, v : TStringSet;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">makeStringSet</span>( chs : TCharSet ) : TStringSet;
+    <span style="color: #ff00ff;">var</span> ch : <span style="color: #ff00ff;">char</span>;
+    <span style="color: #00ffff;">begin</span>
+      result := TStringSet.Create;
+      <span style="color: #00ffff;">for</span> ch <span style="color: #00ffff;">in</span> chs <span style="color: #00ffff;">do</span> result.include( ch );
+    <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">ToString</span>( ss : TStringSet) : <span style="color: #ff00ff;">string</span>;
+    <span style="color: #ff00ff;">var</span> s : <span style="color: #ff00ff;">string</span>;
+    <span style="color: #00ffff;">begin</span>
+      result := <span style="color: #00ff00;">''</span>;
+      <span style="color: #00ffff;">for</span> s <span style="color: #00ffff;">in</span> s <span style="color: #00ffff;">do</span> result += s;
+    <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">setup</span>;
+    <span style="color: #00ffff;">begin</span>
+      h := makeStringSet(hexits);
+      v := makeStringSet(vowels);
+    <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">test_iter</span>;
+    <span style="color: #00ffff;">begin</span>
+      chk.equal( <span style="color: #00ff00;">'0123456789abcdef'</span>, ToString(h));
+    <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$mode delphi</span><span style="color: #66f;">}</span>
 <span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">sets</span>;
-<span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">uses</span> rb
+<span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">uses</span> rb;
   &lt;&lt;<span style="color: #ff00ff;">type</span>:ISet&gt;&gt;
   <span style="color: #ff00ff;">type</span> GSet&lt;t&gt; = <span style="color: #ff00ff;">class</span> <span style="color: #66f;">// </span><span style="color: #66f;">( TInterfacedObject, ISet&lt;T&gt; )</span>
-    <span style="color: #66f;">// </span><span style="color: #66f;">constructor Create;</span>
-    <span style="color: #66f;">// </span><span style="color: #66f;">destructor Destroy; override;</span>
-    <span style="color: #66f;">{ </span><span style="color: #66f;">stateful operations </span><span style="color: #66f;">}</span> 
-    <span style="color: #66f;">// </span><span style="color: #66f;">procedure include( val : T ); virtual;</span>
-    <span style="color: #66f;">// </span><span style="color: #66f;">procedure exclude( val : T ); virtual;</span>
+  <span style="color: #00ffff;">private</span>
+    <span style="color: #ff00ff;">type</span> TRBTree = TRBMap&lt;T,byte&gt;;
+  <span style="color: #00ffff;">private</span> 
+    _tree : TRBTree;
+  <span style="color: #00ffff;">public</span>
+    <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>;
+    <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">Destroy</span>; <span style="color: #00ffff;">override</span>;
+    <span style="color: #66f;">{ </span><span style="color: #66f;">stateful operations </span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">include</span>( val : T ); <span style="color: #00ffff;">virtual</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">exclude</span>( val : T ); <span style="color: #00ffff;">virtual</span>;
     <span style="color: #66f;">{ </span><span style="color: #66f;">predicates, comparisons, and queries </span><span style="color: #66f;">}</span>
-    <span style="color: #66f;">// </span><span style="color: #66f;">function contains( val : T ): boolean; virtual;</span>
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">contains</span>( val : T ): <span style="color: #ff00ff;">boolean</span>; <span style="color: #00ffff;">virtual</span>;
     <span style="color: #66f;">// </span><span style="color: #66f;">function isSubsetOf( other : ISet&lt;T&gt; ): boolean;virtual;</span>
     <span style="color: #66f;">// </span><span style="color: #66f;">function isSupersetOf( other : ISet&lt;T&gt; ): boolean;virtual;</span>
     <span style="color: #66f;">{ </span><span style="color: #66f;">algebraic operations </span><span style="color: #66f;">}</span>

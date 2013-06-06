@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title></title>
+<!-- 2013-05-16 Thu 18:17 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal"/>
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title"></h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. unit <code>mnml</code> : minneron main loop</a></li>
+<li><a href="#sec-2">2. interface</a></li>
+<li><a href="#sec-3">3. implementation</a>
+<ul>
+<li><a href="#sec-3-1">3.1. internal variables</a></li>
+<li><a href="#sec-3-2">3.2. <code>step</code></a></li>
+<li><a href="#sec-3-3">3.3. <code>loop</code></a></li>
+<li><a href="#sec-3-4">3.4. <code>done</code></a></li>
+<li><a href="#sec-3-5">3.5. <code>define</code></a></li>
+<li><a href="#sec-3-6">3.6. <code>launch</code></a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. initialization</a></li>
+<li><a href="#sec-5">5. finalization</a></li>
+<li><a href="#sec-6">6. planned enhancements</a>
+<ul>
+<li><a href="#sec-6-1">6.1. create a module for scheduled tasks</a></li>
+<li><a href="#sec-6-2">6.2. create a unit to handle module definititions</a></li>
+<li><a href="#sec-6-3">6.3. actor model for retro</a></li>
+<li><a href="#sec-6-4">6.4. module system</a></li>
+<li><a href="#sec-6-5">6.5. message passing system</a></li>
+</ul>
+</li>
+<li><a href="#sec-7">7. example usage</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><a id="k5kjxsw034g0" name="k5kjxsw034g0"></a><span class="section-number-2">1</span> unit <code>mnml</code> : minneron main loop</h2>
+<div class="outline-text-2" id="text-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{ </span><span style="color: #66f;">minneron main loop </span><span style="color: #66f;">}</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$mode objfpc</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">mnml</span>;
+  <span style="color: #00ffff;">interface</span>
+  <span style="color: #00ffff;">uses</span> sysutils;
+    <span style="color: #ff00ff;">type</span>
+      TThunk = procedure;
+      TToken = <span style="color: #ff00ff;">string</span>[31];
+      TCmdId = cardinal;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">define</span>( <span style="color: #ff00ff;">var</span> cmd : TCmdId; thunk : TThunk; token : TToken );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">launch</span>( <span style="color: #ff00ff;">const</span> cmd : TCmdId );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">launch</span>( <span style="color: #ff00ff;">const</span> cmd : TToken );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">step</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">loop</span>;
+    <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">done</span> : <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">implementation</span>
+    <span style="color: #ff00ff;">var</span>
+      queue  : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> TCmdId;
+      thunks : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> TThunk;
+      tokens : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> TToken;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">step</span>;
+    <span style="color: #ff00ff;">var</span> i, n : cardinal;
+    <span style="color: #00ffff;">begin</span>
+      n := length(queue);
+      <span style="color: #00ffff;">if</span> n &gt; 0 <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">for</span> i := 0 <span style="color: #00ffff;">to</span> n - 1 <span style="color: #00ffff;">do</span> thunks[queue[i]]();
+      <span style="color: #00ffff;">if</span> length(queue) &gt; n <span style="color: #00ffff;">then</span>
+        <span style="color: #66f;">{ </span><span style="color: #66f;">shift newly launched commands to start of the array </span><span style="color: #66f;">}</span>
+        <span style="color: #00ffff;">for</span> i := n <span style="color: #00ffff;">to</span> length(queue) - 1 <span style="color: #00ffff;">do</span> queue[i-n] := queue[i];
+      <span style="color: #66f;">{ </span><span style="color: #66f;">now truncate the array so only the new items remain </span><span style="color: #66f;">}</span>
+      SetLength(queue, Length(queue)-n)
+    <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">loop</span>;
+    <span style="color: #00ffff;">begin</span>
+      <span style="color: #00ffff;">repeat</span> step <span style="color: #00ffff;">until</span> done
+    <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">done</span> : <span style="color: #ff00ff;">boolean</span>; <span style="color: #00ffff;">inline</span>;
+    <span style="color: #00ffff;">begin</span>
+      done := length(queue) = 0;
+    <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">define</span>( <span style="color: #ff00ff;">var</span> cmd : TCmdId; thunk : TThunk; token : TToken );
+    <span style="color: #00ffff;">begin</span>
+      cmd := length(thunks);
+      setlength(thunks, cmd+1);
+      setlength(tokens, cmd+1);
+      thunks[cmd] := thunk;
+      tokens[cmd] := token;
+    <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">launch</span>( <span style="color: #ff00ff;">const</span> cmd  : TCmdId );
+    <span style="color: #00ffff;">begin</span>
+      setlength(queue, length(queue)+1);
+      queue[cmd] := cmd;
+    <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">launch</span>( <span style="color: #ff00ff;">const</span> cmd  : TToken );
+    <span style="color: #ff00ff;">var</span> i : cardinal; found : <span style="color: #ff00ff;">boolean</span> = false;
+    <span style="color: #00ffff;">begin</span>
+      <span style="color: #00ffff;">for</span> i := 0 <span style="color: #00ffff;">to</span> length(queue)-1 <span style="color: #00ffff;">do</span>
+        <span style="color: #00ffff;">if</span> tokens[i]=cmd <span style="color: #00ffff;">then</span> 
+          <span style="color: #00ffff;">begin</span>
+            launch( i );
+            found := true;
+          <span style="color: #00ffff;">end</span>;
+      <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">not</span> found <span style="color: #00ffff;">then</span>
+        <span style="color: #00ffff;">raise</span> Exception.Create(<span style="color: #00ff00;">'undefined: '</span> + cmd );
+    <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">initialization</span>
+  <span style="color: #00ffff;">finalization</span>
+    SetLength(tokens, 0);
+    SetLength(thunks, 0);
+    SetLength(queue,  0);
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><a id="ab9hx2x034g0" name="ab9hx2x034g0"></a><span class="section-number-2">2</span> interface</h2>
+<div class="outline-text-2" id="text-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="interface"><span style="color: #00ffff;">interface</span>
+<span style="color: #00ffff;">uses</span> sysutils;
+  <span style="color: #ff00ff;">type</span>
+    TThunk = procedure;
+    TToken = <span style="color: #ff00ff;">string</span>[31];
+    TCmdId = cardinal;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">define</span>( <span style="color: #ff00ff;">var</span> cmd : TCmdId; thunk : TThunk; token : TToken );
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">launch</span>( <span style="color: #ff00ff;">const</span> cmd : TCmdId );
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">launch</span>( <span style="color: #ff00ff;">const</span> cmd : TToken );
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">step</span>;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">loop</span>;
+  <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">done</span> : <span style="color: #ff00ff;">boolean</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><a id="y8n1knz034g0" name="y8n1knz034g0"></a><span class="section-number-2">3</span> implementation</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> internal variables</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="implementation"><span style="color: #00ffff;">implementation</span>
+  <span style="color: #ff00ff;">var</span>
+    queue  : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> TCmdId;
+    thunks : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> TThunk;
+    tokens : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> TToken;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><a id="uxv9rtw034g0" name="uxv9rtw034g0"></a><span class="section-number-3">3.2</span> <code>step</code></h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="implementation"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">step</span>;
+  <span style="color: #ff00ff;">var</span> i, n : cardinal;
+  <span style="color: #00ffff;">begin</span>
+    n := length(queue);
+    <span style="color: #00ffff;">if</span> n &gt; 0 <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">for</span> i := 0 <span style="color: #00ffff;">to</span> n - 1 <span style="color: #00ffff;">do</span> thunks[queue[i]]();
+    <span style="color: #00ffff;">if</span> length(queue) &gt; n <span style="color: #00ffff;">then</span>
+      <span style="color: #66f;">{ </span><span style="color: #66f;">shift newly launched commands to start of the array </span><span style="color: #66f;">}</span>
+      <span style="color: #00ffff;">for</span> i := n <span style="color: #00ffff;">to</span> length(queue) - 1 <span style="color: #00ffff;">do</span> queue[i-n] := queue[i];
+    <span style="color: #66f;">{ </span><span style="color: #66f;">now truncate the array so only the new items remain </span><span style="color: #66f;">}</span>
+    SetLength(queue, Length(queue)-n)
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><a id="vkn7ibw034g0" name="vkn7ibw034g0"></a><span class="section-number-3">3.3</span> <code>loop</code></h3>
+<div class="outline-text-3" id="text-3-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="implementation"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">loop</span>;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">repeat</span> step <span style="color: #00ffff;">until</span> done
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><a id="14ted41134g0" name="14ted41134g0"></a><span class="section-number-3">3.4</span> <code>done</code></h3>
+<div class="outline-text-3" id="text-3-4">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="implementation"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">done</span> : <span style="color: #ff00ff;">boolean</span>; <span style="color: #00ffff;">inline</span>;
+  <span style="color: #00ffff;">begin</span>
+    done := length(queue) = 0;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-5" class="outline-3">
+<h3 id="sec-3-5"><a id="hdeho31134g0" name="hdeho31134g0"></a><span class="section-number-3">3.5</span> <code>define</code></h3>
+<div class="outline-text-3" id="text-3-5">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="implementation"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">define</span>( <span style="color: #ff00ff;">var</span> cmd : TCmdId; thunk : TThunk; token : TToken );
+  <span style="color: #00ffff;">begin</span>
+    cmd := length(thunks);
+    setlength(thunks, cmd+1);
+    setlength(tokens, cmd+1);
+    thunks[cmd] := thunk;
+    tokens[cmd] := token;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-6" class="outline-3">
+<h3 id="sec-3-6"><a id="tey0a41134g0" name="tey0a41134g0"></a><span class="section-number-3">3.6</span> <code>launch</code></h3>
+<div class="outline-text-3" id="text-3-6">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="implementation"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">launch</span>( <span style="color: #ff00ff;">const</span> cmd  : TCmdId );
+  <span style="color: #00ffff;">begin</span>
+    setlength(queue, length(queue)+1);
+    queue[cmd] := cmd;
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">launch</span>( <span style="color: #ff00ff;">const</span> cmd  : TToken );
+  <span style="color: #ff00ff;">var</span> i : cardinal; found : <span style="color: #ff00ff;">boolean</span> = false;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">for</span> i := 0 <span style="color: #00ffff;">to</span> length(queue)-1 <span style="color: #00ffff;">do</span>
+      <span style="color: #00ffff;">if</span> tokens[i]=cmd <span style="color: #00ffff;">then</span> 
+        <span style="color: #00ffff;">begin</span>
+          launch( i );
+          found := true;
+        <span style="color: #00ffff;">end</span>;
+    <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">not</span> found <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">raise</span> Exception.Create(<span style="color: #00ff00;">'undefined: '</span> + cmd );
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><a id="6a76cy0134g0" name="6a76cy0134g0"></a><span class="section-number-2">4</span> initialization</h2>
+<div class="outline-text-2" id="text-4">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="initialization"><span style="color: #00ffff;">initialization</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><a id="m2i8w01134g0" name="m2i8w01134g0"></a><span class="section-number-2">5</span> finalization</h2>
+<div class="outline-text-2" id="text-5">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="finalization"><span style="color: #00ffff;">finalization</span>
+  SetLength(tokens, 0);
+  SetLength(thunks, 0);
+  SetLength(queue,  0);
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><a id="m2k24e2134g0" name="m2k24e2134g0"></a><span class="section-number-2">6</span> planned enhancements</h2>
+<div class="outline-text-2" id="text-6">
+</div>
+<div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><a id="ydr91ey034g0" name="ydr91ey034g0"></a><span class="section-number-3">6.1</span> <span class="todo TODO">TODO</span> create a module for scheduled tasks</h3>
+<div class="outline-text-3" id="text-6-1">
+<div class="org-src-container">
+
+<pre class="src src-recur">function  ( pcmd : callable; interval, times, priority : integer ) : TTaskId;
+function  change( task : callable; interval, times, priority : integer ) : TTaskId;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6-2" class="outline-3">
+<h3 id="sec-6-2"><a id="zqc4pey034g0" name="zqc4pey034g0"></a><span class="section-number-3">6.2</span> <span class="todo TODO">TODO</span> create a unit to handle module definititions</h3>
+<div class="outline-text-3" id="text-6-2">
+<p>
+function  module( name : TModName  ) : TModId;
+type TModId : cardinal;
+TModName : string<sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup>;
+</p>
+</div>
+</div>
+<div id="outline-container-sec-6-3" class="outline-3">
+<h3 id="sec-6-3"><a id="d5s2oc2134g0" name="d5s2oc2134g0"></a><span class="section-number-3">6.3</span> <span class="todo TODO">TODO</span> actor model for retro</h3>
+<div class="outline-text-3" id="text-6-3">
+</div>
+</div>
+
+<div id="outline-container-sec-6-4" class="outline-3">
+<h3 id="sec-6-4"><a id="8vdhed2134g0" name="8vdhed2134g0"></a><span class="section-number-3">6.4</span> <span class="todo TODO">TODO</span> module system</h3>
+<div class="outline-text-3" id="text-6-4">
+</div>
+</div>
+
+<div id="outline-container-sec-6-5" class="outline-3">
+<h3 id="sec-6-5"><a id="pqdase2134g0" name="pqdase2134g0"></a><span class="section-number-3">6.5</span> <span class="todo TODO">TODO</span> message passing system</h3>
+<div class="outline-text-3" id="text-6-5">
+<p>
+TMessage : record end;
+TQueue   : record end;
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><a id="oseegbv034g0" name="oseegbv034g0"></a><span class="section-number-2">7</span> example usage</h2>
+<div class="outline-text-2" id="text-7">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">program</span> <span style="color: #ffffff; font-weight: bold;">rnd</span>;
+<span style="color: #00ffff;">uses</span> crt, mnml;
+
+  <span style="color: #ff00ff;">var</span> cmd_rnd : TCmdId;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">EmitRandomChars</span>;
+  <span style="color: #ff00ff;">var</span> x , y, c : byte;
+  <span style="color: #00ffff;">begin</span>
+    x := crt.WindMaxX <span style="color: #00ffff;">div</span> 2 + 1
+         + round((random-0.5) * (random( crt.WindMaxX + 1 )));
+    <span style="color: #66f;">{ </span><span style="color: #66f;">random * random will give a strong bias to top of screen </span><span style="color: #66f;">}</span>
+    y := round(random * random * random( crt.WindMaxY+1));
+    crt.textcolor( random( 8 ));
+    <span style="color: #00ffff;">if</span> <span style="color: #ff00ff;">boolean</span>(random( 2 )) <span style="color: #00ffff;">then</span> crt.highvideo <span style="color: #00ffff;">else</span> crt.lowvideo;
+    crt.gotoxy(x, y);
+    <span style="color: #00ffff;">write</span>(chr(random(128 - 32) + 32));
+    <span style="color: #00ffff;">if</span> crt.keypressed <span style="color: #00ffff;">then</span> crt.readkey <span style="color: #00ffff;">else</span> mnml.launch(cmd_rnd);
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">begin</span>
+  mnml.define(cmd_rnd, @EmitRandomChars, <span style="color: #00ff00;">'rnd'</span>);
+  mnml.launch(cmd_rnd);
+  mnml.loop;
+  crt.normvideo;
+  crt.clrscr;
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p>DEFINITION NOT FOUND.</p></div>
+
+
+</div>
+</div></div>
+</body>
+</html>
