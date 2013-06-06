@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>pl0rx : a pl/0-&gt;retro compiler</title>
-<!-- 2013-06-06 Thu 00:44 -->
+<!-- 2013-06-06 Thu 00:59 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -88,24 +88,23 @@ Here is a contrived example of PL/0 code, which prints the first 10 cube numbers
 <div class="outline-text-2" id="text-1">
 <div class="org-src-container">
 
-<pre class="src src-python"><span style="color: #66f;">#+begin_src pascal</span>
-  var
-    i,                   <span style="color: #66f;"># loop counter</span>
-    result;              <span style="color: #66f;"># result of cube operation</span>
+<pre class="src src-pascal"><span style="color: #ff00ff;">var</span>
+  i,                   <span style="color: #66f;">{ </span><span style="color: #66f;">loop counter </span><span style="color: #66f;">}</span>
+  result;              <span style="color: #66f;">{ </span><span style="color: #66f;">result of cube operation </span><span style="color: #66f;">}</span>
 
-  procedure cube;
-    result := i * i * i;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">cube</span>;
+  result := i * i * i;
 
-  <span style="color: #66f;"># main program</span>
-  begin
-    i := 1;
-    <span style="color: #00ffff;">while</span> i &lt; 10 do
-      begin
-        call cube;
-        ! result;        <span style="color: #66f;"># "!" means "print"</span>
-        i := i + 1
-      end
-  end.
+<span style="color: #66f;">{ </span><span style="color: #66f;">main program </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">begin</span>
+  i := 1;
+  <span style="color: #00ffff;">while</span> i &lt; 10 <span style="color: #00ffff;">do</span>
+    <span style="color: #00ffff;">begin</span>
+      call cube;
+      ! result;        <span style="color: #66f;">{ </span><span style="color: #66f;">"!" means "print" </span><span style="color: #66f;">}</span>
+      i := i + 1
+    <span style="color: #00ffff;">end</span>
+<span style="color: #00ffff;">end</span>.
 </pre>
 </div>
 
@@ -126,19 +125,19 @@ Here is a definition of the PL/0 syntax, specified in the ANTLR4 language:
   <span style="color: #00ffff;">;</span>
 
 <span style="color: #ffffff; font-weight: bold;">block</span>
-  <span style="color: #00ffff;">:</span> <span style="color: #ff00ff;">consts</span>? <span style="color: #ff00ff;">vars</span>? <span style="color: #ff00ff;">procedure</span>* <span style="color: #ff00ff;">statement</span> <span style="color: #00ffff;">;</span>
+  <span style="color: #00ffff;">:</span> <span style="color: #ff00ff;">consts</span>? <span style="color: #ff00ff;">vars</span>? <span style="color: #ff00ff;">procedure</span>* <span style="color: #ff00ff;">statement</span>
+  <span style="color: #00ffff;">;</span>
 
 <span style="color: #ffffff; font-weight: bold;">consts</span>
   <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'const'</span> <span style="color: #ff00ff;">Ident</span> <span style="color: #00ff00;">'='</span> <span style="color: #ff00ff;">Number</span> <span style="color: #00ffff;">(</span><span style="color: #00ff00;">','</span> <span style="color: #ff00ff;">Ident</span> <span style="color: #00ff00;">'='</span> <span style="color: #ff00ff;">Number</span><span style="color: #00ffff;">)*</span> <span style="color: #00ff00;">';'</span>
   <span style="color: #00ffff;">;</span>
 
 <span style="color: #ffffff; font-weight: bold;">vars</span>
-  <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'var'</span> <span style="color: #ff00ff;">Ident</span> <span style="color: #00ffff;">((</span><span style="color: #00ff00;">','</span> <span style="color: #ff00ff;">Ident</span><span style="color: #00ffff;">)*</span> <span style="color: #00ff00;">';'</span><span style="color: #00ffff;">)*</span> <span style="color: #00ff00;">';'</span>
+  <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'var'</span> <span style="color: #ff00ff;">Ident</span> <span style="color: #00ffff;">(</span><span style="color: #00ff00;">','</span> <span style="color: #ff00ff;">Ident</span><span style="color: #00ffff;">)*</span> <span style="color: #00ff00;">';'</span>
   <span style="color: #00ffff;">;</span>
 
 <span style="color: #ffffff; font-weight: bold;">procedure</span>
   <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'procedure'</span> <span style="color: #ff00ff;">Ident</span> <span style="color: #00ff00;">';'</span> <span style="color: #ff00ff;">block</span> <span style="color: #00ff00;">';'</span>
-       <span style="color: #ff00ff;">statement</span> <span style="color: #00ff00;">';'</span>
   <span style="color: #00ffff;">;</span>
 
 <span style="color: #ffffff; font-weight: bold;">statement</span>
@@ -171,7 +170,7 @@ Here is a definition of the PL/0 syntax, specified in the ANTLR4 language:
 
 
 <span style="color: #ffffff; font-weight: bold;">WS</span>     <span style="color: #00ffff;">:</span> [ \t\n]+ -&gt; <span style="color: #ff00ff;">skip</span> <span style="color: #00ffff;">;</span> <span style="color: #66f;">// </span><span style="color: #66f;">skip spaces, tabs, newlines</span>
-<span style="color: #ffffff; font-weight: bold;">Comment</span> <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'#'</span> .*? <span style="color: #00ff00;">'\n'</span> -&gt; <span style="color: #ff00ff;">skip</span><span style="color: #00ffff;">;</span>
+<span style="color: #ffffff; font-weight: bold;">Comment</span> <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'{'</span> .*? <span style="color: #00ff00;">'}'</span> -&gt; <span style="color: #ff00ff;">skip</span><span style="color: #00ffff;">;</span>
 
 <span style="color: #ffffff; font-weight: bold;">Ident</span>  <span style="color: #00ffff;">:</span> <span style="color: #ff00ff;">ALPHA</span> <span style="color: #00ffff;">(</span><span style="color: #ff00ff;">ALPHA</span> <span style="color: #00ffff;">|</span> <span style="color: #ff00ff;">DIGIT</span><span style="color: #00ffff;">)*</span> <span style="color: #00ffff;">;</span>
 <span style="color: #ffffff; font-weight: bold;">Number</span> <span style="color: #00ffff;">:</span> <span style="color: #ff00ff;">DIGIT</span>+<span style="color: #00ffff;">;</span>
@@ -208,11 +207,17 @@ grun PL0 program -tree cubes.pl0
 </pre>
 
 <p>
-&#x2026; Then we should see an AST:
+&#x2026; Then we should see a dump of the parse tree:
 </p>
 
 <pre class="example">
-(program (block var i , result ; procedure cube ; (block (statement result := (expression (term (factor i) * (factor i) * (factor i))))) ; (statement begin (statement i := (expression (term (factor 1)))) ; (statement while (condition (expression (term (factor i))) &lt; (expression (term (factor 10)))) do (statement begin (statement call cube) ; (statement ! result) ; (statement i := (expression (term (factor i)) + (term (factor 1)))) end)) end)) .)
+(program (block (vars var i , result ;) (procedure procedure cube ;
+(block (statement result := (expression (term (factor i) * (factor i) *
+(factor i))))) ;) (statement begin (statement i := (expression (term
+(factor 1)))) ; (statement while (condition (expression (term (factor i)))
+&lt; (expression (term (factor 10)))) do (statement begin (statement call
+cube) ; (statement ! result) ; (statement i := (expression (term (factor
+i)) + (term (factor 1)))) end)) end)) .)
 </pre>
 
 <p>
@@ -221,11 +226,28 @@ Here's the same tree, reformatted a bit for clarity:
 
 <div class="org-src-container">
 
-<pre class="src src-lisp">(program
-   (<span style="color: #00ffff;">block</span> var i , result <span style="color: #66f;">;</span>
-          procedure cube <span style="color: #66f;">;</span>
-     (<span style="color: #00ffff;">block</span> 
-         (statement result <span style="color: #ff00ff; font-weight: bold;">:=</span> (expression (term (factor i) * (factor i) * (factor i))))) <span style="color: #66f;">; </span><span style="color: #66f;">(statement begin (statement i := (expression (term (factor 1)))) ; (statement while (condition (expression (term (factor i))) &lt; (expression (term (factor 10)))) do (statement begin (statement call cube) ; (statement ! result) ; (statement i := (expression (term (factor i)) + (term (factor 1)))) end)) end)) .)</span>
+<pre class="src src-text">(program
+  (block
+    (vars var i , result ;)
+    (procedure procedure cube ;
+       (block (statement
+          result := (expression
+            (term (factor i) *
+                  (factor i) *
+                  (factor i))))) ;)
+(statement begin
+  (statement i := (expression (term (factor 1)))) ;
+  (statement while
+     (condition (expression (term (factor i))) &lt;
+                (expression (term (factor 10)))) do 
+     (statement begin
+       (statement call cube) ;
+       (statement ! result) ;
+       (statement i := (expression 
+          (term (factor i)) +
+          (term (factor 1))))
+     end))
+end)) .)
 </pre>
 </div>
 </div>
