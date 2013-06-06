@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>pl0rx : a pl/0 → retro compiler , part 2</title>
+<!-- 2013-06-06 Thu 03:07 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal"/>
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">pl0rx : a pl/0 → retro compiler , part 2</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. lexical analysis</a>
+<ul>
+<li><a href="#sec-1-1">1.1. tokens</a></li>
+<li><a href="#sec-1-2">1.2. lexer</a></li>
+<li><a href="#sec-1-3">1.3. helper routine: <code>in-range?</code></a></li>
+<li><a href="#sec-1-4">1.4. now the tokenizer</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+(draft)
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> lexical analysis</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> tokens</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+We'll use the <code>enum</code> library to generate a set of constants to identify our tokens. Purely as a convention, we'll use the backtick character as a prefix for token names:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">needs</span> <span style="color: #ff6347;">enum'</span> <span style="color: #c63; font-weight: bold;">with</span> <span style="color: #ff6347;">enum'</span>
+<span style="color: #66f;">( tokens )</span>
+enum| `. `const `= `, `; `var `procedure `:=
+      `call `! `begin `end `if `then `while `do
+      `odd `# `&lt; `&lt;= `&gt; `&gt;= `+ `- `* `/ `( `) `{ `}
+      `&lt;name&gt; <span style="color: #c63; font-weight: bold;">|</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> lexer</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+We will fetch one token at a time, by way of fetching one character at a time. This works for PL/0 because the grammar is designed so that everything is tagged on the left. You only have to look ahead ad one token to know what should come next.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">variables|</span> ch tok <span style="color: #c63; font-weight: bold;">|</span>
+
+<span style="color: #c63; font-weight: bold;">:</span> next-ch getc <span style="color: #00ffff;">dup</span> ch <span style="color: #00ffff;">!</span>
+<span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( -c) read the next character from input and populate ch"</span> :doc
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> helper routine: <code>in-range?</code></h3>
+<div class="outline-text-3" id="text-1-3">
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">:</span> in-range? <span style="color: #00ffff;">push</span> <span style="color: #00ffff;">over</span> <span style="color: #00ffff;">push</span> <span style="color: #00ffff;">&gt;=</span> <span style="color: #00ffff;">pop</span> <span style="color: #00ffff;">pop</span> <span style="color: #00ffff;">&lt;=</span> <span style="color: #00ffff;">and</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( nxy-f ) is n in range x..y inclusive?"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> letter? 'a 'z in-range? 'A 'Z in-range? <span style="color: #00ffff;">or</span>
+<span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( c-f ) is character c a letter?"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> digit? '0 '9 in-range?
+<span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( c-f ) is character c a digit?"</span> :doc
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> now the tokenizer</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+We can use <code>whend</code> (retro's equivalent of a <code>case</code> or <code>switch</code> statement) to dispatch the tokens:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">:</span> consume next-ch <span style="color: #00ffff;">drop</span> <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">:</span> next-tok
+  <span style="color: #00ffff;">[</span> ch
+    <span style="color: #66f;">( these characters /are/ tokens )</span>
+    <span style="color: #66f;">( !! TODO: simplify this table! )</span>
+    <span style="color: #00ffff;">[</span> '. <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `. <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> ', <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `, <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+    <span style="color: #00ffff;">[</span> '; <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `; <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> '# <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `# <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> 
+    <span style="color: #00ffff;">[</span> '+ <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `+ <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> '- <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `- <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+    <span style="color: #00ffff;">[</span> '* <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `* <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span> <span style="color: #00ffff;">[</span> '/ <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `/ <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+    <span style="color: #00ffff;">[</span> '! <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `! <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+
+    <span style="color: #66f;">( these immediately trigger a parse rule )</span>
+    <span style="color: #00ffff;">[</span> '( <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span>    <span style="color: #00ffff;">[</span> read-subexpr <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+    <span style="color: #00ffff;">[</span> '{ <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span>    <span style="color: #00ffff;">[</span> read-comment <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+    <span style="color: #00ffff;">[</span> digit? <span style="color: #00ffff;">]</span>  <span style="color: #00ffff;">[</span> read-num  <span style="color: #00ffff;">]</span>    <span style="color: #ffd700; font-weight: bold;">whend</span>
+    <span style="color: #00ffff;">[</span> letter? <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> read-word <span style="color: #00ffff;">]</span>    <span style="color: #ffd700; font-weight: bold;">whend</span>
+
+    <span style="color: #66f;">( these require reading a second char first )</span>
+    <span style="color: #66f;">( !! TODO: refactor this too )</span>
+    <span style="color: #00ffff;">[</span> '&lt; <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> next-ch '=
+               <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> `&lt;= <span style="color: #66f;">( TODO: consume )</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `&lt; <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+    <span style="color: #00ffff;">[</span> '&gt; <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> next-ch '=
+               <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> `&gt;= <span style="color: #66f;">( TODO: consume )</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> `&gt; <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+    <span style="color: #00ffff;">[</span> ': <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> next-ch '= <span style="color: #66f;">( TODO: expect )</span>
+               <span style="color: #00ffff;">=</span> <span style="color: #00ffff;">[</span> `:= <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> error <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span> <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+  <span style="color: #00ffff;">]</span> <span style="color: #c63; font-weight: bold;">do</span>
+<span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( -t ) return the next token"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
