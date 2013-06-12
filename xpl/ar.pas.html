@@ -1,0 +1,622 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>ar.pas : Array interface</title>
+<!-- 2013-06-12 Wed 05:19 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal"/>
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+
+<script type="text/javascript" src="http://orgmode.org/org-info.js">
+/**
+ *
+ * @source: http://orgmode.org/org-info.js
+ *
+ * @licstart  The following is the entire license notice for the
+ *  JavaScript code in http://orgmode.org/org-info.js.
+ *
+ * Copyright (C) 2012-2013  Sebastian Rose
+ *
+ *
+ * The JavaScript code in this tag is free software: you can
+ * redistribute it and/or modify it under the terms of the GNU
+ * General Public License (GNU GPL) as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option)
+ * any later version.  The code is distributed WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+ *
+ * As additional permission under GNU GPL version 3 section 7, you
+ * may distribute non-source (e.g., minimized or compacted) forms of
+ * that code without the copy of the GNU GPL normally required by
+ * section 4, provided you include this license notice and a URL
+ * through which recipients can access the Corresponding Source.
+ *
+ * @licend  The above is the entire license notice
+ * for the JavaScript code in http://orgmode.org/org-info.js.
+ *
+ */
+</script>
+
+<script type="text/javascript">
+
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+
+<!--/*--><![CDATA[/*><!--*/
+org_html_manager.set("TOC_DEPTH", "3");
+org_html_manager.set("LINK_HOME", "");
+org_html_manager.set("LINK_UP", "");
+org_html_manager.set("LOCAL_TOC", "1");
+org_html_manager.set("VIEW_BUTTONS", "0");
+org_html_manager.set("MOUSE_HINT", "underline");
+org_html_manager.set("FIXED_TOC", "0");
+org_html_manager.set("TOC", "0");
+org_html_manager.set("VIEW", "showall");
+org_html_manager.setup();  // activate after the parameters are set
+/*]]>*///-->
+</script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">ar.pas : Array interface</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. The IArray Interface</a></li>
+<li><a href="#sec-2">2. A simple test suite.</a></li>
+<li><a href="#sec-3">3. Implementations</a>
+<ul>
+<li><a href="#sec-3-1">3.1. GAbstractArray</a></li>
+<li><a href="#sec-3-2">3.2. GDynArray</a></li>
+<li><a href="#sec-3-3">3.3. GFileArray</a></li>
+<li><a href="#sec-3-4">3.4. GCachedArray</a></li>
+<li><a href="#sec-3-5">3.5. GBPlusArray</a></li>
+<li><a href="#sec-3-6">3.6. GEmbeddedArray</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. Appendix: Templates for Generated Files</a>
+<ul>
+<li><a href="#sec-4-1">4.1. template for UNIT <code>ar</code></a></li>
+<li><a href="#sec-4-2">4.2. template for test suite</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> The IArray Interface</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Previously, we looked at the <a href="https://github.com/tangentstorm/xpl/blob/master/code/sq.pas">sq unit</a>, in which we defined a generic sequence type, whose interface looked like this:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span> generic ISequence&lt;tKey, tVal&gt; = <span style="color: #00ffff;">interface</span>
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">Length</span> : cardinal;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetItem</span>( i : tKey ) : tVal;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetItem</span>( i : tKey; <span style="color: #ff00ff;">var</span> value : tVal );
+  <span style="color: #00ffff;">property</span> item[ i : tKey ] : tVal
+    <span style="color: #00ffff;">read</span> GetItem <span style="color: #00ffff;">write</span> SetItem; <span style="color: #00ffff;">default</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+We further provided an abstract class, <code>GSeq&lt;tKey,tVal&gt;</code>, which provides an enumerator for classes implementing <code>ISequence</code>. This allows us to loop through the values of a sequence with pascal's <code>for &#x2026; in &#x2026; do</code> syntax.
+</p>
+
+<p>
+An array is a specific type of sequence that uses a continuous range of values for its keys.
+</p>
+
+<p>
+Arrays in standard pascal can have arbitrary start and end indices (that is, you can declare an <code>array[ -5 .. 237 ]</code> if you like, or <code>array['a'..'z']</code>, or even <code>array[byte]</code>, which translates to <code>array[0..255]</code>, the range of the <code>byte</code> type.
+</p>
+
+<p>
+However, most of the time, it's sufficient to range from zero to some maximum value, and in fact this is how dynamic arrays work in object pascal, thus we can define an interface that works very much like a dynamic array simply by specializing <code>ISequence</code> and using <code>cardinal</code> as the key type:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="type:IArray"><span style="color: #ff00ff;">type</span>
+  IArray&lt;T&gt; = <span style="color: #00ffff;">interface</span> (ISequence&lt;cardinal, T&gt;)
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Resize</span>( newlen : cardinal );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Append</span>( value : T );
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+Remember, <code>T</code> is a type variable, indicating some particular but as-yet unspecificred type, as if we'd declared an <code>array of T</code>.
+</p>
+
+<p>
+The two additional methods we've added indicate that we will concern ourselves here with <i>dynamic</i> arrays, which can grow and shrink at runtime, rather than having fixed bounds.
+</p>
+
+<p>
+Object pascal offers dynamic arrays, which are basically the same as static arrays, except they're allocated on the heap. You can resize them with <code>SetLength</code>, but since this can copy the entire array each time you resize it, it's not always efficient to grow the array.
+</p>
+
+<p>
+Since keys in an array are a contiguous sequence of values, arrays generally store their values in a single contiguous block of RAM. This allows the compiler to use simple pointer arithmetic under the hood to
+allow very fast access to the data.
+</p>
+
+<p>
+Sometimes, though, we prefer something that looks and feels like an array, but uses some other kind of storage system underneath. In this unit, we'll explore several classes that all implement this same interface, but have very different implementations under the hood.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> A simple test suite.</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+The compiler will check that each of our array classes provides the necessary methods to implement <code>IArray</code>, but it can't guarantee that the implementation actually does what we want.
+</p>
+
+<p>
+Actually, nothing short of a formal proof can guarantee that our software is correct (and then only if we trust both the compiler and our logic), but we can at least provide evidence that it's probably doing the right thing.
+</p>
+
+<p>
+To that end, we will run each class through the following test suite, which simply creates and populates an array.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="check_array"><span style="color: #ff00ff;">type</span>
+  ICardinalArray = IArray&lt;cardinal&gt;;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">check_array</span>( a : ICardinalArray );
+  <span style="color: #ff00ff;">var</span> i : byte;
+  <span style="color: #00ffff;">begin</span>
+
+    <span style="color: #66f;">{ </span><span style="color: #66f;">test that we can grow the array with append: </span><span style="color: #66f;">}</span>
+    chk.equal( 0, a.length );
+    <span style="color: #00ffff;">for</span> i := 0 <span style="color: #00ffff;">to</span> 127 <span style="color: #00ffff;">do</span> a.append( i * i );
+
+    chk.equal( 128, a.length );
+
+    <span style="color: #66f;">{ </span><span style="color: #66f;">now resize and make sure we can both read the</span>
+<span style="color: #66f;">      old values and write the new slots </span><span style="color: #66f;">}</span>
+    a.resize( 256 );
+    <span style="color: #00ffff;">for</span> i := 255 <span style="color: #00ffff;">downto</span> 128 <span style="color: #00ffff;">do</span>
+      <span style="color: #00ffff;">begin</span>
+        <span style="color: #66f;">{ </span><span style="color: #66f;">writeln( 'a[', i, '] := a[', 256 - i - 1, '] -&gt; ',</span>
+<span style="color: #66f;">          a[ 256 - i - 1 ], ' -&gt; ', i, ' ',</span>
+<span style="color: #66f;">          round(sqrt( a[ 256 - i - 1 ]))); </span><span style="color: #66f;">}</span>
+        a[ i ] := round(sqrt( a[ 256 - i - 1 ]));
+      <span style="color: #00ffff;">end</span>;
+
+    <span style="color: #66f;">{ </span><span style="color: #66f;">do a few spot tests to make sure it worked right. </span><span style="color: #66f;">}</span>
+    chk.equal( a[   0 ],     0 );
+    chk.equal( a[  64 ],  4096 );
+    chk.equal( a[ 126 ], 15876 );
+    chk.equal( a[ 127 ], 16129 );
+    chk.equal( a[ 128 ],   127 );
+    chk.equal( a[ 129 ],   126 );
+    chk.equal( a[ 192 ],    63 );
+    chk.equal( a[ 255 ],     0 );
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Implementations</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> <span class="done DONE">DONE</span> GAbstractArray</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+GAbstractArray is a partial implementation of the interface. It doesn't actually store any data and thus can't be used on its own, but it gives us a place to put common code that we will reuse for all the full implementations.
+</p>
+
+<p>
+The first batch of methods deal with routine maintenance on the <code>_length</code> field.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GAbstractArray</span>&lt;T&gt;.Create( len : cardinal );
+  <span style="color: #00ffff;">begin</span>
+    _length := len;
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GAbstractArray</span>&lt;T&gt;.CheckRange( ix : cardinal );
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> ix &gt;= _length <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">raise</span> ERangeError.Create( <span style="color: #00ff00;">'Out of range: '</span> + IntToStr( ix ));
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GAbstractArray</span>&lt;T&gt;.Resize( len : cardinal );
+  <span style="color: #00ffff;">begin</span>
+    _length := len;
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GAbstractArray</span>&lt;T&gt;.Length : cardinal;
+  <span style="color: #00ffff;">begin</span>
+    result := _length;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+We can now previde a generic version of <code>Append</code> usable by all the subclasses.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GAbstractArray</span>&lt;T&gt;.Append( value : t );
+  <span style="color: #00ffff;">begin</span>
+    self.Resize( _length + 1 );
+    <span style="color: #66f;">{ </span><span style="color: #66f;">-1 because length has now increased by one </span><span style="color: #66f;">}</span>
+    self[ _length - 1 ] := value;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> <span class="done DONE">DONE</span> GDynArray</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+Our first implementation simply wraps the normal dynamic arrays that Free Pascal already provides. <code>GDynArray</code> offers no practical benefit for users <i>except</i> that it conforms to our interface, and thus will work with any other code we write to that interface.
+</p>
+
+<p>
+However, it does provide a good baseline sanity check for our tests and a simple reference implementation of the interface.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GDynArray</span>&lt;T&gt;.Create( len : cardinal );
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">inherited</span> Create( len );
+    SetLength( _array, len );
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GDynArray</span>&lt;T&gt;.Resize( len : cardinal );
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">inherited</span> Resize( len );
+    SetLength( _array, len );
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GDynArray</span>&lt;T&gt;.GetItem( ix : cardinal ) : T;
+  <span style="color: #00ffff;">begin</span>
+    CheckRange( ix );
+    result := _array[ ix ];
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GDynArray</span>&lt;T&gt;.SetItem( ix : cardinal; <span style="color: #ff00ff;">const</span> val: T );
+  <span style="color: #00ffff;">begin</span>
+    CheckRange( ix );
+    _array[ ix ] := val
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">GDynArray</span>&lt;T&gt;.Destroy;
+  <span style="color: #00ffff;">begin</span>
+    _array := Nil
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> <span class="done DONE">DONE</span> GFileArray</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+<code>GFileArray</code> operates on a disk file: items are loaded to and from <code>file</code>. Usually, this corresponds to a binary file on disk somewhere, but files are implemented much like classes in pascal (in that their behavior is defined by a record that contains functon pointers) so other implementations are also possible.
+</p>
+
+<p>
+Note that the tight coupling to the disk makes <code>GFileArray</code> somewhat slower than other options. This class is designed for use with our database, and in conjunction with <code>GCachedArray</code>, defined next.
+</p>
+
+<p>
+In most cases, if you need to save an array to disk, it's probably better to write the whole thing to disk at once, and just work with a cached copy in ram.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GFileArray</span>&lt;T&gt;.Create( <span style="color: #ff00ff;">var</span> f : <span style="color: #ff00ff;">file</span> );
+  <span style="color: #00ffff;">begin</span>
+    _file := f;
+    <span style="color: #00ffff;">inherited</span> Create( filesize( f ) <span style="color: #00ffff;">div</span> sizeOf( T ));
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GFileArray</span>&lt;T&gt;.Resize( len : cardinal );
+  <span style="color: #ff00ff;">var</span> n : cardinal; buf : T;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> len &lt; _length <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">begin</span>
+        seek( _file, filesize( _file ));
+        truncate( _file );
+      <span style="color: #00ffff;">end</span>
+    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> len &gt; _length <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">begin</span>
+        seek( _file, filesize( _file ));
+        buf := <span style="color: #00ffff;">default</span>( T );
+        <span style="color: #00ffff;">for</span> n := _length <span style="color: #00ffff;">to</span> len <span style="color: #00ffff;">do</span>
+          BlockWrite( _file, buf, sizeOf( T ));
+      <span style="color: #00ffff;">end</span>;
+    <span style="color: #66f;">// </span><span style="color: #66f;">else do nothing</span>
+    <span style="color: #00ffff;">inherited</span> Resize( len );
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GFileArray</span>&lt;T&gt;.GetItem( ix : cardinal ) : T;
+  <span style="color: #00ffff;">begin</span>
+    seek( _file, ix * sizeOf( T ));
+    BlockRead( _file, result, sizeof( T ));
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GFileArray</span>&lt;T&gt;.SetItem( ix : cardinal; <span style="color: #ff00ff;">const</span> val: T );
+  <span style="color: #00ffff;">begin</span>
+    seek( _file, ix * sizeOf( T ));
+    BlockWrite( _file, val, sizeof( T ));
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">GFileArray</span>&lt;T&gt;.Destroy;
+  <span style="color: #00ffff;">begin</span>
+    Close( _file );
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> <span class="todo TODO">TODO</span> GCachedArray</h3>
+</div>
+<div id="outline-container-sec-3-5" class="outline-3">
+<h3 id="sec-3-5"><span class="section-number-3">3.5</span> <span class="todo TODO">TODO</span> GBPlusArray</h3>
+<div class="outline-text-3" id="text-3-5">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GBPlusArray</span>&lt;T&gt;.Create( len : cardinal );
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">inherited</span> Create( len )
+    bp.TTree.Create;
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GBPlusArray</span>&lt;T&gt;.GetItem( ix : cardinal ) : T;
+  <span style="color: #00ffff;">begin</span>
+     result := <span style="color: #00ffff;">default</span>( t )
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GBPlusArray</span>&lt;T&gt;.SetItem( ix : cardinal; <span style="color: #ff00ff;">const</span> val: T );
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">GBPlusArray</span>&lt;T&gt;.Destroy;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-6" class="outline-3">
+<h3 id="sec-3-6"><span class="section-number-3">3.6</span> <span class="todo TODO">TODO</span> GEmbeddedArray</h3>
+<div class="outline-text-3" id="text-3-6">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="ar:imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GEmbeddedArray</span>&lt;T&gt;.Create( a : IArray&lt;T&gt;; len : cardinal );
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">inherited</span> Create( len )
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GEmbeddedArray</span>&lt;T&gt;.GetItem( ix : cardinal ) : T;
+  <span style="color: #00ffff;">begin</span>
+     result := <span style="color: #00ffff;">default</span>(t)
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GEmbeddedArray</span>&lt;T&gt;.SetItem( ix : cardinal; <span style="color: #ff00ff;">const</span> val: T );
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">GEmbeddedArray</span>&lt;T&gt;.Destroy;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Appendix: Templates for Generated Files</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> template for UNIT <code>ar</code></h3>
+<div class="outline-text-3" id="text-4-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$mode delphi</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">ar</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">Array interface </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">uses</span> sq, sysutils, bp;
+
+  &lt;&lt;<span style="color: #ff00ff;">type</span>:IArray&gt;&gt;
+
+  <span style="color: #ff00ff;">type</span>
+    GAbstractArray&lt;T&gt; = <span style="color: #ff00ff;">class</span> ( GSeq&lt;cardinal, T&gt;, IArray&lt;T&gt; )
+      <span style="color: #00ffff;">protected</span>
+        _length : cardinal;
+        <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">CheckRange</span>( ix : cardinal );
+      <span style="color: #00ffff;">public</span>
+        <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( len : cardinal );
+        <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">Length</span> : cardinal; <span style="color: #00ffff;">override</span>;
+        <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Resize</span>( len : cardinal ); <span style="color: #00ffff;">virtual</span>;
+        <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Append</span>( value : t ); <span style="color: #00ffff;">virtual</span>;
+      <span style="color: #00ffff;">end</span>;
+
+    GDynArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( GAbstractArray&lt;T&gt; )
+      <span style="color: #00ffff;">protected</span>
+        _array : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> T;
+      <span style="color: #00ffff;">public</span>
+        <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( len : cardinal );
+        <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetItem</span>( ix : cardinal ) : T; <span style="color: #00ffff;">override</span>;
+        <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetItem</span>( ix : cardinal; <span style="color: #ff00ff;">const</span> val: T ); <span style="color: #00ffff;">override</span>;
+        <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Resize</span>( len : cardinal ); <span style="color: #00ffff;">override</span>;
+        <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">Destroy</span>; <span style="color: #00ffff;">override</span>;
+      <span style="color: #00ffff;">end</span>;
+
+    GFileArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( GAbstractArray&lt;T&gt; )
+      <span style="color: #00ffff;">protected</span>
+        _file : <span style="color: #ff00ff;">file</span>;
+      <span style="color: #00ffff;">public</span>
+        <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( <span style="color: #ff00ff;">var</span> f : <span style="color: #ff00ff;">file</span> );
+        <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Resize</span>( len : cardinal );
+        <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetItem</span>( ix : cardinal ) : T; <span style="color: #00ffff;">override</span>;
+        <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetItem</span>( ix : cardinal; <span style="color: #ff00ff;">const</span> val: T ); <span style="color: #00ffff;">override</span>;
+        <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">Destroy</span>; <span style="color: #00ffff;">override</span>;
+      <span style="color: #00ffff;">end</span>;
+
+    GBPlusArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( GAbstractArray&lt;T&gt; )
+      <span style="color: #00ffff;">protected</span>
+        _tree : bp.TTree&lt;T&gt;;
+      <span style="color: #00ffff;">public</span>
+        <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( len : cardinal );
+        <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetItem</span>( ix : cardinal ) : T; <span style="color: #00ffff;">override</span>;
+        <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetItem</span>( ix : cardinal; <span style="color: #ff00ff;">const</span> val: T ); <span style="color: #00ffff;">override</span>;
+        <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">Destroy</span>; <span style="color: #00ffff;">override</span>;
+      <span style="color: #00ffff;">end</span>;
+
+    GEmbeddedArray&lt;T&gt; = <span style="color: #ff00ff;">class</span>( GAbstractArray&lt;T&gt; )
+      <span style="color: #00ffff;">public</span>
+        <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( a : IArray&lt;T&gt;; len : cardinal );
+        <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetItem</span>( ix : cardinal ) : T; <span style="color: #00ffff;">override</span>;
+        <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetItem</span>( ix : cardinal; <span style="color: #ff00ff;">const</span> val: T ); <span style="color: #00ffff;">override</span>;
+        <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">Destroy</span>; <span style="color: #00ffff;">override</span>;
+      <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">implementation</span>
+  &lt;&lt;ar:imp&gt;&gt;
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> template for test suite</h3>
+<div class="outline-text-3" id="text-4-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$mode delphi</span><span style="color: #66f;">}</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$i test_ar.def</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">implementation</span>
+<span style="color: #00ffff;">uses</span> ar, fs, sysutils;
+
+&lt;&lt;check_array&gt;&gt;
+<span style="color: #ff00ff;">type</span>
+  TDynArray      =  <span style="color: #ff00ff;">class</span> (GDynArray&lt;cardinal&gt;, ICardinalArray);
+  TFileArray     =  GFileArray&lt;cardinal&gt;;
+  TBPlusArray    =  GBPlusArray&lt;cardinal&gt;;
+  TEmbeddedArray =  GEmbeddedArray&lt;cardinal&gt;;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">test_dynarray</span>;
+  <span style="color: #00ffff;">begin</span>
+    check_array( TDynArray.Create( 0 ));
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">test_filearray</span>;
+  <span style="color: #ff00ff;">var</span> f : <span style="color: #ff00ff;">file</span> <span style="color: #00ffff;">of</span> cardinal;
+  <span style="color: #00ffff;">begin</span>
+    fs.update( f, <span style="color: #00ff00;">'test_ar.b4sd'</span> );
+    check_array( TFileArray.Create( f ));
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">test_bplusarray</span>;
+  <span style="color: #00ffff;">begin</span>
+    check_array( TBPlusArray.Create( 0 ));
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">test_embeddedarray</span>;
+  <span style="color: #00ffff;">begin</span>
+    check_array( TEmbeddedArray.Create( TDynArray.Create( 1024 ), 32 ));
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">begin</span>
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

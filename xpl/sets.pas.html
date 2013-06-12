@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>generalized sets for pascal</title>
+<!-- 2013-06-12 Wed 05:19 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal j. wallace"/>
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">generalized sets for pascal</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Pascal's Native <code>SET</code> Type</a></li>
+<li><a href="#sec-2">2. Limitations of Native Sets</a></li>
+<li><a href="#sec-3">3. A Generic Interface for Sets</a></li>
+<li><a href="#sec-4">4. Using this document as a tutorial.</a></li>
+<li><a href="#sec-5">5. The Test Framework</a></li>
+<li><a href="#sec-6">6. Implementation : GSet&lt;T&gt;</a>
+<ul>
+<li><a href="#sec-6-1">6.1. Constructor and Destructor</a></li>
+<li><a href="#sec-6-2">6.2. Membership</a></li>
+<li><a href="#sec-6-3">6.3. Appendix: unit <code>sets</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Pascal's Native <code>SET</code> Type</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+A distinguishing feature of Pascal and its sucessors is the <code>set</code> type. 
+</p>
+
+<p>
+For example, you might declare an enumerated type <code>day</code> to represent the days of the week, and then a set type called <code>days</code> to hold multiple values of this type:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span>
+  Day  = (mon, tue, wed, thu, fri, sat, sun);
+  Days = <span style="color: #ff00ff;">set</span> <span style="color: #00ffff;">of</span> Day;
+</pre>
+</div>
+
+<p>
+You can then declare literal values of this type, either as constants or as variables:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">const</span>
+  weekdays = [ mon .. fri ]; <span style="color: #66f;">// </span><span style="color: #66f;">literal range</span>
+
+<span style="color: #ff00ff;">var</span>
+  mwf : Days = [ mon, wed, fri ]; <span style="color: #66f;">// </span><span style="color: #66f;">literal set</span>
+</pre>
+</div>
+
+<p>
+Note that unlike a mathematical set, pascal sets are ordered.
+</p>
+
+<p>
+These sets can be passed as parameters, traversed with a <code>for</code> &#x2026; <code>in</code> loop. The underlying enumerated type can be parsed with <code>read</code> and printed <code>write</code> and <code>writeln</code>, so printing the contents of a set is a simple matter of looping:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">writedays</span>( title : <span style="color: #ff00ff;">string</span>; whichdays : Days );
+  <span style="color: #ff00ff;">var</span> d : Day;
+  <span style="color: #00ffff;">begin</span>
+    writeln( title );
+    <span style="color: #00ffff;">for</span> d <span style="color: #00ffff;">in</span> whichdays <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">write</span>( <span style="color: #00ff00;">'  '</span>, d );
+    writeln;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+Most importantly, pascal offers a rich variety of set operations:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">var</span> w, s : <span style="color: #ff00ff;">set</span> <span style="color: #00ffff;">of</span> days;
+<span style="color: #00ffff;">begin</span>
+  w := weekdays;              <span style="color: #66f;">// </span><span style="color: #66f;">weekdays</span>
+  s := mwf + [sat, sun];      <span style="color: #66f;">// </span><span style="color: #66f;">arbitrary set of days</span>
+  writedays( <span style="color: #00ff00;">'s:'</span>, s);
+  writedays( <span style="color: #00ff00;">'w:'</span>, w);
+  writeln;
+  writedays( <span style="color: #00ff00;">' w + s:'</span>,  w + s ); <span style="color: #66f;">// </span><span style="color: #66f;">union</span>
+  writedays( <span style="color: #00ff00;">' w * s:'</span>,  w * s ); <span style="color: #66f;">// </span><span style="color: #66f;">intersection</span>
+  writedays( <span style="color: #00ff00;">' w - s:'</span>,  w - s ); <span style="color: #66f;">// </span><span style="color: #66f;">difference</span>
+  writedays( <span style="color: #00ff00;">' s - w:'</span>,  s - w ); <span style="color: #66f;">// </span><span style="color: #66f;">difference</span>
+  writedays( <span style="color: #00ff00;">'w &gt;&lt; s:'</span>, w&gt;&lt;s );   <span style="color: #66f;">// </span><span style="color: #66f;">symmetric difference</span>
+  writeln;
+  writeln( <span style="color: #00ff00;">'  w   &lt;= s: '</span>, w &lt;= s );    <span style="color: #66f;">// </span><span style="color: #66f;">subset?</span>
+  writeln( <span style="color: #00ff00;">'  mwf &lt;= w: '</span>, mwf &lt;= w );  <span style="color: #66f;">// </span><span style="color: #66f;">subset?</span>
+  writeln( <span style="color: #00ff00;">'  w   &gt;= s: '</span>, w &gt;= s );    <span style="color: #66f;">// </span><span style="color: #66f;">superset?</span>
+  writeln( <span style="color: #00ff00;">'  w    = s: '</span>, w = s );     <span style="color: #66f;">// </span><span style="color: #66f;">equal</span>
+  writeln( <span style="color: #00ff00;">'  w   &lt;&gt; s: '</span>, w &lt;&gt; s );    <span style="color: #66f;">// </span><span style="color: #66f;">not-equal</span>
+  writeln( <span style="color: #00ff00;">'mon in mwf: '</span>, mon <span style="color: #00ffff;">in</span> mwf); <span style="color: #66f;">// </span><span style="color: #66f;">element-of?</span>
+  writeln( <span style="color: #00ff00;">'tue in mwf: '</span>, tue <span style="color: #00ffff;">in</span> mwf); <span style="color: #66f;">// </span><span style="color: #66f;">element-of?</span>
+  writeln;
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+
+<p>
+Here is the output of the above program:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-example">s: [ mon wed fri sat sun ]
+w: [ mon tue wed thu fri ]
+
+ w + s: [ mon tue wed thu fri sat sun ]
+ w * s: [ mon wed fri ]
+ w - s: [ tue thu ]
+ s - w: [ sat sun ]
+w &gt;&lt; s: [ tue thu sat sun ]
+
+  w   &lt;= s: FALSE
+  mwf &lt;= w: TRUE
+  w   &gt;= s: FALSE
+  w    = s: FALSE
+  w   &lt;&gt; s: TRUE
+mon in mwf: TRUE
+tue in mwf: FALSE
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Limitations of Native Sets</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Traditionally, pascal sets are implemented as bitmaps - usually 32-bit values - where each member of a set is represented by a single bit. This means that the underlying enumerated type is limited to ranges of 32 values.
+</p>
+
+<p>
+With the <a href="http://freepascal.org/">free pascal</a> compiler, sets can be arbitrarily large, allowing you to create sets of characters or or other numbers, but they're still limited to simple underlying types.
+</p>
+
+<p>
+Bitmapped sets are incredibly useful, but occasionally it's convenient to work work with sets of more complex objects, that may not even map to a spefic ordinal number.
+</p>
+
+<p>
+For example, there's no easy way to create a set of strings or real numbers in pascal, or sets of arbitrary records, as you'd want in a database application. The best you can do is create some kind of container structure that keeps its contents sorted. Then when you add a value to the container, you just check to make sure it's not already there, and if so, discard it.
+</p>
+
+<p>
+In fact, there are a number of <a href="http://wiki.freepascal.org/Data_Structures,_Containers,_Collections">container libraries for pascal</a>, and some of them offer set types based on trees, (<a href="http://svn.freepascal.org/cgi-bin/viewvc.cgi/trunk/packages/fcl-stl/src/gset.pp?revision=17310&view=markup">gset.pp</a> in the free pascal component library, for example). As far as I could tell, though, none of them actually provide the basic operations that you get with pascal's native sets.
+</p>
+
+<p>
+Most of the time, that's okay. Often when you reach for a set of, what you really want is a collection of unique values. But since I'm making a database that supports relational algebra, I need a <code>set</code> in the mathematical sense, with support for unions and intersections and so on.
+</p>
+
+<p>
+So&#x2026; Let's make one.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> A Generic Interface for Sets</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+In thinking through an implementation, it can be helpful to define an interface. Interfaces have no code associated with them. They simply define a set of attributes and operations that other types can provide. This allows you to swap out different implementations of an interface without changing the code that uses it.
+</p>
+
+<p>
+Here's an interface for our set type:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="type:ISet"><span style="color: #ff00ff;">type</span> ISet&lt;T&gt; = <span style="color: #00ffff;">interface</span>
+  <span style="color: #66f;">{ </span><span style="color: #66f;">stateful operations </span><span style="color: #66f;">}</span> 
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">include</span>( val : T );
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">exclude</span>( val : T );
+  <span style="color: #66f;">{ </span><span style="color: #66f;">predicates, comparisons, and queries </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">contains</span>( val : T ): <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">isSubsetOf</span>( other : ISet&lt;T&gt; ): <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">isSupersetOf</span>( other : ISet&lt;T&gt; ): <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">isEqualTo</span>( other : ISet&lt;T&gt; ): <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">count</span> : cardinal;
+  <span style="color: #66f;">{ </span><span style="color: #66f;">algebraic operations </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">copy</span> : ISet&lt;T&gt;;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">withval</span>( val : T ) : ISet&lt;T&gt;;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">without</span>( val : T ) : ISet&lt;T&gt;;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">union</span>( other : ISet&lt;T&gt; ): ISet&lt;T&gt;;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">intersect</span>( other : ISet&lt;t&gt; ): ISet&lt;T&gt;;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">difference</span>( other : ISet&lt;t&gt; ): Iset&lt;T&gt;;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">symdiff</span>( other : ISet&lt;t&gt; ): Iset&lt;T&gt;;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+The <code>&lt;T&gt;</code> syntax indicates that the interface is generic, which means it takes a type as a parameter. If we want a set of string, for example, we could declare a variable of type <code>ISet&lt;string&gt;</code>. To use this syntax in free pascal, you need to make sure the compiler is in <code>{$mode delphi}</code>. You can also use generics in <code>{$mode objfpc}</code> but the syntax is <a href="http://www.freepascal.org/docs-html/ref/refse44.html#x97-1070008.2">slightly different</a>.
+</p>
+
+<p>
+Since we are only providing one implementation, you might think declaring an interface is overkill, but there is a second benefit to using interfaces in pascal:
+</p>
+
+<p>
+If you use an interface in your variable declaration rather than a concrete type, the compiler will generate a little extra code that performs reference counting on your behalf. the reference count callbacks can do whatever you want them to do, but if you make your class an instance of <code>tinterfacedobject</code> then it will inherit some basic garbage collection behavior. (if you don't want that, just work directly with the class, rather than the interface.)
+</p>
+
+<p>
+The only slight downside to interfaces in pascal is that (unlike in java or c#) you have to explicitly redeclare that you're implementing each part of the interface. so, if you skip to the end of this document, you'll see where i've declared the <code>gset</code> class, and it's a word for word copy of of the interface declaration (with the addition of a contstructor and destructor, which we'll get to in a moment.)
+</p>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Using this document as a tutorial.</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Before we get started, I want to point out that this document is meant as a trail for others to follow as they build up their understanding.
+</p>
+
+<p>
+Usually, we're confronted with code in a finished state, with routines presented in some arbitrary order, with all kinds of interdependencies, and it can be hard to know where to start reading.
+</p>
+
+<p>
+The goal here is to provide not so much a description of how it is, but how it got to be that way.
+</p>
+
+<p>
+The discussion and interface above should give you a clear idea of where we're going. The narrative below provides the step by step instructions for how to get there.
+</p>
+
+<p>
+In fact, both the finished code and the nicely rendered version you are reading are both generated from the same file. 
+</p>
+
+<p>
+If you just want to use the library, a link to the finished code is provided at the end.
+</p>
+
+<p>
+If you'd prefer to follow along yourself and treat this document as a tutorial, then you should start by copying and pasting the following commented-out version of the code. (Or just adding the method declarations one by one as we go along).
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span> GSet&lt;t&gt; = <span style="color: #ff00ff;">class</span> <span style="color: #66f;">// </span><span style="color: #66f;">( TInterfacedObject, ISet&lt;T&gt; )</span>
+<span style="color: #00ffff;">private</span>
+  <span style="color: #ff00ff;">type</span> TRBTree = TRBMap&lt;T,byte&gt;;
+<span style="color: #00ffff;">private</span>
+  _tree : TRBTree;
+<span style="color: #00ffff;">public</span>
+  <span style="color: #66f;">// </span><span style="color: #66f;">constructor Create;</span>
+  <span style="color: #66f;">// </span><span style="color: #66f;">destructor Destroy; override;</span>
+  <span style="color: #66f;">{ </span><span style="color: #66f;">stateful operations </span><span style="color: #66f;">}</span>
+  <span style="color: #66f;">// </span><span style="color: #66f;">procedure include( val : T ); virtual;</span>
+  <span style="color: #66f;">// </span><span style="color: #66f;">procedure exclude( val : T ); virtual;</span>
+  <span style="color: #66f;">{ </span><span style="color: #66f;">predicates, comparisons, and queries </span><span style="color: #66f;">}</span>
+  <span style="color: #66f;">// </span><span style="color: #66f;">function contains( val : T ): boolean; virtual;</span>
+  <span style="color: #66f;">// </span><span style="color: #66f;">function isSubsetOf( other : ISet&lt;T&gt; ): boolean;virtual;</span>
+  <span style="color: #66f;">// </span><span style="color: #66f;">function isSupersetOf( other : ISet&lt;T&gt; ): boolean;virtual;</span>
+  <span style="color: #66f;">{ </span><span style="color: #66f;">algebraic operations </span><span style="color: #66f;">}</span>
+  <span style="color: #66f;">// </span><span style="color: #66f;">function copy : ISet&lt;T&gt;;</span>
+  <span style="color: #66f;">// </span><span style="color: #66f;">function withval( val : T ) : ISet&lt;T&gt;;virtual;</span>
+  <span style="color: #66f;">// </span><span style="color: #66f;">function without( val : T ) : ISet&lt;T&gt;;virtual;</span>
+  <span style="color: #66f;">// </span><span style="color: #66f;">function union( other : ISet&lt;T&gt; ): ISet&lt;T&gt;;virtual;</span>
+  <span style="color: #66f;">// </span><span style="color: #66f;">function intersect( other : ISet&lt;t&gt; ): ISet&lt;T&gt;;virtual;</span>
+  <span style="color: #66f;">// </span><span style="color: #66f;">function difference( other : ISet&lt;t&gt; ): Iset&lt;T&gt;;virtual;</span>
+  <span style="color: #66f;">// </span><span style="color: #66f;">function symdiff( other : ISet&lt;t&gt; ): Iset&lt;T&gt;;virtual;</span>
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+We'll tackle the functions in order of the dependency, so that we don't have half-finished code lying around, and we can keep the tests running after every step.
+</p>
+
+<p>
+We won't declare that <code>GSet</code> implements <code>ISet</code> until we've implemented all the methods. Otherwise the compiler will complain and we won't be able to run the tests.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> The Test Framework</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+I use a very simple test framework that generates some of the boilerplate code that pascal requires. You can find it here:
+</p>
+
+<p>
+<a href="https://github.com/tangentstorm/xpl/tree/master/test">https://github.com/tangentstorm/xpl/tree/master/test</a>
+</p>
+
+<p>
+This repository includes both the finished <code>test_sets.pas</code> and (if you move over to <code>../code</code>, the finished <code>sets.pas</code>).
+</p>
+
+<p>
+There is currently a small python dependency used to generate the boilerplate code for the tests. (hopefully this will be ported to pascal soon).
+</p>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> Implementation : GSet&lt;T&gt;</h2>
+<div class="outline-text-2" id="text-6">
+</div><div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><span class="section-number-3">6.1</span> Constructor and Destructor</h3>
+<div class="outline-text-3" id="text-6-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="class:GSet"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GSet</span>&lt;t&gt;.Create;
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">inherited</span>;
+  _tree := TRBTree.Create;
+<span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">GSet</span>&lt;T&gt;.Destroy;
+<span style="color: #00ffff;">begin</span>
+  _tree.Free;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6-2" class="outline-3">
+<h3 id="sec-6-2"><span class="section-number-3">6.2</span> Membership</h3>
+<div class="outline-text-3" id="text-6-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="class:GSet"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GSet</span>&lt;T&gt;.include( val : T );
+<span style="color: #00ffff;">begin</span>
+<span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GSet</span>&lt;T&gt;.exclude( val : T );
+<span style="color: #00ffff;">begin</span>
+<span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GSet</span>&lt;T&gt;.contains( val : T ) : <span style="color: #ff00ff;">boolean</span>;
+<span style="color: #00ffff;">begin</span>
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-6-3" class="outline-3">
+<h3 id="sec-6-3"><span class="section-number-3">6.3</span> Appendix: unit <code>sets</code></h3>
+<div class="outline-text-3" id="text-6-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$mode delphi</span><span style="color: #66f;">}</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$i test_sets.def </span><span style="color: #66f;">}{</span><span style="color: #66f;">$h+</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">implementation</span> <span style="color: #00ffff;">uses</span> sets;
+
+  <span style="color: #ff00ff;">type</span>
+    TStringSet = GSet&lt;<span style="color: #ff00ff;">string</span>&gt;;
+    TCharSet   = <span style="color: #ff00ff;">set</span> <span style="color: #00ffff;">of</span> <span style="color: #ff00ff;">char</span>;
+
+  <span style="color: #ff00ff;">const</span> <span style="color: #66f;">{ </span><span style="color: #66f;">these are built-in (set of char), tested with bits </span><span style="color: #66f;">}</span>
+    hexits = [<span style="color: #00ff00;">'0'</span>..<span style="color: #00ff00;">'9'</span>,<span style="color: #00ff00;">'a'</span>..<span style="color: #00ff00;">'f'</span>];
+    vowels = [<span style="color: #00ff00;">'a'</span>,<span style="color: #00ff00;">'e'</span>,<span style="color: #00ff00;">'i'</span>,<span style="color: #00ff00;">'o'</span>,<span style="color: #00ff00;">'u'</span>];
+
+  <span style="color: #ff00ff;">var</span> <span style="color: #66f;">{ </span><span style="color: #66f;">these use the custom implementation </span><span style="color: #66f;">}</span>
+    h, v : TStringSet;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">makeStringSet</span>( chs : TCharSet ) : TStringSet;
+    <span style="color: #ff00ff;">var</span> ch : <span style="color: #ff00ff;">char</span>;
+    <span style="color: #00ffff;">begin</span>
+      result := TStringSet.Create;
+      <span style="color: #00ffff;">for</span> ch <span style="color: #00ffff;">in</span> chs <span style="color: #00ffff;">do</span> result.include( ch );
+    <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">ToString</span>( ss : TStringSet) : <span style="color: #ff00ff;">string</span>;
+    <span style="color: #ff00ff;">var</span> s : <span style="color: #ff00ff;">string</span>;
+    <span style="color: #00ffff;">begin</span>
+      result := <span style="color: #00ff00;">''</span>;
+      <span style="color: #00ffff;">for</span> s <span style="color: #00ffff;">in</span> s <span style="color: #00ffff;">do</span> result += s;
+    <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">setup</span>;
+    <span style="color: #00ffff;">begin</span>
+      h := makeStringSet(hexits);
+      v := makeStringSet(vowels);
+    <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">test_iter</span>;
+    <span style="color: #00ffff;">begin</span>
+      chk.equal( <span style="color: #00ff00;">'0123456789abcdef'</span>, ToString(h));
+    <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$mode delphi</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">sets</span>;
+<span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">uses</span> rb;
+  &lt;&lt;<span style="color: #ff00ff;">type</span>:ISet&gt;&gt;
+  <span style="color: #ff00ff;">type</span> GSet&lt;t&gt; = <span style="color: #ff00ff;">class</span> <span style="color: #66f;">// </span><span style="color: #66f;">( TInterfacedObject, ISet&lt;T&gt; )</span>
+  <span style="color: #00ffff;">private</span>
+    <span style="color: #ff00ff;">type</span> TRBTree = TRBMap&lt;T,byte&gt;;
+  <span style="color: #00ffff;">private</span> 
+    _tree : TRBTree;
+  <span style="color: #00ffff;">public</span>
+    <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>;
+    <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">Destroy</span>; <span style="color: #00ffff;">override</span>;
+    <span style="color: #66f;">{ </span><span style="color: #66f;">stateful operations </span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">include</span>( val : T ); <span style="color: #00ffff;">virtual</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">exclude</span>( val : T ); <span style="color: #00ffff;">virtual</span>;
+    <span style="color: #66f;">{ </span><span style="color: #66f;">predicates, comparisons, and queries </span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">contains</span>( val : T ): <span style="color: #ff00ff;">boolean</span>; <span style="color: #00ffff;">virtual</span>;
+    <span style="color: #66f;">// </span><span style="color: #66f;">function isSubsetOf( other : ISet&lt;T&gt; ): boolean;virtual;</span>
+    <span style="color: #66f;">// </span><span style="color: #66f;">function isSupersetOf( other : ISet&lt;T&gt; ): boolean;virtual;</span>
+    <span style="color: #66f;">{ </span><span style="color: #66f;">algebraic operations </span><span style="color: #66f;">}</span>
+    <span style="color: #66f;">// </span><span style="color: #66f;">function copy : ISet&lt;T&gt;;</span>
+    <span style="color: #66f;">// </span><span style="color: #66f;">function withval( val : T ) : ISet&lt;T&gt;;virtual;</span>
+    <span style="color: #66f;">// </span><span style="color: #66f;">function without( val : T ) : ISet&lt;T&gt;;virtual;</span>
+    <span style="color: #66f;">// </span><span style="color: #66f;">function union( other : ISet&lt;T&gt; ): ISet&lt;T&gt;;virtual;</span>
+    <span style="color: #66f;">// </span><span style="color: #66f;">function intersect( other : ISet&lt;t&gt; ): ISet&lt;T&gt;;virtual;</span>
+    <span style="color: #66f;">// </span><span style="color: #66f;">function difference( other : ISet&lt;t&gt; ): Iset&lt;T&gt;;virtual;</span>
+    <span style="color: #66f;">// </span><span style="color: #66f;">function symdiff( other : ISet&lt;t&gt; ): Iset&lt;T&gt;;virtual;</span>
+  <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">implementation</span>
+  &lt;&lt;<span style="color: #ff00ff;">class</span>:GSet&gt;&gt;
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

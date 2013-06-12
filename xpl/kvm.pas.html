@@ -1,0 +1,751 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>kvm : keyboard/video/mouse support for virtual consoles</title>
+<!-- 2013-06-12 Wed 05:19 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="Michal J Wallace"/>
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">kvm : keyboard/video/mouse support for virtual consoles</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Goals</a></li>
+<li><a href="#sec-2">2. <code>ITerm</code> : abstract screen interface</a></li>
+<li><a href="#sec-3">3. Data Types</a>
+<ul>
+<li><a href="#sec-3-1">3.1. TTextAttr</a></li>
+<li><a href="#sec-3-2">3.2. TScreenCell</a></li>
+<li><a href="#sec-3-3">3.3. TScreenGrid</a></li>
+<li><a href="#sec-3-4">3.4. TPoint</a></li>
+<li><a href="#sec-3-5">3.5. TRect</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. <code>TScreenTerm</code></a>
+<ul>
+<li><a href="#sec-4-1">4.1. Implementation</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. <code>TAnsiTerm</code></a></li>
+<li><a href="#sec-6">6. char mnemonics for ansi colors.</a></li>
+<li><a href="#sec-7">7. Unit Life cycle.</a></li>
+<li><a href="#sec-8">8. Legacy interface : CRT</a>
+<ul>
+<li><a href="#sec-8-1">8.1. interface</a></li>
+<li><a href="#sec-8-2">8.2. implementation</a>
+<ul>
+<li><a href="#sec-8-2-1">8.2.1. the <code>TextAttr</code> property</a></li>
+<li><a href="#sec-8-2-2">8.2.2. Cursor control</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-9">9. APPENDIX Convenience Routines</a>
+<ul>
+<li><a href="#sec-9-1">9.1. interface</a></li>
+<li><a href="#sec-9-2">9.2. implementation</a></li>
+<li><a href="#sec-9-3">9.3. Screens</a></li>
+</ul>
+</li>
+<li><a href="#sec-10">10. OUTPUT <code>kvm.pas</code></a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Goals</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This module implements an enhanced terminal device, with support for
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> <code>ITerm</code> : abstract screen interface</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+A screen tracks a cursor position, bounds, color.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="ITerm"><span style="color: #ff00ff;">type</span> ITerm = <span style="color: #00ffff;">interface</span>
+  <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Width</span> : word;
+  <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Height</span>: word;
+  <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">MaxX</span>  : word;
+  <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">MaxY</span>  : word;
+  <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">WhereX</span>: word;
+  <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">WhereY</span>: word;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ClrScr</span>;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ClrEol</span>;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Fg</span>( c : byte );
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Bg</span>( c : byte );
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Emit</span>( wc : widechar );
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GotoXY</span>( x, y : word );
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">InsLine</span>;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">DelLine</span>;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetTextAttr</span>( value : word );
+  <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">GetTextAttr</span> : word;
+  <span style="color: #00ffff;">property</span>  TextAttr : word <span style="color: #00ffff;">read</span> GetTextAttr <span style="color: #00ffff;">write</span> SetTextAttr;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Data Types</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> TTextAttr</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+For our text attributes, we're going to use 256 colors. This strikes a good balance between storage space and aesthetics. There's really not much need for more colors than this when we're talking about a fixed-width text display.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="TTextAttr"><span style="color: #ff00ff;">type</span> TTextAttr = <span style="color: #ff00ff;">record</span>
+    bg : byte;
+    fg : byte;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> TScreenCell</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+A terminal cell combines a text attribute with a 16-bit WideChar.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="TScreenCell"><span style="color: #ff00ff;">type</span> TScreenCell = <span style="color: #ff00ff;">record</span>
+    ch   : widechar;
+    attr : TTextAttr;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> TScreenGrid</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+A terminal's display buffer is essentially a grid of such cells. I'm using my <a href="https://github.com/tangentstorm/xpl/blob/master/code/grids.pas">generic <code>TGrid</code> class</a> here to avoid duplicating code.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="TScreenGrid"><span style="color: #ff00ff;">type</span> TScreenGrid = <span style="color: #ff00ff;">class</span> (specialize TGrid&lt;TScreenCell&gt;)
+  <span style="color: #00ffff;">private</span>
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetAttr</span>( <span style="color: #ff00ff;">const</span> x, y : word ) : TTextAttr;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetChar</span>( <span style="color: #ff00ff;">const</span> x, y : word ) : WideChar;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetAttr</span>( <span style="color: #ff00ff;">const</span> x, y : word; <span style="color: #ff00ff;">const</span> value : TTextAttr );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetChar</span>( <span style="color: #ff00ff;">const</span> x, y : word; <span style="color: #ff00ff;">const</span> value : WideChar );
+  <span style="color: #00ffff;">public</span>
+    <span style="color: #00ffff;">property</span> attr[ x, y : word ] : TTextAttr <span style="color: #00ffff;">read</span> GetAttr <span style="color: #00ffff;">write</span> SetAttr;
+    <span style="color: #00ffff;">property</span> <span style="color: #ff00ff;">char</span>[ x, y : word ] : WideChar <span style="color: #00ffff;">read</span> GetChar <span style="color: #00ffff;">write</span> SetChar;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TScreenGrid.GetAttr</span>( <span style="color: #ff00ff;">const</span> x, y : word ) : TTextAttr;
+  <span style="color: #00ffff;">begin</span>
+    result.fg := self[ x, y ].attr.fg;
+    result.bg := self[ x, y ].attr.bg;
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TScreenGrid.SetAttr</span>( <span style="color: #ff00ff;">const</span> x, y  : word;
+                             <span style="color: #ff00ff;">const</span> value : TTextAttr );
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">with</span> _data[ xyToI( x, y ) ].attr <span style="color: #00ffff;">do</span>
+      <span style="color: #00ffff;">begin</span>
+        bg := value.bg;
+        fg := value.fg;
+      <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TScreenGrid.GetChar</span>( <span style="color: #ff00ff;">const</span> x, y : word ) : WideChar;
+  <span style="color: #00ffff;">begin</span>
+    result := self[ x, y ].ch;
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TScreenGrid.SetChar</span>( <span style="color: #ff00ff;">const</span> x, y  : word;
+                             <span style="color: #ff00ff;">const</span> value : WideChar );
+  <span style="color: #00ffff;">begin</span>
+    _data[ xyToI( x, y ) ].ch := value;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> TPoint</h3>
+<div class="outline-text-3" id="text-3-4">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="TPoint"><span style="color: #ff00ff;">type</span> TPoint = <span style="color: #ff00ff;">class</span>
+  x, y : cardinal;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-5" class="outline-3">
+<h3 id="sec-3-5"><span class="section-number-3">3.5</span> TRect</h3>
+<div class="outline-text-3" id="text-3-5">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="TRect"><span style="color: #ff00ff;">type</span> TRect = <span style="color: #ff00ff;">class</span>
+  x, y : cardinal;
+  w, h : cardinal;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> <code>TScreenTerm</code></h2>
+<div class="outline-text-2" id="text-4">
+<p>
+This is a contrcete implementation of ITerm.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="TScreenTerm"><span style="color: #ff00ff;">type</span> TScreenTerm = <span style="color: #ff00ff;">class</span> (TInterfacedObject, ITerm)
+  <span style="color: #00ffff;">public</span>
+    &lt;&lt;ITerm-Members&gt;&gt;
+  <span style="color: #00ffff;">private</span>
+    attr : TTextAttr;
+    curs : TPoint;
+    grid : TScreenGrid;
+  <span style="color: #00ffff;">public</span>
+    <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( w, h : word );
+    <span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">Destroy</span>; <span style="color: #00ffff;">override</span>;
+    <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Cursor</span> : TPoint;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> Implementation</h3>
+<div class="outline-text-3" id="text-4-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">TScreenTerm.Create</span>( w, h : word );
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">destructor</span> <span style="color: #ffffff; font-weight: bold;">TScreenTerm.Destroy</span>;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">TScreenTerm.Width</span>  : word; <span style="color: #00ffff;">begin</span> result := grid.w      <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">TScreenTerm.Height</span> : word; <span style="color: #00ffff;">begin</span> result := grid.h      <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">TScreenTerm.MaxX</span>   : word; <span style="color: #00ffff;">begin</span> result := width - 1   <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">TScreenTerm.MaxY</span>   : word; <span style="color: #00ffff;">begin</span> result := height - 1  <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">TScreenTerm.WhereX</span> : word; <span style="color: #00ffff;">begin</span> result := cursor.x    <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">TScreenTerm.WhereY</span> : word; <span style="color: #00ffff;">begin</span> result := cursor.y    <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">TScreenTerm.GetTextAttr</span> : word;
+  <span style="color: #00ffff;">begin</span>
+    result := word(attr)
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TScreenTerm.SetTextAttr</span>( value : word );
+  <span style="color: #00ffff;">begin</span>
+    attr := TTextAttr(value)
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TScreenTerm.Fg</span>( color : byte );
+  <span style="color: #00ffff;">begin</span>
+    attr.fg := color
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TScreenTerm.Bg</span>( color : byte );
+  <span style="color: #00ffff;">begin</span>
+    attr.bg := color
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TScreenTerm.ClrScr</span>;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TScreenTerm.ClrEol</span>;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TScreenTerm.GotoXY</span>( x, y : word );
+  <span style="color: #00ffff;">begin</span>
+    cursor.x := x;
+    cursor.y := y;
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TScreenTerm.Emit</span>( wc : widechar );
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TScreenTerm.InsLine</span>;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TScreenTerm.DelLine</span>;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TScreenTerm.Cursor</span> : TPoint;
+  <span style="color: #00ffff;">begin</span>
+    result := curs
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> <code>TAnsiTerm</code></h2>
+<div class="outline-text-2" id="text-5">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="TAnsiTerm"><span style="color: #ff00ff;">type</span> TAnsiTerm = <span style="color: #ff00ff;">class</span> (TInterfacedObject, ITerm)
+  <span style="color: #00ffff;">public</span>
+    &lt;&lt;ITerm-Members&gt;&gt;
+  <span style="color: #00ffff;">private</span>
+    x, y : word;
+    attr : word;
+  <span style="color: #00ffff;">public</span>
+    <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ResetColor</span>;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.Create</span>;
+  <span style="color: #00ffff;">begin</span>
+    attr := $0007
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #66f;">{ </span><span style="color: #66f;">TODO: find a way to get this data without the baggage incurred by</span>
+<span style="color: #66f;">  crt or video modules (breaking keyboard input or clearing the screen  </span><span style="color: #66f;">}</span>
+
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.Width</span>  : word; <span style="color: #00ffff;">begin</span> result := terminal.w <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.Height</span> : word; <span style="color: #00ffff;">begin</span> result := terminal.h <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.MaxX</span>   : word; <span style="color: #00ffff;">begin</span> result := width  - 1  <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.MaxY</span>   : word; <span style="color: #00ffff;">begin</span> result := height - 1  <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.WhereX</span> : word; <span style="color: #00ffff;">begin</span> result := x  <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.WhereY</span> : word; <span style="color: #00ffff;">begin</span> result := y  <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.GetTextAttr</span> : word;
+  <span style="color: #00ffff;">begin</span>
+    result := attr;
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.SetTextAttr</span>( value : word );
+  <span style="color: #00ffff;">begin</span>
+    Fg(lo(value));
+    Bg(hi(value));
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.Fg</span>( color : byte );
+  <span style="color: #00ffff;">begin</span>
+    attr := hi(attr) <span style="color: #00ffff;">shl</span> 8 + color;
+    <span style="color: #66f;">{ </span><span style="color: #66f;">xterm 256-color extensions </span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">write</span>( #27, <span style="color: #00ff00;">'[38;5;'</span>, color , <span style="color: #00ff00;">'m'</span> )
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.Bg</span>( color : byte );
+  <span style="color: #00ffff;">begin</span>
+    attr := color <span style="color: #00ffff;">shl</span> 8 + lo(attr);
+    <span style="color: #66f;">{ </span><span style="color: #66f;">xterm 256-color extensions </span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">write</span>( #27, <span style="color: #00ff00;">'[48;5;'</span>, color , <span style="color: #00ff00;">'m'</span> )
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.ClrScr</span>;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">write</span>( #27, <span style="color: #00ff00;">'[H'</span>, #27, <span style="color: #00ff00;">'[J'</span> )
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.ClrEol</span>;
+  <span style="color: #ff00ff;">var</span> curx, cury, i : byte;
+  <span style="color: #00ffff;">begin</span>
+    terminal.getxy( curx, cury );
+    <span style="color: #00ffff;">for</span> i := succ(curx) <span style="color: #00ffff;">to</span> maxX <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">write</span>(<span style="color: #00ff00;">' '</span>);
+    gotoxy( curx, cury );
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.GotoXY</span>( x, y : word );
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">write</span>( #27, <span style="color: #00ff00;">'['</span>, y + 1, <span style="color: #00ff00;">';'</span>, x + 1, <span style="color: #00ff00;">'H'</span> )
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.Emit</span>( wc : widechar );
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">write</span>( wc )
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #66f;">{ </span><span style="color: #66f;">TODO </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.InsLine</span>;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.DelLine</span>;
+  <span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TAnsiTerm.ResetColor</span>;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">write</span>( #27, <span style="color: #00ff00;">'[0m'</span> )
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> char mnemonics for ansi colors.</h2>
+<div class="outline-text-2" id="text-6">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="extras"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">fg</span>( c : <span style="color: #ff00ff;">char</span> );
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">bg</span>( c : <span style="color: #ff00ff;">char</span> );
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">bg</span>( c :  <span style="color: #ff00ff;">char</span> );
+  <span style="color: #ff00ff;">var</span> i : byte;
+  <span style="color: #00ffff;">begin</span>
+    i := pos( c, <span style="color: #00ff00;">'krgybmcwKRGYBMCW'</span> );
+    <span style="color: #00ffff;">if</span> i &gt; 0 <span style="color: #00ffff;">then</span> bg( i - 1  );
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">fg</span>( c :  <span style="color: #ff00ff;">char</span> );
+  <span style="color: #ff00ff;">var</span> i : byte;
+  <span style="color: #00ffff;">begin</span>
+    i := pos( c, <span style="color: #00ff00;">'krgybmcwKRGYBMCW'</span> );
+    <span style="color: #00ffff;">if</span> i &gt; 0 <span style="color: #00ffff;">then</span> fg( i - 1  );
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> Unit Life cycle.</h2>
+<div class="outline-text-2" id="text-7">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="lifecycle"><span style="color: #00ffff;">initialization</span>
+  work := TAnsiTerm.Create;
+  work.GotoXY( terminal.startX, terminal.startY );
+<span style="color: #00ffff;">finalization</span>
+  <span style="color: #66f;">{ </span><span style="color: #66f;">work is destroyed automatically by reference count </span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> Legacy interface : CRT</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+CRT was the original console library for turbo pascal. It uses 1-based cordinates, and is limited to 16 colors.
+</p>
+</div>
+
+<div id="outline-container-sec-8-1" class="outline-3">
+<h3 id="sec-8-1"><span class="section-number-3">8.1</span> interface</h3>
+<div class="outline-text-3" id="text-8-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{ </span><span style="color: #66f;">--- warning!! generated file. edit ~/b/web/kvm.org instead!! --- </span><span style="color: #66f;">}</span>
+
+
+
+<span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">crt</span>;
+<span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">uses</span> kvm;
+
+&lt;&lt;helpers&gt;&gt;
+
+<span style="color: #66f;">{ </span><span style="color: #66f;">window / cursor managament </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GotoXY</span>( x, y : word );
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">WhereX</span> : byte;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">WhereY</span> : byte;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Window</span>( x1, y1, x2, y2 : Byte );
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ClrEol</span>;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ClrScr</span>;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">DelLine</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">delete line at cursor </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">InsLine</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">insert line at cursor </span><span style="color: #66f;">}</span>
+
+<span style="color: #66f;">{ </span><span style="color: #66f;">color </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TextColor</span>( c : byte );
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TextBackground</span>( c : byte );
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">HighVideo</span>;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">LowVideo</span>;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">NormVideo</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">restores color from startup </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">property</span> TextAttr : byte
+  <span style="color: #00ffff;">read</span>  crt_get_textattr
+  <span style="color: #00ffff;">write</span> crt_set_textattr;
+
+<span style="color: #66f;">{ </span><span style="color: #66f;">interaction </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">KeyPressed</span> : <span style="color: #ff00ff;">boolean</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">ReadKey</span> : <span style="color: #ff00ff;">char</span>;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Delay</span>;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Sound</span>;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">NoSound</span>;
+<span style="color: #66f;">{ </span><span style="color: #66f;">TODO:</span>
+<span style="color: #66f;">property CheckBreak : boolean </span><span style="color: #66f;">}</span>
+
+<span style="color: #00ffff;">implementation</span>
+  &lt;&lt;@crt:impl&gt;&gt;
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-8-2" class="outline-3">
+<h3 id="sec-8-2"><span class="section-number-3">8.2</span> implementation</h3>
+<div class="outline-text-3" id="text-8-2">
+</div><div id="outline-container-sec-8-2-1" class="outline-4">
+<h4 id="sec-8-2-1"><span class="section-number-4">8.2.1</span> the <code>TextAttr</code> property</h4>
+<div class="outline-text-4" id="text-8-2-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="crt:impl"><span style="color: #ff00ff;">var</span> _textattr : kvm.TTextAttr;
+<span style="color: #ff00ff;">type</span> TCrtColor  = $0 .. $f;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">crt_set_textattr</span>( value : byte );
+<span style="color: #00ffff;">begin</span>
+  _textattr.bg := hi( value );
+  _textattr.fg := lo( value );
+<span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">crt_get_textattr</span> : byte;
+<span style="color: #00ffff;">begin</span>
+  result := (_textattr.bg <span style="color: #00ffff;">shl</span> 8) + _textattr.fg;
+<span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TextColor</span>( c : byte );
+<span style="color: #00ffff;">begin</span>
+  _textattr.fg := TCrtColor( c );
+<span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TextBackground</span>( c : byte );
+<span style="color: #00ffff;">begin</span>
+  _textattr.bg := TCrtColor( c );
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-8-2-2" class="outline-4">
+<h4 id="sec-8-2-2"><span class="section-number-4">8.2.2</span> Cursor control</h4>
+<div class="outline-text-4" id="text-8-2-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="crt:impl"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GotoXY</span>( x, y : cardinal );
+<span style="color: #00ffff;">begin</span>
+  WhereX := x;
+  WhereY := y;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> APPENDIX Convenience Routines</h2>
+<div class="outline-text-2" id="text-9">
+<p>
+In general, you're only going to work with one screen at a time, so it's convenient to have a set of routines that deal with whatever the current screen happens to be at the moment.
+</p>
+</div>
+
+<div id="outline-container-sec-9-1" class="outline-3">
+<h3 id="sec-9-1"><span class="section-number-3">9.1</span> interface</h3>
+<div class="outline-text-3" id="text-9-1">
+<p>
+These follow the ITerm interface exactly.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="ITerm-Members"><span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Width</span> : word;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Height</span>: word;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">MaxX</span>  : word;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">MaxY</span>  : word;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">WhereX</span> : word;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">WhereY</span> : word;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ClrScr</span>;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ClrEol</span>;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Fg</span>( color : byte );
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Bg</span>( color : byte );
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Emit</span>( wc : widechar );
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GotoXY</span>( x, y : word );
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">InsLine</span>;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">DelLine</span>;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetTextAttr</span>( value : word );
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">GetTextAttr</span> : word;
+<span style="color: #00ffff;">property</span>  TextAttr : word <span style="color: #00ffff;">read</span> GetTextAttr <span style="color: #00ffff;">write</span> SetTextAttr;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-9-2" class="outline-3">
+<h3 id="sec-9-2"><span class="section-number-3">9.2</span> implementation</h3>
+<div class="outline-text-3" id="text-9-2">
+<p>
+Since they just delegate to an <code>ITerm</code>, the implementation is trivial.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="kvm:impl"><span style="color: #ff00ff;">var</span> work : ITerm;
+
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Width</span>  : word; <span style="color: #00ffff;">begin</span> result := work.Width <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Height</span> : word; <span style="color: #00ffff;">begin</span> result := work.Height <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">MaxX</span>   : word; <span style="color: #00ffff;">begin</span> result := work.MaxX <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">MaxY</span>   : word; <span style="color: #00ffff;">begin</span> result := work.MaxY <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">WhereX</span> : word; <span style="color: #00ffff;">begin</span> result := work.WhereX <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">WhereY</span> : word; <span style="color: #00ffff;">begin</span> result := work.WhereY <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ClrScr</span>; <span style="color: #00ffff;">begin</span> work.ClrScr <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ClrEol</span>; <span style="color: #00ffff;">begin</span> work.ClrEol <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Fg</span>( color : byte );    <span style="color: #00ffff;">begin</span> work.Fg( color ) <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Bg</span>( color : byte );    <span style="color: #00ffff;">begin</span> work.Bg( color ) <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Emit</span>( wc : widechar ); <span style="color: #00ffff;">begin</span> work.Emit( wc ) <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GotoXY</span>( x, y : word ); <span style="color: #00ffff;">begin</span> work.GotoXY( x, y ) <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">InsLine</span>; <span style="color: #00ffff;">begin</span> work.InsLine <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">DelLine</span>; <span style="color: #00ffff;">begin</span> work.DelLine <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetTextAttr</span>( value : word );
+  <span style="color: #00ffff;">begin</span> work.TextAttr := value <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">GetTextAttr</span> : word;
+  <span style="color: #00ffff;">begin</span> result := work.TextAttr <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-9-3" class="outline-3">
+<h3 id="sec-9-3"><span class="section-number-3">9.3</span> Screens</h3>
+<div class="outline-text-3" id="text-9-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{ </span><span style="color: #66f;">these two are a bit trickier </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TScreen.GetTextAttr</span> : word;
+  <span style="color: #00ffff;">begin</span>
+    result := ( work._fg <span style="color: #00ffff;">shl</span> 8 ) + work._bg;
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TScreen.SetTextAttr</span>( value : word );
+  <span style="color: #00ffff;">begin</span>
+    work._fg := value <span style="color: #00ffff;">and</span> $0f;
+    work._bg := (value <span style="color: #00ffff;">and</span> $f00) <span style="color: #00ffff;">shr</span> 8;
+    fg( work._fg );
+    bg( work._bg );
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><span class="section-number-2">10</span> OUTPUT <code>kvm.pas</code></h2>
+<div class="outline-text-2" id="text-10">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{ </span><span style="color: #66f;">--- warning!! generated file. edit ~/b/web/kvm.org instead!! --- </span><span style="color: #66f;">}</span>
+
+
+<span style="color: #66f;">{</span><span style="color: #66f;">$mode objfpc</span><span style="color: #66f;">}{</span><span style="color: #66f;">$i xpc.inc</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">kvm</span>;
+<span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">uses</span> xpc, grids, terminal;
+
+  &lt;&lt;ITerm&gt;&gt;
+  &lt;&lt;ITerm-Members&gt;&gt;
+
+  &lt;&lt;TTextAttr&gt;&gt;
+  &lt;&lt;TScreenCell&gt;&gt;
+  &lt;&lt;TScreenGrid&gt;&gt;
+  &lt;&lt;TPoint&gt;&gt;
+  &lt;&lt;TRect&gt;&gt;
+  &lt;&lt;TScreenTerm&gt;&gt;
+  &lt;&lt;TAnsiTerm&gt;&gt;
+
+  &lt;&lt;extras&gt;&gt;
+
+<span style="color: #00ffff;">implementation</span>
+  &lt;&lt;@kvm:impl&gt;&gt;
+
+&lt;&lt;lifecycle&gt;&gt;
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
