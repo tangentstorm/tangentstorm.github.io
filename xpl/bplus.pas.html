@@ -1,0 +1,972 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>b+ trees</title>
+<!-- 2013-06-12 Wed 05:54 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal j wallace"/>
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+
+<script type="text/javascript" src="http://orgmode.org/org-info.js">
+/**
+ *
+ * @source: http://orgmode.org/org-info.js
+ *
+ * @licstart  The following is the entire license notice for the
+ *  JavaScript code in http://orgmode.org/org-info.js.
+ *
+ * Copyright (C) 2012-2013  Sebastian Rose
+ *
+ *
+ * The JavaScript code in this tag is free software: you can
+ * redistribute it and/or modify it under the terms of the GNU
+ * General Public License (GNU GPL) as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option)
+ * any later version.  The code is distributed WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+ *
+ * As additional permission under GNU GPL version 3 section 7, you
+ * may distribute non-source (e.g., minimized or compacted) forms of
+ * that code without the copy of the GNU GPL normally required by
+ * section 4, provided you include this license notice and a URL
+ * through which recipients can access the Corresponding Source.
+ *
+ * @licend  The above is the entire license notice
+ * for the JavaScript code in http://orgmode.org/org-info.js.
+ *
+ */
+</script>
+
+<script type="text/javascript">
+
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+
+<!--/*--><![CDATA[/*><!--*/
+org_html_manager.set("TOC_DEPTH", "3");
+org_html_manager.set("LINK_HOME", "");
+org_html_manager.set("LINK_UP", "");
+org_html_manager.set("LOCAL_TOC", "1");
+org_html_manager.set("VIEW_BUTTONS", "0");
+org_html_manager.set("MOUSE_HINT", "underline");
+org_html_manager.set("FIXED_TOC", "0");
+org_html_manager.set("TOC", "0");
+org_html_manager.set("VIEW", "info");
+org_html_manager.setup();  // activate after the parameters are set
+/*]]>*///-->
+</script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">b+ trees</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Intro to B+ Trees</a>
+<ul>
+<li><a href="#sec-1-1">1.1. what is a b+ tree?</a></li>
+<li><a href="#sec-1-2">1.2. what problem does a b+ tree overcome?</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. Object Model and Public Interface</a>
+<ul>
+<li><a href="#sec-2-1">2.1. unit <code>bp</code>;</a></li>
+<li><a href="#sec-2-2">2.2. Public <code>IBPlus</code> interface</a></li>
+<li><a href="#sec-2-3">2.3. type <code>TNode</code></a></li>
+<li><a href="#sec-2-4">2.4. type <code>TTree</code></a></li>
+<li><a href="#sec-2-5">2.5. type <code>TIter</code></a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. Implementation (roughly following wikipedia: B+ Trees)</a>
+<ul>
+<li><a href="#sec-3-1">3.1. <code>[6/8]</code> Node class</a>
+<ul>
+<li><a href="#sec-3-1-1">3.1.1. constructor</a></li>
+<li><a href="#sec-3-1-2">3.1.2. <code>[1/1]</code> location</a></li>
+<li><a href="#sec-3-1-3">3.1.3. <code>[9/9]</code> insertion</a></li>
+<li><a href="#sec-3-1-4">3.1.4. iteration</a></li>
+<li><a href="#sec-3-1-5">3.1.5. finding the new root of the tree</a></li>
+<li><a href="#sec-3-1-6">3.1.6. debugging with .tostring</a></li>
+<li><a href="#sec-3-1-7">3.1.7. deletion</a></li>
+<li><a href="#sec-3-1-8">3.1.8. bulk-loading</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-2">3.2. <code>[0/1]</code> The container class (TTree)</a>
+<ul>
+<li><a href="#sec-3-2-1">3.2.1. <code>[0/0]</code> constructor</a></li>
+<li><a href="#sec-3-2-2">3.2.2. put</a></li>
+<li><a href="#sec-3-2-3">3.2.3. enumerator</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-3">3.3. <code>[4/4]</code> TIter : iterator for the Tree class</a>
+<ul>
+<li><a href="#sec-3-3-1">3.3.1. TEXT Walking a B+-Tree</a></li>
+<li><a href="#sec-3-3-2">3.3.2. constructor</a></li>
+<li><a href="#sec-3-3-3">3.3.3. reset</a></li>
+<li><a href="#sec-3-3-4">3.3.4. getcurrent</a></li>
+<li><a href="#sec-3-3-5">3.3.5. movenext</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-4">3.4. OUTPUT: <code>bp.pas</code></a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. Usage: An Indexed Triple Store</a>
+<ul>
+<li><a href="#sec-4-1">4.1. declarations</a></li>
+<li><a href="#sec-4-2">4.2. </a>
+<ul>
+<li><a href="#sec-4-2-1">4.2.1. populate</a></li>
+<li><a href="#sec-4-2-2">4.2.2. print forward</a></li>
+<li><a href="#sec-4-2-3">4.2.3. print backward</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-5">5. end</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Intro to B+ Trees</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> <span class="todo TODO">TODO</span> what is a b+ tree?</h3>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> <span class="todo TODO">TODO</span> what problem does a b+ tree overcome?</h3>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Object Model and Public Interface</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> unit <code>bp</code>;</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="interface"><span style="color: #66f;">{ </span><span style="color: #66f;">B+ Trees for pascal </span><span style="color: #66f;">}</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$mode delphi</span><span style="color: #66f;">}</span> <span style="color: #66f;">{</span><span style="color: #66f;">$i xpc.inc</span><span style="color: #66f;">}</span> <span style="color: #66f;">{</span><span style="color: #66f;">$H+</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">bp</span>;
+<span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">uses</span> xpc, sysutils;
+
+  <span style="color: #ff00ff;">const</span> empty = maxint;
+
+  <span style="color: #ff00ff;">type</span>
+    TKey   = <span style="color: #ff00ff;">integer</span>;
+    TVal   = TObject;
+    IBPlus = <span style="color: #00ffff;">interface</span>
+      &lt;&lt;IBPlusMethods&gt;&gt;
+    <span style="color: #00ffff;">end</span>;
+    TTree  = <span style="color: #ff00ff;">class</span>; <span style="color: #66f;">// </span><span style="color: #66f;">forward reference for TIter</span>
+    &lt;&lt;TNode&gt;&gt;
+    &lt;&lt;TIter&gt;&gt;
+    &lt;&lt;TTree&gt;&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Public <code>IBPlus</code> interface</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="IBPlusMethods"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">put</span>( key : TKey; val : TVal );
+<span style="color: #66f;">//</span><span style="color: #66f;">procedure del( key : TKey );</span>
+<span style="color: #66f;">//</span><span style="color: #66f;">function get( key : TKey ): TVal;</span>
+<span style="color: #66f;">//</span><span style="color: #66f;">function has( key : Tkey ): boolean;</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> type <code>TNode</code></h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="TNode">TNode = <span style="color: #ff00ff;">class</span> ( TInterfacedObject, IBPlus )
+ <span style="color: #00ffff;">public</span>
+  <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">CreateLeaf</span>( size : <span style="color: #ff00ff;">integer</span> );
+  <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">CreateInner</span>( size : <span style="color: #ff00ff;">integer</span> );
+  &lt;&lt;IBPlusMethods&gt;&gt;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">tostring</span>: <span style="color: #ff00ff;">string</span>; <span style="color: #00ffff;">override</span>;
+ <span style="color: #00ffff;">private</span>
+  isleaf      : <span style="color: #ff00ff;">boolean</span>;
+  _parent   : TNode;
+  _next     : TNode;
+  keys : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> TKey;
+  vals : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> TObject;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">locate</span>( key : TKey ): TNode;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">inskey</span>( key : TKey ): cardinal;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">full</span> : <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">split</span>;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">rebalance</span>;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">firstkey</span> : TKey;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">isroot</span> : <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">addchild</span>( key : TKey; kid : TNode );
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">next</span> : TNode;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">findslot</span>( key : TKey ): word;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">findroot</span> : TNode;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">isinner</span> : <span style="color: #ff00ff;">boolean</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> type <code>TTree</code></h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="TTree">TTree = <span style="color: #ff00ff;">class</span>
+ <span style="color: #00ffff;">public</span>
+  <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( branchfactor : <span style="color: #ff00ff;">integer</span> = 64 );
+  &lt;&lt;IBPlusMethods&gt;&gt;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetEnumerator</span>: TIter;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">tostring</span>: <span style="color: #ff00ff;">string</span>; <span style="color: #00ffff;">override</span>;
+ <span style="color: #00ffff;">private</span>
+  root : TNode;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> type <code>TIter</code></h3>
+<div class="outline-text-3" id="text-2-5">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="TIter">TIter = <span style="color: #ff00ff;">class</span>
+<span style="color: #00ffff;">private</span>
+  tree : TTree; <span style="color: #66f;">// </span><span style="color: #66f;">only useful to support Reset</span>
+  node : TNode;
+  step : <span style="color: #ff00ff;">integer</span>;  <span style="color: #66f;">// </span><span style="color: #66f;">index/offset within the node</span>
+<span style="color: #00ffff;">public</span>
+  <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( aTree : TTree );
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetCurrent</span> : TVal;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">MoveNext</span> : <span style="color: #ff00ff;">Boolean</span>;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Reset</span>;
+  <span style="color: #00ffff;">property</span> Current:TVal <span style="color: #00ffff;">read</span> GetCurrent;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Implementation (roughly following <a href="http://en.wikipedia.org/wiki/B+_tree">wikipedia: B+ Trees</a>)</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> <span class="todo TODO">TODO</span> <code>[6/8]</code> Node class</h3>
+<div class="outline-text-3" id="text-3-1">
+</div><div id="outline-container-sec-3-1-1" class="outline-4">
+<h4 id="sec-3-1-1"><span class="section-number-4">3.1.1</span> <span class="done DONE">DONE</span> constructor</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">TNode.CreateLeaf</span>( size : <span style="color: #ff00ff;">integer</span> );
+  <span style="color: #ff00ff;">var</span> i : <span style="color: #ff00ff;">integer</span>;
+<span style="color: #00ffff;">begin</span>
+  isleaf := true;
+  _next  := nil;
+  _parent := nil;
+  SetLength( keys, size + 1 );
+  SetLength( vals, size + 1 ); <span style="color: #66f;">// </span><span style="color: #66f;">extra link</span>
+  <span style="color: #00ffff;">for</span> i := 0 <span style="color: #00ffff;">to</span> size <span style="color: #00ffff;">do</span>
+  <span style="color: #00ffff;">begin</span>
+    keys[i] := empty;
+    vals[i] := nil;
+  <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">TNode.CreateInner</span>( size : <span style="color: #ff00ff;">integer</span> );
+<span style="color: #00ffff;">begin</span>
+  self.CreateLeaf(size);
+  self.isleaf := false;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-1-2" class="outline-4">
+<h4 id="sec-3-1-2"><span class="section-number-4">3.1.2</span> <span class="done DONE">DONE</span> <code>[1/1]</code> location</h4>
+<div class="outline-text-4" id="text-3-1-2">
+</div><ol class="org-ol"><li><span class="done DONE">DONE</span> TNode.locate<br/><div class="outline-text-5" id="text-3-1-2-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #66f;">{ </span><span style="color: #66f;">Find first child key less the new key. It is important that</span>
+<span style="color: #66f;">  both =locate= and =inskey= use the same algorithm for locating</span>
+<span style="color: #66f;">  the key, or the linked list at the bottom of the tree will break.</span>
+
+<span style="color: #66f;">  Further, we will make sure that we walk left to right (lowest</span>
+<span style="color: #66f;">  key to highest) because in inner nodes, the links always point to</span>
+<span style="color: #66f;">  the first child.</span>
+
+<span style="color: #66f;">  Example:</span>
+
+<span style="color: #66f;">      tree: [ 5:[ 5 _ _ _ ] 8:[ 8 12 _ _ ] 50:[ 50 _ _ _ ] _ ]</span>
+<span style="color: #66f;">      goal: find slot for 24</span>
+
+<span style="color: #66f;">  Here, 24 is both "after 8" or "before 50". It's important to check</span>
+<span style="color: #66f;">  both numbers, and then choose the /leftmost/ side of the range.</span>
+<span style="color: #66f;">  (If we had chosen to use the highest value for the child keys instead</span>
+<span style="color: #66f;">  of the lowest, then of course we would choose the rightmost child.) </span><span style="color: #66f;">}</span>
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TNode.FindSlot</span>( key : TKey ) : word;
+<span style="color: #00ffff;">begin</span>
+  result := 0;
+  <span style="color: #00ffff;">if</span> key &gt;= keys[ 0 ] <span style="color: #00ffff;">then</span>
+    <span style="color: #00ffff;">repeat</span>
+      inc(result)
+    <span style="color: #00ffff;">until</span> (result = high(keys)) <span style="color: #00ffff;">or</span> (key &lt; keys[ result ])
+<span style="color: #00ffff;">end</span>;
+
+<span style="color: #66f;">{ </span><span style="color: #66f;">This search routine always succeeds, since it finds the location</span>
+<span style="color: #66f;">  where the key /should/ be in the tree, whether it's /actually/</span>
+<span style="color: #66f;">  there or not. </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TNode.locate</span>( key : TKey ) : TNode;
+<span style="color: #ff00ff;">var</span> slot : <span style="color: #ff00ff;">integer</span>;
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">if</span> isleaf
+    <span style="color: #00ffff;">then</span> result := self
+    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">begin</span>
+      slot := findslot(key);
+      <span style="color: #00ffff;">if</span> slot &gt; 0 <span style="color: #00ffff;">then</span> dec( slot ); <span style="color: #66f;">// </span><span style="color: #66f;">keys[slot] = empty then dec( slot );</span>
+      result := (vals[slot] <span style="color: #00ffff;">as</span> TNode).locate( key );
+    <span style="color: #00ffff;">end</span>
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-3-1-3" class="outline-4">
+<h4 id="sec-3-1-3"><span class="section-number-4">3.1.3</span> <span class="done DONE">DONE</span> <code>[9/9]</code> insertion</h4>
+<div class="outline-text-4" id="text-3-1-3">
+</div><ol class="org-ol"><li><span class="done DONE">DONE</span> TNode.put<br/><div class="outline-text-5" id="text-3-1-3-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TNode.put</span>( key : TKey; val : TVal );
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">if</span> isleaf <span style="color: #00ffff;">then</span>
+    <span style="color: #00ffff;">begin</span>
+      vals[inskey( key )] := val;
+      rebalance;
+    <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">else</span> locate( key ).put( key, val )
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</li>
+<li><span class="done DONE">DONE</span> TNode.inskey<br/><div class="outline-text-5" id="text-3-1-3-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #66f;">{ </span><span style="color: #66f;">insert key </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TNode.inskey</span>( key : TKey ) : cardinal;
+ <span style="color: #ff00ff;">var</span> i, slot : <span style="color: #ff00ff;">integer</span>;
+<span style="color: #00ffff;">begin</span>
+  slot := findslot( key );
+
+  <span style="color: #66f;">// </span><span style="color: #66f;">if first value is about to change, update the parent key:</span>
+  <span style="color: #00ffff;">if</span> (slot = 0) <span style="color: #00ffff;">and</span> <span style="color: #00ffff;">not</span> isroot <span style="color: #00ffff;">then</span>
+  <span style="color: #00ffff;">begin</span>
+    i := 0;
+    <span style="color: #00ffff;">while</span> _parent.keys[i] &lt;&gt; keys[0] <span style="color: #00ffff;">do</span> inc(i);
+    _parent.keys[i] := key;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">for</span> i := high(keys) <span style="color: #00ffff;">downto</span> slot+1 <span style="color: #00ffff;">do</span>
+  <span style="color: #00ffff;">begin</span>
+    vals[i] := vals[i-1];
+    keys[i] := keys[i-1];
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #66f;">{ </span><span style="color: #66f;">finally, fill the hole we just made, and return its location </span><span style="color: #66f;">}</span>
+  keys[ slot ] := key;
+  vals[ slot ] := nil;
+  result := slot
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</li>
+<li><span class="done DONE">DONE</span> TNode.rebalance<br/><div class="outline-text-5" id="text-3-1-3-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TNode.rebalance</span>;
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">if</span> full <span style="color: #00ffff;">then</span> split
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</li>
+<li><span class="done DONE">DONE</span> TNode.full<br/><div class="outline-text-5" id="text-3-1-3-4">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TNode.full</span> : <span style="color: #ff00ff;">boolean</span>;
+<span style="color: #00ffff;">begin</span>
+  result := keys[high(keys)] &lt;&gt; empty;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</li>
+<li><span class="done DONE">DONE</span> TNode.split<br/><div class="outline-text-5" id="text-3-1-3-5">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TNode.split</span>;
+  <span style="color: #ff00ff;">var</span> newnode: TNode;
+  &lt;&lt;copyhalf&gt;&gt;
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">if</span> isleaf <span style="color: #00ffff;">then</span>
+    <span style="color: #00ffff;">begin</span>
+      newnode := TNode.CreateLeaf( length(keys ));
+      newnode._next := _next;
+      _next := newnode;
+    <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">else</span> newnode := TNode.CreateInner( length(keys ));
+  copyhalf;
+  <span style="color: #00ffff;">if</span> isroot <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">begin</span>
+    _parent := TNode.CreateInner( length( keys ));
+    _parent.addchild( self.firstkey, self )
+  <span style="color: #00ffff;">end</span>;
+  _parent.addchild( newnode.firstkey, newnode )
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</li>
+<li><span class="done DONE">DONE</span> <a id="copyhalf" name="copyhalf"></a><br/><div class="outline-text-5" id="text-3-1-3-6">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="copyhalf"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">copyhalf</span>;
+  <span style="color: #ff00ff;">var</span> i, half : <span style="color: #ff00ff;">integer</span>;
+<span style="color: #00ffff;">begin</span>
+  half := length(keys) <span style="color: #00ffff;">div</span> 2;
+  <span style="color: #00ffff;">for</span> i := half <span style="color: #00ffff;">to</span> high(keys) <span style="color: #00ffff;">do</span>
+  <span style="color: #00ffff;">begin</span>
+    newnode.keys[i-half] := keys[i];
+    newnode.vals[i-half] := vals[i];
+    <span style="color: #00ffff;">if</span> (newnode.isinner) <span style="color: #00ffff;">and</span> (vals[i] &lt;&gt; nil) <span style="color: #00ffff;">then</span>
+      (vals[i] <span style="color: #00ffff;">as</span> TNode)._parent := newnode;
+    keys[i] := empty;
+    vals[i] := nil;
+  <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</li>
+<li><span class="done DONE">DONE</span> TNode.isroot<br/><div class="outline-text-5" id="text-3-1-3-7">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TNode.isroot</span> : <span style="color: #ff00ff;">boolean</span>;
+<span style="color: #00ffff;">begin</span>
+  result := <span style="color: #00ffff;">not</span> assigned(_parent);
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</li>
+<li><span class="done DONE">DONE</span> TNode.isinner<br/><div class="outline-text-5" id="text-3-1-3-8">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TNode.isinner</span> : <span style="color: #ff00ff;">boolean</span>;
+<span style="color: #00ffff;">begin</span>
+  result := <span style="color: #00ffff;">not</span> isleaf
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</li>
+
+<li><span class="done DONE">DONE</span> firstkey<br/><div class="outline-text-5" id="text-3-1-3-9">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TNode.firstkey</span> : TKey;
+<span style="color: #00ffff;">begin</span>
+  result := keys[0]
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</li>
+<li><span class="done DONE">DONE</span> addchild<br/><div class="outline-text-5" id="text-3-1-3-10">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TNode.addchild</span>( key : TKey; kid : TNode );
+<span style="color: #00ffff;">begin</span>
+  assert( <span style="color: #00ffff;">not</span> isleaf );
+  vals[inskey( key )] := kid;
+  kid._parent := self;
+  rebalance;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-3-1-4" class="outline-4">
+<h4 id="sec-3-1-4"><span class="section-number-4">3.1.4</span> <span class="done DONE">DONE</span> iteration</h4>
+<div class="outline-text-4" id="text-3-1-4">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TNode.next</span> : TNode;
+<span style="color: #00ffff;">begin</span>
+  result := _next;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-1-5" class="outline-4">
+<h4 id="sec-3-1-5"><span class="section-number-4">3.1.5</span> <span class="done DONE">DONE</span> finding the new root of the tree</h4>
+<div class="outline-text-4" id="text-3-1-5">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TNode.findroot</span> : TNode;
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">if</span> isroot
+    <span style="color: #00ffff;">then</span> result := self
+    <span style="color: #00ffff;">else</span> result := _parent.findroot
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-1-6" class="outline-4">
+<h4 id="sec-3-1-6"><span class="section-number-4">3.1.6</span> <span class="done DONE">DONE</span> debugging with .tostring</h4>
+<div class="outline-text-4" id="text-3-1-6">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TTree.tostring</span>: <span style="color: #ff00ff;">string</span>;
+<span style="color: #00ffff;">begin</span>
+  result := self.root.tostring;
+<span style="color: #00ffff;">end</span>;
+
+<span style="color: #ff00ff;">var</span> gIndent : <span style="color: #ff00ff;">string</span> = <span style="color: #00ff00;">''</span>;
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TNode.ToString</span> : <span style="color: #ff00ff;">string</span>;
+  <span style="color: #ff00ff;">var</span> s : <span style="color: #ff00ff;">string</span>; i : <span style="color: #ff00ff;">integer</span>;
+<span style="color: #00ffff;">begin</span>
+
+  s := <span style="color: #00ff00;">''</span>;
+
+  <span style="color: #66f;">// </span><span style="color: #66f;">draw the keys</span>
+  <span style="color: #00ffff;">if</span> isleaf <span style="color: #00ffff;">then</span> s += <span style="color: #00ff00;">'['</span>  <span style="color: #00ffff;">else</span> s += <span style="color: #00ff00;">'{'</span>;
+
+  <span style="color: #00ffff;">for</span> i := low(keys) <span style="color: #00ffff;">to</span> high(keys) <span style="color: #00ffff;">do</span>
+    <span style="color: #00ffff;">if</span> (i = 0) <span style="color: #00ffff;">and</span> (keys[i] = empty) <span style="color: #00ffff;">then</span> s := s + <span style="color: #00ff00;">' &lt; '</span>
+    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> (self.keys[i] = empty) <span style="color: #00ffff;">then</span> s := s + <span style="color: #00ff00;">' - '</span>
+    <span style="color: #00ffff;">else</span> s := s + <span style="color: #00ff00;">' '</span> + IntToStr(self.keys[ i ]) + <span style="color: #00ff00;">' '</span>;
+
+  <span style="color: #00ffff;">if</span> isleaf <span style="color: #00ffff;">and</span> assigned(_next) <span style="color: #00ffff;">then</span>
+    s := s + <span style="color: #00ff00;">' -&gt; '</span> + IntToStr(_next.firstkey);
+
+  <span style="color: #00ffff;">if</span> isleaf <span style="color: #00ffff;">then</span> s += <span style="color: #00ff00;">' ]'</span> <span style="color: #00ffff;">else</span> s += <span style="color: #00ff00;">' }'</span>;
+
+  <span style="color: #66f;">// </span><span style="color: #66f;">draw the values</span>
+  gIndent += <span style="color: #00ff00;">'  '</span>;
+  <span style="color: #00ffff;">for</span> i := low(keys) <span style="color: #00ffff;">to</span> high(keys) <span style="color: #00ffff;">do</span>
+    <span style="color: #00ffff;">if</span> assigned(self.vals[ i ]) <span style="color: #00ffff;">then</span>
+       s := s + lineending + gIndent + self.vals[ i ].ToString;
+  setlength(gIndent, length(gIndent)-2);
+  result := s;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-1-7" class="outline-4">
+<h4 id="sec-3-1-7"><span class="section-number-4">3.1.7</span> <span class="todo TODO">TODO</span> deletion</h4>
+<div class="outline-text-4" id="text-3-1-7">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TNode.del</span>( key : TKey );
+<span style="color: #00ffff;">begin</span>
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-1-8" class="outline-4">
+<h4 id="sec-3-1-8"><span class="section-number-4">3.1.8</span> <span class="todo TODO">TODO</span> bulk-loading</h4>
+<div class="outline-text-4" id="text-3-1-8">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">TNode.bulk</span>( pairs : TKeyValPair );
+<span style="color: #00ffff;">begin</span>
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> <span class="todo TODO">TODO</span> <code>[0/1]</code> The container class (TTree)</h3>
+<div class="outline-text-3" id="text-3-2">
+</div><div id="outline-container-sec-3-2-1" class="outline-4">
+<h4 id="sec-3-2-1"><span class="section-number-4">3.2.1</span> <span class="todo TODO">TODO</span> <code>[0/0]</code> constructor</h4>
+<div class="outline-text-4" id="text-3-2-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">TTree.Create</span>( branchfactor : <span style="color: #ff00ff;">integer</span> = 64 );
+<span style="color: #00ffff;">begin</span>
+  root := TNode.CreateLeaf( branchfactor );
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2-2" class="outline-4">
+<h4 id="sec-3-2-2"><span class="section-number-4">3.2.2</span> put</h4>
+<div class="outline-text-4" id="text-3-2-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TTree.put</span>( key : TKey; val : TVal );
+<span style="color: #00ffff;">begin</span>
+  root.put( key, val );
+  <span style="color: #66f;">// </span><span style="color: #66f;">find the new root</span>
+  root := root.findroot; <span style="color: #66f;">// </span><span style="color: #66f;">"for the home team"</span>
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2-3" class="outline-4">
+<h4 id="sec-3-2-3"><span class="section-number-4">3.2.3</span> enumerator</h4>
+<div class="outline-text-4" id="text-3-2-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TTree.GetEnumerator</span> : TIter;
+<span style="color: #00ffff;">begin</span>
+  result := TIter.Create( self )
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> <span class="todo TODO">TODO</span> <code>[4/4]</code> TIter : iterator for the Tree class</h3>
+<div class="outline-text-3" id="text-3-3">
+</div><div id="outline-container-sec-3-3-1" class="outline-4">
+<h4 id="sec-3-3-1"><span class="section-number-4">3.3.1</span> TEXT Walking a B+-Tree</h4>
+<div class="outline-text-4" id="text-3-3-1">
+<p>
+The leaf nodes of a B+Tree are linked together to form a chain, making it easy to iterate over the links in sequential order.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3-3-2" class="outline-4">
+<h4 id="sec-3-3-2"><span class="section-number-4">3.3.2</span> <span class="done DONE">DONE</span> constructor</h4>
+<div class="outline-text-4" id="text-3-3-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">TIter.Create</span>( aTree : TTree );
+<span style="color: #00ffff;">begin</span>
+  self.tree := aTree;
+  self.Reset;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-3-3" class="outline-4">
+<h4 id="sec-3-3-3"><span class="section-number-4">3.3.3</span> <span class="done DONE">DONE</span> reset</h4>
+<div class="outline-text-4" id="text-3-3-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TIter.Reset</span>;
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #66f;">// </span><span style="color: #66f;">this should walk down to the first (leftmost) leaf node</span>
+  node := self.tree.root.locate(-maxint);
+  step := -1;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-3-4" class="outline-4">
+<h4 id="sec-3-3-4"><span class="section-number-4">3.3.4</span> <span class="done DONE">DONE</span> getcurrent</h4>
+<div class="outline-text-4" id="text-3-3-4">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TIter.GetCurrent</span> : TObject;
+<span style="color: #00ffff;">begin</span>
+  result := node.vals[step];
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-3-5" class="outline-4">
+<h4 id="sec-3-3-5"><span class="section-number-4">3.3.5</span> <span class="done DONE">DONE</span> movenext</h4>
+<div class="outline-text-4" id="text-3-3-5">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="imp"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TIter.MoveNext</span> : <span style="color: #ff00ff;">Boolean</span>;
+<span style="color: #00ffff;">begin</span>
+  result := false;
+  <span style="color: #00ffff;">if</span> assigned(node) <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">begin</span>
+    inc(step);
+    <span style="color: #00ffff;">if</span> (step &gt; high(node.keys))
+    <span style="color: #00ffff;">or</span> (node.keys[step] = empty)
+    <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">begin</span>
+      node := node.next;
+      step := 0;
+    <span style="color: #00ffff;">end</span>;
+    result := assigned(node);
+  <span style="color: #00ffff;">end</span>
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> OUTPUT: <code>bp.pas</code></h3>
+<div class="outline-text-3" id="text-3-4">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{ </span><span style="color: #66f;">NOTE : this file is generated from ~/b/web/bp.pas.org , so...</span>
+<span style="color: #66f;">  ---&gt;&gt; DON'T EDIT THIS FILE! &lt;&lt;--- </span><span style="color: #66f;">}</span>
+&lt;&lt;<span style="color: #00ffff;">interface</span>&gt;&gt;
+<span style="color: #00ffff;">implementation</span>
+  &lt;&lt;imp&gt;&gt;
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Usage: An Indexed Triple Store</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> declarations</h3>
+<div class="outline-text-3" id="text-4-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="test"><span style="color: #66f;">{</span><span style="color: #66f;">$i xpc.inc</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">program</span> <span style="color: #ffffff; font-weight: bold;">bpdemo</span>;
+<span style="color: #00ffff;">uses</span> bp, strutils, sysutils;
+
+  <span style="color: #ff00ff;">const</span> kMax = 255; <span style="color: #66f;">// </span><span style="color: #66f;">65535;  { change if you want to test speed }</span>
+  <span style="color: #ff00ff;">type</span>
+    TTriple = <span style="color: #ff00ff;">class</span>
+      sub, rel, obj : <span style="color: #ff00ff;">integer</span>;
+      <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( SubId, RelId, ObjId : <span style="color: #ff00ff;">integer</span> );
+      <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Print</span>;
+      <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">tostring</span>: <span style="color: #ff00ff;">string</span>; <span style="color: #00ffff;">override</span>;
+      <span style="color: #66f;">// </span><span style="color: #66f;">function reversed : IEnumerator;</span>
+    <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">TTriple.Create</span>( SubId, RelId, ObjId : <span style="color: #ff00ff;">integer</span> );
+  <span style="color: #00ffff;">begin</span>
+    sub := subid;
+    rel := relid;
+    obj := objid;
+  <span style="color: #00ffff;">end</span>;
+
+
+  <span style="color: #ff00ff;">var</span> building : <span style="color: #ff00ff;">boolean</span> = true;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TTriple.ToString</span> : <span style="color: #ff00ff;">string</span>;
+  <span style="color: #00ffff;">begin</span>
+    result := <span style="color: #00ff00;">'('</span>  + PadLeft(IntToStr( sub ), 4) +
+              <span style="color: #00ff00;">', '</span> + PadLeft(IntToStr( rel ), 4) +
+              <span style="color: #00ff00;">', '</span> + PadLeft(IntToStr( obj ), 4) +
+              <span style="color: #00ff00;">')'</span>;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TTriple.print</span>;
+  <span style="color: #00ffff;">begin</span>
+    writeln( self.tostring )
+  <span style="color: #00ffff;">end</span>;
+
+  &lt;&lt;main&gt;&gt;
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> <a id="main" name="main"></a></h3>
+<div class="outline-text-3" id="text-4-2">
+</div><div id="outline-container-sec-4-2-1" class="outline-4">
+<h4 id="sec-4-2-1"><span class="section-number-4">4.2.1</span> populate</h4>
+<div class="outline-text-4" id="text-4-2-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="main">  <span style="color: #ff00ff;">var</span>
+    subs, rels, objs : bp.TTree;
+    trip             : TObject;
+    i, j, k, tmp     : cardinal;
+    nums             : <span style="color: #ff00ff;">array</span> [0..2, 0..kMax] <span style="color: #00ffff;">of</span> word;
+<span style="color: #00ffff;">begin</span>
+
+randomize;
+
+<span style="color: #66f;">{ </span><span style="color: #66f;">create three indices for a triplestore </span><span style="color: #66f;">}</span>
+subs := bp.TTree.create(16); <span style="color: #66f;">// </span><span style="color: #66f;">just to make the trace interesting</span>
+rels := bp.TTree.create;
+objs := bp.TTree.create;
+
+<span style="color: #66f;">{ </span><span style="color: #66f;">generate the numbers 0..kMax in three columns </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">for</span> j := 0 <span style="color: #00ffff;">to</span> 2 <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">for</span> i := 0 <span style="color: #00ffff;">to</span> kMax <span style="color: #00ffff;">do</span> nums[j][i] := i;
+
+<span style="color: #66f;">{ </span><span style="color: #66f;">shuffle the columns independently </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">for</span> j := 0 <span style="color: #00ffff;">to</span> 2 <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">for</span> i := 0 <span style="color: #00ffff;">to</span> kMax * 4 <span style="color: #00ffff;">do</span>
+<span style="color: #00ffff;">begin</span>
+  k := random(kMax);
+  tmp := nums[j][k];
+  nums[j][k] := nums[j][k+1];
+  nums[j][k+1] := tmp;
+<span style="color: #00ffff;">end</span>;
+
+<span style="color: #66f;">{ </span><span style="color: #66f;">initial index: </span><span style="color: #66f;">}</span>
+writeln(<span style="color: #00ff00;">'initial index:'</span>);
+writeln(subs.tostring);
+
+<span style="color: #66f;">{ </span><span style="color: #66f;">generate and index the random triples </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">for</span> i := 0 <span style="color: #00ffff;">to</span> kMax <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">begin</span>
+  trip := TTriple.create(nums[0][i], nums[1][i], nums[2][i]);
+  <span style="color: #00ffff;">with</span> TTriple(trip) <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">begin</span>
+    <span style="color: #66f;">{ </span><span style="color: #66f;">for debugging, show one of the indices being built step by step </span><span style="color: #66f;">}</span>
+    writeln;
+    writeln(<span style="color: #00ff00;">'adding key:'</span>, sub:2 ); <span style="color: #66f;">//</span><span style="color: #66f;">, '-&gt; ', rel:2, ', ',  obj:2 );</span>
+
+    subs.put( sub, trip );
+    rels.put( rel, trip );
+    objs.put( obj, trip );
+
+    writeln(subs.tostring);
+  <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2-2" class="outline-4">
+<h4 id="sec-4-2-2"><span class="section-number-4">4.2.2</span> print forward</h4>
+<div class="outline-text-4" id="text-4-2-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="main"> building := false;
+<span style="color: #66f;">{ </span><span style="color: #66f;">print them in order by each index </span><span style="color: #66f;">}</span>
+writeln(<span style="color: #00ff00;">'--subs--'</span>);
+<span style="color: #00ffff;">for</span> trip <span style="color: #00ffff;">in</span> subs <span style="color: #00ffff;">do</span> TTriple(trip).print;
+writeln(<span style="color: #00ff00;">'--rels--'</span>);
+<span style="color: #00ffff;">for</span> trip <span style="color: #00ffff;">in</span> rels <span style="color: #00ffff;">do</span> TTriple(trip).print;
+writeln(<span style="color: #00ff00;">'--objs--'</span>);
+<span style="color: #00ffff;">for</span> trip <span style="color: #00ffff;">in</span> objs <span style="color: #00ffff;">do</span> TTriple(trip).print;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2-3" class="outline-4">
+<h4 id="sec-4-2-3"><span class="section-number-4">4.2.3</span> <span class="todo TODO">TODO</span> print backward</h4>
+<div class="outline-text-4" id="text-4-2-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{ </span><span style="color: #66f;">and reversed </span><span style="color: #66f;">}</span>
+writeln(<span style="color: #00ff00;">'--subs desc--'</span>);
+<span style="color: #00ffff;">for</span> trip <span style="color: #00ffff;">in</span> subs.reversed <span style="color: #00ffff;">do</span> TTriple(trip).print;
+writeln(<span style="color: #00ff00;">'--objs desc--'</span>);
+<span style="color: #00ffff;">for</span> trip <span style="color: #00ffff;">in</span> objs.reversed <span style="color: #00ffff;">do</span> Triple(trip).print;
+writeln(<span style="color: #00ff00;">'--rels desc--'</span>);
+<span style="color: #00ffff;">for</span> trip <span style="color: #00ffff;">in</span> rels.reversed <span style="color: #00ffff;">do</span> TTriple(trip).print;
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> end</h2>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>xpl : cross pascal library</title>
+<!-- 2013-06-12 Wed 05:54 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal"/>
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">xpl : cross pascal library</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. narrative code</a></li>
+<li><a href="#sec-2">2. alphabetical list of all units</a></li>
+<li><a href="#sec-3">3. generate links for these</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> narrative code</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+These units are written with a literate programming style:
+</p>
+
+<dl class="org-dl">
+<dt> <a href="arrays.pas.html">arrays</a> </dt><dd>generic array components
+</dd>
+<dt> <a href="bplus.html">bplus</a>  </dt><dd>an implementation of B+ trees.
+</dd>
+<dt> <a href="kvm.pas.html">kvm</a>    </dt><dd>a modern <code>crt</code>, providing a 256 color, unicode-enabled text terminal
+</dd>
+<dt> <a href="sets.pas.html">sets</a>   </dt><dd>generic sets of abitrary type (sets of records, classes, etc)
+</dd>
+</dl>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> alphabetical list of all units</h2>
+<div class="outline-text-2" id="text-2">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left"/>
+
+<col class="left"/>
+
+<col class="left"/>
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">unit</th>
+<th scope="col" class="left">problem?</th>
+<th scope="col" class="left">notes/description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">arrays</td>
+<td class="left">-docs?</td>
+<td class="left">generic arrays</td>
+</tr>
+
+<tr>
+<td class="left">ascii</td>
+<td class="left">..!</td>
+<td class="left">ascii character codes</td>
+</tr>
+
+<tr>
+<td class="left">bp</td>
+<td class="left">-org</td>
+<td class="left">b+ trees (untangled from org-mode&#x2026; need to clean up)</td>
+</tr>
+
+<tr>
+<td class="left">{ brx }</td>
+<td class="left">??(.inc)</td>
+<td class="left">experimental generic type thing</td>
+</tr>
+
+<tr>
+<td class="left">build</td>
+<td class="left">-path</td>
+<td class="left">tree builder &#x2026; dotted paths not laz-friendly yet</td>
+</tr>
+
+<tr>
+<td class="left">chk</td>
+<td class="left">-docs?</td>
+<td class="left">assertion/unit test helpers</td>
+</tr>
+
+<tr>
+<td class="left">cli</td>
+<td class="left">-silly</td>
+<td class="left">a few colorful command line interface routines ( is this useful?)</td>
+</tr>
+
+<tr>
+<td class="left">cr</td>
+<td class="left">..</td>
+<td class="left">generic cursor interface</td>
+</tr>
+
+<tr>
+<td class="left">cw</td>
+<td class="left">-old</td>
+<td class="left">colorwrite (quite useful but probably needs to be modernized)</td>
+</tr>
+
+<tr>
+<td class="left">cx</td>
+<td class="left">-docs?</td>
+<td class="left">colored expection tracebacks</td>
+</tr>
+
+<tr>
+<td class="left">di</td>
+<td class="left">-weak</td>
+<td class="left">simple dictionary-like type. TODO: see olliebol's type</td>
+</tr>
+
+<tr>
+<td class="left">{ dm }</td>
+<td class="left">!bad.py</td>
+<td class="left">doc model&#x2026; (half-ported python code wrapped in pascal)</td>
+</tr>
+
+<tr>
+<td class="left">fs</td>
+<td class="left">?old</td>
+<td class="left">file system</td>
+</tr>
+
+<tr>
+<td class="left">fx</td>
+<td class="left">?old</td>
+<td class="left">user interface effects</td>
+</tr>
+
+<tr>
+<td class="left">{ gn }</td>
+<td class="left">!bad.py</td>
+<td class="left">generators (unfinished)</td>
+</tr>
+
+<tr>
+<td class="left">grids</td>
+<td class="left">..</td>
+<td class="left">grids</td>
+</tr>
+
+<tr>
+<td class="left">gt</td>
+<td class="left">..</td>
+<td class="left">graph theory routines</td>
+</tr>
+
+<tr>
+<td class="left">{ hz }</td>
+<td class="left">??</td>
+<td class="left">sound &#x2013; TODO: broken old dos stuff. won't compile. see gh:badsector/pasaudio?</td>
+</tr>
+
+<tr>
+<td class="left">kbd</td>
+<td class="left">..</td>
+<td class="left">keyboard routine (makes new keyboard unit look more like old crt)</td>
+</tr>
+
+<tr>
+<td class="left">kvm</td>
+<td class="left">(dup)</td>
+<td class="left">kvm all-in-one TOOD: merge with vt,kbd,mou maybe kvm = interfaces?</td>
+</tr>
+
+<tr>
+<td class="left">li</td>
+<td class="left">-weak</td>
+<td class="left">lisp "interpreter"  TODO: use variants&#x2026; also rename to sx ?</td>
+</tr>
+
+<tr>
+<td class="left">ll</td>
+<td class="left">~style</td>
+<td class="left">linked list / tree data structure  TODO : clean up code and rename (&#x2026;to???)</td>
+</tr>
+
+<tr>
+<td class="left">log</td>
+<td class="left">-weak</td>
+<td class="left">rudimentarylogging system</td>
+</tr>
+
+<tr>
+<td class="left">mou</td>
+<td class="left">??</td>
+<td class="left">ancient mouse stuff TODO : replace / integrate with new mouse unit</td>
+</tr>
+
+<tr>
+<td class="left">num</td>
+<td class="left">-old</td>
+<td class="left">old numeric routines. probably good but need docs.</td>
+</tr>
+
+<tr>
+<td class="left">oo</td>
+<td class="left">-weak</td>
+<td class="left">this is not useful yet (i think brx uses it, and it does define vo,ru,na,ti)</td>
+</tr>
+
+<tr>
+<td class="left">os</td>
+<td class="left">-weak</td>
+<td class="left">os.thisdir TODO: port python style stuff</td>
+</tr>
+
+<tr>
+<td class="left">posix</td>
+<td class="left">-weak</td>
+<td class="left">only has 1 function: posix.time -&gt; int64 TODO: either expand or delet this</td>
+</tr>
+
+<tr>
+<td class="left">sq</td>
+<td class="left">2.7.1</td>
+<td class="left">generic sequences / interfaces. I like this but it won't compile in 2.6.2 :/</td>
+</tr>
+
+<tr>
+<td class="left">stacks</td>
+<td class="left">style</td>
+<td class="left">generic stacks. TODO: extract interface&#x2026; object -&gt; class</td>
+</tr>
+
+<tr>
+<td class="left">stri</td>
+<td class="left">-old</td>
+<td class="left">string routines. TODO: cf <a href="http://freepascal.org/docs-html/rtl/strutils/">http://freepascal.org/docs-html/rtl/strutils/</a></td>
+</tr>
+
+<tr>
+<td class="left">tm</td>
+<td class="left">-silly</td>
+<td class="left">my old "startdate" date format :) (see output of this)</td>
+</tr>
+
+<tr>
+<td class="left">ui</td>
+<td class="left">mixed</td>
+<td class="left">tex-based/semigraphic UI widgets . Good stuff but needs work.</td>
+</tr>
+
+<tr>
+<td class="left">utf8</td>
+<td class="left">-weak</td>
+<td class="left">rudimentary utf8 encode/decode. probably not useful.</td>
+</tr>
+
+<tr>
+<td class="left">vid</td>
+<td class="left">(dup)</td>
+<td class="left">ovelaps with vt</td>
+</tr>
+
+<tr>
+<td class="left">vt</td>
+<td class="left">..</td>
+<td class="left">virtual terminal + interface. mostly good/working. TODO: write/writeln</td>
+</tr>
+
+<tr>
+<td class="left">xpc</td>
+<td class="left">&#x2026;</td>
+<td class="left">general handy routines</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> <span class="todo TODO">TODO</span> generate links for these</h2>
+</div>
+</div>
+</body>
+</html>
