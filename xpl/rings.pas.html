@@ -1,0 +1,828 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>rings</title>
+<!-- 2013-06-12 Wed 09:27 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal"/>
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">rings</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Introduction</a></li>
+<li><a href="#sec-2">2. About the implementation</a></li>
+<li><a href="#sec-3">3. Types of Node</a>
+<ul>
+<li><a href="#sec-3-1">3.1. Link Nodes are just abstract ring members</a></li>
+<li><a href="#sec-3-2">3.2. Item Nodes contain values.</a></li>
+<li><a href="#sec-3-3">3.3. RingNodes contain child rings</a></li>
+<li><a href="#sec-3-4">3.4. Clasp Nodes serve as sentinel values in the ring.</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. <code>GRingCursor</code> : walks the structure</a></li>
+<li><a href="#sec-5">5. <code>GRing</code> the main ring type</a></li>
+<li><a href="#sec-6">6. OUTPUT <code>rings.pas</code></a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+The <code>rings</code> module implements an unusual nested ring structure. As far as I know, it isn't well known in computer science, and may not even have a name, although it is a specific instance of a <i>strange loop</i>. I tend to call it a <i>chandelier</i> or <i>ring tree</i> when describing its shape, or a <i>jumptree</i> when describing its function.
+</p>
+
+<p>
+Strictly speaking, a jumptree is a cyclic graph and therefore is not actually a tree, but it is a well-behaved graph that can be used like a tree.
+</p>
+
+<p>
+Its topology is described by the following rules:
+</p>
+
+<ul class="org-ul">
+<li>the root of the tree is replaced with a <b>hub</b>, which is like the root of a tree in every way <i>except</i> that it has a special parent node called a <b>mirror node</b>, (which we will get to in  moment).
+</li>
+<li>each node forms a doubly-linked list (or <b>ring</b>) with its siblings
+</li>
+<li>each ring has exactly one <b>clasp node</b>, which serves as a sentinel value when looping.
+</li>
+<li>it follows from the above four rules that the hub forms a ring with itself and therefore must be a clasp.
+</li>
+<li>every leaf in the tree has a unique mirror node for its child
+</li>
+<li>every mirror node has a unique leaf node for a parent
+</li>
+<li>leaf nodes and mirror nodes share a one-to-one relationship.
+</li>
+<li><i>mirror</i> nodes are arranged in a special ring called the <i>rim</i>
+</li>
+<li>all siblings share the same parent, <i>except</i> for mirror nodes.
+</li>
+<li>the child of each mirror nodes is the hub.
+</li>
+<li>the child node of a clasp may be any non-mirror node.
+</li>
+<li>by default, the child of a clasp is the clasp itself
+</li>
+</ul>
+
+<p>
+There are some interesting implications to these rules:
+</p>
+
+<ul class="org-ul">
+<li>It is possible to reach a parent node by moving <i>downward</i> through the tree until you reach the rim, then passing "through the mirror" to the hub, and walking back down to the parent node.
+</li>
+<li>Each node is connected to exactly four edges
+</li>
+<li>There are no null pointers involved.
+</li>
+</ul>
+
+<p>
+The jumptree is well suited for situations where you need to need to traverse a tree in arbitrary directions.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> About the implementation</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Since all siblings share a parent, only clasp nodes actually need a parent pointer. You can find the parent of any node simply by walking the ring of siblings until you reach the clasp.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Types of Node</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Nodes can be composed like blocks.
+</p>
+</div>
+
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> Link Nodes are just abstract ring members</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="node-types"><span style="color: #66f;">{ </span><span style="color: #66f;">TLinkNode : link class with .nextLink, .prevLink </span><span style="color: #66f;">}</span>
+GLinkNode = <span style="color: #ff00ff;">class</span>
+  nextLink, prevLink : GLinkNode;
+  <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">create</span>;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">length</span> : cardinal; <span style="color: #00ffff;">virtual</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Item Nodes contain values.</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="node-types">GCellNode = <span style="color: #ff00ff;">class</span>( GLinkNode )
+<span style="color: #00ffff;">protected</span>
+  _val : t;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">_set</span>( v : t );
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">_get</span> : T;
+ <span style="color: #00ffff;">public</span>
+  <span style="color: #00ffff;">property</span> value : T <span style="color: #00ffff;">read</span> _get <span style="color: #00ffff;">write</span> _set;
+  <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">create</span>( v : t );
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">length</span> : cardinal; <span style="color: #00ffff;">override</span>;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">is_clasp</span> : <span style="color: #ff00ff;">boolean</span>; <span style="color: #00ffff;">virtual</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><span class="section-number-3">3.3</span> RingNodes contain child rings</h3>
+<div class="outline-text-3" id="text-3-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="node-types"><span style="color: #66f;">{ </span><span style="color: #66f;">allow creation of nested lists (trees) </span><span style="color: #66f;">}</span>
+GRingNode = <span style="color: #ff00ff;">class</span> ( GLinkNode )
+   items : GRing;
+   <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">create</span>;
+   <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">length</span> : cardinal; <span style="color: #00ffff;">override</span>;
+ <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><span class="section-number-3">3.4</span> Clasp Nodes serve as sentinel values in the ring.</h3>
+<div class="outline-text-3" id="text-3-4">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="node-types"><span style="color: #66f;">{ </span><span style="color: #66f;">list.TClaspNode : a special node that joins the ends of the list </span><span style="color: #66f;">}</span>
+<span style="color: #66f;">{ </span><span style="color: #66f;">It's only a cell node because that made the implementation of </span>
+<span style="color: #66f;">  the cursor simpler. Probably there's a better design involving</span>
+<span style="color: #66f;">  nterfaces, though. </span><span style="color: #66f;">}</span>
+<span style="color: #66f;">// </span><span style="color: #66f;">&#7; TODO : refactor the node class hierarchy</span>
+GClaspNode = <span style="color: #ff00ff;">class</span>( GCellNode )
+  parent : GLinkNode;
+  <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">create</span>;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">length</span> : cardinal; <span style="color: #00ffff;">override</span>;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">is_clasp</span> : <span style="color: #ff00ff;">boolean</span>; <span style="color: #00ffff;">override</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> <code>GRingCursor</code> : walks the structure</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+As an alternative to looking up the parent nodes, if you started at the hub and are walking downward, you can simply maintain a stack of parent nodes. This module provides a <code>GRingCursor</code> for maintaining such a stack.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="GRingCursor"><span style="color: #66f;">{ </span><span style="color: #66f;">tracks a position in the list, even through inserts/deletes </span><span style="color: #66f;">}</span>
+<span style="color: #ff00ff;">type</span> GRingCursor = <span style="color: #ff00ff;">class</span>
+  <span style="color: #ff00ff;">type</span> SNodeStack = specialize stacks.GStack&lt;GCellNode&gt;;
+  <span style="color: #00ffff;">protected</span>
+    _ring  : SRingOfT; <span style="color: #66f;">// </span><span style="color: #66f;">the main list</span>
+    _cell  : GCellNode;
+    _idx  : cardinal;
+    _path : SNodeStack;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">_get_value</span> : T;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">_set_value</span>( v : T );
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">_get_index</span> : cardinal;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">nextcell</span> : GCellNode; <span style="color: #00ffff;">virtual</span>;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">prevcell</span> : GCellNode; <span style="color: #00ffff;">virtual</span>;
+  <span style="color: #00ffff;">public</span>
+    <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">create</span>( lis : SRingOfT );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">reset</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">to_top</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">to_end</span>;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">at_top</span> : <span style="color: #ff00ff;">boolean</span>;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">at_end</span> : <span style="color: #ff00ff;">boolean</span>;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">at_clasp</span> : <span style="color: #ff00ff;">boolean</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">move_to</span>( other : GRingCursor );
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">move_next</span> : <span style="color: #ff00ff;">boolean</span>;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">move_prev</span> : <span style="color: #ff00ff;">boolean</span>;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">next</span>( out t : T ) : <span style="color: #ff00ff;">boolean</span>;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">prev</span>( out t : T ) : <span style="color: #ff00ff;">boolean</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">inject_prev</span>( <span style="color: #ff00ff;">const</span> val : T );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">inject_next</span>( <span style="color: #ff00ff;">const</span> val : T );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">delete_next</span>;
+    <span style="color: #00ffff;">property</span> value : T <span style="color: #00ffff;">read</span> _get_value <span style="color: #00ffff;">write</span> _set_value;
+    <span style="color: #00ffff;">property</span> <span style="color: #00ffff;">index</span> : cardinal <span style="color: #00ffff;">read</span> _get_index;
+  <span style="color: #00ffff;">public</span>  <span style="color: #66f;">{ </span><span style="color: #66f;">for..in loop interface </span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">movenext</span> : <span style="color: #ff00ff;">boolean</span>;
+    <span style="color: #00ffff;">property</span> current  : t <span style="color: #00ffff;">read</span> _get_value;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> <code>GRing</code> the main ring type</h2>
+<div class="outline-text-2" id="text-5">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="GRing"><span style="color: #ff00ff;">type</span>
+  generic GRing&lt;t&gt; = <span style="color: #ff00ff;">class</span>
+
+    <span style="color: #00ffff;">private</span> <span style="color: #ff00ff;">type</span> 
+      &lt;&lt;@node-types&gt;&gt;
+      SRingOfT = specialize GRing&lt;t&gt;; <span style="color: #66f;">{ </span><span style="color: #66f;">internal name for this type </span><span style="color: #66f;">}</span>
+      SNodeStack = specialize stacks.GStack&lt;GCellNode&gt;;
+      &lt;&lt;GRingCursor&gt;&gt;
+
+    <span style="color: #00ffff;">public</span> <span style="color: #66f;">{ </span><span style="color: #66f;">procedure types used by foreach, find </span><span style="color: #66f;">}</span>
+      <span style="color: #ff00ff;">type</span> GNodeAction = procedure( <span style="color: #ff00ff;">var</span> n : T ) <span style="color: #00ffff;">is</span> nested;
+      <span style="color: #ff00ff;">type</span> GNodePredicate = function( n : T ) : <span style="color: #ff00ff;">Boolean</span> <span style="color: #00ffff;">is</span> nested;
+
+    <span style="color: #00ffff;">protected</span>
+      _clasp : GClaspNode; <span style="color: #66f;">// </span><span style="color: #66f;">holds the two ends together</span>
+      _count : cardinal;
+      <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">FindNext</span>( <span style="color: #ff00ff;">const</span> start : GCellNode; 
+                           <span style="color: #ff00ff;">var</span> p     : SNodeStack; out v : GCellNode ) : <span style="color: #ff00ff;">boolean</span>;
+      <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">FindPrev</span>( <span style="color: #ff00ff;">const</span> start : GCellNode; 
+                           <span style="color: #ff00ff;">var</span> p     : SNodeStack; out v : GCellNode ) : <span style="color: #ff00ff;">boolean</span>;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">firstcell</span>: GCellNode;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">lastcell</span>: GCellNode;
+   <span style="color: #00ffff;">public</span>
+    <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">create</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">append</span>( val : T );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">insert</span>( val : T );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">insert_at</span>( val : T;  at_index : cardinal = 0 );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">remove</span>( val : T );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">drop</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">foreach</span>( action : GNodeAction );
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">find</span>( pred : GNodePredicate ) : T;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">is_empty</span>: <span style="color: #ff00ff;">boolean</span>;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">first</span> : T;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">last</span> : T;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">make_cursor</span> : GRingCursor;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">length</span> : cardinal;
+
+    <span style="color: #66f;">{ </span><span style="color: #66f;">-- interface for for..in loops -- </span><span style="color: #66f;">}</span>
+   <span style="color: #00ffff;">public</span>
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">getenumerator</span> : GRingCursor;
+
+    <span style="color: #66f;">{ </span><span style="color: #66f;">-- ancient deprecated interface -- </span><span style="color: #66f;">}</span>
+   <span style="color: #00ffff;">public</span>
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">next</span>( <span style="color: #ff00ff;">const</span> n : T ) : T; deprecated;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">prev</span>( <span style="color: #ff00ff;">const</span> n : T ) : T; deprecated;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">empty</span>: <span style="color: #ff00ff;">boolean</span>; deprecated;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">foreachdo</span>( what : GNodeAction ); deprecated;
+    <span style="color: #66f;">// </span><span style="color: #66f;">&#7; procedure killall; deprecated;</span>
+  <span style="color: #00ffff;">end</span>;
+&#12;
+<span style="color: #00ffff;">implementation</span>
+
+  <span style="color: #66f;">{ </span><span style="color: #66f;">-- link ( internal type ) -- </span><span style="color: #66f;">}</span>
+
+  <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GRing.GLinkNode.create</span>;
+  <span style="color: #00ffff;">begin</span>
+    self.nextlink := nil;
+    self.prevlink := nil;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GLinkNode.length</span> : cardinal;
+  <span style="color: #00ffff;">begin</span>
+    result := 0;
+  <span style="color: #00ffff;">end</span>;
+&#12;
+
+  <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GRing.GCellNode.create</span>( v : t );
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">inherited</span> create;
+    self.value := v;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.GCellNode._set</span>( v : T );
+  <span style="color: #00ffff;">begin</span> self._val := v;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GCellNode._get</span> : T;
+  <span style="color: #00ffff;">begin</span> result := self._val;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GCellNode.is_clasp</span> : <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">begin</span>
+    result := false;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GCellNode.length</span> : cardinal;
+  <span style="color: #00ffff;">begin</span>
+    result := 1;
+  <span style="color: #00ffff;">end</span>;
+&#12;
+  <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GRing.GClaspNode.create</span>;
+  <span style="color: #00ffff;">begin</span>
+    self.nextlink := self;
+    self.prevlink := self;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GClaspNode.is_clasp</span> : <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">begin</span>
+    result := true;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GClaspNode.length</span> : cardinal;
+  <span style="color: #00ffff;">begin</span>
+    result := 0;
+  <span style="color: #00ffff;">end</span>;
+
+&#12;
+  <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingNode.create</span>;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">inherited</span> create;
+    items := SRingOfT.create;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingNode.length</span> : cardinal;
+  <span style="color: #00ffff;">begin</span>
+    result := items.length;
+  <span style="color: #00ffff;">end</span>;
+
+&#12;
+  <span style="color: #66f;">{ </span><span style="color: #66f;">-- list cursor ( internal type ) -- </span><span style="color: #66f;">}</span>
+
+  <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.Create</span>( lis : SRingOfT );
+  <span style="color: #00ffff;">begin</span>
+    _ring := lis;
+    <span style="color: #66f;">// </span><span style="color: #66f;">&#7; todo: use a dynamically resizable stack</span>
+    _path := SNodeStack.Create( kMaxDepth );
+    self.reset;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.reset</span>;
+  <span style="color: #00ffff;">begin</span>
+    _cell := _ring._clasp;
+    _idx := 0;
+  <span style="color: #00ffff;">end</span>;
+&#12;
+  <span style="color: #66f;">// </span><span style="color: #66f;">default implementation does a depth-first walk of the tree</span>
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.nextcell</span> : GCellNode;
+  <span style="color: #00ffff;">begin</span>
+    _ring.FindNext( _cell, _path, result )
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.prevcell</span> : GCellNode;
+  <span style="color: #00ffff;">begin</span>
+    _ring.FindPrev( _cell, _path, result )
+  <span style="color: #00ffff;">end</span>;
+&#12;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.move_next</span> : <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> _ring.is_empty <span style="color: #00ffff;">then</span> result := false
+    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">begin</span>
+      _cell := self.nextcell;
+      inc( _idx );
+      result := ( _cell &lt;&gt; _ring._clasp );
+    <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.next</span>( out t : t ) : <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">begin</span>
+    result := self.move_next;
+    <span style="color: #00ffff;">if</span> result <span style="color: #00ffff;">then</span> t := _cell.value;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #66f;">{ </span><span style="color: #66f;">this is only here to allow for..in loops </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.movenext</span> : <span style="color: #ff00ff;">boolean</span>; <span style="color: #00ffff;">inline</span>;
+  <span style="color: #00ffff;">begin</span> result := self.move_next
+  <span style="color: #00ffff;">end</span>;
+
+&#12;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.move_prev</span> : <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> _ring.is_empty <span style="color: #00ffff;">then</span> result := false
+    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">begin</span>
+      _cell := self.prevcell;
+      <span style="color: #00ffff;">if</span> _idx = 0 <span style="color: #00ffff;">then</span> _idx := _ring.length <span style="color: #00ffff;">else</span> dec( _idx );
+      result := ( _cell &lt;&gt; _ring._clasp );
+    <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">GRing.cursor.move_prev </span><span style="color: #66f;">}</span>
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.prev</span>( out t : t ) : <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">begin</span>
+    result := self.move_prev;
+    <span style="color: #00ffff;">if</span> result <span style="color: #00ffff;">then</span> t := _cell.value;
+  <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">GRing.cursor.prev </span><span style="color: #66f;">}</span>
+
+&#12;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.to_top</span>;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> _ring.is_empty <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">raise</span> Exception.create(<span style="color: #00ff00;">'no top item to go to'</span>)
+    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">begin</span>
+      self.reset;
+      self.move_next
+    <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.to_end</span>;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> _ring.is_empty <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">raise</span> Exception.create(<span style="color: #00ff00;">'no end item to go to'</span>)
+    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">begin</span>
+      self.reset;
+      self.move_prev
+    <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.at_top</span> : <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">begin</span>
+    result := (self.prevcell = _ring._clasp) <span style="color: #00ffff;">and</span> <span style="color: #00ffff;">not</span> _ring.is_empty;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.at_end</span> : <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">begin</span>
+    result := (self.nextcell = _ring._clasp) <span style="color: #00ffff;">and</span> <span style="color: #00ffff;">not</span> _ring.is_empty;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.at_clasp</span> : <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">begin</span>
+    result := (self._cell = _ring._clasp);
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.move_to</span>( other : GRingCursor );
+  <span style="color: #00ffff;">begin</span>
+    _cell := other._cell;
+    _idx := other._idx;
+    _ring := other._ring;
+  <span style="color: #00ffff;">end</span>;
+&#12;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor._get_value</span> : t;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> _cell = _ring._clasp <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">raise</span> Exception.create(
+              <span style="color: #00ff00;">'can''t get value at the clasp. move the cursor.'</span> )
+    <span style="color: #00ffff;">else</span> result := _cell.value
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor._set_value</span>( v : t );
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> _cell = _ring._clasp <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">raise</span> Exception.create(
+              <span style="color: #00ff00;">'can''t set value at the clasp. move the cursor.'</span> )
+    <span style="color: #00ffff;">else</span> _cell.value := v
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor._get_index</span> : cardinal;
+  <span style="color: #00ffff;">begin</span>
+    result := _idx;
+  <span style="color: #00ffff;">end</span>;
+&#12;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.inject_prev</span>( <span style="color: #ff00ff;">const</span> val : T );
+    <span style="color: #ff00ff;">var</span> ln : GLinkNode;
+  <span style="color: #00ffff;">begin</span>
+    inc( self._ring._count );
+    inc( self._idx );
+    ln := GCellNode.Create( val );
+    ln.nextlink := self._cell;
+    ln.prevlink := self._cell.prevlink;
+    self._cell.prevlink.nextlink := ln;
+    self._cell.prevlink := ln;
+  <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">GRing.cursor.inject_prev </span><span style="color: #66f;">}</span>
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.inject_next</span>( <span style="color: #ff00ff;">const</span> val : T );
+    <span style="color: #ff00ff;">var</span> ln : GLinkNode;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #66f;">// </span><span style="color: #66f;">we don't increase the index here because we're injecting *after*</span>
+    inc( self._ring._count );
+    ln := GCellNode.Create( val );
+    ln.prevlink := self._cell;
+    ln.nextlink := self._cell.nextlink;
+    self._cell.nextlink.prevlink := ln;
+    self._cell.nextlink := ln;
+  <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">GRing.cursor.inject_next </span><span style="color: #66f;">}</span>
+&#12;
+  <span style="color: #66f;">// </span><span style="color: #66f;">&#7; this is probably leaking memory. how to deal with pointers?</span>
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.GRingCursor.delete_next</span>;
+    <span style="color: #ff00ff;">var</span> temp : GLinkNode;
+  <span style="color: #00ffff;">begin</span>
+    temp := self._cell.nextlink;
+    <span style="color: #00ffff;">if</span> temp &lt;&gt; self._ring._clasp <span style="color: #00ffff;">then</span>
+    <span style="color: #00ffff;">begin</span>
+      self._cell.nextlink := temp.nextlink;
+      self._cell.nextlink.prevlink := self._cell;
+      temp.nextlink := nil;
+      temp.prevlink := nil;
+      <span style="color: #66f;">// </span><span style="color: #66f;">todo: temp.free</span>
+    <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">end</span>;
+&#12;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.make_cursor</span> : GRingCursor;
+  <span style="color: #00ffff;">begin</span>
+    result := GRingCursor.Create( self )
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.length</span> : cardinal;
+    <span style="color: #ff00ff;">var</span> ln : GLinkNode;
+  <span style="color: #00ffff;">begin</span>
+    result := 0;
+    ln := _clasp;
+    <span style="color: #00ffff;">repeat</span>
+      inc( result, ln.length );
+      ln := ln.nextlink;
+    <span style="color: #00ffff;">until</span> ln = _clasp;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #66f;">{ </span><span style="color: #66f;">this allows 'for .. in' in the fpc / delphi compilers </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.getenumerator</span>: GRingCursor;
+  <span style="color: #00ffff;">begin</span>
+    result := self.make_cursor
+  <span style="color: #00ffff;">end</span>;
+
+&#12;
+<span style="color: #66f;">{</span><span style="color: #66f;">-- public 'list' type --</span><span style="color: #66f;">}</span>
+
+  <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">GRing.create</span>;
+  <span style="color: #00ffff;">begin</span>
+    _clasp := GClaspNode.Create;
+    _count := 0;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.find</span>( pred : GNodePredicate ) : t;
+    <span style="color: #ff00ff;">var</span> cur : GRingCursor; found : <span style="color: #ff00ff;">boolean</span> = false;
+  <span style="color: #00ffff;">begin</span>
+    cur := self.make_cursor;
+    cur.to_top;
+    <span style="color: #00ffff;">repeat</span>
+      found := pred( cur.value )
+    <span style="color: #00ffff;">until</span> found <span style="color: #00ffff;">or</span> <span style="color: #00ffff;">not</span> cur.move_next;
+    <span style="color: #00ffff;">if</span> found <span style="color: #00ffff;">then</span> result := cur.value
+  <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">find </span><span style="color: #66f;">}</span>
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.foreachdo</span>( what : GNodeAction ); <span style="color: #00ffff;">inline</span>; deprecated;
+  <span style="color: #00ffff;">begin</span> foreach( what )
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.foreach</span>( action : GNodeAction );
+    <span style="color: #ff00ff;">var</span> item : T;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">for</span> item <span style="color: #00ffff;">in</span> self <span style="color: #00ffff;">do</span> action( item );
+  <span style="color: #00ffff;">end</span>;
+
+&#12;
+  <span style="color: #66f;">{ </span><span style="color: #66f;">insert : add to the start of the list, right after the clasp </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.insert</span>( val : T );
+    <span style="color: #ff00ff;">var</span> ln : GCellNode;
+  <span style="color: #00ffff;">begin</span>
+    inc(_count);
+    ln := GCellNode.Create( val );
+    ln.prevlink := _clasp;
+    ln.nextlink := _clasp.nextlink;
+    _clasp.nextlink.prevlink := ln;
+    _clasp.nextlink := ln;
+  <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">insert </span><span style="color: #66f;">}</span>
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.insert_at</span>( val : T; at_index : cardinal );
+    <span style="color: #ff00ff;">var</span> cur : GRingCursor;
+  <span style="color: #00ffff;">begin</span>
+    cur := self.make_cursor;
+    <span style="color: #00ffff;">if</span> at_index &gt;= length <span style="color: #00ffff;">then</span> cur.to_end
+    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">while</span> cur.<span style="color: #00ffff;">index</span> &lt; at_index <span style="color: #00ffff;">do</span> cur.move_next;
+    cur.inject_next( val );
+  <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">insert_at </span><span style="color: #66f;">}</span>
+
+  <span style="color: #66f;">{ </span><span style="color: #66f;">append : add to the end of the list, right before the clasp </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.append</span>( val : T );
+    <span style="color: #ff00ff;">var</span> ln : GLinkNode;
+  <span style="color: #00ffff;">begin</span>
+    inc(_count);
+    ln := GCellNode.Create( val );
+    ln.nextlink := _clasp;
+    ln.prevlink := _clasp.prevlink;
+    _clasp.prevlink.nextlink := ln;
+    _clasp.prevlink := ln;
+  <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">append </span><span style="color: #66f;">}</span>
+&#12;
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.remove</span>( val : T );
+    <span style="color: #ff00ff;">var</span> c : GRingCursor; found : <span style="color: #ff00ff;">boolean</span> = false;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">not</span> self.is_empty <span style="color: #00ffff;">then</span> pass
+    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">begin</span>
+      c := self.make_cursor;
+      <span style="color: #00ffff;">repeat</span>
+        c.move_next;
+        found := c.value = val;
+      <span style="color: #00ffff;">until</span> found <span style="color: #00ffff;">or</span> c.at_end;
+      <span style="color: #00ffff;">if</span> found <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">begin</span>
+        c.move_prev;
+        c.delete_next
+      <span style="color: #00ffff;">end</span>
+    <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">remove </span><span style="color: #66f;">}</span>
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing.drop</span>;
+    <span style="color: #ff00ff;">var</span> temp : GLinkNode;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> is_empty <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">raise</span> Exception.create(<span style="color: #00ff00;">'attempted to drop from empty list'</span>)
+    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">begin</span>
+      temp := _clasp.prevlink;
+      _clasp.prevlink := _clasp.prevlink.prevlink;
+      temp.prevlink := nil;
+      temp.nextlink := nil;
+      temp.free;
+    <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">end</span>;
+&#12;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.is_empty</span> : <span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #00ffff;">begin</span> result := _count = 0
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.FindNext</span>(
+    <span style="color: #ff00ff;">const</span> start : GCellNode; <span style="color: #ff00ff;">var</span> p : SNodeStack; out v : GCellNode ) : <span style="color: #ff00ff;">boolean</span>;
+    <span style="color: #ff00ff;">var</span> ln : GLinkNode;
+  <span style="color: #00ffff;">begin</span>
+    result := false;
+    ln := start;
+    <span style="color: #00ffff;">repeat</span>
+      ln := ln.nextlink;
+      <span style="color: #00ffff;">if</span> ( ln <span style="color: #00ffff;">is</span> GCellNode ) <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">with</span> ln <span style="color: #00ffff;">as</span> GCellNode <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">begin</span>
+        p.push( ln <span style="color: #00ffff;">as</span> GRingNode );
+        <span style="color: #00ffff;">if</span> items.length = 0 <span style="color: #00ffff;">then</span> ln := ln.nextlink
+        <span style="color: #00ffff;">else</span> ln := items._clasp
+      <span style="color: #00ffff;">end</span>
+      <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> ln <span style="color: #00ffff;">is</span> GClaspNode <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">begin</span>
+        <span style="color: #00ffff;">if</span> p.count &gt; 0 <span style="color: #00ffff;">then</span> ln := p.pop
+        <span style="color: #00ffff;">else</span> ln := _clasp
+      <span style="color: #00ffff;">end</span>
+      <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> ln <span style="color: #00ffff;">is</span> GCellNode <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">begin</span>
+        result := true;
+        v := ln <span style="color: #00ffff;">as</span> GCellNode;
+      <span style="color: #00ffff;">end</span>
+    <span style="color: #00ffff;">until</span> result <span style="color: #00ffff;">or</span> ( ln = _clasp );
+    v := ln <span style="color: #00ffff;">as</span> GCellNode;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #66f;">{ </span><span style="color: #66f;">should be exactly the same as above but s/next/prev/g </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.FindPrev</span>(
+    <span style="color: #ff00ff;">const</span> start : GCellNode; <span style="color: #ff00ff;">var</span> p : SNodeStack; out v : GCellNode ) : <span style="color: #ff00ff;">boolean</span>;
+    <span style="color: #ff00ff;">var</span> ln : GLinkNode;
+  <span style="color: #00ffff;">begin</span>
+    result := false;
+    ln := start;
+    <span style="color: #00ffff;">repeat</span>
+      ln := ln.prevlink;
+      <span style="color: #00ffff;">if</span> ( ln <span style="color: #00ffff;">is</span> GRingNode ) <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">with</span> (ln <span style="color: #00ffff;">as</span> GRingNode) <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">begin</span>
+        p.push( ln <span style="color: #00ffff;">as</span> GRingNode );
+        <span style="color: #00ffff;">if</span> ( items.length = 0 ) <span style="color: #00ffff;">then</span> ln := ln.prevlink
+        <span style="color: #00ffff;">else</span> result := items.FindPrev(items._clasp, p, v )
+      <span style="color: #00ffff;">end</span>
+      <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> ln <span style="color: #00ffff;">is</span> GClaspNode <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">begin</span>
+        <span style="color: #00ffff;">if</span> p.count &gt; 0 <span style="color: #00ffff;">then</span> ln := p.pop
+        <span style="color: #00ffff;">else</span> ln := _clasp
+      <span style="color: #00ffff;">end</span>
+      <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> ln <span style="color: #00ffff;">is</span> GCellNode <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">begin</span>
+        result := true;
+        v := ln <span style="color: #00ffff;">as</span> GCellNode;
+      <span style="color: #00ffff;">end</span>
+    <span style="color: #00ffff;">until</span> result <span style="color: #00ffff;">or</span> ( ln = _clasp );
+    v := ln <span style="color: #00ffff;">as</span> GCellNode;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.FirstCell</span> : GCellNode;
+  <span style="color: #ff00ff;">var</span> p : SNodeStack;
+  <span style="color: #00ffff;">begin</span>
+    p := SNodeStack.Create( kMaxDepth );
+    <span style="color: #00ffff;">if</span> self.is_empty <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">raise</span> Exception.create(<span style="color: #00ff00;">'empty list has no first member.'</span>)
+    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">not</span> FindNext( _clasp, p, result ) <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">raise</span> Exception.create(<span style="color: #00ff00;">'nested empty list has no first member.'</span>)
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.First</span>: t;
+  <span style="color: #00ffff;">begin</span>
+    result := self.FirstCell.value;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.LastCell</span> : GCellNode;
+  <span style="color: #ff00ff;">var</span> p : SNodeStack;
+  <span style="color: #00ffff;">begin</span>
+    p := SNodeStack.Create( kMaxDepth );
+    <span style="color: #00ffff;">if</span> is_empty <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">raise</span> Exception.create(<span style="color: #00ff00;">'empty list has no last member.'</span>)
+    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">not</span> FindPrev( _clasp, p, result ) <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">raise</span> Exception.create(<span style="color: #00ff00;">'nested empty list has no last member.'</span>)
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.last</span>: T;
+  <span style="color: #00ffff;">begin</span>
+    result := self.lastcell.value;
+  <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">last </span><span style="color: #66f;">}</span>
+
+&#12;
+<span style="color: #66f;">{</span><span style="color: #66f;">-- deprecated list interface --</span><span style="color: #66f;">}</span>
+
+  <span style="color: #66f;">{ </span><span style="color: #66f;">this one is bad because "empty" can be a verb </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.empty</span> : <span style="color: #ff00ff;">boolean</span>; <span style="color: #00ffff;">inline</span>; deprecated;
+  <span style="color: #00ffff;">begin</span> result := self.is_empty;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #66f;">{ </span><span style="color: #66f;">i don't really see the point of these </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.next</span>( <span style="color: #ff00ff;">const</span> n: T ): T; <span style="color: #00ffff;">inline</span>; deprecated;
+  <span style="color: #00ffff;">begin</span>
+    die(<span style="color: #00ff00;">'do i really need GRing.nextn? '</span>);
+    result := n;
+  <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GRing.prev</span>( <span style="color: #ff00ff;">const</span> n: T): T; <span style="color: #00ffff;">inline</span>; deprecated;
+  <span style="color: #00ffff;">begin</span>
+    die(<span style="color: #00ff00;">'do i really need GRing.prev? '</span>);
+    result := n;
+  <span style="color: #00ffff;">end</span>;
+
+&#12;
+<span style="color: #00ffff;">initialization</span>
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> OUTPUT <code>rings.pas</code></h2>
+<div class="outline-text-2" id="text-6">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$mode objfpc</span><span style="color: #66f;">}{</span><span style="color: #66f;">$i xpc.inc</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">rings</span>;
+<span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">uses</span> xpc, sysutils, stacks;
+
+  <span style="color: #ff00ff;">const</span> kMaxDepth = 16;
+  &lt;&lt;GRing&gt;&gt;
+
+<span style="color: #00ffff;">implementation</span>
+
+  &lt;&lt;GLinkNode&gt;&gt;
+  &lt;&lt;GCellNode&gt;&gt;
+  &lt;&lt;GClaspNode&gt;&gt;
+  &lt;&lt;GRingNode&gt;&gt;
+  &lt;&lt;GRing&gt;&gt;
+
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
