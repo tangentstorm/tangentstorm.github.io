@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title></title>
-<!-- 2013-06-12 Wed 20:56 -->
+<!-- 2013-06-12 Wed 21:15 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -58,144 +58,308 @@ for the JavaScript code in this tag.
 <body>
 <div id="content">
 <h1 class="title"></h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. what's a mirror node?</a></li>
+<li><a href="#sec-2">2. what is the purpose of the data structure?</a></li>
+<li><a href="#sec-3">3. so you have item nodes, ring "parents", and special clasp type that marks the end of the ring and carries the parent pointer?</a></li>
+<li><a href="#sec-4">4. in ordinary computer science theory, you have to choose, a subroutine or a thread..not both</a></li>
+<li><a href="#sec-5">5. im asking if the tree levels represent subroutines or parallel threads</a></li>
+<li><a href="#sec-6">6. why do you imagine people leaving their job like that?</a></li>
+</ul>
+</div>
+</div>
 <p>
 <span class="timestamp-wrapper"><span class="timestamp">&lt;2013-06-12 Wed&gt;</span></span>
 </p>
 
 <p>
-13:03:26 sirdancealo3 i thing your structure is targeted at a lower level
-13:03:40 @tangentstorm What do you mean?
-13:04:06 sirdancealo3 whats a mirror node?
-13:04:42 @tangentstorm you get that there are a bunch of rings, and the rings form a tree, right?
-13:04:47 sirdancealo3 yeah
-13:04:59 @tangentstorm so not all the nodes in the rings have children
-13:05:15 @tangentstorm if a node has a child, then that child is a ring.
-13:05:25 @tangentstorm but not all nodes have children.
-13:05:39 @tangentstorm so in a normal tree, the nodes without children are the leaves.
-13:05:50 @tangentstorm each of those leaves is on one of the rings.
-13:05:52 @tangentstorm with me so far?
-13:08:12 @tangentstorm &#x2026;
-13:08:27 sirdancealo3 yeah
-13:08:27 sirdancealo3 a node is also a one man ring
-13:08:27 sirdancealo3 and a leaf is a node without children
-13:08:32 sirdancealo3 anyway..im not a math person..what is the purpose of the data structure?
-13:08:37 sirdancealo3 the use
-13:08:52 @tangentstorm sorry i seem to be lagging by like almost 2 mins according to weechat :(
-13:09:19 @tangentstorm see&#x2026; the tree contains a program
-13:09:25 @tangentstorm each ring is a loop.
-13:09:33 @tangentstorm each node contains an instruction.
-13:10:01 @tangentstorm multiple rings represent multiple concurrent tasks.
-13:10:30 @tangentstorm but if you only have one turist (instruction pointer&#x2026;)
-13:10:33 sirdancealo3 The jumptree is well suited for situations where you need to need to traverse a tree
-in arbitrary directions.
-13:10:42 @tangentstorm then you need to switch between those concurrent tasks.
-13:11:49 @tangentstorm Since every downward link points to a node on a ring, the downward links can rotate
-to point to different items.
-13:11:53 sirdancealo3 so you have item nodes, ring "parents", and special clasp type that marks the end of
-the ring and carries the parent pointer
-13:12:36 sirdancealo3 sorry for interrupting
-13:12:47 @tangentstorm item = instruction&#x2026; parent = subroutine call&#x2026; clasp = return from routine / go
-back to top of loop
-13:13:45 sirdancealo3 in ordinary computer science theory, you have to choose, a subroutine or a
-thread..not both
-13:13:51 @tangentstorm the rim is simply a linked list of all the leaf nodes in a single ring.
-13:14:47 @tangentstorm subroutines and threads are different things.
-13:15:08 sirdancealo3 but it could be sort of a synchronization&#x2026;structure&#x2026;thing..
-13:15:33 @tangentstorm a thread is basically a virtual instruction pointer / cpu&#x2026; it's a thing that
-moves around the tree of your source code.
-13:15:50 @tangentstorm a subroutine is the thing through which it moves.
-13:16:39 sirdancealo3 im asking if the tree levels represent subroutines or parallel threads
-13:17:06 @tangentstorm think of it as an org chart in the company.
+clarifying questions provided by sirdancealo3. :) 
 </p>
 
 
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> what's a mirror node?</h2>
+<div class="outline-text-2" id="text-1">
 <p>
-13:17:09 @tangentstorm a company.
-13:17:20 @tangentstorm each ring is a department or job
-13:17:54 @tangentstorm so it's likea  a routine that needs to be populated with workers
-13:18:00 @tangentstorm worker = thread.
-13:18:43 @tangentstorm if the company is fully staffed then each job is filled by a dedicated worker.
-13:19:02 @tangentstorm if the company is not fully staffed then some workers must fill multiple jobs.
-13:19:08 @tangentstorm (multi-tasking)
-13:19:51 sirdancealo3 ok
-13:19:53 @tangentstorm but suppose there is a job that many different people can do.
-13:20:12 @tangentstorm i could do step 1, and then get called away.
-13:20:24 @tangentstorm now i remeber that i'm about to do step 2, but you don't know that.
-13:20:40 @tangentstorm so even though you  can do the job you won't because it's already in progress and
-you don't know where i left it.
-13:20:58 sirdancealo3 :)
-13:21:20 @tangentstorm but suppose instead of keeping it in my head, the steps were arranged in a ring,
-and there was a pointer showing which one was next.
-13:21:38 @tangentstorm then i can just leave, and whoever shows up next can just start on step 2.
-13:22:15 @tangentstorm the child pointer serves this purpose.
-13:22:43 @tangentstorm or
-13:22:54 @tangentstorm the child pointer could just point at the clasp, which is the "start"
-13:23:04 @tangentstorm (also the end of course)
-13:23:19 @tangentstorm the clasp is allowed to have an arbitrary child
-13:23:33 @tangentstorm so as you walk the tree, you arrive at this clasp.
-13:23:51 @tangentstorm if the child of the clasp is not itself, then you start a new instance of the
-thread.
-13:24:08 sirdancealo3 mm
-13:24:19 @tangentstorm if the child of the clasp is one of its siblings, then there is work in progress
-and you can pick up on that job where the last guy left off.
-13:24:41 @tangentstorm (you close the door behind you by setting the clasp's child back to the clasp itself)
-13:24:44 @tangentstorm here's the thing
-13:24:48 sirdancealo3 why do you imagine people leaving their job like that?
-13:25:00 @tangentstorm it's just a metaphor.
-13:25:07 @tangentstorm but one reason is that the company is understaffed
-13:25:15 @tangentstorm and so they have to go do their other job.
-13:25:36 @tangentstorm here's the thing:
-13:25:52 @tangentstorm it doesn't matter whether you pick the next task to be done or start a new task.
-13:26:04 @tangentstorm your choice can be completely random.
-13:26:26 @tangentstorm because if you resume the previous task, the door closes behind you and the clasp
-now links back to itself.
-13:27:01 @tangentstorm so if you flip a coin and decide to walk down to the child node, you wind up back
-where you started immediately.
+you get that there are a bunch of rings, and the rings form a tree, right?
 </p>
 
 <p>
-13:27:09 @tangentstorm and are presented with the exact same choice again.
-13:27:40 @tangentstorm so you just keep looping until either your coin tells you to start a new instance
-13:28:08 @tangentstorm or some other worker sets the child pointer to resume a task that they're leaving.
-13:28:29 @tangentstorm now for the kicker&#x2026;
-13:28:46 sirdancealo3 mm
-13:28:50 @tangentstorm this property of being able to randomly choose to go forward or descend the tree&#x2026;
-13:29:11 @tangentstorm this same choice works no matter where you are in the tree.
-13:29:55 @tangentstorm that is why, when you reach the bottom, you are simply teleported back to the hub.
-13:30:06 @tangentstorm well.
-13:30:18 @tangentstorm except first you pass "through the looking glass"
-13:30:23 @tangentstorm (the mirror node)
-13:30:35 @tangentstorm which can randomly teleport you to any workstation (leaf node)
-13:30:44 @tangentstorm now there may not be anything to do there.
-13:30:50 @tangentstorm wait.
-13:30:54 @tangentstorm it's not randomly teleporting you.
-13:31:05 @tangentstorm you are randomly deciding whether to keep walking around the ring or not.
-13:31:27 @tangentstorm (on the mirror nodes, you have the aditional choice of going back through the
-mirror)
-13:31:33  * sirdancealo3 blinks
-13:31:47 sirdancealo3 you are gonna get rich when quantum computers arrive
-13:31:50 sirdancealo3 or ant computers
-13:31:50 @tangentstorm :D
-13:32:18 sirdancealo3 haha..no, its cool, dude
-13:33:00 @tangentstorm so basically all the working memory is stored in little tokens that are sitting
-around these nodes.. tokens = documenst, whatever&#x2026; whatever you would need to do
+so.. not all the nodes in the rings have children.
+</p>
+
+<p>
+if a node has a child, then that child is a ring.
+</p>
+
+<p>
+but not all nodes have children.
+</p>
+
+<p>
+so in a normal tree, the nodes without children are the leaves.
+</p>
+
+<p>
+each of those leaves is on one of the rings.
+</p>
+
+<p>
+we want the rim to be a ring of all the leaf nodes, but we can't break the rings that are already there.
+</p>
+
+<p>
+instead, we create a secondary node corresponding to each leaf, and link <i>those</i>.
+</p>
+
+<p>
+the name 'mirror' indicates both the 1-1 correspondence to the leaf nodes and also the idea of 'stepping through the looking glass', since going downward from a mirror node takes you back to the hub.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> what is the purpose of the data structure?</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+see&#x2026; the tree contains a program
+each ring is a loop.
+each node contains an instruction.
+multiple rings represent multiple concurrent tasks.
+but if you only have one turist (instruction pointer&#x2026;)
+then you need to switch between those concurrent tasks.
+</p>
+
+<p>
+Since every downward link points to a node on a ring, the downward links can rotate to point to different items.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> so you have item nodes, ring "parents", and special clasp type that marks the end of the ring and carries the parent pointer?</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+item = instruction&#x2026; 
+parent = subroutine call&#x2026; 
+clasp = return from routine / go back to top of loop
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> in ordinary computer science theory, you have to choose, a subroutine or a thread..not both</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+subroutines and threads are different things.
+</p>
+
+<p>
+a thread is basically a virtual instruction pointer / cpu&#x2026; it's a thing that moves around the tree of your source code.
+</p>
+
+<p>
+a subroutine is the thing through which it moves.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> im asking if the tree levels represent subroutines or parallel threads</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+think of it as an org chart in a company.
+</p>
+
+<p>
+each ring is a department or job
+</p>
+
+<p>
+so it's like a routine that needs to be populated with workers
+</p>
+
+<p>
+worker = thread.
+</p>
+
+<p>
+if the company is fully staffed, then each job is filled by a dedicated worker.
+</p>
+
+<p>
+if the company is not fully staffed, then some workers must fill multiple jobs. (multi-tasking)
+</p>
+
+<p>
+but suppose there is a job that many different people can do.
+</p>
+
+<p>
+i might do step 1, and then get called away.
+</p>
+
+<p>
+now, i remeber that i'm about to do step 2, but you don't know that.
+</p>
+
+<p>
+so even though you can do the job, you won't because it's already in progress and you don't know where i left it.
+</p>
+
+<p>
+but suppose instead of keeping it in my head, the steps were arranged in a ring, and there was a pointer showing which one was next.
+</p>
+
+<p>
+then i can just leave, and whoever shows up next can just start on step 2.
+</p>
+
+<p>
+the child pointer serves this purpose.
+</p>
+
+<p>
+or
+</p>
+
+<p>
+the child pointer could just point at the clasp, which is the "start"
+</p>
+
+<p>
+(also the end of course)
+</p>
+
+<p>
+the clasp is allowed to have an arbitrary child
+</p>
+
+<p>
+so as you walk the tree, you arrive at this clasp.
+</p>
+
+<p>
+if the child of the clasp is not itself, then you start a new instance of the thread.
+</p>
+
+<p>
+if the child of the clasp is one of its siblings, then there is work in progress and you can pick up on that job where the last guy left off.
+</p>
+
+<p>
+(you close the door behind you by setting the clasp's child back to the clasp itself)
+</p>
+
+<p>
+here's the thing
+</p>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> why do you imagine people leaving their job like that?</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+it's just a metaphor.
+</p>
+
+<p>
+but one reason is that the company is understaffed
+</p>
+
+<p>
+and so they have to go do their other job.
+</p>
+
+<p>
+here's the thing:
+</p>
+
+<p>
+it doesn't matter whether you pick the next task to be done or start a new task.
+</p>
+
+<p>
+your choice can be completely random.
+</p>
+
+<p>
+if you resume the previous task, the door closes behind you and the clasp now links back to itself.
+</p>
+
+<p>
+so if you flip a coin and decide to walk down to the child node, you wind up back where you started immediately.
+</p>
+
+<p>
+and are presented with the exact same choice again.
+</p>
+
+<p>
+so you just keep looping until either your coin tells you to start a new instance or some other worker sets the child pointer to resume a task that they're leaving.
+</p>
+
+<p>
+now for the kicker&#x2026;
+</p>
+
+<p>
+this property of being able to randomly choose to go forward or descend the tree&#x2026;
+</p>
+
+<p>
+this same choice works no matter where you are in the tree.
+</p>
+
+<p>
+that is why, when you reach the bottom, you are simply teleported back to the hub.
+</p>
+
+<p>
+well. except first you pass "through the looking glass" (the mirror node)
+</p>
+
+<p>
+which can randomly teleport you to any workstation (leaf node)
+</p>
+
+<p>
+now, there may not be anything to do there.
+</p>
+
+<p>
+wait.
+</p>
+
+<p>
+it's not randomly teleporting you.
+</p>
+
+<p>
+you are randomly deciding whether to keep walking around the ring or not.
+</p>
+
+<p>
+(on the mirror nodes, you have the aditional choice of going back through the mirror)
+</p>
+
+<p>
+so basically all the working memory is stored in little tokens that are sitting
+around these nodes.. tokens = documents, whatever&#x2026; whatever you would need to do
 in order to do the job at that workstation.
-13:33:29 @tangentstorm since all the data is stored in the tree, the computers can all be very dumb
-13:33:38 @tangentstorm and they don't need any ram of their own.
-13:33:45 @tangentstorm "ants" is a very good analogy.
-13:34:07 sirdancealo3 we should really build an ant computer
-13:34:12 @tangentstorm :)
-13:35:13 sirdancealo3 i dont follow about the ram thing
-13:36:11 sirdancealo3 and this whole thing is an integral part of your big project?
-13:36:29 sirdancealo3 its like, a better cpu architecture part?
-13:38:49 sirdancealo3 or is this just inside the forth VM&#x2026;
-14:05:44 @tangentstorm sorry got called away.
-14:06:51 @tangentstorm sirdancealo3: which ram thing? i will try to clarify :)
-14:07:23  * sirdancealo3 away now
-14:07:28 @tangentstorm but yeah, it's all part of the project.
-14:07:31 @tangentstorm ok.. later :)
-14:08:47 @tangentstorm should have said they don't need <i>much</i> ram
 </p>
+
+<p>
+since all the data is stored in the tree, the computers can all be very dumb, and hardly even need any ram at all.
+</p>
+
+<p>
+they only need to be smart enough to do the work in front of them and follow the instructions at that particular node.
+</p>
+</div>
+</div>
 </div>
 </body>
 </html>
