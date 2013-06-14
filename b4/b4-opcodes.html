@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title></title>
-<!-- 2013-06-14 Fri 08:13 -->
+<!-- 2013-06-14 Fri 08:18 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -134,12 +134,12 @@ The following is a small virtual machine with an instruction set inspired by the
     op : byte = 0; <span style="color: #66f;">{ </span><span style="color: #66f;">current opcode </span><span style="color: #66f;">}</span>
     po : byte = 0; <span style="color: #66f;">{ </span><span style="color: #66f;">previous opcode </span><span style="color: #66f;">}</span>
   <span style="color: #00ffff;">begin</span>
-    <span style="color: #00ffff;">while</span> <span style="color: #00ffff;">not</span> done <span style="color: #00ffff;">do</span>
+    <span style="color: #00ffff;">with</span> self <span style="color: #00ffff;">do</span>
       <span style="color: #00ffff;">begin</span>
-        op := ram[ ip ];
-        <span style="color: #66f;">{  }</span> <span style="color: #00ffff;">if</span> po <span style="color: #00ffff;">in</span> s4 <span style="color: #00ffff;">and</span> op <span style="color: #00ffff;">in</span> s3 <span style="color: #00ffff;">then</span> inc( t, ( op - $E0 ) * $1000 )
-        <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> po <span style="color: #00ffff;">in</span> s3 <span style="color: #00ffff;">and</span> op <span style="color: #00ffff;">in</span> s2 <span style="color: #00ffff;">then</span> inc( t, ( op - $C0 ) *   $40 )
-        <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> po <span style="color: #00ffff;">in</span> s2 <span style="color: #00ffff;">and</span> op <span style="color: #00ffff;">in</span> s1 <span style="color: #00ffff;">then</span> emit( t + op - $80 )
+        op := ram[ regs.p ];
+        <span style="color: #66f;">{  }</span> <span style="color: #00ffff;">if</span> po <span style="color: #00ffff;">in</span> s4 <span style="color: #00ffff;">and</span> op <span style="color: #00ffff;">in</span> s3 <span style="color: #00ffff;">then</span>  inc( regs.t, ( op - $E0 ) * $1000 )
+        <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> po <span style="color: #00ffff;">in</span> s3 <span style="color: #00ffff;">and</span> op <span style="color: #00ffff;">in</span> s2 <span style="color: #00ffff;">then</span>  inc( regs.t, ( op - $C0 ) *   $40 )
+        <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> po <span style="color: #00ffff;">in</span> s2 <span style="color: #00ffff;">and</span> op <span style="color: #00ffff;">in</span> s1 <span style="color: #00ffff;">then</span> emit( regs.t + op - $80 )
         <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> op <span style="color: #00ffff;">in</span> s0 <span style="color: #00ffff;">then</span> emit( op )
         <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> op <span style="color: #00ffff;">in</span> s1 <span style="color: #00ffff;">then</span> perform( opcodes[ op - $80 ])
         <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> op <span style="color: #00ffff;">in</span> s2 <span style="color: #00ffff;">then</span> push(( op - $C0 ) *    $40 )
