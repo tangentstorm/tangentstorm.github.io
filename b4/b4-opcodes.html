@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title></title>
-<!-- 2013-06-14 Fri 08:18 -->
+<!-- 2013-06-14 Fri 08:20 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="michal"/>
@@ -106,7 +106,7 @@ The following is a small virtual machine with an instruction set inspired by the
 
 <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">init</span>( self : machine );
   <span style="color: #00ffff;">begin</span>
-    <span style="color: #00ffff;">with</span> self.regs <span style="color: #00ffff;">do</span> 
+    <span style="color: #00ffff;">with</span> self.regs <span style="color: #00ffff;">do</span>
       <span style="color: #00ffff;">begin</span>
         t := 0; s := 0; r := 0; q := 0;
         p :=  $00; <span style="color: #66f;">{ </span><span style="color: #66f;">program counter starts here. </span>
@@ -136,6 +136,7 @@ The following is a small virtual machine with an instruction set inspired by the
   <span style="color: #00ffff;">begin</span>
     <span style="color: #00ffff;">with</span> self <span style="color: #00ffff;">do</span>
       <span style="color: #00ffff;">begin</span>
+        po := regs.q;
         op := ram[ regs.p ];
         <span style="color: #66f;">{  }</span> <span style="color: #00ffff;">if</span> po <span style="color: #00ffff;">in</span> s4 <span style="color: #00ffff;">and</span> op <span style="color: #00ffff;">in</span> s3 <span style="color: #00ffff;">then</span>  inc( regs.t, ( op - $E0 ) * $1000 )
         <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> po <span style="color: #00ffff;">in</span> s3 <span style="color: #00ffff;">and</span> op <span style="color: #00ffff;">in</span> s2 <span style="color: #00ffff;">then</span>  inc( regs.t, ( op - $C0 ) *   $40 )
@@ -146,7 +147,7 @@ The following is a small virtual machine with an instruction set inspired by the
         <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> op <span style="color: #00ffff;">in</span> s3 <span style="color: #00ffff;">then</span> push(( op - $E0 ) *  $1000 )
         <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> op <span style="color: #00ffff;">in</span> s4 <span style="color: #00ffff;">then</span> push(( op - $F0 ) * $40000 )
         <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> op <span style="color: #00ffff;">in</span> s5 <span style="color: #00ffff;">then</span> pass; <span style="color: #66f;">{ </span><span style="color: #66f;">ignore reserved bytecodes </span><span style="color: #66f;">}</span>
-        po := op;
+        regs.q := op;
       <span style="color: #00ffff;">end</span>;
   <span style="color: #00ffff;">end</span>;
 </pre>
