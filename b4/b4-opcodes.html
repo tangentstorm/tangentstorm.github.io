@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title></title>
+<!-- 2013-06-14 Fri 08:13 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal"/>
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title"></h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. b4-opcodes</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> b4-opcodes</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+The following is a small virtual machine with an instruction set inspired by the UTF-8 encoding.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">const</span>
+  s0 = [ $00 .. $7F ]; <span style="color: #66f;">{ </span><span style="color: #66f;">ascii character set </span><span style="color: #66f;">}</span>
+  s1 = [ $80 .. $BF ]; <span style="color: #66f;">{ </span><span style="color: #66f;">instructions </span><span style="color: #66f;">}</span>
+  s2 = [ $C0 .. $DF ]; <span style="color: #66f;">{ </span><span style="color: #66f;">start of 2-byte sequence </span><span style="color: #66f;">}</span>
+  s3 = [ $E0 .. $EF ]; <span style="color: #66f;">{ </span><span style="color: #66f;">start of 3-byte sequence </span><span style="color: #66f;">}</span>
+  s4 = [ $F0 .. $F4 ]; <span style="color: #66f;">{ </span><span style="color: #66f;">start of 4-byte sequence </span><span style="color: #66f;">}</span>
+  s5 = [ $F4 .. $FF ]; <span style="color: #66f;">{ </span><span style="color: #66f;">reserved </span><span style="color: #66f;">}</span>
+
+  kRamsize   = 65536; <span style="color: #66f;">{ </span><span style="color: #66f;">64k, or 2^16 </span><span style="color: #66f;">}</span>
+  kStackSize =  1024;
+
+<span style="color: #ff00ff;">type</span>
+  u32     = 0 .. 4294967295; <span style="color: #66f;">{ </span><span style="color: #66f;">2^32 - 1 </span><span style="color: #66f;">}</span>
+  stack   = <span style="color: #ff00ff;">array</span>[ 0 .. kStackSize - 1 ] <span style="color: #00ffff;">of</span> u32;
+  store   = <span style="color: #ff00ff;">array</span>[ 0 .. kRamSize - 1 ] <span style="color: #00ffff;">of</span> u32;
+
+  machine = <span style="color: #ff00ff;">record</span>
+              ram  : store;
+              data : stack;
+              addr : stack;
+              regs : <span style="color: #ff00ff;">record</span>
+                       t, s : u32; <span style="color: #66f;">{ </span><span style="color: #66f;">top and second values of the data stack </span><span style="color: #66f;">}</span>
+                       r    : u32; <span style="color: #66f;">{ </span><span style="color: #66f;">top value of the return stack </span><span style="color: #66f;">}</span>
+                       i, o : u32; <span style="color: #66f;">{ </span><span style="color: #66f;">input/output pointers </span><span style="color: #66f;">}</span>
+                       p    : u32; <span style="color: #66f;">{ </span><span style="color: #66f;">program counter (instructon pointer) </span><span style="color: #66f;">}</span>
+                       q    : u32; <span style="color: #66f;">{ </span><span style="color: #66f;">previous opcode </span><span style="color: #66f;">}</span>
+                     <span style="color: #00ffff;">end</span>;
+            <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">init</span>( self : machine );
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">with</span> self.regs <span style="color: #00ffff;">do</span> 
+      <span style="color: #00ffff;">begin</span>
+        t := 0; s := 0; r := 0; q := 0;
+        p :=  $00; <span style="color: #66f;">{ </span><span style="color: #66f;">program counter starts here. </span>
+<span style="color: #66f;">                     the first 256 bytes should therefore contain </span>
+<span style="color: #66f;">                     the bios </span><span style="color: #66f;">}</span>
+        i := $100; <span style="color: #66f;">{ </span><span style="color: #66f;">start of input buffer </span><span style="color: #66f;">}</span>
+        o := $200; <span style="color: #66f;">{ </span><span style="color: #66f;">start of output buffer </span><span style="color: #66f;">}</span>
+      <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">emit</span>( self : machine; u : u32 );
+  <span style="color: #00ffff;">begin</span>
+    self.ram[ self.regs.o ] := u;
+    inc( self.regs.o );
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">next</span>( self : machine ) : u32;
+  <span style="color: #00ffff;">begin</span>
+    result := self.ram[ self.regs.i ];
+    inc( self.regs.i )
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">step</span>( self : machine );
+  <span style="color: #ff00ff;">var</span>
+    op : byte = 0; <span style="color: #66f;">{ </span><span style="color: #66f;">current opcode </span><span style="color: #66f;">}</span>
+    po : byte = 0; <span style="color: #66f;">{ </span><span style="color: #66f;">previous opcode </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">while</span> <span style="color: #00ffff;">not</span> done <span style="color: #00ffff;">do</span>
+      <span style="color: #00ffff;">begin</span>
+        op := ram[ ip ];
+        <span style="color: #66f;">{  }</span> <span style="color: #00ffff;">if</span> po <span style="color: #00ffff;">in</span> s4 <span style="color: #00ffff;">and</span> op <span style="color: #00ffff;">in</span> s3 <span style="color: #00ffff;">then</span> inc( t, ( op - $E0 ) * $1000 )
+        <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> po <span style="color: #00ffff;">in</span> s3 <span style="color: #00ffff;">and</span> op <span style="color: #00ffff;">in</span> s2 <span style="color: #00ffff;">then</span> inc( t, ( op - $C0 ) *   $40 )
+        <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> po <span style="color: #00ffff;">in</span> s2 <span style="color: #00ffff;">and</span> op <span style="color: #00ffff;">in</span> s1 <span style="color: #00ffff;">then</span> emit( t + op - $80 )
+        <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> op <span style="color: #00ffff;">in</span> s0 <span style="color: #00ffff;">then</span> emit( op )
+        <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> op <span style="color: #00ffff;">in</span> s1 <span style="color: #00ffff;">then</span> perform( opcodes[ op - $80 ])
+        <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> op <span style="color: #00ffff;">in</span> s2 <span style="color: #00ffff;">then</span> push(( op - $C0 ) *    $40 )
+        <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> op <span style="color: #00ffff;">in</span> s3 <span style="color: #00ffff;">then</span> push(( op - $E0 ) *  $1000 )
+        <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> op <span style="color: #00ffff;">in</span> s4 <span style="color: #00ffff;">then</span> push(( op - $F0 ) * $40000 )
+        <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> op <span style="color: #00ffff;">in</span> s5 <span style="color: #00ffff;">then</span> pass; <span style="color: #66f;">{ </span><span style="color: #66f;">ignore reserved bytecodes </span><span style="color: #66f;">}</span>
+        po := op;
+      <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
