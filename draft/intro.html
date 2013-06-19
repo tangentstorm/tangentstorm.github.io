@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title></title>
+<!-- 2013-06-18 Tue 22:01 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="michal"/>
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title"></h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. There are four fundamental aspects to computation:</a>
+<ul>
+<li><a href="#sec-1-1">1.1. <i>State</i> : A computer has a state consisting of data that it can both modify and observe.</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. The state must be observable <i>and actually observed</i> by the computer itself.</a></li>
+<li><a href="#sec-1-1-2">1.1.2. The state must be modifiable by the computer itself.</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. <i>Sequence</i> : A computer performs a sequence of actions specified by its state.</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. shorten this</a></li>
+<li><a href="#sec-1-2-2">1.2.2. finish <i>sequence</i></a></li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. <i>Selection</i> : A computer chooses between different sequences of action, according to its state.</a></li>
+<li><a href="#sec-1-4">1.4. <i>Recursion</i> : A computer can repeat sequences of actions indefinitely.</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. footnote 7 (summarizing turings paper) should me moved to its own document</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><a id="ors8y7t0c5g0" name="ors8y7t0c5g0"></a><span class="section-number-2">1</span> There are four fundamental aspects to computation:</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><a id="orrag8t0c5g0" name="orrag8t0c5g0"></a><span class="section-number-3">1.1</span> <i>State</i> : A computer has a state consisting of data that it can both modify and observe.</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+For example, the state of its ram and the colors of the pixels on the screen and whether a motor is moving in a printer and so on.
+</p>
+
+<p>
+We can gather observers we can collect this data and notice that it changes over time.
+</p>
+
+<p>
+The arrangement of the data at a particular point in time is called a state.
+</p>
+
+<p>
+Only some of this state is important for computation.
+</p>
+</div>
+
+<div id="outline-container-sec-1-1-1" class="outline-4">
+<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> The state must be observable <i>and actually observed</i> by the computer itself.</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<p>
+For example, the state of the pixels on a desktop computer's monitor is an output of the computer, and it is part of the state, but it is irrelevant to computation. The video signal is simply an <i>output</i>. You can safely disconnect your computer's monitor without affecting the operation of the computer. (This is true even if you're using a touchscreen: the touchscreen is an input device but the video signal going out and the touch signals coming in are completely separate and not necessarily related. (For example, a touch event could be accidental and unknown to the user&#x2026; As anyone who has ever pocket-dialed a number on their cellphone can appreciate.))
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-1-2" class="outline-4">
+<h4 id="sec-1-1-2"><span class="section-number-4">1.1.2</span> The state must be modifiable by the computer itself.</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<p>
+The state of a keyboard or mouse is outside of the computer's control
+</p>
+
+<p>
+From a certain point of view, you can think of the combination of an electronic computer and a human user as a sort of cyborg computing system. From this point of view, the input/output devices <i>are</i> a form of state, because they are observable and modifiable by the human part of the system. But for our purposes we will be talking about actual, physical, computers, or simulations of physical computers. 
+</p>
+
+<p>
+When the computer receives a signal from a keyboard, they record it in memory and usually put it in a queue to be processed. Of course the "queue" is just an arbitrary section of the computer's RAM. Whoever programmed the computer decided how and where the keyboard events should be allocated, how many should be remembered, and what format would be used, and so on. There are many ways to do this, and in fact, it's common for different libraries to represent keyboard events in radically different ways, even when using the same programming language on the same computer.
+</p>
+
+<p>
+The fact that such choices are even possible is a result of the fact that the computer is able to observe and modify its data stores.
+</p>
+
+<p>
+So this is what we mean by <i>state</i>.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><a id="pkwaznu0c5g0" name="pkwaznu0c5g0"></a><span class="section-number-3">1.2</span> <i>Sequence</i> : A computer performs a sequence of actions specified by its state.</h3>
+<div class="outline-text-3" id="text-1-2">
+</div>
+
+<div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> <span class="todo TODO">TODO</span> shorten this</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<p>
+Any number of machines perform sequences of actions.
+</p>
+
+<p>
+Cuckoo Clocks can perform incredibly elaborate sequences of actions whose timings are controlled precisely by the rotatation of differently sized gears.
+</p>
+
+<p>
+Devices consisting of gears are even capable of very impressive feats, even performing computations.
+</p>
+
+<p>
+The first working mechanical calculator, the Pascaline, was a desk-sized device created in the 1700's by French mathematician Blaise Pascal, capable of performing basic arithmetic. <sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup> By the mid 20th century there were handheld mechanical calculators capable of performing complicated arithmetic such as square roots.<sup><a id="fnr.2" name="fnr.2" class="footref" href="#fn.2">2</a></sup>
+</p>
+
+<p>
+Mechanical devices were also capable of carrying out sophisticated operations like encryption. In fact one of the forces that lead to the rapid developement of electronic computers in the 1940's was the British and American need to decipher encrypted messages such as those produced by the Enigma machine. <sup><a id="fnr.3" name="fnr.3" class="footref" href="#fn.3">3</a></sup>
+</p>
+
+<p>
+There were also <i>programmable</i> mechanical devices. For example, the Jaquard Loom <sup><a id="fnr.4" name="fnr.4" class="footref" href="#fn.4">4</a></sup>, invented in 1801 was capable of producing a wide variety of patterns determined by holes punched into stiff paper cards.
+</p>
+
+<p>
+During World War II, while the early computer scientists were developing code-breaking machines in Bletchley Park, the great physicists of the time were hard at work in Los Alamos, using punch-card driven mechanical calculating devices to work through the complicated math involved in developing the atomic bomb. <sup><a id="fnr.5" name="fnr.5" class="footref" href="#fn.5">5</a></sup>
+</p>
+
+<p>
+All of these machines were fascinating, complicated devices, but they were not true computers. It was the British mathematician Alan Turing who first described a specification of a <i>universal</i> device capable of carrying out any conceivable compuation.
+</p>
+
+<p>
+Turing's computer was purely mathematical construct<sup><a id="fnr.6" name="fnr.6" class="footref" href="#fn.6">6</a></sup>,
+</p>
+
+<p>
+universal computer is a purely mathematical construct, and can never actually be built<sup><a id="fnr.7" name="fnr.7" class="footref" href="#fn.7">7</a></sup> and the bears only a superficial resemblence to the way modern electronic computers work, but 
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><a id="j1t1p700d5g0" name="j1t1p700d5g0"></a><span class="section-number-4">1.2.2</span> <span class="todo TODO">TODO</span> finish <i>sequence</i></h4>
+<div class="outline-text-4" id="text-1-2-2">
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> <span class="todo TODO">TODO</span> <i>Selection</i> : A computer chooses between different sequences of action, according to its state.</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+n:PROPERTIES:
+:TS:       <span class="timestamp-wrapper"><span class="timestamp">&lt;2013-06-18 12:41PM&gt;</span></span>
+:ID:       1lqairu0c5g0
+:END:n
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><a id="t3f5iqu0c5g0" name="t3f5iqu0c5g0"></a><span class="section-number-3">1.4</span> <span class="todo TODO">TODO</span> <i>Recursion</i> : A computer can repeat sequences of actions indefinitely.</h3>
+<div class="outline-text-3" id="text-1-4">
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><a id="gojkh700d5g0" name="gojkh700d5g0"></a><span class="section-number-2">2</span> <span class="todo TODO">TODO</span> footnote 7 (summarizing turings paper) should me moved to its own document</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
+<a href="http://www.youtube.com/watch?v=3h71HAJWnVU">Pascaline Video Demo</a>
+</p></div>
+
+<div class="footdef"><sup><a id="fn.2" name="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara">
+<a href="http://www.youtube.com/watch?v=HYsOi6L_Pw4">Curta Video</a>
+</p></div>
+
+<div class="footdef"><sup><a id="fn.3" name="fn.3" class="footnum" href="#fnr.3">3</a></sup> <p class="footpara">
+Neal Stephenson's <a href="http://www.cryptonomicon.com/">Cryptonomicon</a> offers an entertaining fictional view of the developement of computers and information theory during the war.
+</p></div>
+
+<div class="footdef"><sup><a id="fn.4" name="fn.4" class="footnum" href="#fnr.4">4</a></sup> <p class="footpara">
+Wikipedia: <a href="http://en.wikipedia.org/wiki/Jacquard_loom">Jacquard Loom</a>
+</p></div>
+
+<div class="footdef"><sup><a id="fn.5" name="fn.5" class="footnum" href="#fnr.5">5</a></sup> <p class="footpara">
+The great physicist Richard Feynman tells a number of stories about the computing lab at Los Alamos in <a href="http://en.wikipedia.org/wiki/Surely_You're_Joking,_Mr._Feynman!">Surely You're Joking, Mr. Feynman!</a> (That book is purely a book of stories. <i>Feynman Lectures on Computation</i> is also quite good and is aimed at a technical audience, and is a fascinating look at computation from a physicist's point of view.)
+</p></div>
+
+<div class="footdef"><sup><a id="fn.6" name="fn.6" class="footnum" href="#fnr.6">6</a></sup> <p class="footpara">
+Turing's machine is described in his 1936 paper, <i>On Computable Numbers, with an Application to the Entscheidungsproblem</i> (<a href="http://classes.soe.ucsc.edu/cmps210/Winter11/Papers/turing-1936.pdf">PDF</a>, <a href="https://docs.google.com/file/d/0BwO0SQND3WU5WHZEY2pIWGpfQzg/edit?usp=sharing">google drive</a>). The <i>Entscheidungsproblem</i> (German for "decision problem") was a mathematical named by the mathematician David Hilbert in 1928 as being one of the most important unsolved mathematical problems of the time. It asks whether or not it is possible to produce an algorithm that, given a set of axioms and following the rules of first-order logic, can accurately decide whether an arbitrary logical statement is universally true or not. Turing defines the notion of a computable number - one "whose expressions as a decimal are calculable by finite means" and shows that his machines are capable of computing any such computable number. He then goes on to distinguish between situations in which the machine continues to run indefinitely without producing any more digits and introduces what has come to be called the <i>halting problem</i>, which shows that 
+</p></div>
+
+<div class="footdef"><sup><a id="fn.7" name="fn.7" class="footnum" href="#fnr.7">7</a></sup> <p class="footpara">
+A <i>truly universal</i> Turing Machine can never be built because it would require an infinite amount of tape. Without infinite tape, it's possible that the result of a computation will be too big to fit on the tape. But of course to build one would require an infinite amount of matter, and as you started to gather that tape, the gravitational force of all the tape would cause the machine to deform into a sphere (that's why planets are spheres) and, eventually, a black hole. Of course you could reduce the density by leaving the tape unspooled, but you still eventually need an infinite amount of space to hold it. Fortunately, we don't actually need to perform <i>every</i> possible calculation, and even a small approximation of a Turing machine is capable of performing a staggering variety of useful and interesting computations.
+</p></div>
+
+
+</div>
+</div></div>
+</body>
+</html>
