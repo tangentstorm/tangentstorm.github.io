@@ -1,0 +1,1786 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>the free pascal video module</title>
+<!-- 2013-09-03 Tue 23:43 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">the free pascal video module</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. interface</a>
+<ul>
+<li><a href="#sec-1-1">1.1. </a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. type  Tencoding=(cp437,         {Codepage 437}</a></li>
+<li><a href="#sec-3">3. implementation</a></li>
+<li><a href="#sec-4">4. function convert<sub>vga</sub><sub>to</sub><sub>acs</sub>(ch:char):word;</a></li>
+<li><a href="#sec-5">5. procedure SendEscapeSeqNdx(ndx:Ttermcode);</a></li>
+<li><a href="#sec-6">6. XY2Ans</a></li>
+<li><a href="#sec-7">7. &lt;disabled&gt; <del>Attr2Ansi(Attr,OAttr:byte):string;</del></a></li>
+<li><a href="#sec-8">8. function attr2ansi(attr,oattr:byte):string;</a></li>
+<li><a href="#sec-9">9. updatetty</a></li>
+<li><a href="#sec-10">10. function transform<sub>cp850</sub><sub>to</sub><sub>iso01</sub>(const st:string):string;</a></li>
+<li><a href="#sec-11">11. function transform<sub>linuxlowascii</sub><sub>to</sub><sub>vga</sub>(const st:string):string;</a></li>
+<li><a href="#sec-12">12. function transform<sub>cp437</sub><sub>to</sub><sub>UTF8</sub>(const st:string): string;</a></li>
+<li><a href="#sec-13">13. function transform(const hstr:string):string;</a></li>
+<li><a href="#sec-14">14. procedure outdata(hstr:string);</a></li>
+<li><a href="#sec-15">15. procedure OutClr(c:byte);</a></li>
+<li><a href="#sec-16">16. procedure OutSpaces;</a></li>
+<li><a href="#sec-17">17. procedure update<sub>vcsa</sub>(force:boolean);</a></li>
+<li><a href="#sec-18">18. procedure saveRawSettings(const tio: termio.termios);</a></li>
+<li><a href="#sec-19">19. procedure restoreRawSettings(tio: termio.termios);</a></li>
+<li><a href="#sec-20">20. function UTF8Enabled: Boolean;</a></li>
+<li><a href="#sec-21">21. procedure decide<sub>codepages</sub>;</a></li>
+<li><a href="#sec-22">22. procedure prepareInitVideo;</a></li>
+<li><a href="#sec-23">23. procedure videoInitDone;</a></li>
+<li><a href="#sec-24">24. procedure prepareDoneVideo;</a></li>
+<li><a href="#sec-25">25. procedure doneVideoDone;</a></li>
+<li><a href="#sec-26">26. procedure SysInitVideo;</a></li>
+<li><a href="#sec-27">27. procedure SysDoneVideo;</a></li>
+<li><a href="#sec-28">28. procedure SysClearScreen;</a></li>
+<li><a href="#sec-29">29. procedure SysUpdateScreen(Force: Boolean);</a></li>
+<li><a href="#sec-30">30. function SysGetCapabilities: Word;</a></li>
+<li><a href="#sec-31">31. procedure SysSetCursorPos(NewCursorX, NewCursorY: Word);</a></li>
+<li><a href="#sec-32">32. cursor type</a>
+<ul>
+<li><a href="#sec-32-1">32.1. function SysGetCursorType: Word;</a></li>
+<li><a href="#sec-32-2">32.2. procedure SysSetCursorType(NewType: Word);</a></li>
+</ul>
+</li>
+<li><a href="#sec-33">33. video modes</a>
+<ul>
+<li><a href="#sec-33-1">33.1. function SysSetVideoMode(const mode:Tvideomode):boolean;</a></li>
+</ul>
+</li>
+<li><a href="#sec-34">34. dispatch record and initialization</a></li>
+</ul>
+</div>
+</div>
+<p>
+freepascal/rtl/unix/video.pp
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> interface</h2>
+<div class="outline-text-2" id="text-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{</span>
+<span style="color: #66f;">    This file is part of the Free Pascal run time library.</span>
+<span style="color: #66f;">    Copyright (c) 1999-2000 by Florian Klaempfl</span>
+<span style="color: #66f;">    member of the Free Pascal development team</span>
+
+<span style="color: #66f;">    Video unit for linux</span>
+
+<span style="color: #66f;">    See the file COPYING.FPC, included in this distribution,</span>
+<span style="color: #66f;">    for details about the copyright.</span>
+
+<span style="color: #66f;">    This program is distributed in the hope that it will be useful,</span>
+<span style="color: #66f;">    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span style="color: #66f;">    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</span>
+
+<span style="color: #66f;"> **********************************************************************</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">video</span>;
+
+<span style="color: #66f;">{</span><span style="color: #66f;">$I-</span><span style="color: #66f;">}</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$GOTO on</span><span style="color: #66f;">}</span>
+
+<span style="color: #66f;">{</span><span style="color: #66f;">*****************************************************************************</span><span style="color: #66f;">}</span>
+                                   <span style="color: #00ffff;">interface</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">*****************************************************************************</span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> </h3>
+<div class="outline-text-3" id="text-1-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$i videoh.inc</span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> type  Tencoding=(cp437,         {Codepage 437}</h2>
+<div class="outline-text-2" id="text-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span>  Tencoding=(cp437,         <span style="color: #66f;">{</span><span style="color: #66f;">Codepage 437</span><span style="color: #66f;">}</span>
+                 cp850,         <span style="color: #66f;">{</span><span style="color: #66f;">Codepage 850</span><span style="color: #66f;">}</span>
+                 cp852,         <span style="color: #66f;">{</span><span style="color: #66f;">Codepage 852</span><span style="color: #66f;">}</span>
+                 cp866,         <span style="color: #66f;">{</span><span style="color: #66f;">Codepage 866</span><span style="color: #66f;">}</span>
+                 koi8r,         <span style="color: #66f;">{</span><span style="color: #66f;">KOI8-R codepage</span><span style="color: #66f;">}</span>
+                 iso01,         <span style="color: #66f;">{</span><span style="color: #66f;">ISO 8859-1</span><span style="color: #66f;">}</span>
+                 iso02,         <span style="color: #66f;">{</span><span style="color: #66f;">ISO 8859-2</span><span style="color: #66f;">}</span>
+                 iso03,         <span style="color: #66f;">{</span><span style="color: #66f;">ISO 8859-3</span><span style="color: #66f;">}</span>
+                 iso04,         <span style="color: #66f;">{</span><span style="color: #66f;">ISO 8859-4</span><span style="color: #66f;">}</span>
+                 iso05,         <span style="color: #66f;">{</span><span style="color: #66f;">ISO 8859-5</span><span style="color: #66f;">}</span>
+                 iso06,         <span style="color: #66f;">{</span><span style="color: #66f;">ISO 8859-6</span><span style="color: #66f;">}</span>
+                 iso07,         <span style="color: #66f;">{</span><span style="color: #66f;">ISO 8859-7</span><span style="color: #66f;">}</span>
+                 iso08,         <span style="color: #66f;">{</span><span style="color: #66f;">ISO 8859-8</span><span style="color: #66f;">}</span>
+                 iso09,         <span style="color: #66f;">{</span><span style="color: #66f;">ISO 8859-9</span><span style="color: #66f;">}</span>
+                 iso10,         <span style="color: #66f;">{</span><span style="color: #66f;">ISO 8859-10</span><span style="color: #66f;">}</span>
+                 iso13,         <span style="color: #66f;">{</span><span style="color: #66f;">ISO 8859-13</span><span style="color: #66f;">}</span>
+                 iso14,         <span style="color: #66f;">{</span><span style="color: #66f;">ISO 8859-14</span><span style="color: #66f;">}</span>
+                 iso15,         <span style="color: #66f;">{</span><span style="color: #66f;">ISO 8859-15</span><span style="color: #66f;">}</span>
+                 utf8);         <span style="color: #66f;">{</span><span style="color: #66f;">UTF-8</span><span style="color: #66f;">}</span>
+
+<span style="color: #ff00ff;">const</span>  <span style="color: #66f;">{</span><span style="color: #66f;">Contains all code pages that can be considered a normal vga font.</span>
+<span style="color: #66f;">        Note: KOI8-R has line drawing characters in wrong place. Support</span>
+<span style="color: #66f;">              can perhaps be added, for now we'll let it rest.</span><span style="color: #66f;">}</span>
+       vga_codepages=[cp437,cp850,cp852,cp866];
+       iso_codepages=[iso01,iso02,iso03,iso04,iso05,iso06,iso07,iso08,
+                      iso09,iso10,iso13,iso14,iso15];
+
+<span style="color: #ff00ff;">var</span> internal_codepage,external_codepage:Tencoding;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> implementation</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">*****************************************************************************</span><span style="color: #66f;">}</span>
+                                <span style="color: #00ffff;">implementation</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">*****************************************************************************</span><span style="color: #66f;">}</span>
+
+<span style="color: #00ffff;">uses</span>  baseunix,termio,strings
+     <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>,linuxvcs<span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>;
+
+<span style="color: #66f;">{</span><span style="color: #66f;">$i video.inc</span><span style="color: #66f;">}</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$i convert.inc</span><span style="color: #66f;">}</span>
+
+<span style="color: #ff00ff;">type</span>  Tconsole_type=(ttyNetwork
+                     <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>,ttyLinux<span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+                     ,ttyFreeBSD
+                     ,ttyNetBSD);
+
+      Tconversion=(cv_none,
+                   cv_cp437_to_iso01,
+                   cv_cp850_to_iso01,
+                   cv_linuxlowascii_to_vga,
+                   cv_cp437_to_UTF8);
+
+      Ttermcode=(
+        enter_alt_charset_mode,
+        exit_alt_charset_mode,
+        clear_screen,
+        cursor_home,
+        cursor_normal,
+        cursor_visible_underline,
+        cursor_visible_block,
+        cursor_invisible,
+        enter_ca_mode,
+        exit_ca_mode,
+        exit_am_mode,
+        ena_acs
+      );
+      Ttermcodes=<span style="color: #ff00ff;">array</span>[Ttermcode] <span style="color: #00ffff;">of</span> Pchar;
+      Ptermcodes=^Ttermcodes;
+
+<span style="color: #ff00ff;">const</span> term_codes_ansi:Ttermcodes=
+        (#$1B#$5B#$31#$31#$6D,                              <span style="color: #66f;">{</span><span style="color: #66f;">enter_alt_charset_mode</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$31#$30#$6D,                              <span style="color: #66f;">{</span><span style="color: #66f;">exit_alt_charset_mode</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$48#$1B#$5B#$4A,                          <span style="color: #66f;">{</span><span style="color: #66f;">clear_screen</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$48,                                      <span style="color: #66f;">{</span><span style="color: #66f;">cursor_home</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">cursor_normal</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">cursor visible, underline</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">cursor visible, block</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">cursor_invisible</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">enter_ca_mode</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">exit_ca_mode</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">exit_am_mode</span><span style="color: #66f;">}</span>
+         nil);                                              <span style="color: #66f;">{</span><span style="color: #66f;">ena_acs</span><span style="color: #66f;">}</span>
+
+      term_codes_freebsd:Ttermcodes=
+        (nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">enter_alt_charset_mode</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">exit_alt_charset_mode</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$48#$1B#$5B#$4A,                          <span style="color: #66f;">{</span><span style="color: #66f;">clear_screen</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$48,                                      <span style="color: #66f;">{</span><span style="color: #66f;">cursor_home</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$3D#$30#$43,                              <span style="color: #66f;">{</span><span style="color: #66f;">cursor_normal</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$3D#$31#$43,                              <span style="color: #66f;">{</span><span style="color: #66f;">cursor visible, underline</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$3D#$31#$43,                              <span style="color: #66f;">{</span><span style="color: #66f;">cursor visible, block</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">cursor_invisible</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">enter_ca_mode</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">exit_ca_mode</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">exit_am_mode</span><span style="color: #66f;">}</span>
+         nil);                                              <span style="color: #66f;">{</span><span style="color: #66f;">ena_acs</span><span style="color: #66f;">}</span>
+
+      term_codes_linux:Ttermcodes=
+        (#$1B#$5B#$31#$31#$6D,                              <span style="color: #66f;">{</span><span style="color: #66f;">enter_alt_charset_mode</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$31#$30#$6D,                              <span style="color: #66f;">{</span><span style="color: #66f;">exit_alt_charset_mode</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$48#$1B#$5B#$4A,                          <span style="color: #66f;">{</span><span style="color: #66f;">clear_screen</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$48,                                      <span style="color: #66f;">{</span><span style="color: #66f;">cursor_home</span><span style="color: #66f;">}</span>
+         #$1B<span style="color: #00ff00;">'[?25h'</span>#$1B<span style="color: #00ff00;">'[?0c'</span>,                             <span style="color: #66f;">{</span><span style="color: #66f;">cursor_normal</span><span style="color: #66f;">}</span>
+         #$1B<span style="color: #00ff00;">'[?0c'</span>,                                        <span style="color: #66f;">{</span><span style="color: #66f;">cursor visible, underline</span><span style="color: #66f;">}</span>
+         #$1B<span style="color: #00ff00;">'[?6c'</span>,                                        <span style="color: #66f;">{</span><span style="color: #66f;">cursor visible, block</span><span style="color: #66f;">}</span>
+         #$1B<span style="color: #00ff00;">'[?1c'</span>,                                        <span style="color: #66f;">{</span><span style="color: #66f;">cursor_invisible</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">enter_ca_mode</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">exit_ca_mode</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">exit_am_mode</span><span style="color: #66f;">}</span>
+         nil);                                              <span style="color: #66f;">{</span><span style="color: #66f;">ena_acs</span><span style="color: #66f;">}</span>
+
+      term_codes_vt100:Ttermcodes=
+        (#$0E,                                              <span style="color: #66f;">{</span><span style="color: #66f;">enter_alt_charset_mode</span><span style="color: #66f;">}</span>
+         #$0F,                                              <span style="color: #66f;">{</span><span style="color: #66f;">exit_alt_charset_mode</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$48#$1B#$5B#$4A<span style="color: #66f;">{</span><span style="color: #66f;">#$24#$3C#$35#$30#$3E</span><span style="color: #66f;">}</span>,    <span style="color: #66f;">{</span><span style="color: #66f;">clear_screen</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$48,                                      <span style="color: #66f;">{</span><span style="color: #66f;">cursor_home</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">cursor_normal</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">cursor visible, underline</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">cursor visible, block</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">cursor_invisible</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">enter_ca_mode</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">exit_ca_mode</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$3F#$37#$6C,                              <span style="color: #66f;">{</span><span style="color: #66f;">exit_am_mode</span><span style="color: #66f;">}</span>
+         #$1B#$28#$42#$1B#$29#$30);                         <span style="color: #66f;">{</span><span style="color: #66f;">ena_acs</span><span style="color: #66f;">}</span>
+
+      term_codes_vt220:Ttermcodes=
+        (#$1B#$28#$30<span style="color: #66f;">{</span><span style="color: #66f;">#$24#$3C#$32#$3E</span><span style="color: #66f;">}</span>,                    <span style="color: #66f;">{</span><span style="color: #66f;">enter_alt_charset_mode</span><span style="color: #66f;">}</span>
+         #$1B#$28#$42<span style="color: #66f;">{</span><span style="color: #66f;">#$24#$3C#$34#$3E</span><span style="color: #66f;">}</span>,                    <span style="color: #66f;">{</span><span style="color: #66f;">exit_alt_charset_mode</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$48#$1B#$5B#$4A,                          <span style="color: #66f;">{</span><span style="color: #66f;">clear_screen</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$48,                                      <span style="color: #66f;">{</span><span style="color: #66f;">cursor_home</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">cursor_normal</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">cursor visible, underline</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">cursor visible, block</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">cursor_invisible</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">enter_ca_mode</span><span style="color: #66f;">}</span>
+         nil,                                               <span style="color: #66f;">{</span><span style="color: #66f;">exit_ca_mode</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$3F#$37#$6C,                              <span style="color: #66f;">{</span><span style="color: #66f;">exit_am_mode</span><span style="color: #66f;">}</span>
+         #$1B#$29#$30);                                     <span style="color: #66f;">{</span><span style="color: #66f;">ena_acs</span><span style="color: #66f;">}</span>
+
+      term_codes_xterm:Ttermcodes=
+        (#$0E,                                              <span style="color: #66f;">{</span><span style="color: #66f;">enter_alt_charset_mode</span><span style="color: #66f;">}</span>
+         #$0F,                                              <span style="color: #66f;">{</span><span style="color: #66f;">exit_alt_charset_mode</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$48#$1B#$5B#$32#$4A,                      <span style="color: #66f;">{</span><span style="color: #66f;">clear_screen</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$48,                                      <span style="color: #66f;">{</span><span style="color: #66f;">cursor_home</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$3F#$31#$32#$6C#$1B#$5B#$3F#$32#$35#$68,  <span style="color: #66f;">{</span><span style="color: #66f;">cursor_normal</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$3F#$31#$32#$3B#$32#$35#$68,              <span style="color: #66f;">{</span><span style="color: #66f;">cursor visible, underline</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$3F#$31#$32#$3B#$32#$35#$68,              <span style="color: #66f;">{</span><span style="color: #66f;">cursor visible, block</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$3F#$32#$35#$6C,                          <span style="color: #66f;">{</span><span style="color: #66f;">cursor_invisible</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$3F#$31#$30#$34#$39#$68,                  <span style="color: #66f;">{</span><span style="color: #66f;">enter_ca_mode</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$3F#$31#$30#$34#$39#$6C,                  <span style="color: #66f;">{</span><span style="color: #66f;">exit_ca_mode</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$3F#$37#$6C,                              <span style="color: #66f;">{</span><span style="color: #66f;">exit_am_mode</span><span style="color: #66f;">}</span>
+         #$1B#$28#$42#$1B#$29#$30);                         <span style="color: #66f;">{</span><span style="color: #66f;">ena_acs</span><span style="color: #66f;">}</span>
+
+      term_codes_beos:Ttermcodes=
+        (nil,<span style="color: #66f;">//</span><span style="color: #66f;">#$0E,                                              {enter_alt_charset_mode}</span>
+         nil,<span style="color: #66f;">//</span><span style="color: #66f;">#$0F,                                              {exit_alt_charset_mode}</span>
+         #$1B#$5B#$48#$1B#$5B#$4A,                                  <span style="color: #66f;">{</span><span style="color: #66f;">clear_screen</span><span style="color: #66f;">}</span>
+         #$1B#$5B#$48,                                      <span style="color: #66f;">{</span><span style="color: #66f;">cursor_home</span><span style="color: #66f;">}</span>
+         #$1B<span style="color: #00ff00;">'[?25h'</span>,<span style="color: #66f;">// </span><span style="color: #66f;">nil,//#$1B#$5B#$3F#$31#$32#$6C#$1B#$5B#$3F#$32#$35#$68,  {cursor_normal}</span>
+         nil,<span style="color: #66f;">//</span><span style="color: #66f;">#$1B#$5B#$3F#$31#$32#$3B#$32#$35#$68,              {cursor visible, underline}</span>
+         nil,<span style="color: #66f;">//</span><span style="color: #66f;">#$1B#$5B#$3F#$31#$32#$3B#$32#$35#$68,              {cursor visible, block}</span>
+         #$1B<span style="color: #00ff00;">'[?25l'</span>,<span style="color: #66f;">//</span><span style="color: #66f;">nil,//#$1B#$5B#$3F#$32#$35#$6C,                          {cursor_invisible}</span>
+         nil,<span style="color: #66f;">//</span><span style="color: #66f;">#$1B#$5B#$3F#$31#$30#$34#$39#$68,                  {enter_ca_mode}</span>
+         nil,<span style="color: #66f;">//</span><span style="color: #66f;">#$1B#$5B#$3F#$31#$30#$34#$39#$6C,                  {exit_ca_mode}</span>
+         nil,<span style="color: #66f;">//</span><span style="color: #66f;">#$1B#$5B#$3F#$37#$6C,                              {exit_am_mode}</span>
+         nil);<span style="color: #66f;">//</span><span style="color: #66f;">#$1B#$28#$42#$1B#$29#$30);                         {ena_acs}</span>
+
+<span style="color: #ff00ff;">const</span>    terminal_names:<span style="color: #ff00ff;">array</span>[0..11] <span style="color: #00ffff;">of</span> <span style="color: #ff00ff;">string</span>[7]=(
+                        <span style="color: #00ff00;">'ansi'</span>,
+                        <span style="color: #00ff00;">'cons'</span>,
+                        <span style="color: #00ff00;">'eterm'</span>,
+                        <span style="color: #00ff00;">'gnome'</span>,
+                        <span style="color: #00ff00;">'konsole'</span>,
+                        <span style="color: #00ff00;">'linux'</span>,
+                        <span style="color: #00ff00;">'rxvt'</span>,
+                        <span style="color: #00ff00;">'screen'</span>,
+                        <span style="color: #00ff00;">'vt100'</span>,
+                        <span style="color: #00ff00;">'vt220'</span>,
+                        <span style="color: #00ff00;">'xterm'</span>,
+                        <span style="color: #00ff00;">'beterm'</span>);
+         terminal_data:<span style="color: #ff00ff;">array</span>[0..11] <span style="color: #00ffff;">of</span> Ptermcodes=(
+                        @term_codes_ansi,
+                        @term_codes_freebsd,
+                        @term_codes_xterm,
+                        @term_codes_xterm,
+                        @term_codes_xterm,
+                        @term_codes_linux,
+                        @term_codes_xterm,
+                        @term_codes_xterm,
+                        @term_codes_vt100,
+                        @term_codes_vt220,
+                        @term_codes_xterm,
+                        @term_codes_beos);
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">const</span> convert:Tconversion=cv_none;
+
+<span style="color: #ff00ff;">var</span>
+  LastCursorType : byte;
+<span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+  TtyFd: Longint;
+<span style="color: #66f;">{</span><span style="color: #66f;">$endif linux</span><span style="color: #66f;">}</span>
+  Console: Tconsole_type;
+  cur_term_strings:Ptermcodes;
+<span style="color: #66f;">{</span><span style="color: #66f;">$ifdef logging</span><span style="color: #66f;">}</span>
+  f: <span style="color: #ff00ff;">file</span>;
+
+<span style="color: #ff00ff;">const</span>
+  logstart: <span style="color: #ff00ff;">string</span> = <span style="color: #00ff00;">''</span>;
+  nl: <span style="color: #ff00ff;">char</span> = #10;
+  logend: <span style="color: #ff00ff;">string</span> = #10#10;
+<span style="color: #66f;">{</span><span style="color: #66f;">$endif logging</span><span style="color: #66f;">}</span>
+
+<span style="color: #66f;">{</span><span style="color: #66f;">$ifdef cpui386</span><span style="color: #66f;">}</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$ASMMODE ATT</span><span style="color: #66f;">}</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$endif cpui386</span><span style="color: #66f;">}</span>
+
+<span style="color: #ff00ff;">const</span>
+
+<span style="color: #66f;">{  </span><span style="color: #66f;">can_delete_term : boolean = false;</span><span style="color: #66f;">}</span>
+  ACSIn : <span style="color: #ff00ff;">string</span> = <span style="color: #00ff00;">''</span>;
+  ACSOut : <span style="color: #ff00ff;">string</span> = <span style="color: #00ff00;">''</span>;
+  in_ACS : <span style="color: #ff00ff;">boolean</span> =false;
+
+  TerminalSupportsHighIntensityColors: <span style="color: #ff00ff;">boolean</span> = false;
+  TerminalSupportsBold: <span style="color: #ff00ff;">boolean</span> = true;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> function convert<sub>vga</sub><sub>to</sub><sub>acs</sub>(ch:char):word;</h2>
+<div class="outline-text-2" id="text-4">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">convert_vga_to_acs</span>(ch:<span style="color: #ff00ff;">char</span>):word;
+
+<span style="color: #66f;">{</span><span style="color: #66f;">Ch contains a character in the VGA character set (i.e. codepage 437).</span>
+<span style="color: #66f;"> This routine tries to convert some VGA symbols as well as possible to the</span>
+<span style="color: #66f;"> xterm alternate character set.</span>
+
+<span style="color: #66f;"> Return type is word to allow expanding to UCS-2 characters in the</span>
+<span style="color: #66f;"> future.</span><span style="color: #66f;">}</span>
+
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">case</span> ch <span style="color: #00ffff;">of</span>
+    #18:
+      convert_vga_to_acs:=word(<span style="color: #00ff00;">'|'</span>);
+    #24, #30: <span style="color: #66f;">{</span><span style="color: #66f;">&#24;&#30;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=word(<span style="color: #00ff00;">'^'</span>);
+    #25, #31: <span style="color: #66f;">{</span><span style="color: #66f;">&#25;&#31;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=word(<span style="color: #00ff00;">'v'</span>);
+    #26, #16: <span style="color: #66f;">{</span><span style="color: #66f;">Never introduce a ctrl-Z ... &#16;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=word(<span style="color: #00ff00;">'&gt;'</span>);
+    <span style="color: #66f;">{</span><span style="color: #66f;">#27,</span><span style="color: #66f;">}</span> #17: <span style="color: #66f;">{</span><span style="color: #66f;">&#27;&#17;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=word(<span style="color: #00ff00;">'&lt;'</span>);
+    #176, #177, #178: <span style="color: #66f;">{</span><span style="color: #66f;">&#176;&#177;&#178;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=$f800+word(<span style="color: #00ff00;">'a'</span>);
+    #180, #181, #182, #185: <span style="color: #66f;">{</span><span style="color: #66f;">&#180;&#181;&#182;&#185;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=$f800+word(<span style="color: #00ff00;">'u'</span>);
+    #183, #184, #187, #191: <span style="color: #66f;">{</span><span style="color: #66f;">&#183;&#184;&#187;&#191;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=$f800+word(<span style="color: #00ff00;">'k'</span>);
+    #188, #189, #190, #217: <span style="color: #66f;">{</span><span style="color: #66f;">&#188;&#189;&#190;&#217;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=$f800+word(<span style="color: #00ff00;">'j'</span>);
+    #192, #200, #211, #212: <span style="color: #66f;">{</span><span style="color: #66f;">&#192;&#200;&#211;&#212;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=$f800+word(<span style="color: #00ff00;">'m'</span>);
+    #193, #202, #207, #208: <span style="color: #66f;">{</span><span style="color: #66f;">&#193;&#202;&#207;&#208;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=$f800+word(<span style="color: #00ff00;">'v'</span>);
+    #194, #203, #209, #210: <span style="color: #66f;">{</span><span style="color: #66f;">&#194;&#203;&#209;&#210;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=$f800+word(<span style="color: #00ff00;">'w'</span>);
+    #195, #198, #199, #204: <span style="color: #66f;">{</span><span style="color: #66f;">&#195;&#198;&#199;&#204;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=$f800+word(<span style="color: #00ff00;">'t'</span>);
+    #196, #205: <span style="color: #66f;">{</span><span style="color: #66f;">&#196;&#205;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=$f800+word(<span style="color: #00ff00;">'q'</span>);
+    #179, #186: <span style="color: #66f;">{</span><span style="color: #66f;">&#179;&#186;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=$f800+word(<span style="color: #00ff00;">'x'</span>);
+    #197, #206, #215, #216: <span style="color: #66f;">{</span><span style="color: #66f;">&#197;&#206;&#215;&#216;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=$f800+word(<span style="color: #00ff00;">'n'</span>);
+    #201, #213, #214, #218: <span style="color: #66f;">{</span><span style="color: #66f;">&#201;&#213;&#214;&#218;</span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=$f800+word(<span style="color: #00ff00;">'l'</span>);
+    #254: <span style="color: #66f;">{ </span><span style="color: #66f;">&#254; </span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=word(<span style="color: #00ff00;">'*'</span>);
+    <span style="color: #66f;">{ </span><span style="color: #66f;">Shadows for Buttons </span><span style="color: #66f;">}</span>
+    #220  <span style="color: #66f;">{ </span><span style="color: #66f;">&#220; </span><span style="color: #66f;">}</span>,
+    #223: <span style="color: #66f;">{ </span><span style="color: #66f;">&#223; </span><span style="color: #66f;">}</span>
+      convert_vga_to_acs:=$f800+word(<span style="color: #00ff00;">'a'</span>);
+    <span style="color: #00ffff;">else</span>
+      convert_vga_to_acs:=word(ch);
+  <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> procedure SendEscapeSeqNdx(ndx:Ttermcode);</h2>
+<div class="outline-text-2" id="text-5">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SendEscapeSeqNdx</span>(ndx:Ttermcode);
+
+<span style="color: #ff00ff;">var</span> p:PChar;
+
+<span style="color: #00ffff;">begin</span>
+<span style="color: #66f;">{ </span><span style="color: #66f;">Always true because of vt100 default.</span>
+<span style="color: #66f;">  if not assigned(cur_term_Strings) then</span>
+<span style="color: #66f;">    exit</span><span style="color: #66f;">}{</span><span style="color: #66f;">RunError(219)</span><span style="color: #66f;">}</span>;
+  p:=cur_term_strings^[ndx];
+  <span style="color: #00ffff;">if</span> p&lt;&gt;nil <span style="color: #00ffff;">then</span>
+    fpwrite(stdoutputhandle,p^,strlen(p));
+<span style="color: #00ffff;">end</span>;
+
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SendEscapeSeq</span>(<span style="color: #ff00ff;">const</span> S: <span style="color: #ff00ff;">String</span>);
+<span style="color: #00ffff;">begin</span>
+  fpWrite(stdoutputhandle, S[1], Length(S));
+<span style="color: #00ffff;">end</span>;
+
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">IntStr</span>(l:longint):<span style="color: #ff00ff;">string</span>;
+
+<span style="color: #00ffff;">begin</span>
+  Str(l,intstr);
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> XY2Ans</h2>
+<div class="outline-text-2" id="text-6">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">Function</span> <span style="color: #ffffff; font-weight: bold;">XY2Ansi</span>(x,y,ox,oy:longint):<span style="color: #ff00ff;">String</span>;
+<span style="color: #66f;">{</span>
+<span style="color: #66f;">  Returns a string with the escape sequences to go to X,Y on the screen.</span>
+
+<span style="color: #66f;">  Note that x, y, ox, oy are 1-based (i.e. top-left corner of the screen</span>
+<span style="color: #66f;">  is (1, 1)), while SetCursorPos parameters and CursorX and CursorY</span>
+<span style="color: #66f;">  are 0-based (top-left corner of the screen is (0, 0)).</span>
+<span style="color: #66f;">}</span>
+
+<span style="color: #ff00ff;">var</span> delta:longint;
+    direction:<span style="color: #ff00ff;">char</span>;
+    movement:<span style="color: #ff00ff;">string</span>[32];
+
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">if</span> ((x=1) <span style="color: #00ffff;">and</span> (oy+1=y)) <span style="color: #00ffff;">and</span> (console&lt;&gt;ttyfreebsd) <span style="color: #00ffff;">then</span>
+    <span style="color: #00ffff;">begin</span>
+      XY2Ansi:=#13#10;
+      exit;
+    <span style="color: #00ffff;">end</span>;
+  direction:=<span style="color: #00ff00;">'H'</span>;
+  <span style="color: #00ffff;">if</span> y=oy <span style="color: #00ffff;">then</span>
+   <span style="color: #00ffff;">begin</span>
+     <span style="color: #00ffff;">if</span> x=ox <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">begin</span>
+        XY2Ansi:=<span style="color: #00ff00;">''</span>;
+        exit;
+      <span style="color: #00ffff;">end</span>;
+     <span style="color: #00ffff;">if</span> x=1 <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">begin</span>
+        XY2Ansi:=#13;
+        exit;
+      <span style="color: #00ffff;">end</span>;
+     delta:=ox-x;
+     direction:=<span style="color: #ff00ff;">char</span>(byte(<span style="color: #00ff00;">'C'</span>)+byte(x&lt;=ox));
+   <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">if</span> x=ox <span style="color: #00ffff;">then</span>
+   <span style="color: #00ffff;">begin</span>
+     delta:=oy-y;
+     direction:=<span style="color: #ff00ff;">char</span>(byte(<span style="color: #00ff00;">'A'</span>)+byte(y&gt;oy));
+   <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #00ffff;">if</span> direction=<span style="color: #00ff00;">'H'</span> <span style="color: #00ffff;">then</span>
+    movement:=intstr(y)+<span style="color: #00ff00;">';'</span>+intstr(x)
+  <span style="color: #00ffff;">else</span>
+    movement:=intstr(abs(delta));
+
+  xy2ansi:=#27<span style="color: #00ff00;">'['</span>+movement+direction;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> &lt;disabled&gt; <del>Attr2Ansi(Attr,OAttr:byte):string;</del></h2>
+<div class="outline-text-2" id="text-7">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">const</span>  ansitbl:<span style="color: #ff00ff;">array</span>[0..7] <span style="color: #00ffff;">of</span> <span style="color: #ff00ff;">char</span>=<span style="color: #00ff00;">'04261537'</span>;
+<span style="color: #66f;">{</span><span style="color: #66f;">$ifdef disabled</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">Function</span> <span style="color: #ffffff; font-weight: bold;">Attr2Ansi</span>(Attr,OAttr:byte):<span style="color: #ff00ff;">string</span>;
+<span style="color: #66f;">{</span>
+<span style="color: #66f;">  Convert Attr to an Ansi String, the Optimal code is calculate</span>
+<span style="color: #66f;">  with use of the old OAttr</span>
+<span style="color: #66f;">}</span>
+<span style="color: #ff00ff;">var</span>
+  hstr : <span style="color: #ff00ff;">string</span>[16];
+  OFg,OBg,Fg,Bg:byte;
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">AddSep</span>(ch:<span style="color: #ff00ff;">char</span>);
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> length(hstr)&gt;0 <span style="color: #00ffff;">then</span>
+     hstr:=hstr+<span style="color: #00ff00;">';'</span>;
+    hstr:=hstr+ch;
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">if</span> Attr=OAttr <span style="color: #00ffff;">then</span>
+   <span style="color: #00ffff;">begin</span>
+     Attr2Ansi:=<span style="color: #00ff00;">''</span>;
+     exit;
+   <span style="color: #00ffff;">end</span>;
+  Hstr:=<span style="color: #00ff00;">''</span>;
+  Fg:=Attr <span style="color: #00ffff;">and</span> $f;
+  Bg:=Attr <span style="color: #00ffff;">shr</span> 4;
+  OFg:=OAttr <span style="color: #00ffff;">and</span> $f;
+  OBg:=OAttr <span style="color: #00ffff;">shr</span> 4;
+<span style="color: #66f;">{  </span><span style="color: #66f;">This resets colours to their defaults, the problem is we don't know what</span>
+<span style="color: #66f;">  the default is, i.e. it can either be white on black or back on white or</span>
+<span style="color: #66f;">  even something totally different. This causes undesired colour schemes</span>
+<span style="color: #66f;">  in the IDE on some terminals.</span>
+<span style="color: #66f;">  if (OFg&lt;&gt;7) or (Fg=7) or ((OFg&gt;7) and (Fg&lt;8)) or ((OBg&gt;7) and (Bg&lt;8)) then</span>
+<span style="color: #66f;">   begin</span>
+<span style="color: #66f;">     hstr:='0';</span>
+<span style="color: #66f;">     OFg:=7;</span>
+<span style="color: #66f;">     OBg:=0;</span>
+<span style="color: #66f;">   end;</span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">if</span> (Fg&gt;7) <span style="color: #00ffff;">and</span> (OFg&lt;8) <span style="color: #00ffff;">then</span>
+   <span style="color: #00ffff;">begin</span>
+     AddSep(<span style="color: #00ff00;">'1'</span>);
+     OFg:=OFg <span style="color: #00ffff;">or</span> 8;
+   <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">if</span> (Bg <span style="color: #00ffff;">and</span> 8)&lt;&gt;(OBg <span style="color: #00ffff;">and</span> 8) <span style="color: #00ffff;">then</span>
+   <span style="color: #00ffff;">begin</span>
+     AddSep(<span style="color: #00ff00;">'5'</span>);
+     OBg:=OBg <span style="color: #00ffff;">or</span> 8;
+   <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">if</span> (Fg&lt;&gt;OFg) <span style="color: #00ffff;">then</span>
+   <span style="color: #00ffff;">begin</span>
+     AddSep(<span style="color: #00ff00;">'3'</span>);
+     hstr:=hstr+AnsiTbl[fg <span style="color: #00ffff;">and</span> 7];
+   <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">if</span> (Bg&lt;&gt;OBg) <span style="color: #00ffff;">then</span>
+   <span style="color: #00ffff;">begin</span>
+     AddSep(<span style="color: #00ff00;">'4'</span>);
+     hstr:=hstr+AnsiTbl[bg <span style="color: #00ffff;">and</span> 7];
+   <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">if</span> hstr=<span style="color: #00ff00;">'0'</span> <span style="color: #00ffff;">then</span>
+   hstr:=<span style="color: #00ff00;">''</span>;
+  Attr2Ansi:=#27<span style="color: #00ff00;">'['</span>+hstr+<span style="color: #00ff00;">'m'</span>;
+<span style="color: #00ffff;">end</span>;
+<span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> function attr2ansi(attr,oattr:byte):string;</h2>
+<div class="outline-text-2" id="text-8">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">attr2ansi</span>(attr,oattr:byte):<span style="color: #ff00ff;">string</span>;
+
+<span style="color: #ff00ff;">var</span> OFg,OBg,Fg,Bg:byte;
+
+<span style="color: #00ffff;">begin</span>
+  Fg:=Attr <span style="color: #00ffff;">and</span> $f;
+  Bg:=Attr <span style="color: #00ffff;">shr</span> 4;
+  OFg:=OAttr <span style="color: #00ffff;">and</span> $f;
+  OBg:=OAttr <span style="color: #00ffff;">shr</span> 4;
+  attr2ansi:=#27<span style="color: #00ff00;">'['</span>;
+  <span style="color: #00ffff;">if</span> TerminalSupportsBold <span style="color: #00ffff;">then</span>
+    <span style="color: #00ffff;">if</span> fg <span style="color: #00ffff;">and</span> 8&lt;&gt;0 <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">begin</span>
+        <span style="color: #66f;">{</span><span style="color: #66f;">Enable bold if not yet on.</span><span style="color: #66f;">}</span>
+        <span style="color: #00ffff;">if</span> ofg <span style="color: #00ffff;">and</span> 8=0 <span style="color: #00ffff;">then</span>
+          attr2ansi:=attr2ansi+<span style="color: #00ff00;">'1;'</span>;
+      <span style="color: #00ffff;">end</span>
+    <span style="color: #00ffff;">else</span>
+      <span style="color: #66f;">{</span><span style="color: #66f;">Disable bold if on.</span><span style="color: #66f;">}</span>
+      <span style="color: #00ffff;">if</span> ofg <span style="color: #00ffff;">and</span> 8&lt;&gt;0 <span style="color: #00ffff;">then</span>
+        attr2ansi:=attr2ansi+<span style="color: #00ff00;">'22;'</span>;
+  <span style="color: #00ffff;">if</span> bg <span style="color: #00ffff;">and</span> 8&lt;&gt;0 <span style="color: #00ffff;">then</span>
+    <span style="color: #00ffff;">begin</span>
+      <span style="color: #66f;">{</span><span style="color: #66f;">Enable bold if not yet on.</span><span style="color: #66f;">}</span>
+      <span style="color: #00ffff;">if</span> obg <span style="color: #00ffff;">and</span> 8=0 <span style="color: #00ffff;">then</span>
+        attr2ansi:=attr2ansi+<span style="color: #00ff00;">'5;'</span>;
+    <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">else</span>
+    <span style="color: #66f;">{</span><span style="color: #66f;">Disable bold if on.</span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">if</span> obg <span style="color: #00ffff;">and</span> 8&lt;&gt;0 <span style="color: #00ffff;">then</span>
+      attr2ansi:=attr2ansi+<span style="color: #00ff00;">'25;'</span>;
+
+  <span style="color: #00ffff;">if</span> TerminalSupportsHighIntensityColors <span style="color: #00ffff;">then</span>
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> fg <span style="color: #00ffff;">and</span> 15&lt;&gt;ofg <span style="color: #00ffff;">and</span> 15 <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">if</span> fg <span style="color: #00ffff;">and</span> 8&lt;&gt;0 <span style="color: #00ffff;">then</span>
+        attr2ansi:=attr2ansi+<span style="color: #00ff00;">'9'</span>+ansitbl[fg <span style="color: #00ffff;">and</span> 7]+<span style="color: #00ff00;">';'</span>
+      <span style="color: #00ffff;">else</span>
+        attr2ansi:=attr2ansi+<span style="color: #00ff00;">'3'</span>+ansitbl[fg <span style="color: #00ffff;">and</span> 7]+<span style="color: #00ff00;">';'</span>;
+  <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">else</span>
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> fg <span style="color: #00ffff;">and</span> 7&lt;&gt;ofg <span style="color: #00ffff;">and</span> 7 <span style="color: #00ffff;">then</span>
+      attr2ansi:=attr2ansi+<span style="color: #00ff00;">'3'</span>+ansitbl[fg <span style="color: #00ffff;">and</span> 7]+<span style="color: #00ff00;">';'</span>;
+  <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">if</span> bg <span style="color: #00ffff;">and</span> 7&lt;&gt;obg <span style="color: #00ffff;">and</span> 7 <span style="color: #00ffff;">then</span>
+     attr2ansi:=attr2ansi+<span style="color: #00ff00;">'4'</span>+ansitbl[bg <span style="color: #00ffff;">and</span> 7]+<span style="color: #00ff00;">';'</span>;
+
+  <span style="color: #00ffff;">if</span> attr2ansi[length(attr2ansi)]=<span style="color: #00ff00;">';'</span> <span style="color: #00ffff;">then</span>
+    attr2ansi[length(attr2ansi)]:=<span style="color: #00ff00;">'m'</span>
+  <span style="color: #00ffff;">else</span>
+   attr2ansi:=<span style="color: #00ff00;">''</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> updatetty</h2>
+<div class="outline-text-2" id="text-9">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">UpdateTTY</span>(Force:<span style="color: #ff00ff;">boolean</span>);
+<span style="color: #ff00ff;">type</span>
+  tchattr=<span style="color: #ff00ff;">packed</span> <span style="color: #ff00ff;">record</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$ifdef ENDIAN_LITTLE</span><span style="color: #66f;">}</span>
+    ch : <span style="color: #ff00ff;">char</span>;
+    attr : byte;
+<span style="color: #66f;">{</span><span style="color: #66f;">$else</span><span style="color: #66f;">}</span>
+    attr : byte;
+    ch : <span style="color: #ff00ff;">char</span>;
+<span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">end</span>;
+<span style="color: #ff00ff;">var</span>
+  outbuf   : <span style="color: #ff00ff;">array</span>[0..1023+255] <span style="color: #00ffff;">of</span> <span style="color: #ff00ff;">char</span>;
+  chattr   : tchattr;
+  skipped  : <span style="color: #ff00ff;">boolean</span>;
+  outptr,
+  spaces,
+  eol,
+  x,y,
+  LastX,LastY,
+  SpaceAttr,
+  LastAttr : longint;
+  p,pold   : pvideocell;
+  LastLineWidth : Longint;
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">transform_cp437_to_iso01</span>(<span style="color: #ff00ff;">const</span> st:<span style="color: #ff00ff;">string</span>):<span style="color: #ff00ff;">string</span>;
+
+  <span style="color: #ff00ff;">var</span> i:byte;
+      c:<span style="color: #ff00ff;">char</span>;
+      converted:word;
+
+  <span style="color: #00ffff;">begin</span>
+    transform_cp437_to_iso01:=<span style="color: #00ff00;">''</span>;
+    <span style="color: #00ffff;">for</span> i:=1 <span style="color: #00ffff;">to</span> length(st) <span style="color: #00ffff;">do</span>
+      <span style="color: #00ffff;">begin</span>
+        c:=st[i];
+        <span style="color: #00ffff;">case</span> c <span style="color: #00ffff;">of</span>
+          #0..#31:
+            converted:=convert_lowascii_to_iso01[c];
+          #128..#255:
+            converted:=convert_cp437_to_iso01[c];
+          <span style="color: #00ffff;">else</span>
+            converted:=byte(c);
+        <span style="color: #00ffff;">end</span>;
+        <span style="color: #00ffff;">if</span> converted <span style="color: #00ffff;">and</span> $ff00=$f800 <span style="color: #00ffff;">then</span>
+          <span style="color: #00ffff;">begin</span>
+            <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">not</span> in_ACS <span style="color: #00ffff;">then</span>
+              <span style="color: #00ffff;">begin</span>
+                transform_cp437_to_iso01:=transform_cp437_to_iso01+ACSIn;
+                in_ACS:=true;
+              <span style="color: #00ffff;">end</span>;
+            c:=<span style="color: #ff00ff;">char</span>(converted <span style="color: #00ffff;">and</span> $ff);
+          <span style="color: #00ffff;">end</span>
+        <span style="color: #00ffff;">else</span>
+          <span style="color: #00ffff;">if</span> in_ACS <span style="color: #00ffff;">then</span>
+            <span style="color: #00ffff;">begin</span>
+              transform_cp437_to_iso01:=transform_cp437_to_iso01+ACSOut+
+                                        Attr2Ansi(LastAttr,0);
+              in_ACS:=false;
+            <span style="color: #00ffff;">end</span>;
+        transform_cp437_to_iso01:=transform_cp437_to_iso01+c;
+      <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><span class="section-number-2">10</span> function transform<sub>cp850</sub><sub>to</sub><sub>iso01</sub>(const st:string):string;</h2>
+<div class="outline-text-2" id="text-10">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">transform_cp850_to_iso01</span>(<span style="color: #ff00ff;">const</span> st:<span style="color: #ff00ff;">string</span>):<span style="color: #ff00ff;">string</span>;
+
+<span style="color: #ff00ff;">var</span> i:byte;
+    c:<span style="color: #ff00ff;">char</span>;
+    converted:word;
+
+<span style="color: #00ffff;">begin</span>
+  transform_cp850_to_iso01:=<span style="color: #00ff00;">''</span>;
+  <span style="color: #00ffff;">for</span> i:=1 <span style="color: #00ffff;">to</span> length(st) <span style="color: #00ffff;">do</span>
+    <span style="color: #00ffff;">begin</span>
+      c:=st[i];
+      <span style="color: #00ffff;">case</span> c <span style="color: #00ffff;">of</span>
+        #0..#31:
+          converted:=convert_lowascii_to_iso01[c];
+        #128..#255:
+          converted:=convert_cp850_to_iso01[c];
+        <span style="color: #00ffff;">else</span>
+          converted:=byte(c);
+      <span style="color: #00ffff;">end</span>;
+      <span style="color: #00ffff;">if</span> converted <span style="color: #00ffff;">and</span> $ff00=$f800 <span style="color: #00ffff;">then</span>
+        <span style="color: #00ffff;">begin</span>
+          <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">not</span> in_ACS <span style="color: #00ffff;">then</span>
+            <span style="color: #00ffff;">begin</span>
+              transform_cp850_to_iso01:=transform_cp850_to_iso01+ACSIn;
+              in_ACS:=true;
+            <span style="color: #00ffff;">end</span>;
+        <span style="color: #00ffff;">end</span>
+      <span style="color: #00ffff;">else</span>
+        <span style="color: #00ffff;">if</span> in_ACS <span style="color: #00ffff;">then</span>
+          <span style="color: #00ffff;">begin</span>
+            transform_cp850_to_iso01:=transform_cp850_to_iso01+ACSOut+
+                                      Attr2Ansi(LastAttr,0);
+            in_ACS:=false;
+          <span style="color: #00ffff;">end</span>;
+      c:=<span style="color: #ff00ff;">char</span>(converted <span style="color: #00ffff;">and</span> $ff);
+      transform_cp850_to_iso01:=transform_cp850_to_iso01+c;
+    <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-11" class="outline-2">
+<h2 id="sec-11"><span class="section-number-2">11</span> function transform<sub>linuxlowascii</sub><sub>to</sub><sub>vga</sub>(const st:string):string;</h2>
+<div class="outline-text-2" id="text-11">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">transform_linuxlowascii_to_vga</span>(<span style="color: #ff00ff;">const</span> st:<span style="color: #ff00ff;">string</span>):<span style="color: #ff00ff;">string</span>;
+
+<span style="color: #ff00ff;">var</span> i:byte;
+    c:<span style="color: #ff00ff;">char</span>;
+    converted:word;
+
+<span style="color: #00ffff;">begin</span>
+  transform_linuxlowascii_to_vga:=<span style="color: #00ff00;">''</span>;
+  <span style="color: #00ffff;">for</span> i:=1 <span style="color: #00ffff;">to</span> length(st) <span style="color: #00ffff;">do</span>
+    <span style="color: #00ffff;">begin</span>
+      c:=st[i];
+      <span style="color: #00ffff;">case</span> c <span style="color: #00ffff;">of</span>
+        #0..#31:
+          converted:=convert_linuxlowascii_to_vga[c];
+        <span style="color: #00ffff;">else</span>
+          converted:=byte(c);
+      <span style="color: #00ffff;">end</span>;
+      c:=<span style="color: #ff00ff;">char</span>(converted <span style="color: #00ffff;">and</span> $ff);
+      transform_linuxlowascii_to_vga:=transform_linuxlowascii_to_vga+c;
+    <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-12" class="outline-2">
+<h2 id="sec-12"><span class="section-number-2">12</span> function transform<sub>cp437</sub><sub>to</sub><sub>UTF8</sub>(const st:string): string;</h2>
+<div class="outline-text-2" id="text-12">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">transform_cp437_to_UTF8</span>(<span style="color: #ff00ff;">const</span> st:<span style="color: #ff00ff;">string</span>): <span style="color: #ff00ff;">string</span>;
+<span style="color: #ff00ff;">var</span> i:byte;
+    c : <span style="color: #ff00ff;">char</span>;
+    converted : WideChar;
+    s : WideString;
+<span style="color: #00ffff;">begin</span>
+  s := <span style="color: #00ff00;">''</span>;
+  <span style="color: #00ffff;">for</span> i:=1 <span style="color: #00ffff;">to</span> length(st) <span style="color: #00ffff;">do</span>
+    <span style="color: #00ffff;">begin</span>
+      c:=st[i];
+      <span style="color: #00ffff;">case</span> c <span style="color: #00ffff;">of</span>
+        #0..#31:
+          converted:=convert_lowascii_to_UTF8[c];
+        #127..#255:
+          converted:=convert_cp437_to_UTF8[c];
+        <span style="color: #00ffff;">else</span>
+        <span style="color: #00ffff;">begin</span>
+          converted := #0;
+          converted := c;
+        <span style="color: #00ffff;">end</span>;
+      <span style="color: #00ffff;">end</span>;
+      s := s + converted;
+    <span style="color: #00ffff;">end</span>;
+  transform_cp437_to_UTF8 := Utf8Encode(s);  
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-13" class="outline-2">
+<h2 id="sec-13"><span class="section-number-2">13</span> function transform(const hstr:string):string;</h2>
+<div class="outline-text-2" id="text-13">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">transform</span>(<span style="color: #ff00ff;">const</span> hstr:<span style="color: #ff00ff;">string</span>):<span style="color: #ff00ff;">string</span>;
+
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">case</span> convert <span style="color: #00ffff;">of</span>
+    cv_linuxlowascii_to_vga:
+      transform:=transform_linuxlowascii_to_vga(hstr);
+    cv_cp437_to_iso01:
+      transform:=transform_cp437_to_iso01(hstr);
+    cv_cp850_to_iso01:
+      transform:=transform_cp850_to_iso01(hstr);
+    cv_cp437_to_UTF8:
+      transform:=transform_cp437_to_UTF8(hstr);
+    <span style="color: #00ffff;">else</span>
+      transform:=hstr;
+  <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-14" class="outline-2">
+<h2 id="sec-14"><span class="section-number-2">14</span> procedure outdata(hstr:string);</h2>
+<div class="outline-text-2" id="text-14">
+<div class="org-src-container">
+
+<pre class="src src-pascal">  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">outdata</span>(hstr:<span style="color: #ff00ff;">string</span>);
+
+  <span style="color: #00ffff;">begin</span>
+   <span style="color: #00ffff;">If</span> Length(HStr)&gt;0 <span style="color: #00ffff;">Then</span>
+   <span style="color: #00ffff;">Begin</span>
+    <span style="color: #00ffff;">while</span> (eol&gt;0) <span style="color: #00ffff;">do</span>
+     <span style="color: #00ffff;">begin</span>
+       hstr:=#13#10+hstr;
+       dec(eol);
+     <span style="color: #00ffff;">end</span>;
+<span style="color: #66f;">{    </span><span style="color: #66f;">if (convert=cv_vga_to_acs) and (ACSIn&lt;&gt;'') and (ACSOut&lt;&gt;'') then</span>
+<span style="color: #66f;">      transform_using_acs(Hstr);</span><span style="color: #66f;">}</span>
+    move(hstr[1],outbuf[outptr],length(hstr));
+    inc(outptr,length(hstr));
+    <span style="color: #00ffff;">if</span> outptr&gt;=1024 <span style="color: #00ffff;">then</span>
+     <span style="color: #00ffff;">begin</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$ifdef logging</span><span style="color: #66f;">}</span>
+       blockwrite(f,logstart[1],length(logstart));
+       blockwrite(f,nl,1);
+       blockwrite(f,outptr,sizeof(outptr));
+       blockwrite(f,nl,1);
+       blockwrite(f,outbuf,outptr);
+       blockwrite(f,nl,1);
+<span style="color: #66f;">{</span><span style="color: #66f;">$endif logging</span><span style="color: #66f;">}</span>
+       fpWrite(stdoutputhandle,outbuf,outptr);
+       outptr:=0;
+     <span style="color: #00ffff;">end</span>;
+    <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-15" class="outline-2">
+<h2 id="sec-15"><span class="section-number-2">15</span> procedure OutClr(c:byte);</h2>
+<div class="outline-text-2" id="text-15">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">OutClr</span>(c:byte);
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">if</span> c=LastAttr <span style="color: #00ffff;">then</span>
+   exit;
+  OutData(Attr2Ansi(c,LastAttr));
+  LastAttr:=c;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-16" class="outline-2">
+<h2 id="sec-16"><span class="section-number-2">16</span> procedure OutSpaces;</h2>
+<div class="outline-text-2" id="text-16">
+<div class="org-src-container">
+
+<pre class="src src-pascal">  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">OutSpaces</span>;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> (Spaces=0) <span style="color: #00ffff;">then</span>
+     exit;
+    OutClr(SpaceAttr);
+    OutData(Space(Spaces));
+    LastX:=x;
+    LastY:=y;
+    Spaces:=0;
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #66f;">(*</span>
+<span style="color: #66f;">function GetTermString(ndx:Ttermcode):String;</span>
+<span style="color: #66f;">var</span>
+<span style="color: #66f;">   P{,pdelay</span><span style="color: #66f;">}</span>: PChar;
+<span style="color: #00ffff;">begin</span>
+  GetTermString:=<span style="color: #00ff00;">''</span>;
+  <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">not</span> assigned(cur_term_Strings) <span style="color: #00ffff;">then</span>
+    exit<span style="color: #66f;">{</span><span style="color: #66f;">RunError(219)</span><span style="color: #66f;">}</span>;
+  P:=cur_term_Strings^[Ndx];
+  <span style="color: #00ffff;">if</span> assigned(p) <span style="color: #00ffff;">then</span>
+   <span style="color: #00ffff;">begin</span> <span style="color: #66f;">{ </span><span style="color: #66f;">Do not transmit the delays </span><span style="color: #66f;">}</span>
+<span style="color: #66f;">{     </span><span style="color: #66f;">pdelay:=strpos(p,'$&lt;');</span>
+<span style="color: #66f;">     if assigned(pdelay) then</span>
+<span style="color: #66f;">       pdelay^:=#0;</span><span style="color: #66f;">}</span>
+     GetTermString:=StrPas(p);
+<span style="color: #66f;">{     </span><span style="color: #66f;">if assigned(pdelay) then</span>
+<span style="color: #66f;">       pdelay^:='$';</span><span style="color: #66f;">}</span>
+   <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">end</span>;
+*)
+
+<span style="color: #00ffff;">begin</span>
+  OutPtr:=0;
+  Eol:=0;
+  skipped:=true;
+  p:=PVideoCell(VideoBuf);
+  pold:=PVideoCell(OldVideoBuf);
+<span style="color: #66f;">{ </span><span style="color: #66f;">init Attr, X,Y and set autowrap off </span><span style="color: #66f;">}</span>
+  SendEscapeSeq(#27<span style="color: #00ff00;">'[0;40;37m'</span>#27<span style="color: #00ff00;">'[?7l'</span><span style="color: #66f;">{</span><span style="color: #66f;">#27'[H'</span><span style="color: #66f;">}</span> );
+<span style="color: #66f;">//  </span><span style="color: #66f;">1.0.x: SendEscapeSeq(#27'[m'{#27'[H'});</span>
+  LastAttr:=7;
+  LastX:=-1;
+  LastY:=-1;
+  <span style="color: #00ffff;">for</span> y:=1 <span style="color: #00ffff;">to</span> ScreenHeight <span style="color: #00ffff;">do</span>
+   <span style="color: #00ffff;">begin</span>
+     SpaceAttr:=0;
+     Spaces:=0;
+     LastLineWidth:=ScreenWidth;
+     <span style="color: #00ffff;">If</span> (y=ScreenHeight) <span style="color: #00ffff;">And</span> (Console=ttyFreeBSD) <span style="color: #66f;">{</span><span style="color: #66f;">And :am: is on</span><span style="color: #66f;">}</span> <span style="color: #00ffff;">Then</span>
+      LastLineWidth:=ScreenWidth-2;
+     <span style="color: #00ffff;">for</span> x:=1 <span style="color: #00ffff;">to</span> LastLineWidth <span style="color: #00ffff;">do</span>
+      <span style="color: #00ffff;">begin</span>
+        <span style="color: #00ffff;">if</span> (<span style="color: #00ffff;">not</span> force) <span style="color: #00ffff;">and</span> (p^=pold^) <span style="color: #00ffff;">then</span>
+         <span style="color: #00ffff;">begin</span>
+           <span style="color: #00ffff;">if</span> (Spaces&gt;0) <span style="color: #00ffff;">then</span>
+            OutSpaces;
+           skipped:=true;
+         <span style="color: #00ffff;">end</span>
+        <span style="color: #00ffff;">else</span>
+         <span style="color: #00ffff;">begin</span>
+           <span style="color: #00ffff;">if</span> skipped <span style="color: #00ffff;">then</span>
+            <span style="color: #00ffff;">begin</span>
+              OutData(XY2Ansi(x,y,LastX,LastY));
+              LastX:=x;
+              LastY:=y;
+              skipped:=false;
+            <span style="color: #00ffff;">end</span>;
+           chattr:=tchattr(p^);
+<span style="color: #66f;">{           </span><span style="color: #66f;">if chattr.ch in [#0,#255] then</span>
+<span style="color: #66f;">            chattr.ch:=' ';</span><span style="color: #66f;">}</span>
+           <span style="color: #00ffff;">if</span> chattr.ch=<span style="color: #00ff00;">' '</span> <span style="color: #00ffff;">then</span>
+            <span style="color: #00ffff;">begin</span>
+              <span style="color: #00ffff;">if</span> Spaces=0 <span style="color: #00ffff;">then</span>
+               SpaceAttr:=chattr.Attr;
+              <span style="color: #00ffff;">if</span> (chattr.attr <span style="color: #00ffff;">and</span> $f0)=(spaceattr <span style="color: #00ffff;">and</span> $f0) <span style="color: #00ffff;">then</span>
+               chattr.Attr:=SpaceAttr
+              <span style="color: #00ffff;">else</span>
+               <span style="color: #00ffff;">begin</span>
+                 OutSpaces;
+                 SpaceAttr:=chattr.Attr;
+               <span style="color: #00ffff;">end</span>;
+              inc(Spaces);
+            <span style="color: #00ffff;">end</span>
+           <span style="color: #00ffff;">else</span>
+            <span style="color: #00ffff;">begin</span>
+              <span style="color: #00ffff;">if</span> (Spaces&gt;0) <span style="color: #00ffff;">then</span>
+               OutSpaces;
+<span style="color: #66f;">{              </span><span style="color: #66f;">if ord(chattr.ch)&lt;32 then</span>
+<span style="color: #66f;">                begin</span>
+<span style="color: #66f;">                  Chattr.Attr:= $ff xor Chattr.Attr;</span>
+<span style="color: #66f;">                  ChAttr.ch:=chr(ord(chattr.ch)+ord('A')-1);</span>
+<span style="color: #66f;">                end;</span><span style="color: #66f;">}</span>
+              <span style="color: #00ffff;">if</span> LastAttr&lt;&gt;chattr.Attr <span style="color: #00ffff;">then</span>
+               OutClr(chattr.Attr);
+              OutData(transform(chattr.ch));
+              LastX:=x+1;
+              LastY:=y;
+            <span style="color: #00ffff;">end</span>;
+           p^:=tvideocell(chattr);
+         <span style="color: #00ffff;">end</span>;
+        inc(p);
+        inc(pold);
+      <span style="color: #00ffff;">end</span>;
+     <span style="color: #00ffff;">if</span> (Spaces&gt;0) <span style="color: #00ffff;">then</span>
+      OutSpaces;
+     <span style="color: #00ffff;">if</span> force <span style="color: #00ffff;">then</span>
+      inc(eol)
+     <span style="color: #00ffff;">else</span>
+      skipped:=true;
+   <span style="color: #00ffff;">end</span>;
+  eol:=0;
+ <span style="color: #66f;">{</span><span style="color: #66f;">if am in capabilities? Then</span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">if</span> (Console=ttyFreeBSD) <span style="color: #00ffff;">and</span> (Plongint(p)^&lt;&gt;plongint(pold)^) <span style="color: #00ffff;">Then</span>
+   <span style="color: #00ffff;">begin</span>
+    OutData(XY2Ansi(ScreenWidth,ScreenHeight,LastX,LastY));
+    OutData(#8);
+    <span style="color: #66f;">{</span><span style="color: #66f;">Output last char</span><span style="color: #66f;">}</span>
+    chattr:=tchattr(p[1]);
+    <span style="color: #00ffff;">if</span> LastAttr&lt;&gt;chattr.Attr <span style="color: #00ffff;">then</span>
+     OutClr(chattr.Attr);
+    OutData(transform(chattr.ch));
+    inc(LastX);
+<span style="color: #66f;">//    </span><span style="color: #66f;">OutData(XY2Ansi(ScreenWidth-1,ScreenHeight,LastX,LastY));</span>
+<span style="color: #66f;">//   </span><span style="color: #66f;">OutData(GetTermString(Insert_character));</span>
+    OutData(#8+#27+<span style="color: #00ff00;">'[1@'</span>);
+
+    chattr:=tchattr(p^);
+    <span style="color: #00ffff;">if</span> LastAttr&lt;&gt;chattr.Attr <span style="color: #00ffff;">then</span>
+     OutClr(chattr.Attr);
+    OutData(transform(chattr.ch));
+    inc(LastX);
+   <span style="color: #00ffff;">end</span>;
+  OutData(XY2Ansi(CursorX+1,CursorY+1,LastX,LastY));
+  <span style="color: #00ffff;">if</span> in_ACS <span style="color: #00ffff;">then</span>
+    <span style="color: #00ffff;">begin</span>
+      <span style="color: #66f;">{</span><span style="color: #66f;">If the program crashes and the ACS is still enabled, the user's</span>
+<span style="color: #66f;">       keyboard will output strange characters. Therefore we disable the</span>
+<span style="color: #66f;">       acs after each screen update, so the risk that it happens is greatly</span>
+<span style="color: #66f;">       reduced.</span><span style="color: #66f;">}</span>
+<span style="color: #66f;">{      </span><span style="color: #66f;">SendEscapeSeqNdx(exit_alt_charset_mode);</span><span style="color: #66f;">}</span>
+      outdata(acsout);
+      in_acs:=false;
+    <span style="color: #00ffff;">end</span>;
+<span style="color: #66f;">{</span><span style="color: #66f;">$ifdef logging</span><span style="color: #66f;">}</span>
+  blockwrite(f,logstart[1],length(logstart));
+  blockwrite(f,nl,1);
+  blockwrite(f,outptr,sizeof(outptr));
+  blockwrite(f,nl,1);
+  blockwrite(f,outbuf,outptr);
+  blockwrite(f,nl,1);
+<span style="color: #66f;">{</span><span style="color: #66f;">$endif logging</span><span style="color: #66f;">}</span>
+  fpWrite(stdoutputhandle,outbuf,outptr);
+ <span style="color: #66f;">{</span><span style="color: #66f;">turn autowrap on</span><span style="color: #66f;">}</span>
+<span style="color: #66f;">//  </span><span style="color: #66f;">SendEscapeSeq(#27'[?7h');</span>
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-17" class="outline-2">
+<h2 id="sec-17"><span class="section-number-2">17</span> procedure update<sub>vcsa</sub>(force:boolean);</h2>
+<div class="outline-text-2" id="text-17">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">update_vcsa</span>(force:<span style="color: #ff00ff;">boolean</span>);
+
+<span style="color: #ff00ff;">const</span> max_updates=64;
+
+label update,update_all,equal_loop,unequal_loop;
+
+<span style="color: #ff00ff;">var</span> position,update_count,i:word;
+    update_positions:<span style="color: #ff00ff;">array</span>[0..max_updates-1] <span style="color: #00ffff;">of</span> word;
+    update_lengths:<span style="color: #ff00ff;">array</span>[0..max_updates-1] <span style="color: #00ffff;">of</span> word;
+
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">if</span> force <span style="color: #00ffff;">then</span>
+    <span style="color: #00ffff;">goto</span> update_all;
+
+  update_count:=0;
+  i:=0;
+
+equal_loop:
+  <span style="color: #00ffff;">repeat</span>
+    <span style="color: #00ffff;">if</span> videobuf^[i]&lt;&gt;oldvideobuf^[i] <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">goto</span> unequal_loop;
+    inc(i);
+  <span style="color: #00ffff;">until</span> i&gt;videobufsize <span style="color: #00ffff;">div</span> 2;
+  <span style="color: #00ffff;">goto</span> update;
+
+unequal_loop:
+  <span style="color: #00ffff;">if</span> update_count&gt;=max_updates <span style="color: #00ffff;">then</span>
+    <span style="color: #00ffff;">goto</span> update_all;
+  update_positions[update_count]:=i;
+  update_lengths[update_count]:=0;
+  inc(update_count);
+  <span style="color: #00ffff;">repeat</span>
+    <span style="color: #00ffff;">if</span> videobuf^[i]=oldvideobuf^[i] <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">goto</span> equal_loop;
+    inc(i);
+    inc(update_lengths[update_count-1]);
+  <span style="color: #00ffff;">until</span> i&gt;videobufsize <span style="color: #00ffff;">div</span> 2;
+
+update:
+  <span style="color: #00ffff;">for</span> i:=1 <span style="color: #00ffff;">to</span> update_count <span style="color: #00ffff;">do</span>
+    <span style="color: #00ffff;">begin</span>
+      position:=update_positions[i-1];
+      fppwrite(ttyfd,videobuf^[position],update_lengths[i-1]*2,4+position*2);
+    <span style="color: #00ffff;">end</span>;
+  exit;
+update_all:
+  fppwrite(ttyfd,videobuf^,videobufsize,4);
+<span style="color: #00ffff;">end</span>;
+<span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-18" class="outline-2">
+<h2 id="sec-18"><span class="section-number-2">18</span> procedure saveRawSettings(const tio: termio.termios);</h2>
+<div class="outline-text-2" id="text-18">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">var</span>
+  preInitVideoTio, postInitVideoTio: termio.termios;
+  inputRaw, outputRaw: <span style="color: #ff00ff;">boolean</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">saveRawSettings</span>(<span style="color: #ff00ff;">const</span> tio: termio.termios);
+
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">with</span> tio <span style="color: #00ffff;">do</span>
+   <span style="color: #00ffff;">begin</span>
+     inputRaw :=
+       ((c_iflag <span style="color: #00ffff;">and</span> (IGNBRK <span style="color: #00ffff;">or</span> BRKINT <span style="color: #00ffff;">or</span> PARMRK <span style="color: #00ffff;">or</span> ISTRIP <span style="color: #00ffff;">or</span>
+                                INLCR <span style="color: #00ffff;">or</span> IGNCR <span style="color: #00ffff;">or</span> ICRNL <span style="color: #00ffff;">or</span> IXON)) = 0) <span style="color: #00ffff;">and</span>
+       ((c_lflag <span style="color: #00ffff;">and</span> (ECHO <span style="color: #00ffff;">or</span> ECHONL <span style="color: #00ffff;">or</span> ICANON <span style="color: #00ffff;">or</span> ISIG <span style="color: #00ffff;">or</span> IEXTEN)) = 0);
+     outPutRaw :=
+       ((c_oflag <span style="color: #00ffff;">and</span> OPOST) = 0) <span style="color: #00ffff;">and</span>
+       ((c_cflag <span style="color: #00ffff;">and</span> (CSIZE <span style="color: #00ffff;">or</span> PARENB)) = 0) <span style="color: #00ffff;">and</span>
+       ((c_cflag <span style="color: #00ffff;">and</span> CS8) &lt;&gt; 0);
+   <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-19" class="outline-2">
+<h2 id="sec-19"><span class="section-number-2">19</span> procedure restoreRawSettings(tio: termio.termios);</h2>
+<div class="outline-text-2" id="text-19">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">restoreRawSettings</span>(tio: termio.termios);
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">with</span> tio <span style="color: #00ffff;">do</span>
+    <span style="color: #00ffff;">begin</span>
+      <span style="color: #00ffff;">if</span> inputRaw <span style="color: #00ffff;">then</span>
+        <span style="color: #00ffff;">begin</span>
+          c_iflag := c_iflag <span style="color: #00ffff;">and</span> (<span style="color: #00ffff;">not</span> (IGNBRK <span style="color: #00ffff;">or</span> BRKINT <span style="color: #00ffff;">or</span> PARMRK <span style="color: #00ffff;">or</span> ISTRIP <span style="color: #00ffff;">or</span>
+            INLCR <span style="color: #00ffff;">or</span> IGNCR <span style="color: #00ffff;">or</span> ICRNL <span style="color: #00ffff;">or</span> IXON));
+          c_lflag := c_lflag <span style="color: #00ffff;">and</span>
+            (<span style="color: #00ffff;">not</span> (ECHO <span style="color: #00ffff;">or</span> ECHONL <span style="color: #00ffff;">or</span> ICANON <span style="color: #00ffff;">or</span> ISIG <span style="color: #00ffff;">or</span> IEXTEN));
+          c_cc[VMIN]:=1;
+          c_cc[VTIME]:=0;
+        <span style="color: #00ffff;">end</span>;
+     <span style="color: #00ffff;">if</span> outPutRaw <span style="color: #00ffff;">then</span>
+       <span style="color: #00ffff;">begin</span>
+         c_oflag := c_oflag <span style="color: #00ffff;">and</span> <span style="color: #00ffff;">not</span>(OPOST);
+         c_cflag := c_cflag <span style="color: #00ffff;">and</span> <span style="color: #00ffff;">not</span>(CSIZE <span style="color: #00ffff;">or</span> PARENB) <span style="color: #00ffff;">or</span> CS8;
+       <span style="color: #00ffff;">end</span>;
+   <span style="color: #00ffff;">end</span>;
+  TCSetAttr(1,TCSANOW,tio);
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-20" class="outline-2">
+<h2 id="sec-20"><span class="section-number-2">20</span> function UTF8Enabled: Boolean;</h2>
+<div class="outline-text-2" id="text-20">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">UTF8Enabled</span>: <span style="color: #ff00ff;">Boolean</span>;
+<span style="color: #ff00ff;">var</span>
+  lang:<span style="color: #ff00ff;">string</span>;
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef BEOS</span><span style="color: #66f;">}</span>
+  UTF8Enabled := true;
+  exit;
+  <span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+  lang:=upcase(fpgetenv(<span style="color: #00ff00;">'LANG'</span>));
+  UTF8Enabled := (Pos(<span style="color: #00ff00;">'.UTF-8'</span>, lang) &gt; 0) <span style="color: #00ffff;">or</span> (Pos(<span style="color: #00ff00;">'.UTF8'</span>, lang) &gt; 0);
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-21" class="outline-2">
+<h2 id="sec-21"><span class="section-number-2">21</span> procedure decide<sub>codepages</sub>;</h2>
+<div class="outline-text-2" id="text-21">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">decide_codepages</span>;
+
+<span style="color: #ff00ff;">var</span> s:<span style="color: #ff00ff;">string</span>;
+
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">if</span> external_codepage <span style="color: #00ffff;">in</span> vga_codepages <span style="color: #00ffff;">then</span>
+    <span style="color: #00ffff;">begin</span>
+      <span style="color: #66f;">{</span><span style="color: #66f;">Possible override...</span><span style="color: #66f;">}</span>
+      s:=upcase(fpgetenv(<span style="color: #00ff00;">'CONSOLEFONT_CP'</span>));
+      <span style="color: #00ffff;">if</span> s=<span style="color: #00ff00;">'CP437'</span> <span style="color: #00ffff;">then</span>
+        external_codepage:=cp437
+      <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> s=<span style="color: #00ff00;">'CP850'</span> <span style="color: #00ffff;">then</span>
+        external_codepage:=cp850;
+    <span style="color: #00ffff;">end</span>;
+  <span style="color: #66f;">{</span><span style="color: #66f;">A non-vcsa Linux console can display most control characters, but not all.</span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">if</span> <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>(console&lt;&gt;ttyLinux) <span style="color: #00ffff;">and</span><span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+     (cur_term_strings=@term_codes_linux) <span style="color: #00ffff;">then</span>
+    convert:=cv_linuxlowascii_to_vga;
+  <span style="color: #00ffff;">case</span> external_codepage <span style="color: #00ffff;">of</span>
+    iso01:               <span style="color: #66f;">{</span><span style="color: #66f;">West Europe</span><span style="color: #66f;">}</span>
+      <span style="color: #00ffff;">begin</span>
+        internal_codepage:=cp850;
+        convert:=cv_cp850_to_iso01;
+      <span style="color: #00ffff;">end</span>;
+    iso02:               <span style="color: #66f;">{</span><span style="color: #66f;">East Europe</span><span style="color: #66f;">}</span>
+      internal_codepage:=cp852;
+    iso05:               <span style="color: #66f;">{</span><span style="color: #66f;">Cyrillic</span><span style="color: #66f;">}</span>
+      internal_codepage:=cp866;
+    utf8:
+      <span style="color: #00ffff;">begin</span>
+        internal_codepage:=cp437;
+        convert:=cv_cp437_to_UTF8;
+      <span style="color: #00ffff;">end</span>;
+    <span style="color: #00ffff;">else</span>
+      <span style="color: #00ffff;">if</span> internal_codepage <span style="color: #00ffff;">in</span> vga_codepages <span style="color: #00ffff;">then</span>
+        internal_codepage:=external_codepage
+      <span style="color: #00ffff;">else</span>
+        <span style="color: #66f;">{</span><span style="color: #66f;">We don't know how to convert to the external codepage. Use codepage</span>
+<span style="color: #66f;">         437 in the hope that the actual font has similarity to codepage 437.</span><span style="color: #66f;">}</span>
+        internal_codepage:=cp437;
+  <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-22" class="outline-2">
+<h2 id="sec-22"><span class="section-number-2">22</span> procedure prepareInitVideo;</h2>
+<div class="outline-text-2" id="text-22">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">prepareInitVideo</span>;
+<span style="color: #00ffff;">begin</span>
+  TCGetAttr(1,preInitVideoTio);
+  saveRawSettings(preInitVideoTio);
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-23" class="outline-2">
+<h2 id="sec-23"><span class="section-number-2">23</span> procedure videoInitDone;</h2>
+<div class="outline-text-2" id="text-23">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">videoInitDone</span>;
+<span style="color: #00ffff;">begin</span>
+  TCGetAttr(1,postInitVideoTio);
+  restoreRawSettings(postInitVideoTio);
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-24" class="outline-2">
+<h2 id="sec-24"><span class="section-number-2">24</span> procedure prepareDoneVideo;</h2>
+<div class="outline-text-2" id="text-24">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">prepareDoneVideo</span>;
+<span style="color: #ff00ff;">var</span>
+  tio: termio.termios;
+<span style="color: #00ffff;">begin</span>
+  TCGetAttr(1,tio);
+  saveRawSettings(tio);
+  TCSetAttr(1,TCSANOW,postInitVideoTio);
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-25" class="outline-2">
+<h2 id="sec-25"><span class="section-number-2">25</span> procedure doneVideoDone;</h2>
+<div class="outline-text-2" id="text-25">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">doneVideoDone</span>;
+<span style="color: #00ffff;">begin</span>
+  restoreRawSettings(preInitVideoTio);
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-26" class="outline-2">
+<h2 id="sec-26"><span class="section-number-2">26</span> procedure SysInitVideo;</h2>
+<div class="outline-text-2" id="text-26">
+<div class="org-src-container">
+
+<pre class="src src-pascal"> <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SysInitVideo</span>;
+ <span style="color: #ff00ff;">var</span>
+   <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+   FName        : <span style="color: #ff00ff;">String</span>;
+   <span style="color: #66f;">{</span><span style="color: #66f;">$endif linux</span><span style="color: #66f;">}</span>
+   WS           : <span style="color: #ff00ff;">packed</span> <span style="color: #ff00ff;">record</span>
+                    ws_row, ws_col, ws_xpixel, ws_ypixel : Word;
+                  <span style="color: #00ffff;">end</span>;                                   
+   <span style="color: #66f;">{  </span><span style="color: #66f;">Err       : Longint;</span><span style="color: #66f;">}</span>
+   <span style="color: #66f;">{  </span><span style="color: #66f;">prev_term : TerminalCommon_ptr1;</span><span style="color: #66f;">}</span>
+   term         : <span style="color: #ff00ff;">string</span>;
+   i            : word;
+   <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef Linux</span><span style="color: #66f;">}</span>
+   s            : <span style="color: #ff00ff;">string</span>[15];
+   <span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>     
+   <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef freebsd</span><span style="color: #66f;">}</span>
+   ThisTTY      : <span style="color: #ff00ff;">String</span>[30];
+   <span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>     
+
+ <span style="color: #ff00ff;">const</span> font_vga:<span style="color: #ff00ff;">array</span>[0..11] <span style="color: #00ffff;">of</span> <span style="color: #ff00ff;">char</span>=#15#27<span style="color: #00ff00;">'%@'</span>#27<span style="color: #00ff00;">'(U'</span>#27<span style="color: #00ff00;">'[3h'</span>;
+       font_lat1:<span style="color: #ff00ff;">array</span>[0..5] <span style="color: #00ffff;">of</span> <span style="color: #ff00ff;">char</span>=#27<span style="color: #00ff00;">'%@'</span>#27<span style="color: #00ff00;">'(B'</span>;
+
+ <span style="color: #00ffff;">begin</span>
+   <span style="color: #66f;">{ </span><span style="color: #66f;">check for tty </span><span style="color: #66f;">}</span>
+   <span style="color: #00ffff;">if</span> (IsATTY(stdinputhandle)=1) <span style="color: #00ffff;">then</span>
+   <span style="color: #00ffff;">begin</span>
+     <span style="color: #66f;">{ </span><span style="color: #66f;">save current terminal characteristics and remove rawness </span><span style="color: #66f;">}</span>
+     prepareInitVideo;
+ <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+     <span style="color: #66f;">{ </span><span style="color: #66f;">running on a tty, find out whether locally or remotely </span><span style="color: #66f;">}</span>
+     TTyfd := -1;
+ <span style="color: #66f;">{</span><span style="color: #66f;">$endif linux</span><span style="color: #66f;">}</span>
+     Console:=TTyNetwork;                 <span style="color: #66f;">{</span><span style="color: #66f;">Default: Network or other vtxxx tty</span><span style="color: #66f;">}</span>
+     cur_term_strings:=@term_codes_vt100; <span style="color: #66f;">{</span><span style="color: #66f;">Default: vt100</span><span style="color: #66f;">}</span>
+     external_codepage:=iso01;            <span style="color: #66f;">{</span><span style="color: #66f;">Default: ISO-8859-1</span><span style="color: #66f;">}</span>
+     <span style="color: #00ffff;">if</span> UTF8Enabled <span style="color: #00ffff;">then</span> external_codepage:=utf8;
+
+     <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+     <span style="color: #00ffff;">if</span> (vcs_device&gt;=0) <span style="color: #00ffff;">and</span> (external_codepage&lt;&gt;utf8) <span style="color: #00ffff;">then</span>
+       <span style="color: #00ffff;">begin</span>
+         str(vcs_device,s);
+         fname:=<span style="color: #00ff00;">'/dev/vcsa'</span>+s;
+         <span style="color: #66f;">{ </span><span style="color: #66f;">open console, $1b6=rw-rw-rw- </span><span style="color: #66f;">}</span>
+         ttyfd:=fpopen(fname,$1b6,O_RDWR);
+         <span style="color: #00ffff;">if</span> ttyfd&lt;&gt;-1 <span style="color: #00ffff;">then</span>
+           <span style="color: #00ffff;">begin</span>
+             console:=ttylinux;
+             external_codepage:=cp437;  <span style="color: #66f;">{</span><span style="color: #66f;">VCSA defaults to codepage 437.</span><span style="color: #66f;">}</span>
+           <span style="color: #00ffff;">end</span>
+         <span style="color: #00ffff;">else</span>
+           <span style="color: #00ffff;">if</span> try_grab_vcsa <span style="color: #00ffff;">then</span>
+             <span style="color: #00ffff;">begin</span>
+               ttyfd:=fpopen(fname,$1b6,O_RDWR);
+               <span style="color: #00ffff;">if</span> ttyfd&lt;&gt;-1 <span style="color: #00ffff;">then</span>
+                 <span style="color: #00ffff;">begin</span>
+                   console:=ttylinux;
+                   external_codepage:=cp437;  <span style="color: #66f;">{</span><span style="color: #66f;">VCSA defaults to codepage 437.</span><span style="color: #66f;">}</span>
+                 <span style="color: #00ffff;">end</span>;
+             <span style="color: #00ffff;">end</span>;
+       <span style="color: #00ffff;">end</span>;
+    <span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+
+ <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef freebsd</span><span style="color: #66f;">}</span>
+     ThisTTY:=TTYName(stdinputhandle);
+     <span style="color: #00ffff;">if</span> copy(ThisTTY, 1, 9) = <span style="color: #00ff00;">'/dev/ttyv'</span> <span style="color: #00ffff;">then</span>  <span style="color: #66f;">{</span><span style="color: #66f;">FreeBSD has these</span><span style="color: #66f;">}</span>
+       <span style="color: #00ffff;">begin</span>
+         <span style="color: #66f;">{ </span><span style="color: #66f;">check for (Free?)BSD native</span><span style="color: #66f;">}</span>
+         <span style="color: #00ffff;">if</span> (ThisTTY[10]&gt;=<span style="color: #00ff00;">'0'</span>) <span style="color: #00ffff;">and</span> (ThisTTY[10]&lt;=<span style="color: #00ff00;">'9'</span>) <span style="color: #00ffff;">Then</span>
+           Console:=ttyFreeBSD;   <span style="color: #66f;">{</span><span style="color: #66f;">TTYFd ?</span><span style="color: #66f;">}</span>
+       <span style="color: #00ffff;">end</span>;
+ <span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+     term:=fpgetenv(<span style="color: #00ff00;">'TERM'</span>);
+     <span style="color: #00ffff;">for</span> i:=low(terminal_names) <span style="color: #00ffff;">to</span> high(terminal_names) <span style="color: #00ffff;">do</span>
+       <span style="color: #00ffff;">if</span> copy(term,1,length(terminal_names[i]))=terminal_names[i] <span style="color: #00ffff;">then</span>
+         cur_term_strings:=terminal_data[i];
+     <span style="color: #00ffff;">if</span> cur_term_strings=@term_codes_xterm <span style="color: #00ffff;">then</span>
+       <span style="color: #00ffff;">begin</span>
+         <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef haiku</span><span style="color: #66f;">}</span>
+         TerminalSupportsBold := true;
+         TerminalSupportsHighIntensityColors := false;
+         <span style="color: #66f;">{</span><span style="color: #66f;">$else</span><span style="color: #66f;">}</span>
+         TerminalSupportsBold := false;
+         TerminalSupportsHighIntensityColors := true;
+         <span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+       <span style="color: #00ffff;">end</span>
+     <span style="color: #00ffff;">else</span>
+       <span style="color: #00ffff;">begin</span>
+         TerminalSupportsBold := true;
+         TerminalSupportsHighIntensityColors := false;
+       <span style="color: #00ffff;">end</span>;
+     <span style="color: #00ffff;">if</span> cur_term_strings=@term_codes_beos <span style="color: #00ffff;">then</span>
+       <span style="color: #00ffff;">begin</span>
+         TerminalSupportsBold := false;
+         TerminalSupportsHighIntensityColors := false;      
+       <span style="color: #00ffff;">end</span>;
+     <span style="color: #00ffff;">if</span> cur_term_strings=@term_codes_freebsd <span style="color: #00ffff;">then</span>
+       console:=ttyFreeBSD;
+<span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+     <span style="color: #00ffff;">if</span> (console&lt;&gt;ttylinux) <span style="color: #00ffff;">then</span>
+       <span style="color: #00ffff;">begin</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+         <span style="color: #00ffff;">if</span> cur_term_strings=@term_codes_linux <span style="color: #00ffff;">then</span>
+           <span style="color: #00ffff;">begin</span>
+             <span style="color: #00ffff;">if</span> external_codepage&lt;&gt;utf8 <span style="color: #00ffff;">then</span>
+               <span style="color: #00ffff;">begin</span>
+                 <span style="color: #66f;">{</span><span style="color: #66f;">Enable the VGA character set (codepage 437,850,....)</span><span style="color: #66f;">}</span>
+                 fpwrite(stdoutputhandle,font_vga,sizeof(font_vga));
+                 external_codepage:=cp437;  <span style="color: #66f;">{</span><span style="color: #66f;">Now default to codepage 437.</span><span style="color: #66f;">}</span>
+               <span style="color: #00ffff;">end</span>;
+           <span style="color: #00ffff;">end</span>
+         <span style="color: #00ffff;">else</span>
+           <span style="color: #00ffff;">begin</span>
+             <span style="color: #00ffff;">if</span> external_codepage&lt;&gt;utf8 <span style="color: #00ffff;">then</span>
+             <span style="color: #00ffff;">begin</span>
+               <span style="color: #66f;">{</span><span style="color: #66f;">No VGA font  :(  </span><span style="color: #66f;">}</span>
+               fpwrite(stdoutputhandle,font_lat1,sizeof(font_lat1));
+             <span style="color: #00ffff;">end</span>;
+             <span style="color: #66f;">{ </span><span style="color: #66f;">running on a remote terminal, no error with /dev/vcsa </span><span style="color: #66f;">}</span>
+           <span style="color: #00ffff;">end</span>;
+         <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+       <span style="color: #00ffff;">end</span>;
+     <span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+     fpioctl(stdinputhandle, TIOCGWINSZ, @WS);
+     <span style="color: #00ffff;">if</span> WS.ws_Col=0 <span style="color: #00ffff;">then</span> WS.ws_Col:=80;
+     <span style="color: #00ffff;">if</span> WS.ws_Row=0 <span style="color: #00ffff;">then</span> WS.ws_Row:=25;
+     ScreenWidth:=WS.ws_Col;
+     <span style="color: #66f;">{ </span><span style="color: #66f;">TDrawBuffer only has FVMaxWidth elements</span>
+<span style="color: #66f;">       larger values lead to crashes </span><span style="color: #66f;">}</span>
+     <span style="color: #00ffff;">if</span> ScreenWidth&gt; FVMaxWidth <span style="color: #00ffff;">then</span> ScreenWidth:=FVMaxWidth;
+      ScreenHeight:=WS.ws_Row;
+      CursorX:=0;
+      CursorY:=0;
+      LastCursorType:=$ff;
+      ScreenColor:=True;
+      <span style="color: #66f;">{ </span><span style="color: #66f;">Start with a clear screen </span><span style="color: #66f;">}</span>
+    <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+     <span style="color: #00ffff;">if</span> Console&lt;&gt;ttylinux <span style="color: #00ffff;">then</span>
+       <span style="color: #00ffff;">begin</span>
+    <span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+         SendEscapeSeqNdx(cursor_home);
+         SendEscapeSeqNdx(cursor_normal);
+         SendEscapeSeqNdx(cursor_visible_underline);
+         SendEscapeSeqNdx(enter_ca_mode);
+         SetCursorType(crUnderLine);
+         <span style="color: #00ffff;">If</span> Console=ttyFreeBSD <span style="color: #00ffff;">Then</span>
+           SendEscapeSeqNdx(exit_am_mode);
+    <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+       <span style="color: #00ffff;">end</span>;
+    <span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+ <span style="color: #66f;">{   </span><span style="color: #66f;">Always true because of vt100 default...</span>
+<span style="color: #66f;">   if assigned(cur_term_Strings) then</span>
+<span style="color: #66f;">        begin</span><span style="color: #66f;">}</span>
+     ACSIn:=StrPas(cur_term_strings^[enter_alt_charset_mode]);
+     ACSOut:=StrPas(cur_term_strings^[exit_alt_charset_mode]);
+     <span style="color: #00ffff;">if</span> (ACSIn&lt;&gt;<span style="color: #00ff00;">''</span>) <span style="color: #00ffff;">and</span> (ACSOut&lt;&gt;<span style="color: #00ff00;">''</span>) <span style="color: #00ffff;">then</span>
+       SendEscapeSeqNdx(ena_acs);
+     <span style="color: #66f;">(*         </span><span style="color: #66f;">If fpGetEnv('TERM')='xterm' then</span>
+<span style="color: #66f;">       convert:=cv_vga_to_acs;  {use of acs for xterm is ok</span><span style="color: #66f;">}</span>*)
+     <span style="color: #66f;">{       </span><span style="color: #66f;">end</span>
+<span style="color: #66f;">      else</span>
+<span style="color: #66f;">        begin</span>
+<span style="color: #66f;">       ACSIn:='';</span>
+<span style="color: #66f;">       ACSOut:='';</span>
+<span style="color: #66f;">        end;</span><span style="color: #66f;">}</span>
+     <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef logging</span><span style="color: #66f;">}</span>
+     assign(f,<span style="color: #00ff00;">'video.log'</span>);
+     rewrite(f,1);
+     <span style="color: #66f;">{</span><span style="color: #66f;">$endif logging</span><span style="color: #66f;">}</span>
+     <span style="color: #66f;">{ </span><span style="color: #66f;">save new terminal characteristics and possible restore rawness </span><span style="color: #66f;">}</span>
+     videoInitDone;
+
+     decide_codepages;
+   <span style="color: #00ffff;">end</span>
+   <span style="color: #00ffff;">else</span> ErrorCode:=errVioInit; <span style="color: #66f;">{ </span><span style="color: #66f;">not a TTY </span><span style="color: #66f;">}</span>
+ <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-27" class="outline-2">
+<h2 id="sec-27"><span class="section-number-2">27</span> procedure SysDoneVideo;</h2>
+<div class="outline-text-2" id="text-27">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SysDoneVideo</span>;
+
+<span style="color: #ff00ff;">var</span> font_custom:<span style="color: #ff00ff;">array</span>[0..2] <span style="color: #00ffff;">of</span> <span style="color: #ff00ff;">char</span>=#27<span style="color: #00ff00;">'(K'</span>;
+
+<span style="color: #00ffff;">begin</span>
+  prepareDoneVideo;
+  SetCursorType(crUnderLine);
+<span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">if</span> Console=ttylinux <span style="color: #00ffff;">then</span>
+   SetCursorPos(0,0)
+  <span style="color: #00ffff;">else</span>
+   <span style="color: #00ffff;">begin</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+     SendEscapeSeqNdx(exit_ca_mode);
+     SendEscapeSeqNdx(cursor_home);
+     SendEscapeSeqNdx(cursor_normal);
+     SendEscapeSeqNdx(cursor_visible_underline);
+     SendEscapeSeq(#27<span style="color: #00ff00;">'[H'</span>);
+     <span style="color: #00ffff;">if</span> cur_term_strings=@term_codes_linux <span style="color: #00ffff;">then</span>
+       <span style="color: #00ffff;">begin</span>
+         <span style="color: #66f;">{</span><span style="color: #66f;">Executed in case ttylinux is false (i.e. no vcsa), but</span>
+<span style="color: #66f;">          TERM=linux.</span><span style="color: #66f;">}</span>
+
+         <span style="color: #66f;">{ </span><span style="color: #66f;">if we're in utf8 mode, we didn't change the font, so</span>
+<span style="color: #66f;">           no need to restore anything </span><span style="color: #66f;">}</span>
+         <span style="color: #00ffff;">if</span> external_codepage&lt;&gt;utf8 <span style="color: #00ffff;">then</span>
+         <span style="color: #00ffff;">begin</span>
+           <span style="color: #66f;">{</span><span style="color: #66f;">Enable the character set set through setfont</span><span style="color: #66f;">}</span>
+           fpwrite(stdoutputhandle,font_custom,3);
+         <span style="color: #00ffff;">end</span>;
+       <span style="color: #00ffff;">end</span>;
+<span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+   <span style="color: #00ffff;">end</span>;
+<span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+  ACSIn:=<span style="color: #00ff00;">''</span>;
+  ACSOut:=<span style="color: #00ff00;">''</span>;
+  doneVideoDone;
+<span style="color: #66f;">{</span><span style="color: #66f;">$ifdef logging</span><span style="color: #66f;">}</span>
+  close(f);
+<span style="color: #66f;">{</span><span style="color: #66f;">$endif logging</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-28" class="outline-2">
+<h2 id="sec-28"><span class="section-number-2">28</span> procedure SysClearScreen;</h2>
+<div class="outline-text-2" id="text-28">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SysClearScreen</span>;
+<span style="color: #00ffff;">begin</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">if</span> Console=ttylinux <span style="color: #00ffff;">then</span>
+    UpdateScreen(true)
+  <span style="color: #00ffff;">else</span>
+    <span style="color: #00ffff;">begin</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+      SendEscapeSeq(#27<span style="color: #00ff00;">'[0m'</span>);
+      SendEscapeSeqNdx(clear_screen);
+<span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">end</span>;
+<span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-29" class="outline-2">
+<h2 id="sec-29"><span class="section-number-2">29</span> procedure SysUpdateScreen(Force: Boolean);</h2>
+<div class="outline-text-2" id="text-29">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SysUpdateScreen</span>(Force: <span style="color: #ff00ff;">Boolean</span>);
+<span style="color: #00ffff;">begin</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">if</span> console=ttylinux <span style="color: #00ffff;">then</span>
+    update_vcsa(force)
+  <span style="color: #00ffff;">else</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+    updateTTY(force);
+  move(VideoBuf^,OldVideoBuf^,VideoBufSize);
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-30" class="outline-2">
+<h2 id="sec-30"><span class="section-number-2">30</span> function SysGetCapabilities: Word;</h2>
+<div class="outline-text-2" id="text-30">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">SysGetCapabilities</span>: Word;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #66f;">{ </span><span style="color: #66f;">about cpColor... we should check the terminfo database... </span><span style="color: #66f;">}</span>
+    SysGetCapabilities:=cpUnderLine + cpBlink + cpColor;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-31" class="outline-2">
+<h2 id="sec-31"><span class="section-number-2">31</span> procedure SysSetCursorPos(NewCursorX, NewCursorY: Word);</h2>
+<div class="outline-text-2" id="text-31">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SysSetCursorPos</span>(NewCursorX, NewCursorY: Word);
+  <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+  <span style="color: #ff00ff;">var</span> Pos : <span style="color: #ff00ff;">array</span> [1..2] <span style="color: #00ffff;">of</span> Byte;
+  <span style="color: #66f;">{</span><span style="color: #66f;">$endif linux</span><span style="color: #66f;">}</span> 
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> (CursorX=NewCursorX) <span style="color: #00ffff;">and</span> (CursorY=NewCursorY) <span style="color: #00ffff;">then</span> exit;
+    <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef linux</span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">if</span> Console=ttylinux <span style="color: #00ffff;">then</span>
+      <span style="color: #00ffff;">begin</span>
+        Pos[1]:=NewCursorX;
+        Pos[2]:=NewCursorY;
+        fppwrite(ttyfd,pos,2,2);
+      <span style="color: #00ffff;">end</span>
+    <span style="color: #00ffff;">else</span>
+    <span style="color: #66f;">{</span><span style="color: #66f;">$endif</span><span style="color: #66f;">}</span>
+    <span style="color: #66f;">{ </span><span style="color: #66f;">newcursorx,y and CursorX,Y are 0 based </span><span style="color: #66f;">}</span>
+      SendEscapeSeq(XY2Ansi(                                                      NewCursorX+1,NewCursorY+1,
+                  CursorX+1, CursorY+1));
+    CursorX := NewCursorX;
+    CursorY := NewCursorY;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-32" class="outline-2">
+<h2 id="sec-32"><span class="section-number-2">32</span> cursor type</h2>
+<div class="outline-text-2" id="text-32">
+</div><div id="outline-container-sec-32-1" class="outline-3">
+<h3 id="sec-32-1"><span class="section-number-3">32.1</span> function SysGetCursorType: Word;</h3>
+<div class="outline-text-3" id="text-32-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">SysGetCursorType</span>: Word;
+  <span style="color: #00ffff;">begin</span>
+    SysGetCursorType := LastCursorType
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-32-2" class="outline-3">
+<h3 id="sec-32-2"><span class="section-number-3">32.2</span> procedure SysSetCursorType(NewType: Word);</h3>
+<div class="outline-text-3" id="text-32-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SysSetCursorType</span>(NewType: Word);
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> LastCursorType = NewType <span style="color: #00ffff;">then</span> exit;
+    LastCursorType := NewType;
+    <span style="color: #00ffff;">case</span> NewType <span style="color: #00ffff;">of</span>
+      crBlock  : SendEscapeSeqNdx(cursor_visible_block);
+      crHidden : SendEscapeSeqNdx(cursor_invisible);
+      otherwise  SendEscapeSeqNdx(cursor_normal)
+    <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-33" class="outline-2">
+<h2 id="sec-33"><span class="section-number-2">33</span> video modes</h2>
+<div class="outline-text-2" id="text-33">
+</div><div id="outline-container-sec-33-1" class="outline-3">
+<h3 id="sec-33-1"><span class="section-number-3">33.1</span> function SysSetVideoMode(const mode:Tvideomode):boolean;</h3>
+<div class="outline-text-3" id="text-33-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">SysSetVideoMode</span>(<span style="color: #ff00ff;">const</span> mode:Tvideomode):<span style="color: #ff00ff;">boolean</span>;
+  <span style="color: #ff00ff;">var</span> winsize:Twinsize;
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #66f;">{</span><span style="color: #66f;">Due to xterm resize this procedure might get called with the new xterm size. Approve the video mode change if the new size equals that of the terminal window size.</span><span style="color: #66f;">}</span>
+  SysSetVideoMode:=false;
+  fpioctl(stdinputhandle,TIOCGWINSZ,@winsize);
+  <span style="color: #00ffff;">if</span> (mode.row=winsize.ws_row) <span style="color: #00ffff;">and</span>
+     (mode.col=winsize.ws_col) <span style="color: #00ffff;">then</span>
+    <span style="color: #00ffff;">begin</span>
+      screenwidth  :=mode.col;
+      screenheight :=mode.row;
+      screencolor  :=true;
+      SysSetVideoMode:=true;
+    <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-34" class="outline-2">
+<h2 id="sec-34"><span class="section-number-2">34</span> dispatch record and initialization</h2>
+<div class="outline-text-2" id="text-34">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">Const</span>
+  SysVideoDriver : TVideoDriver = (
+    InitDriver : @SysInitVideo;
+    DoneDriver : @SysDoneVideo;
+    UpdateScreen : @SysUpdateScreen;
+    ClearScreen : @SysClearScreen;
+    SetVideoMode : @SysSetVideoMode;
+    GetVideoModeCount : Nil;
+    GetVideoModeData : Nil;
+    SetCursorPos : @SysSetCursorPos;
+    GetCursorType : @SysGetCursorType;
+    SetCursorType : @SysSetCursorType;
+    GetCapabilities : @SysGetCapabilities;
+  );
+
+<span style="color: #00ffff;">initialization</span>
+  SetVideoDriver(SysVideoDriver);
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

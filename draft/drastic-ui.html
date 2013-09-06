@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title>{TITLE}</title>
+<title>drastic ui</title>
 <!-- 2013-09-03 Tue 23:44 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
@@ -58,84 +58,98 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">{TITLE}</h1>
+<h1 class="title">drastic ui</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. Introduction</a></li>
-<li><a href="#sec-2">2. Implementation</a>
+<li><a href="#sec-1">1. overview : direct interaction with abstract syntax trees</a></li>
+<li><a href="#sec-2">2. relationships between graphical (2.5 dimensional) objects</a>
 <ul>
-<li><a href="#sec-2-1">2.1. program <code>MyProgram</code></a></li>
-<li><a href="#sec-2-2">2.2. Walkthrough</a></li>
-<li><a href="#sec-2-3">2.3. Implementation</a>
-<ul>
-<li><a href="#sec-2-3-1">2.3.1. procedure <code>MyProcedure</code></a></li>
+<li><a href="#sec-2-1">2.1. containment</a></li>
+<li><a href="#sec-2-2">2.2. z-order</a></li>
+<li><a href="#sec-2-3">2.3. proximity</a></li>
+<li><a href="#sec-2-4">2.4. adjacency</a></li>
+<li><a href="#sec-2-5">2.5. alignment</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a href="#sec-3">3. Results</a></li>
-<li><a href="#sec-4">4. Summary</a></li>
+<li><a href="#sec-3">3. SVG and the DOM vs internal representations.</a></li>
 </ul>
 </div>
 </div>
-
 
 <div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> Introduction</h2>
+<h2 id="sec-1"><a id="dppgt2b1w7g0" name="dppgt2b1w7g0"></a><span class="section-number-2">1</span> overview : direct interaction with abstract syntax trees</h2>
+<div class="outline-text-2" id="text-1">
+
+<p>
+The basic idea behind the <i>drastic</i> user interface is that you are interacting directly with abstract syntax trees.
+</p>
+
+<p>
+The visual metaphor is one of <i>text in space</i>.
+</p>
+
+<p>
+Text is typed into rectangular boxes, which can be moved around freely within a scene graph.
+</p>
+</div>
 </div>
 <div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> Implementation</h2>
+<h2 id="sec-2"><a id="7ctg54b1w7g0" name="7ctg54b1w7g0"></a><span class="section-number-2">2</span> relationships between graphical (2.5 dimensional) objects</h2>
 <div class="outline-text-2" id="text-2">
-</div><div id="outline-container-sec-2-1" class="outline-3">
-<h3 id="sec-2-1"><span class="section-number-3">2.1</span> program <code>MyProgram</code></h3>
-<div class="outline-text-3" id="text-2-1">
-<div class="org-src-container">
-
-<pre class="src src-pascal" id="urldb0"></pre>
 </div>
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><a id="61dl16b1w7g0" name="61dl16b1w7g0"></a><span class="section-number-3">2.1</span> containment</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+All graphical objects have a container.
+Containers can be nested.
+</p>
+
+<p>
+Items can be freely dragged around within their containers.
+</p>
 </div>
 </div>
 <div id="outline-container-sec-2-2" class="outline-3">
-<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Walkthrough</h3>
+<h3 id="sec-2-2"><a id="efcg2gb1w7g0" name="efcg2gb1w7g0"></a><span class="section-number-3">2.2</span> z-order</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+Containers can be ordered by their z-index.
+</p>
+</div>
 </div>
 <div id="outline-container-sec-2-3" class="outline-3">
-<h3 id="sec-2-3"><span class="section-number-3">2.3</span> Implementation</h3>
+<h3 id="sec-2-3"><a id="dpyb39b1w7g0" name="dpyb39b1w7g0"></a><span class="section-number-3">2.3</span> proximity</h3>
 <div class="outline-text-3" id="text-2-3">
-</div><div id="outline-container-sec-2-3-1" class="outline-4">
-<h4 id="sec-2-3-1"><span class="section-number-4">2.3.1</span> procedure <code>MyProcedure</code></h4>
-<div class="outline-text-4" id="text-2-3-1">
-<div class="org-src-container">
-
-<pre class="src src-pascal" id="routines"></pre>
 </div>
 </div>
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><a id="o34fq5b1w7g0" name="o34fq5b1w7g0"></a><span class="section-number-3">2.4</span> adjacency</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+Items can be freely dragged around.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><a id="tifda6b1w7g0" name="tifda6b1w7g0"></a><span class="section-number-3">2.5</span> alignment</h3>
+<div class="outline-text-3" id="text-2-5">
 </div>
 </div>
 </div>
 <div id="outline-container-sec-3" class="outline-2">
-<h2 id="sec-3"><span class="section-number-2">3</span> Results</h2>
+<h2 id="sec-3"><a id="qn6dxlb1w7g0" name="qn6dxlb1w7g0"></a><span class="section-number-2">3</span> SVG and the DOM vs internal representations.</h2>
 <div class="outline-text-2" id="text-3">
 <p>
-To compile and run the program, use the following commands:
+SVG is only part of the 'view', and only one possible implementation. There's no reason the core logic needs to know anything about SVG.
 </p>
-
-<pre class="example">
-fpc {progname}.pas
-./{progname}
-</pre>
 
 <p>
-You should see the following output:
+Intstead, the model should be represented abstractly.
 </p>
-
-<pre class="example">
-</pre>
 </div>
-</div>
-<div id="outline-container-sec-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> Summary</h2>
 </div>
 </div>
 </body>

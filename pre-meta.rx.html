@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>a pre-metacomplier for retro</title>
+<!-- 2013-09-03 Tue 23:44 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">a pre-metacomplier for retro</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Asynchronous Environment</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 28-bit address space (16 MB)</a></li>
+<li><a href="#sec-1-2">1.2. Byte-addressed RAM, working with 32-bit cells at once.</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. Smallest five bits are used for type code. Maybe more?</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. Event Polling System</a></li>
+<li><a href="#sec-1-4">1.4. Dispatch Events to Focus Object</a></li>
+<li><a href="#sec-1-5">1.5. Keys can be marked as modifiers or not.</a></li>
+<li><a href="#sec-1-6">1.6. Objects can have keymaps (which can inherit from other keymaps).</a></li>
+<li><a href="#sec-1-7">1.7. There should be a line / editor object.</a></li>
+<li><a href="#sec-1-8">1.8. The line editor manages a single string.</a></li>
+<li><a href="#sec-1-9">1.9. String is passed by reference to a tokenizer.</a></li>
+<li><a href="#sec-1-10">1.10. Tokenizer colors the string and maintains a sequence of tokens.</a></li>
+<li><a href="#sec-1-11">1.11. Token Sequences are further grouped into nodes.</a></li>
+<li><a href="#sec-1-12">1.12. Keyboard Navigation commands work with tokens and nodes.</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. Bicameral VM</a>
+<ul>
+<li><a href="#sec-2-1">2.1. Outer shell uses strings only</a></li>
+<li><a href="#sec-2-2">2.2. Outer shell maintains the scene graph.</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. redl</a></li>
+<li><a href="#sec-4">4. define metacompiler</a></li>
+<li><a href="#sec-5">5. byte loader</a></li>
+<li><a href="#sec-6">6. create and emit numbers</a></li>
+<li><a href="#sec-7">7. IDEA simple calculator loop.</a></li>
+<li><a href="#sec-8">8. Dynamic Dispatch Word</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Asynchronous Environment</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> 28-bit address space (16 MB)</h3>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> Byte-addressed RAM, working with 32-bit cells at once.</h3>
+<div class="outline-text-3" id="text-1-2">
+</div><div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> Smallest five bits are used for type code. Maybe more?</h4>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> Event Polling System</h3>
+</div>
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> Dispatch Events to Focus Object</h3>
+</div>
+<div id="outline-container-sec-1-5" class="outline-3">
+<h3 id="sec-1-5"><span class="section-number-3">1.5</span> Keys can be marked as modifiers or not.</h3>
+</div>
+<div id="outline-container-sec-1-6" class="outline-3">
+<h3 id="sec-1-6"><span class="section-number-3">1.6</span> Objects can have keymaps (which can inherit from other keymaps).</h3>
+</div>
+<div id="outline-container-sec-1-7" class="outline-3">
+<h3 id="sec-1-7"><span class="section-number-3">1.7</span> There should be a line / editor object.</h3>
+</div>
+<div id="outline-container-sec-1-8" class="outline-3">
+<h3 id="sec-1-8"><span class="section-number-3">1.8</span> The line editor manages a single string.</h3>
+</div>
+<div id="outline-container-sec-1-9" class="outline-3">
+<h3 id="sec-1-9"><span class="section-number-3">1.9</span> String is passed by reference to a tokenizer.</h3>
+</div>
+<div id="outline-container-sec-1-10" class="outline-3">
+<h3 id="sec-1-10"><span class="section-number-3">1.10</span> Tokenizer colors the string and maintains a sequence of tokens.</h3>
+</div>
+<div id="outline-container-sec-1-11" class="outline-3">
+<h3 id="sec-1-11"><span class="section-number-3">1.11</span> Token Sequences are further grouped into nodes.</h3>
+</div>
+<div id="outline-container-sec-1-12" class="outline-3">
+<h3 id="sec-1-12"><span class="section-number-3">1.12</span> Keyboard Navigation commands work with tokens and nodes.</h3>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Bicameral VM</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Outer shell uses strings only</h3>
+</div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Outer shell maintains the scene graph.</h3>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> redl</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+The asynchronous message passing system is already running.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">main:</span> <span style="color: #66f;">( \rarr IO \bullet )</span> read <span style="color: #c63; font-weight: bold;">eval</span> draw loop .
+<span style="color: #c63; font-weight: bold;">read:</span> <span style="color: #66f;">( \rarr Tok )</span>
+<span style="color: #c63; font-weight: bold;">eval:</span> <span style="color: #66f;">( compile or execute )</span>
+<span style="color: #c63; font-weight: bold;">draw:</span>                         <span style="color: #c63; font-weight: bold;">compile-only</span>
+<span style="color: #c63; font-weight: bold;">loop:</span>                         <span style="color: #c63; font-weight: bold;">immediate</span>
+getc end <span style="color: #c63; font-weight: bold;">;</span>
+<span style="color: #c63; font-weight: bold;">eval</span> print loop <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #66f;">( from kernel.rx )</span>
+<span style="color: #c63; font-weight: bold;">i:</span> (accept)    <span style="color: #66f;">( i: in the kernel defines an intermediate/helper word )</span>
+   <span style="color: #ffd700; font-weight: bold;">repeat</span>
+     getc
+     <span style="color: #66f;">( handle backspace. guard against underflow. )</span>
+     <span style="color: #00ff00;">dup,</span> <span style="color: #32cd32;">8</span> # <span style="color: #ffd700; font-weight: bold;">=if</span> <span style="color: #00ff00;">drop,</span> <span style="color: #00ff00;">1-,</span> guard? <span style="color: #c63; font-weight: bold;">jump:</span> (accept) <span style="color: #ffd700; font-weight: bold;">then</span>
+     <span style="color: #66f;">( echo to the screen )</span>
+     <span style="color: #00ff00;">dup,</span> putc
+     <span style="color: #66f;">( if it's the terminal char, then exit )</span>
+     <span style="color: #00ff00;">dup,</span> break # <span style="color: #00ff00;">@,</span> <span style="color: #ffd700; font-weight: bold;">=if</span> <span style="color: #00ff00;">drop,</span> <span style="color: #c63; font-weight: bold;">;</span> <span style="color: #ffd700; font-weight: bold;">then</span>
+     <span style="color: #66f;">( else append ch to buffer and return next address )</span>
+     <span style="color: #00ff00;">swap,</span> <span style="color: #00ffff;">!+</span>
+   <span style="color: #ffd700; font-weight: bold;">again</span> <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> <span class="todo TODO">TODO</span> define metacompiler</h2>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> <span class="todo TODO">TODO</span> byte loader</h2>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> <span class="todo TODO">TODO</span> create and emit numbers</h2>
+</div>
+
+
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> IDEA simple calculator loop.</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+Loop that reads words, then shows the stack.
+</p>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> Dynamic Dispatch Word</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+This word would execute an instruction from the top of the stack.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>

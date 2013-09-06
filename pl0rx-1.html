@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>pl0rx : a pl/0 → retro compiler , part 1</title>
+<!-- 2013-09-03 Tue 23:44 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">pl0rx : a pl/0 → retro compiler , part 1</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. PL/0 example code</a></li>
+<li><a href="#sec-2">2. Antlr 4 Grammar for PL/0</a></li>
+</ul>
+</div>
+</div>
+<p>
+PL/0 is a simplified, imperative programming language designed by Niklaus Wirth to teach compilation.
+</p>
+
+<p>
+It has only one data structure (the integer), and three control structures (<code>if</code> / <code>then</code>, <code>while</code>, and the procedure call). Procedure declarations may be nested and may call each other recursively but do not take parameters.
+</p>
+
+<p>
+This tiny feature set makes programming in PL/0 cumbersome, but is sufficient to illustrate the core ideas involved in writing a compiler.
+</p>
+
+<p>
+Here is a contrived example of PL/0 code, which prints the first 10 cube numbers:
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> PL/0 example code</h2>
+<div class="outline-text-2" id="text-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">var</span>
+  i,                   <span style="color: #66f;">{ </span><span style="color: #66f;">loop counter </span><span style="color: #66f;">}</span>
+  result;              <span style="color: #66f;">{ </span><span style="color: #66f;">result of cube operation </span><span style="color: #66f;">}</span>
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">cube</span>;
+  result := i * i * i;
+
+<span style="color: #66f;">{ </span><span style="color: #66f;">main program </span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">begin</span>
+  i := 1;
+  <span style="color: #00ffff;">while</span> i &lt; 10 <span style="color: #00ffff;">do</span>
+    <span style="color: #00ffff;">begin</span>
+      call cube;
+      ! result;        <span style="color: #66f;">{ </span><span style="color: #66f;">"!" means "print" </span><span style="color: #66f;">}</span>
+      i := i + 1
+    <span style="color: #00ffff;">end</span>
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+
+<p>
+Here is a definition of the PL/0 syntax, specified in the ANTLR4 language:
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Antlr 4 Grammar for PL/0</h2>
+<div class="outline-text-2" id="text-2">
+<div class="org-src-container">
+
+<pre class="src src-antlr"><span style="color: #ffffff; font-weight: bold;">grammar</span> <span style="color: #ff00ff;">PL0</span><span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">program</span>
+  <span style="color: #00ffff;">:</span> <span style="color: #ff00ff;">block</span> <span style="color: #00ff00;">'.'</span>
+  <span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">block</span>
+  <span style="color: #00ffff;">:</span> <span style="color: #ff00ff;">consts</span>? <span style="color: #ff00ff;">vars</span>? <span style="color: #ff00ff;">procedure</span>* <span style="color: #ff00ff;">statement</span>
+  <span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">consts</span>
+  <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'const'</span> <span style="color: #ff00ff;">Ident</span> <span style="color: #00ff00;">'='</span> <span style="color: #ff00ff;">Number</span> <span style="color: #00ffff;">(</span><span style="color: #00ff00;">','</span> <span style="color: #ff00ff;">Ident</span> <span style="color: #00ff00;">'='</span> <span style="color: #ff00ff;">Number</span><span style="color: #00ffff;">)*</span> <span style="color: #00ff00;">';'</span>
+  <span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">vars</span>
+  <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'var'</span> <span style="color: #ff00ff;">Ident</span> <span style="color: #00ffff;">(</span><span style="color: #00ff00;">','</span> <span style="color: #ff00ff;">Ident</span><span style="color: #00ffff;">)*</span> <span style="color: #00ff00;">';'</span>
+  <span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">procedure</span>
+  <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'procedure'</span> <span style="color: #ff00ff;">Ident</span> <span style="color: #00ff00;">';'</span> <span style="color: #ff00ff;">block</span> <span style="color: #00ff00;">';'</span>
+  <span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">statement</span>
+  <span style="color: #00ffff;">:</span> <span style="color: #ff00ff;">Ident</span> <span style="color: #00ff00;">':='</span> <span style="color: #ff00ff;">expression</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'call'</span> <span style="color: #ff00ff;">Ident</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'!'</span> <span style="color: #ff00ff;">Ident</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'begin'</span> <span style="color: #ff00ff;">statement</span> <span style="color: #00ffff;">(</span><span style="color: #00ff00;">';'</span> <span style="color: #ff00ff;">statement</span><span style="color: #00ffff;">)*</span> <span style="color: #00ff00;">'end'</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'if'</span> <span style="color: #ff00ff;">condition</span> <span style="color: #00ff00;">'then'</span> <span style="color: #ff00ff;">statement</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'while'</span> <span style="color: #ff00ff;">condition</span> <span style="color: #00ff00;">'do'</span> <span style="color: #ff00ff;">statement</span>
+  <span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">condition</span>
+  <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'odd'</span> <span style="color: #ff00ff;">expression</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #ff00ff;">expression</span> <span style="color: #00ffff;">(</span><span style="color: #00ff00;">'='</span><span style="color: #00ffff;">|</span><span style="color: #00ff00;">'#'</span><span style="color: #00ffff;">|</span><span style="color: #00ff00;">'&lt;'</span><span style="color: #00ffff;">|</span><span style="color: #00ff00;">'&lt;='</span><span style="color: #00ffff;">|</span><span style="color: #00ff00;">'&gt;'</span><span style="color: #00ffff;">|</span><span style="color: #00ff00;">'&gt;='</span><span style="color: #00ffff;">)</span> <span style="color: #ff00ff;">expression</span>
+  <span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">expression</span>
+  <span style="color: #00ffff;">:</span> <span style="color: #00ffff;">(</span><span style="color: #00ff00;">'+'</span><span style="color: #00ffff;">|</span><span style="color: #00ff00;">'-'</span><span style="color: #00ffff;">)?</span> <span style="color: #ff00ff;">term</span> <span style="color: #00ffff;">((</span><span style="color: #00ff00;">'+'</span><span style="color: #00ffff;">|</span><span style="color: #00ff00;">'-'</span><span style="color: #00ffff;">)</span> <span style="color: #ff00ff;">term</span><span style="color: #00ffff;">)*</span>
+  <span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">term</span>
+  <span style="color: #00ffff;">:</span> <span style="color: #ff00ff;">factor</span> <span style="color: #00ffff;">((</span><span style="color: #00ff00;">'*'</span><span style="color: #00ffff;">|</span><span style="color: #00ff00;">'/'</span><span style="color: #00ffff;">)</span> <span style="color: #ff00ff;">factor</span><span style="color: #00ffff;">)*</span>
+  <span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">factor</span>
+  <span style="color: #00ffff;">:</span> <span style="color: #ff00ff;">Ident</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #ff00ff;">Number</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'('</span> <span style="color: #ff00ff;">expression</span> <span style="color: #00ff00;">')'</span>
+  <span style="color: #00ffff;">;</span>
+
+
+<span style="color: #ffffff; font-weight: bold;">WS</span>     <span style="color: #00ffff;">:</span> [ \t\n]+ -&gt; <span style="color: #ff00ff;">skip</span> <span style="color: #00ffff;">;</span> <span style="color: #66f;">// </span><span style="color: #66f;">skip spaces, tabs, newlines</span>
+<span style="color: #ffffff; font-weight: bold;">Comment</span> <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'{'</span> .*? <span style="color: #00ff00;">'}'</span> -&gt; <span style="color: #ff00ff;">skip</span><span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">Ident</span>  <span style="color: #00ffff;">:</span> <span style="color: #ff00ff;">ALPHA</span> <span style="color: #00ffff;">(</span><span style="color: #ff00ff;">ALPHA</span> <span style="color: #00ffff;">|</span> <span style="color: #ff00ff;">DIGIT</span><span style="color: #00ffff;">)*</span> <span style="color: #00ffff;">;</span>
+<span style="color: #ffffff; font-weight: bold;">Number</span> <span style="color: #00ffff;">:</span> <span style="color: #ff00ff;">DIGIT</span>+<span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">ALPHA</span> <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'a'</span>..<span style="color: #00ff00;">'z'</span> <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'A'</span>..<span style="color: #00ff00;">'Z'</span> <span style="color: #00ffff;">;</span>
+<span style="color: #ffffff; font-weight: bold;">DIGIT</span> <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'0'</span>..<span style="color: #00ff00;">'9'</span> <span style="color: #00ffff;">;</span>
+</pre>
+</div>
+
+<p>
+We can set up antlr to run in bash with the following lines (substituting the appropriate path to the antlr jar file of course):
+</p>
+
+<pre class="example">
+export CLASSPATH=".:/path/to/antlr-4.0-complete.jar:$CLASSPATH"
+alias antlr4='java -jar /path/to/antlr-4.0-complete.jar'
+alias grun='java org.antlr.v4.runtime.misc.TestRig'
+</pre>
+
+<p>
+If we then compile the grammar:
+</p>
+
+<pre class="example">
+antlr4 PL0.g4 ; javac *.java
+</pre>
+
+<p>
+&#x2026; And run the test rig against the example code, using the <code>-tree</code> option:
+</p>
+
+<pre class="example">
+grun PL0 program -tree cubes.pl0
+</pre>
+
+<p>
+&#x2026; Then we should see a dump of the parse tree:
+</p>
+
+<pre class="example">
+(program (block (vars var i , result ;) (procedure procedure cube ;
+(block (statement result := (expression (term (factor i) * (factor i) *
+(factor i))))) ;) (statement begin (statement i := (expression (term
+(factor 1)))) ; (statement while (condition (expression (term (factor i)))
+&lt; (expression (term (factor 10)))) do (statement begin (statement call
+cube) ; (statement ! result) ; (statement i := (expression (term (factor
+i)) + (term (factor 1)))) end)) end)) .)
+</pre>
+
+<p>
+Here's the same tree, reformatted a bit for clarity:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-text">(program
+  (block
+    (vars var i , result ;)
+    (procedure procedure cube ;
+       (block (statement
+          result := (expression
+            (term (factor i) *
+                  (factor i) *
+                  (factor i))))) ;)
+(statement begin
+  (statement i := (expression (term (factor 1)))) ;
+  (statement while
+     (condition (expression (term (factor i))) &lt;
+                (expression (term (factor 10)))) do 
+     (statement begin
+       (statement call cube) ;
+       (statement ! result) ;
+       (statement i := (expression 
+          (term (factor i)) +
+          (term (factor 1))))
+     end))
+end)) .)
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

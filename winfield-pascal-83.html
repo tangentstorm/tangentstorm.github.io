@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>pascal in forth ( excerpts from )</title>
-<!-- 2013-06-06 Thu 06:32 -->
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-<meta name="generator" content="Org-mode"/>
-<meta name="author" content="Alan Winfield"/>
+<!-- 2013-09-03 Tue 23:43 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Alan Winfield" />
 <link rel="stylesheet" type="text/css" href="/etc/style.css">
 
 <script type="text/javascript" src="http://orgmode.org/org-info.js">
@@ -396,14 +397,14 @@ The final result of <code>next</code> is returned in the variable <code>type</co
 
 <div class="org-src-container">
 
-<pre class="src src-forth">next +      type ? <span style="color: #7fffd4;">1 </span> ok     (Pascal '+')
-<span style="color: #ffc0cb; font-weight: bold;">next </span>begin  type ? <span style="color: #7fffd4;">20 </span>ok     (and 'begin')
-<span style="color: #ffc0cb; font-weight: bold;">next </span>27     type ? <span style="color: #7fffd4;">0 </span> ok     (a number)
-<span style="color: #ff00ff;">VARIABLE </span><span style="color: #eedd82;">fred
-</span><span style="color: #7fffd4;">1 </span><span style="color: #ff00ff;">CONSTANT </span><span style="color: #eedd82;">true
-</span><span style="color: #ffc0cb; font-weight: bold;">next </span>fred   type ? <span style="color: #7fffd4;">-1 </span>ok     (a variable)
-<span style="color: #ffc0cb; font-weight: bold;">next </span>true   type ? <span style="color: #7fffd4;">-2 </span>ok     (a constant)
-<span style="color: #ffc0cb; font-weight: bold;">next </span>.R     type L 12524 ok  (the CFA <span style="color: #ffc0cb; font-weight: bold;">of </span>.R)
+<pre class="src src-forth">next +      type ? 1  ok     (Pascal '+')
+next begin  type ? 20 ok     (and 'begin')
+next 27     type ? 0  ok     (a number)
+VARIABLE fred
+1 CONSTANT true
+next fred   type ? -1 ok     (a variable)
+next true   type ? -2 ok     (a constant)
+next .R     type L 12524 ok  (the CFA of .R)
 </pre>
 </div>
 
@@ -418,10 +419,10 @@ Although it may come as a surprise, the development of the word <code>next</code
 </div><div id="outline-container-sec-1-7-1" class="outline-4">
 <h4 id="sec-1-7-1"><span class="section-number-4">1.7.1</span> <span class="done DONE">DONE</span> block 2000 - pascal extensions to forth</h4>
 <div class="outline-text-4" id="text-1-7-1">
-</div><ol class="org-ol"><li>forth<br/><div class="outline-text-5" id="text-1-7-1-1">
+</div><ol class="org-ol"><li>forth<br  /><div class="outline-text-5" id="text-1-7-1-1">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( Pascal extensions to FORTH
+<pre class="src src-forth">( Pascal extensions to FORTH
   ---------------------------------------------------
   The following blocks define two new compiling words, '{' and
   '{pascal'. '{' allows infix expressions to be incorporated
@@ -433,14 +434,14 @@ Although it may come as a surprise, the development of the word <code>next</code
   extensions of a CASE structure, and MYSELF to allow a recursive
   colon definition. Also &lt;= &gt;= &lt;&gt; and 2+.
 
-  Developed on sForth.   A.F.T. Winfield 1983 )</span>
+  Developed on sForth.   A.F.T. Winfield 1983 )
 
 FORTH DEFINITIONS DECIMAL --&gt;
 </pre>
 </div>
 </div>
 </li>
-<li>retro<br/><div class="outline-text-5" id="text-1-7-1-2">
+<li>retro<br  /><div class="outline-text-5" id="text-1-7-1-2">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #66f;">( Pascal extensions to retro                                    )</span>
@@ -464,25 +465,25 @@ reset <span style="color: #c63; font-weight: bold;">global</span> <span style="c
 <div id="outline-container-sec-1-7-2" class="outline-4">
 <h4 id="sec-1-7-2"><span class="section-number-4">1.7.2</span> <span class="done DONE">DONE</span> block 2001 - reseverd words</h4>
 <div class="outline-text-4" id="text-1-7-2">
-</div><ol class="org-ol"><li>forth<br/><div class="outline-text-5" id="text-1-7-2-1">
+</div><ol class="org-ol"><li>forth<br  /><div class="outline-text-5" id="text-1-7-2-1">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( Define all Pascal reserved words. Keep these in a separate )</span>
-  <span style="color: #ff00ff;">vocabulary </span><span style="color: #eedd82;">to </span>avoid conflict with similar FORTH words. <span style="color: #ffc0cb; font-weight: bold;">)</span>
-<span style="color: #ff00ff;">VOCABULARY </span><span style="color: #eedd82;">pascal-words </span><span style="color: #00ffff;">IMMEDIATE </span>pascal-words DEFINITIONS
+<pre class="src src-forth">( Define all Pascal reserved words. Keep these in a separate )
+  vocabulary to avoid conflict with similar FORTH words. )
+VOCABULARY pascal-words IMMEDIATE pascal-words DEFINITIONS
 
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">C </span>CREATE ; : F FIND ;             <span style="color: #66f;">( abbreviations to save )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">| </span>, ;     : ---&gt; [COMPILE] --&gt; ;  <span style="color: #66f;">( typing and conflicts )</span>
+: C CREATE ; : F FIND ;             ( abbreviations to save )
+: | , ;     : ---&gt; [COMPILE] --&gt; ;  ( typing and conflicts )
 
-<span style="color: #66f;">( Define as empty definitions so that FIND will work. )</span>
-<span style="color: #66f;">( NOTE: do not insert any comment until after next FORTH. )</span>
+( Define as empty definitions so that FIND will work. )
+( NOTE: do not insert any comment until after next FORTH. )
 
 C +     C -     C *       C /       C mod     C and
 C or    C xor   C &lt;       C &gt;       C &lt;=      C &gt;=
-C &lt;&gt;    C =     C <span style="color: #66f;">(       C )</span>       C <span style="color: #ffc0cb; font-weight: bold;">{ </span><span style="color: #eedd82;">      C }</span>
-C <span style="color: #00ffff;">; </span>    C begin C end     C if      C then    C <span style="color: #ffc0cb; font-weight: bold;">else</span>
-C <span style="color: #ffc0cb; font-weight: bold;">while </span>C do    C repeat  C <span style="color: #ffc0cb; font-weight: bold;">until </span>  C write   C writeln
-C "     C <span style="color: #ffc0cb; font-weight: bold;">for </span>  C to      C by      C [       C <span style="color: #00ffff;">]</span>
+C &lt;&gt;    C =     C (       C )       C {       C }
+C ;     C begin C end     C if      C then    C else
+C while C do    C repeat  C until   C write   C writeln
+C "     C for   C to      C by      C [       C ]
 C .     C not   C :=      C --&gt;
 
 ---&gt;
@@ -491,7 +492,7 @@ C .     C not   C :=      C --&gt;
 </div>
 </li>
 
-<li>retro<br/><div class="outline-text-5" id="text-1-7-2-2">
+<li>retro<br  /><div class="outline-text-5" id="text-1-7-2-2">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #66f;">( Define all Pascal reserved words. Keep these in a separate )</span>
@@ -524,23 +525,23 @@ C .     C <span style="color: #00ffff;">not</span>   C :=
 <div id="outline-container-sec-1-7-3" class="outline-4">
 <h4 id="sec-1-7-3"><span class="section-number-4">1.7.3</span> <span class="done DONE">DONE</span> block 2002 - cfa table ( "code field address ")</h4>
 <div class="outline-text-4" id="text-1-7-3">
-</div><ol class="org-ol"><li>forth<br/><div class="outline-text-5" id="text-1-7-3-1">
+</div><ol class="org-ol"><li>forth<br  /><div class="outline-text-5" id="text-1-7-3-1">
 <div class="org-src-container">
 
 <pre class="src src-forth">C cfa-table
 F +     | F -     | F *      | F /      | F mod    | F and     |
 F or    | F xor   | F &lt;      | F &gt;      | F &lt;=     | F &gt;=      |
-F &lt;&gt;    | F =     | F <span style="color: #66f;">(      | F )</span>      | F <span style="color: #ffc0cb; font-weight: bold;">{ </span><span style="color: #eedd82;">     | F }</span>       |
-F <span style="color: #00ffff;">; </span>    | F begin | F end    | F if     | F then   | F <span style="color: #ffc0cb; font-weight: bold;">else </span>   |
-F <span style="color: #ffc0cb; font-weight: bold;">while </span>| F do    | F repeat | F <span style="color: #ffc0cb; font-weight: bold;">until </span> | F write  | F writeln |
-F "     | F <span style="color: #ffc0cb; font-weight: bold;">for </span>  | F to     | F by     | F [      | F <span style="color: #00ffff;">] </span>      |
+F &lt;&gt;    | F =     | F (      | F )      | F {      | F }       |
+F ;     | F begin | F end    | F if     | F then   | F else    |
+F while | F do    | F repeat | F until  | F write  | F writeln |
+F "     | F for   | F to     | F by     | F [      | F ]       |
 F .     | F not   | F :=     | F --&gt;    | ---&gt;
 
-FORTH DEFINITIONS <span style="color: #66f;">( Go back into forth )</span>
+FORTH DEFINITIONS ( Go back into forth )
 
-<span style="color: #66f;">( 'cfa-table' is a table of the Code Field Addresses of the 
+( 'cfa-table' is a table of the Code Field Addresses of the 
   reserved word definitions in the previous block. Note that ','
-  is redefined as '|' to allow definition of the pascal ',' )</span>
+  is redefined as '|' to allow definition of the pascal ',' )
 
 --&gt;
 </pre>
@@ -559,7 +560,7 @@ Here, he redefined "|" to mean "," &#x2013; which means write to memory. So he's
 </p>
 </div>
 </li>
-<li>retro<br/><div class="outline-text-5" id="text-1-7-3-2">
+<li>retro<br  /><div class="outline-text-5" id="text-1-7-3-2">
 <div class="org-src-container">
 
 <pre class="src src-retro">C cfa-table
@@ -596,31 +597,31 @@ Here, he redefined "|" to mean "," &#x2013; which means write to memory. So he's
 <div id="outline-container-sec-1-7-4" class="outline-4">
 <h4 id="sec-1-7-4"><span class="section-number-4">1.7.4</span> <span class="todo TODO">TODO</span> block 2003</h4>
 <div class="outline-text-4" id="text-1-7-4">
-</div><ol class="org-ol"><li>forth<br/><div class="outline-text-5" id="text-1-7-4-1">
+</div><ol class="org-ol"><li>forth<br  /><div class="outline-text-5" id="text-1-7-4-1">
 <div class="org-src-container">
 
-<pre class="src src-forth">40 CONSTANT words <span style="color: #66f;">( total number of reserved words above )</span>
+<pre class="src src-forth">40 CONSTANT words ( total number of reserved words above )
 
-<span style="color: #66f;">( Search the pascal CFA table for a match with the CFA on top  )</span>
-<span style="color: #66f;">( of the stack, return a value 1..words if found, or leave the )</span>
-<span style="color: #66f;">( input CFA on TOS if not )</span>
+( Search the pascal CFA table for a match with the CFA on top  )
+( of the stack, return a value 1..words if found, or leave the )
+( input CFA on TOS if not )
 
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">match-cfas
-</span>    words <span style="color: #7fffd4;">0 </span>do                     <span style="color: #66f;">( step through cfa-table )</span>
+: match-cfas
+    words 0 do                     ( step through cfa-table )
       DUP
-      I 2*                                 <span style="color: #66f;">( fetch I'th cfa )</span>
+      I 2*                                 ( fetch I'th cfa )
       pascal-words cfa-table FORTH + @
-      = <span style="color: #00ffff;">IF </span>                                <span style="color: #66f;">( if match found )</span>
-          DROP I 1+ <span style="color: #00ffff;">LEAVE </span>       <span style="color: #66f;">( exit, leaving I+1 on TOS )</span>
-        <span style="color: #00ffff;">THEN</span>
-      <span style="color: #00ffff;">LOOP </span>;                            <span style="color: #66f;">( else try next cfa )</span>
+      = IF                                 ( if match found )
+          DROP I 1+ LEAVE        ( exit, leaving I+1 on TOS )
+        THEN
+      LOOP ;                            ( else try next cfa )
 
 --&gt;
 </pre>
 </div>
 </div>
 </li>
-<li>retro<br/><div class="outline-text-5" id="text-1-7-4-2">
+<li>retro<br  /><div class="outline-text-5" id="text-1-7-4-2">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #32cd32;">38</span> <span style="color: #c63; font-weight: bold;">constant</span> numTokens   <span style="color: #66f;">( total number of reserved words above )</span>
@@ -645,26 +646,26 @@ Here, he redefined "|" to mean "," &#x2013; which means write to memory. So he's
 <div id="outline-container-sec-1-7-5" class="outline-4">
 <h4 id="sec-1-7-5"><span class="section-number-4">1.7.5</span> <span class="todo TODO">TODO</span> block 2004 variables for the parser</h4>
 <div class="outline-text-4" id="text-1-7-5">
-</div><ol class="org-ol"><li>forth<br/><div class="outline-text-5" id="text-1-7-5-1">
+</div><ol class="org-ol"><li>forth<br  /><div class="outline-text-5" id="text-1-7-5-1">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( parsing variables .. )</span>
-<span style="color: #ff00ff;">VARIABLE </span><span style="color: #eedd82;">&gt;in </span>   <span style="color: #66f;">( temporary storage of &gt;IN value )</span>
-<span style="color: #ff00ff;">VARIABLE </span><span style="color: #eedd82;">find </span>  <span style="color: #66f;">( result of FIND on next input word )</span>
-<span style="color: #ff00ff;">VARIABLE </span><span style="color: #eedd82;">type </span>  <span style="color: #66f;">( index of token as position in pascal cfa table )</span>
-                <span style="color: #66f;">( '+' = 1, '-' = 2, etc )</span>
+<pre class="src src-forth">( parsing variables .. )
+VARIABLE &gt;in    ( temporary storage of &gt;IN value )
+VARIABLE find   ( result of FIND on next input word )
+VARIABLE type   ( index of token as position in pascal cfa table )
+                ( '+' = 1, '-' = 2, etc )
 
-<span style="color: #66f;">( identify the value of the code pointers for variable / create )</span>
-<span style="color: #66f;">( and constant, so that 'next' will be able to differentiate )</span>
+( identify the value of the code pointers for variable / create )
+( and constant, so that 'next' will be able to differentiate )
 
-FIND type  @ <span style="color: #ff00ff;">CONSTANT </span><span style="color: #eedd82;">vcode </span>  <span style="color: #66f;">( code pointer for variable )</span>
-FIND words @ <span style="color: #ff00ff;">CONSTANT </span><span style="color: #eedd82;">ccode </span>  <span style="color: #66f;">( code pointer for constant )</span>
+FIND type  @ CONSTANT vcode   ( code pointer for variable )
+FIND words @ CONSTANT ccode   ( code pointer for constant )
 --&gt;
 </pre>
 </div>
 </div>
 </li>
-<li>retro<br/><div class="outline-text-5" id="text-1-7-5-2">
+<li>retro<br  /><div class="outline-text-5" id="text-1-7-5-2">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #66f;">( parsing variables .. )</span>
@@ -686,29 +687,29 @@ FIND words <span style="color: #00ffff;">@</span> CONSTANT ccode   <span style="
 <div id="outline-container-sec-1-7-6" class="outline-4">
 <h4 id="sec-1-7-6"><span class="section-number-4">1.7.6</span> <span class="todo TODO">TODO</span> block 2005 - next ( parses for tokens )</h4>
 <div class="outline-text-4" id="text-1-7-6">
-</div><ol class="org-ol"><li>forth<br/><div class="outline-text-5" id="text-1-7-6-1">
+</div><ol class="org-ol"><li>forth<br  /><div class="outline-text-5" id="text-1-7-6-1">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( 'next' assigns a 'type' to the next word in the input stream )</span>
-<span style="color: #66f;">(  type = 1..words : pascal reserved word     )</span>
-<span style="color: #66f;">(         -1       : a variable               )</span>
-<span style="color: #66f;">(         -2       : a constant               )</span>
-<span style="color: #66f;">(  any other value is an existing forth word. )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">next-2 </span>&gt;IN @ &gt;in ! <span style="color: #66f;">( save &gt;IN in case we need to backtrack )</span>
-    <span style="color: #66f;">( try to find next word in pascal words at compile time )</span>
-    <span style="color: #00ffff;">[COMPILE] </span><span style="color: #ffffff; font-weight: bold;">pascal-words </span>FIND <span style="color: #00ffff;">[COMPILE] </span><span style="color: #ffffff; font-weight: bold;">FORTH
-</span>    DUP find !    <span style="color: #66f;">( save result of FIND in find )</span>
-    match-cfas    <span style="color: #66f;">( and search the cfa table for match )</span>
-    DUP type !    <span style="color: #66f;">( place the result in type )</span>
-    DUP words SWAP U&lt; <span style="color: #00ffff;">IF </span>  <span style="color: #66f;">( if no match was found ... )</span>
-       @ DUP vcode = <span style="color: #00ffff;">IF </span>-1 type ! THEN  <span style="color: #66f;">( test for var )</span>
-             ccode = <span style="color: #00ffff;">IF </span>-2 type ! THEN  <span style="color: #66f;">( test for const )</span>
-    <span style="color: #00ffff;">ELSE </span>DROP THEN ; --&gt;  <span style="color: #66f;">( leave stack empty )</span>
+<pre class="src src-forth">( 'next' assigns a 'type' to the next word in the input stream )
+(  type = 1..words : pascal reserved word     )
+(         -1       : a variable               )
+(         -2       : a constant               )
+(  any other value is an existing forth word. )
+: next-2 &gt;IN @ &gt;in ! ( save &gt;IN in case we need to backtrack )
+    ( try to find next word in pascal words at compile time )
+    [COMPILE] pascal-words FIND [COMPILE] FORTH
+    DUP find !    ( save result of FIND in find )
+    match-cfas    ( and search the cfa table for match )
+    DUP type !    ( place the result in type )
+    DUP words SWAP U&lt; IF   ( if no match was found ... )
+       @ DUP vcode = IF -1 type ! THEN  ( test for var )
+             ccode = IF -2 type ! THEN  ( test for const )
+    ELSE DROP THEN ; --&gt;  ( leave stack empty )
 </pre>
 </div>
 </div>
 </li>
-<li>retro<br/><div class="outline-text-5" id="text-1-7-6-2">
+<li>retro<br  /><div class="outline-text-5" id="text-1-7-6-2">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #66f;">( 'next' assigns a 'type' to the next word in the input stream )</span>
@@ -734,31 +735,31 @@ FIND words <span style="color: #00ffff;">@</span> CONSTANT ccode   <span style="
 <div id="outline-container-sec-1-7-7" class="outline-4">
 <h4 id="sec-1-7-7"><span class="section-number-4">1.7.7</span> <span class="todo TODO">TODO</span> block 2006 forth parser tweaks</h4>
 <div class="outline-text-4" id="text-1-7-7">
-</div><ol class="org-ol"><li>forth<br/><div class="outline-text-5" id="text-1-7-7-1">
+</div><ol class="org-ol"><li>forth<br  /><div class="outline-text-5" id="text-1-7-7-1">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( redefine 'next' to allow comment in pascal programs )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">next-1
-</span>  <span style="color: #00ffff;">BEGIN</span>
-    next-2 type @ <span style="color: #7fffd4;">17 </span>=   <span style="color: #66f;">( if next word is '(' .. )</span>
-  <span style="color: #00ffff;">WHILE</span>
-    <span style="color: #7fffd4;">125 </span>WORD DROP        ( skip input up to ')' <span style="color: #00ffff;">)</span>
-  <span style="color: #00ffff;">REPEAT </span>;               <span style="color: #66f;">( and fetch the next thing )</span>
+<pre class="src src-forth">( redefine 'next' to allow comment in pascal programs )
+: next-1
+  BEGIN
+    next-2 type @ 17 =   ( if next word is '(' .. )
+  WHILE
+    125 WORD DROP        ( skip input up to ')' )
+  REPEAT ;               ( and fetch the next thing )
 
-<span style="color: #66f;">( redefine again to allow pascal to go over more than one block )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">next
-</span>  <span style="color: #00ffff;">BEGIN</span>
-    next-1 type @ <span style="color: #7fffd4;">40 </span>=    <span style="color: #66f;">( if next word is '--&gt;' .. )</span>
-  <span style="color: #00ffff;">WHILE</span>
-    <span style="color: #7fffd4;">1 </span>BLK +! 0 &gt;IN !      <span style="color: #66f;">( go to start of next block )</span>
-  <span style="color: #00ffff;">REPEAT </span>;                <span style="color: #66f;">( and fetch the next thing )</span>
+( redefine again to allow pascal to go over more than one block )
+: next
+  BEGIN
+    next-1 type @ 40 =    ( if next word is '--&gt;' .. )
+  WHILE
+    1 BLK +! 0 &gt;IN !      ( go to start of next block )
+  REPEAT ;                ( and fetch the next thing )
 
 --&gt;
 </pre>
 </div>
 </div>
 </li>
-<li>retro<br/><div class="outline-text-5" id="text-1-7-7-2">
+<li>retro<br  /><div class="outline-text-5" id="text-1-7-7-2">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #66f;">( redefine 'next' to allow comment in pascal programs )</span>
@@ -806,7 +807,7 @@ the compiler should translate this into the equivalent Forth expression:
 
 <div class="org-src-container">
 
-<pre class="src src-forth">A @ <span style="color: #7fffd4;">2 </span>*
+<pre class="src src-forth">A @ 2 *
 </pre>
 </div>
 
@@ -840,17 +841,17 @@ An unexpected and useful byproduct of this quest for Pascal in Forth is that the
 
 <div class="org-src-container">
 
-<pre class="src src-forth">VARIABLE A ok          <span style="color: #66f;">( Define A )</span>
-<span style="color: #ff00ff;">VARIABLE </span><span style="color: #eedd82;">B </span>ok          <span style="color: #66f;">( Define B )</span>
-<span style="color: #7fffd4;">10 </span>A ! 20 B ! ok       <span style="color: #66f;">( A=10, B=20 )</span>
-<span style="color: #ffc0cb; font-weight: bold;">{ </span><span style="color: #eedd82;">A + 2 * B }</span> . <span style="color: #7fffd4;">50 </span>ok
-<span style="color: #ffc0cb; font-weight: bold;">{ </span><span style="color: #eedd82;">( A + 2 ) * B ) . 240 ok
-</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">testA&lt;B </span>{ A &lt; B } IF ." yes" THEN <span style="color: #00ffff;">; </span>ok
+<pre class="src src-forth">VARIABLE A ok          ( Define A )
+VARIABLE B ok          ( Define B )
+10 A ! 20 B ! ok       ( A=10, B=20 )
+{ A + 2 * B } . 50 ok
+{ ( A + 2 ) * B ) . 240 ok
+
+: testA&lt;B { A &lt; B } IF ." yes" THEN ; ok
 testA&lt;B yes ok
 
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">formula </span>{ A * A + B * B } ." =" . <span style="color: #00ffff;">; </span>ok
-formula = <span style="color: #7fffd4;">500 </span>ok
+: formula { A * A + B * B } ." =" . ; ok
+formula = 500 ok
 </pre>
 </div>
 
@@ -867,19 +868,19 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-4" id="text-1-10-1">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( convert the number in the input stream, pointed to by &gt;in    )</span>
-<span style="color: #66f;">( into binary and compile/interpret it. exit with error number )</span>
-<span style="color: #66f;">( zero if any non-numeric characters )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">number
-</span>    &gt;in @ &gt;IN !
-    <span style="color: #7fffd4;">0 </span>0 <span style="color: #7fffd4;">32 </span>WORD
+<pre class="src src-forth">( convert the number in the input stream, pointed to by &gt;in    )
+( into binary and compile/interpret it. exit with error number )
+( zero if any non-numeric characters )
+: number
+    &gt;in @ &gt;IN !
+    0 0 32 WORD
     CONVERT
-    C@ <span style="color: #7fffd4;">32 </span>= NOT IF &lt;&gt; perror <span style="color: #00ffff;">THEN</span>
+    C@ 32 = NOT IF &lt;&gt; perror THEN
     DROP
-    STATE @ <span style="color: #00ffff;">IF</span>
-       <span style="color: #00ffff;">[compile] </span><span style="color: #ffffff; font-weight: bold;">LITERAL
-</span>    <span style="color: #00ffff;">THEN</span>
-    <span style="color: #00ffff;">next ;</span>
+    STATE @ IF
+       [compile] LITERAL
+    THEN
+    next ;
 --&gt;
 </pre>
 </div>
@@ -890,21 +891,21 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-4" id="text-1-10-2">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( forward reference to 'expression' )</span>
-<span style="color: #ff00ff;">VARIABLE </span><span style="color: #eedd82;">expr
-</span><span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">callexpr </span>expr @ EXECUTE <span style="color: #00ffff;">;</span>
+<pre class="src src-forth">( forward reference to 'expression' )
+VARIABLE expr
+: callexpr expr @ EXECUTE ;
 
-<span style="color: #66f;">( variable handling )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">variable
-</span>    find @
-    STATE @ <span style="color: #00ffff;">IF </span>, ELSE 2+ <span style="color: #00ffff;">THEN</span>
-    <span style="color: #00ffff;">next </span>type @
-    <span style="color: #7fffd4;">35 </span>= IF <span style="color: #00ffff;">next </span>callexpr
-            <span style="color: #7fffd4;">36 </span>?error
+( variable handling )
+: variable
+    find @
+    STATE @ IF , ELSE 2+ THEN
+    next type @
+    35 = IF next callexpr
+            36 ?error
             comp/int 2*
             comp/int +
-            <span style="color: #00ffff;">next</span>
-         <span style="color: #00ffff;">THEN </span>comp/int @ <span style="color: #00ffff;">;</span>
+            next
+         THEN comp/int @ ;
 --&gt;
 </pre>
 </div>
@@ -915,20 +916,20 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-4" id="text-1-10-3">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( function calls - use these to call forth routines )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">function
-</span>  find @ &gt;R
-  <span style="color: #00ffff;">IF</span>
-    <span style="color: #00ffff;">next </span>callexpr
-    <span style="color: #00ffff;">BEGIN</span>
-      type @ <span style="color: #7fffd4;">37 </span>=
-    <span style="color: #00ffff;">WHILE</span>
-      <span style="color: #00ffff;">next </span>callexpr
-    <span style="color: #00ffff;">REPEAT</span>
-    <span style="color: #7fffd4;">16 </span>?error
-    <span style="color: #00ffff;">next</span>
-  <span style="color: #00ffff;">THEN </span>R&gt;
-  STATE @ <span style="color: #00ffff;">IF </span>, ELSE EXECUTE THEN <span style="color: #00ffff;">;</span>
+<pre class="src src-forth">( function calls - use these to call forth routines )
+: function
+  find @ &gt;R
+  IF
+    next callexpr
+    BEGIN
+      type @ 37 =
+    WHILE
+      next callexpr
+    REPEAT
+    16 ?error
+    next
+  THEN R&gt;
+  STATE @ IF , ELSE EXECUTE THEN ;
 
 --&gt;
 </pre>
@@ -940,21 +941,21 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-4" id="text-1-10-4">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( handle a constant )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">constant </span>find @
-  STATE @ <span style="color: #00ffff;">IF </span>, ELSE 2+ @ THEN next <span style="color: #00ffff;">;</span>
+<pre class="src src-forth">( handle a constant )
+: constant find @
+  STATE @ IF , ELSE 2+ @ THEN next ;
 
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">subexpr </span><span style="color: #00ffff;">next </span>callexpr
-  <span style="color: #7fffd4;">16 </span>?error next <span style="color: #00ffff;">;</span>
+: subexpr next callexpr
+  16 ?error next ;
 
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">factor
-</span>  type @ <span style="color: #00ffff;">CASE</span>
-    <span style="color: #7fffd4;">15 </span>OF subexpr <span style="color: #00ffff;">ENDOF</span>
-     <span style="color: #7fffd4;">0 </span>OF number <span style="color: #00ffff;">ENDOF</span>
-    <span style="color: #7fffd4;">-1 </span>OF variable <span style="color: #00ffff;">ENDOF</span>
-    <span style="color: #7fffd4;">-2 </span>OF constant <span style="color: #00ffff;">ENDOF</span>
-    <span style="color: #7fffd4;">38 </span>OF next MYSELF comp/int NOT <span style="color: #00ffff;">ENDOF</span>
-    DEFAULT DROP function <span style="color: #00ffff;">ENDCASE ;</span>
+: factor
+  type @ CASE
+    15 OF subexpr ENDOF
+     0 OF number ENDOF
+    -1 OF variable ENDOF
+    -2 OF constant ENDOF
+    38 OF next MYSELF comp/int NOT ENDOF
+    DEFAULT DROP function ENDCASE ;
 
 --&gt;
 </pre>
@@ -966,14 +967,14 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-4" id="text-1-10-5">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">term </span>factor
-  <span style="color: #00ffff;">BEGIN </span>type @
-    <span style="color: #00ffff;">CASE </span>3 OF next factor comp/int *   <span style="color: #00ffff;">ENDOF</span>
-         <span style="color: #7fffd4;">4 </span>OF next factor comp/int /   <span style="color: #00ffff;">ENDOF</span>
-         <span style="color: #7fffd4;">5 </span>OF next factor comp/int MOD <span style="color: #00ffff;">ENDOF</span>
-         <span style="color: #7fffd4;">6 </span>OF next factor comp/int AND <span style="color: #00ffff;">ENDOF</span>
-         DEFAULT DROP EXIT <span style="color: #00ffff;">ENDCASE</span>
-  <span style="color: #7fffd4;">0 </span>UNTIL <span style="color: #00ffff;">;</span>
+<pre class="src src-forth">: term factor
+  BEGIN type @
+    CASE 3 OF next factor comp/int *   ENDOF
+         4 OF next factor comp/int /   ENDOF
+         5 OF next factor comp/int MOD ENDOF
+         6 OF next factor comp/int AND ENDOF
+         DEFAULT DROP EXIT ENDCASE
+  0 UNTIL ;
 --&gt;
 </pre>
 </div>
@@ -984,21 +985,21 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-4" id="text-1-10-6">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">simpleexpr
-</span>  type @ <span style="color: #00ffff;">CASE</span>
-    <span style="color: #7fffd4;">1 </span>OF next term ( ignore unary + ) <span style="color: #00ffff;">ENDOF</span>
-    <span style="color: #7fffd4;">2 </span>OF next term comp/int NEGATE <span style="color: #00ffff;">ENDOF</span>
+<pre class="src src-forth">: simpleexpr
+  type @ CASE
+    1 OF next term ( ignore unary + ) ENDOF
+    2 OF next term comp/int NEGATE ENDOF
     DEFAULT DROP term
-  <span style="color: #00ffff;">ENDCASE</span>
-  <span style="color: #00ffff;">BEGIN</span>
-    type @ <span style="color: #00ffff;">CASE</span>
-      <span style="color: #7fffd4;">1 </span>OF next term comp/int +   <span style="color: #00ffff;">ENDOF</span>
-      <span style="color: #7fffd4;">2 </span>OF next term comp/int -   <span style="color: #00ffff;">ENDOF</span>
-      <span style="color: #7fffd4;">7 </span>OF next term comp/int OR  <span style="color: #00ffff;">ENDOF</span>
-      <span style="color: #7fffd4;">8 </span>OF next term comp/int XOR <span style="color: #00ffff;">ENDOF</span>
+  ENDCASE
+  BEGIN
+    type @ CASE
+      1 OF next term comp/int +   ENDOF
+      2 OF next term comp/int -   ENDOF
+      7 OF next term comp/int OR  ENDOF
+      8 OF next term comp/int XOR ENDOF
       DEFAULT DROP EXIT
-    <span style="color: #00ffff;">ENDCASE</span>
-  <span style="color: #7fffd4;">0 </span>UNTIL <span style="color: #00ffff;">;</span>
+    ENDCASE
+  0 UNTIL ;
 
 --&gt;
 </pre>
@@ -1010,16 +1011,16 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-4" id="text-1-10-7">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">expression </span>simpleexpr
-  <span style="color: #00ffff;">BEGIN </span>type @
-    <span style="color: #00ffff;">CASE </span>9 OF  next term comp/int &lt;  <span style="color: #00ffff;">ENDOF</span>
-        <span style="color: #7fffd4;">10 </span>OF  next term comp/int &gt;  <span style="color: #00ffff;">ENDOF</span>
-        <span style="color: #7fffd4;">11 </span>OF  next term comp/int &lt;= <span style="color: #00ffff;">ENDOF</span>
-        <span style="color: #7fffd4;">12 </span>OF  next term comp/int &gt;= <span style="color: #00ffff;">ENDOF</span>
-        <span style="color: #7fffd4;">13 </span>OF  next term comp/int &lt;&gt; <span style="color: #00ffff;">ENDOF</span>
-        <span style="color: #7fffd4;">14 </span>OF  next term comp/int =  <span style="color: #00ffff;">ENDOF</span>
-        DEFAULT DROP EXIT <span style="color: #00ffff;">ENDCASE</span>
-  <span style="color: #7fffd4;">0 </span>UNTIL <span style="color: #00ffff;">;</span>
+<pre class="src src-forth">: expression simpleexpr
+  BEGIN type @
+    CASE 9 OF  next term comp/int &lt;  ENDOF
+        10 OF  next term comp/int &gt;  ENDOF
+        11 OF  next term comp/int &lt;= ENDOF
+        12 OF  next term comp/int &gt;= ENDOF
+        13 OF  next term comp/int &lt;&gt; ENDOF
+        14 OF  next term comp/int =  ENDOF
+        DEFAULT DROP EXIT ENDCASE
+  0 UNTIL ;
 --&gt;
 </pre>
 </div>
@@ -1034,23 +1035,23 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-4" id="text-1-11-1">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( error handler. print line, put BLOCK on TOS line # on NOS )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">.line </span>BLOCK <span style="color: #66f;">( fetch block number )</span>
-  SWAP <span style="color: #7fffd4;">64 </span>* + <span style="color: #66f;">( start address of line )</span>
-  <span style="color: #7fffd4;">63 </span>TYPE ;   <span style="color: #66f;">( print 63 characters )</span>
+<pre class="src src-forth">( error handler. print line, put BLOCK on TOS line # on NOS )
+: .line BLOCK ( fetch block number )
+  SWAP 64 * + ( start address of line )
+  63 TYPE ;   ( print 63 characters )
 
-<span style="color: #66f;">( print error message, error number TOS, and abandon )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">perror
-</span>  BLK @ <span style="color: #00ffff;">IF </span>CR <span style="color: #00ff00;">." pascal compilation error .."</span>
-           CR <span style="color: #00ff00;">." block - "</span> BLK ? ." Line - " &gt;in @ <span style="color: #7fffd4;">64 </span>/ DUP .
-           CR . BLK @ .line <span style="color: #00ffff;">THEN</span>
-        <span style="color: #66f;">( point to current pointer position )</span>
-        CR &gt;in @ <span style="color: #7fffd4;">64 </span>MOD SPACES <span style="color: #00ff00;">." ^ "</span>
-        CR <span style="color: #00ff00;">." Error number - "</span> . CR QUIT <span style="color: #00ffff;">;</span>
+( print error message, error number TOS, and abandon )
+: perror
+  BLK @ IF CR ." pascal compilation error .."
+           CR ." block - " BLK ? ." Line - " &gt;in @ 64 / DUP .
+           CR . BLK @ .line THEN
+        ( point to current pointer position )
+        CR &gt;in @ 64 MOD SPACES ." ^ "
+        CR ." Error number - " . CR QUIT ;
 
-<span style="color: #66f;">( Check if TOS equals current 'type', error if not )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">?error </span>DUP type @ &lt;&gt; <span style="color: #66f;">( not equal ? )</span>
-         <span style="color: #00ffff;">IF </span>perror ELSE DROP THEN <span style="color: #00ffff;">; </span>--&gt;
+( Check if TOS equals current 'type', error if not )
+: ?error DUP type @ &lt;&gt; ( not equal ? )
+         IF perror ELSE DROP THEN ; --&gt;
 </pre>
 </div>
 </div>
@@ -1060,17 +1061,17 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-4" id="text-1-11-2">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( compile / execute, depending on state )</span>
-<span style="color: #66f;">( 'comp/int *' is same as 'STATE @ IF COMPILE * ELSE * THEN' . )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">(comp/int) </span>R&gt; DUP 2+ &gt;R
+<pre class="src src-forth">( compile / execute, depending on state )
+( 'comp/int *' is same as 'STATE @ IF COMPILE * ELSE * THEN' . )
+: (comp/int) R&gt; DUP 2+ &gt;R
              @
-             STATE @ <span style="color: #00ffff;">IF </span>, ELSE EXECUTE THEN <span style="color: #00ffff;">;</span>
+             STATE @ IF , ELSE EXECUTE THEN ;
 
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">comp/int </span>COMPILE (comp/int)   <span style="color: #66f;">( compile runtime code )</span>
-            FIND , <span style="color: #00ffff;">; </span>           <span style="color: #66f;">( and CFA iof next word )</span>
+: comp/int COMPILE (comp/int)   ( compile runtime code )
+            FIND , ;            ( and CFA iof next word )
 
-<span style="color: #66f;">( do these things when 'comp/int word' is compiled )</span>
-<span style="color: #00ffff;">IMMEDIATE</span>
+( do these things when 'comp/int word' is compiled )
+IMMEDIATE
 
 --&gt;
 </pre>
@@ -1084,9 +1085,9 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="org-src-container">
 
 <pre class="src src-forth">FIND expression expr
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">( </span>next expression ; <span style="color: #00ffff;">IMMEDIATE</span>
+: ( next expression ; IMMEDIATE
 
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">) </span>. " Improper termination " <span style="color: #00ffff;">;</span>
+: ) . " Improper termination " ;
 
 --&gt;
 </pre>
@@ -1104,21 +1105,21 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( assignment statement )</span>
-:assign                 <span style="color: #66f;">( we've already found the variable )</span>
-  find @ ,              <span style="color: #66f;">( compile its address )</span>
-  <span style="color: #ffc0cb; font-weight: bold;">next </span>                 <span style="color: #66f;">( we might have [ next )</span>
-  type @ <span style="color: #7fffd4;">35 </span>= if           <span style="color: #66f;">( is it? if so... )</span>
-    <span style="color: #ffc0cb; font-weight: bold;">next </span>expression        <span style="color: #66f;">( read the expression )</span>
-    <span style="color: #7fffd4;">36 </span>?error              <span style="color: #66f;">( followed by ] )</span>
-    compile 2*             <span style="color: #66f;">( double it )</span>
-    compile +              <span style="color: #66f;">( add add to form addr )</span>
-    <span style="color: #ffc0cb; font-weight: bold;">next </span>                  <span style="color: #66f;">( next up should be := )</span>
-  <span style="color: #ffc0cb; font-weight: bold;">then </span>39 ?error        <span style="color: #66f;">( error if it isn't )</span>
-  <span style="color: #ffc0cb; font-weight: bold;">next </span>expression       <span style="color: #66f;">( get the rhs )</span>
-  compile swap          <span style="color: #66f;">( put address on top )</span>
-  compile !             <span style="color: #66f;">( and store it )</span>
-<span style="color: #00ffff;">;</span>
+<pre class="src src-forth">( assignment statement )
+: assign                 ( we've already found the variable )
+  find @ ,              ( compile its address )
+  next                  ( we might have [ next )
+  type @ 35 = if           ( is it? if so... )
+    next expression        ( read the expression )
+    36 ?error              ( followed by ] )
+    compile 2*             ( double it )
+    compile +              ( add add to form addr )
+    next                   ( next up should be := )
+  then 39 ?error        ( error if it isn't )
+  next expression       ( get the rhs )
+  compile swap          ( put address on top )
+  compile !             ( and store it )
+;
 
 --&gt;
 </pre>
@@ -1130,16 +1131,16 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( print out expression, or string )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">writex </span>type @ 31 = <span style="color: #66f;">( do we have a ' ? )</span>
-  <span style="color: #00ffff;">if</span>
-    <span style="color: #00ffff;">[compile] </span><span style="color: #ffffff; font-weight: bold;">." </span>    <span style="color: #66f;">( it's a string then )</span>
-    <span style="color: #00ffff;">next </span>            <span style="color: #66f;">( exit pointing to next )</span>
-  <span style="color: #00ffff;">else</span>
-    expression       <span style="color: #66f;">( an expression )</span>
-    compile .        <span style="color: #66f;">( print result )</span>
-  <span style="color: #00ffff;">then</span>
-<span style="color: #00ffff;">;</span>
+<pre class="src src-forth">( print out expression, or string )
+: writex type @ 31 = ( do we have a ' ? )
+  if
+    [compile] ."     ( it's a string then )
+    next             ( exit pointing to next )
+  else
+    expression       ( an expression )
+    compile .        ( print result )
+  then
+;
 
 --&gt;
 </pre>
@@ -1151,21 +1152,21 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-3" id="text-2-3">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( write statement )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">write </span>next type @ 15 =  <span style="color: #66f;">( followed by ( ? )</span>
-  <span style="color: #00ffff;">if</span>
-    <span style="color: #00ffff;">next </span>writer           <span style="color: #66f;">( we have an expression then )</span>
-    <span style="color: #00ffff;">begin</span>
-      type @ <span style="color: #7fffd4;">37 </span>=         <span style="color: #66f;">( and optionally another )</span>
-    <span style="color: #00ffff;">while</span>
-      <span style="color: #00ffff;">next </span>writex
-    <span style="color: #00ffff;">repeat</span>
-    <span style="color: #7fffd4;">16 </span>?error             <span style="color: #66f;">( must have a close bracket )</span>
-    <span style="color: #00ffff;">next</span>
-  <span style="color: #00ffff;">then ;</span>
+<pre class="src src-forth">( write statement )
+: write next type @ 15 =  ( followed by ( ? )
+  if
+    next writer           ( we have an expression then )
+    begin
+      type @ 37 =         ( and optionally another )
+    while
+      next writex
+    repeat
+    16 ?error             ( must have a close bracket )
+    next
+  then ;
 
-<span style="color: #66f;">( writeln )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">writeln </span>write COMPILE CR ; <span style="color: #66f;">( write and newline )</span>
+( writeln )
+: writeln write COMPILE CR ; ( write and newline )
 
 --&gt;
 </pre>
@@ -1177,21 +1178,21 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-3" id="text-2-4">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( forward reference to statement )</span>
-<span style="color: #ff00ff;">VARIABLE </span><span style="color: #eedd82;">stmt </span>: stmtex stat @ EXECUTE <span style="color: #00ffff;">;</span>
+<pre class="src src-forth">( forward reference to statement )
+VARIABLE stmt : stmtex stat @ EXECUTE ;
 
-<span style="color: #66f;">( compile multiple statements separated by ; )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">mstat </span>statex   <span style="color: #66f;">( must be at least one statement )</span>
-    <span style="color: #00ffff;">begin</span>
-      type @ <span style="color: #7fffd4;">19 </span>=    <span style="color: #66f;">( is there a semi-colon? )</span>
-    <span style="color: #00ffff;">while</span>
-      stmtex         <span style="color: #66f;">( another statement then )</span>
-    <span style="color: #00ffff;">repeat ;</span>
+( compile multiple statements separated by ; )
+: mstat statex   ( must be at least one statement )
+    begin
+      type @ 19 =    ( is there a semi-colon? )
+    while
+      stmtex         ( another statement then )
+    repeat ;
 
-<span style="color: #66f;">( begin statement, enter after we've got 'begin' )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">begin </span>mstmt
-    <span style="color: #7fffd4;">21 </span>?error        <span style="color: #66f;">( should end with END )</span>
-    <span style="color: #00ffff;">next ;</span>
+( begin statement, enter after we've got 'begin' )
+: begin mstmt
+    21 ?error        ( should end with END )
+    next ;
 
 --&gt;
 </pre>
@@ -1203,17 +1204,17 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-3" id="text-2-5">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( if statement, enter after 'if' )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">if </span>next expression <span style="color: #66f;">( need an expression )</span>
-  <span style="color: #7fffd4;">23 </span>?error          <span style="color: #66f;">( followed by THEN )</span>
-  <span style="color: #00ffff;">[compile] </span><span style="color: #ffffff; font-weight: bold;">if </span>      <span style="color: #66f;">( generate IF, same as forth )</span>
+<pre class="src src-forth">( if statement, enter after 'if' )
+: if next expression ( need an expression )
+  23 ?error          ( followed by THEN )
+  [compile] if       ( generate IF, same as forth )
   stmtex
-  type @ <span style="color: #7fffd4;">24 </span>=        <span style="color: #66f;">( do we have an else? .. )</span>
-  <span style="color: #00ffff;">if</span>
-    <span style="color: #00ffff;">[compile] </span><span style="color: #ffffff; font-weight: bold;">else </span>  <span style="color: #66f;">( .. if so )</span>
-    stmtex           <span style="color: #66f;">( compile false statement )</span>
-  <span style="color: #00ffff;">then</span>
-  <span style="color: #00ffff;">[compile] </span><span style="color: #ffffff; font-weight: bold;">then </span>;   <span style="color: #66f;">( finish off total statement )</span>
+  type @ 24 =        ( do we have an else? .. )
+  if
+    [compile] else   ( .. if so )
+    stmtex           ( compile false statement )
+  then
+  [compile] then ;   ( finish off total statement )
 
 --&gt;
 </pre>
@@ -1225,20 +1226,20 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-3" id="text-2-6">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( while .. do loop, enter after we've got the 'while' )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">while </span>[COMPILE] BEGIN   <span style="color: #66f;">( start the construct )</span>
-  <span style="color: #00ffff;">next </span>expression         <span style="color: #66f;">( need an expression )</span>
-  <span style="color: #7fffd4;">26 </span>?error               <span style="color: #66f;">( followed by 'do' )</span>
-  <span style="color: #00ffff;">[COMPILE] </span><span style="color: #ffffff; font-weight: bold;">WHILE </span>        <span style="color: #66f;">( forth while is ok )</span>
-  stmtex                  <span style="color: #66f;">( looped statement )</span>
-  <span style="color: #00ffff;">[COMPILE] </span><span style="color: #ffffff; font-weight: bold;">REPEAT </span>;      <span style="color: #66f;">( end the forth structure )</span>
+<pre class="src src-forth">( while .. do loop, enter after we've got the 'while' )
+: while [COMPILE] BEGIN   ( start the construct )
+  next expression         ( need an expression )
+  26 ?error               ( followed by 'do' )
+  [COMPILE] WHILE         ( forth while is ok )
+  stmtex                  ( looped statement )
+  [COMPILE] REPEAT ;      ( end the forth structure )
 
-<span style="color: #66f;">( repeat .. until loop, enter here after 'repeat' )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">repeat </span>[COMPILE] BEGIN  <span style="color: #66f;">( start the loop )</span>
-  mstmt                   <span style="color: #66f;">( multiple statements )</span>
-  <span style="color: #7fffd4;">28 </span>?error               <span style="color: #66f;">( expect 'until' )</span>
-  <span style="color: #00ffff;">next </span>expression         <span style="color: #66f;">( need an expression now )</span>
-  <span style="color: #00ffff;">[compile] </span><span style="color: #ffffff; font-weight: bold;">UNTIL </span>;       <span style="color: #66f;">( followed by FORTH UNTIL )</span>
+( repeat .. until loop, enter here after 'repeat' )
+: repeat [COMPILE] BEGIN  ( start the loop )
+  mstmt                   ( multiple statements )
+  28 ?error               ( expect 'until' )
+  next expression         ( need an expression now )
+  [compile] UNTIL ;       ( followed by FORTH UNTIL )
 
 --&gt;
 </pre>
@@ -1250,18 +1251,18 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-3" id="text-2-7">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( define a for loop, in forth, using a variable, i.e.
-  step end start variable FOR .. ENDFOR )</span>
+<pre class="src src-forth">( define a for loop, in forth, using a variable, i.e.
+  step end start variable FOR .. ENDFOR )
 
-<span style="color: #66f;">( runtime FOR action .. )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">(FOR) </span>SWAP OVER !               <span style="color: #66f;">( set variable = start value )</span>
-        R&gt;                        <span style="color: #66f;">( fetch this return adddress )</span>
-        SWAP &gt;R SWAP &gt;R SWAP &gt;R   <span style="color: #66f;">( var, end, start -&gt;R stack  )</span>
-        &gt;R <span style="color: #00ffff;">; </span>                     <span style="color: #66f;">( and replace return address )</span>
+( runtime FOR action .. )
+: (FOR) SWAP OVER !               ( set variable = start value )
+        R&gt;                        ( fetch this return adddress )
+        SWAP &gt;R SWAP &gt;R SWAP &gt;R   ( var, end, start -&gt;R stack  )
+        &gt;R ;                      ( and replace return address )
 
-<span style="color: #66f;">( compile time FOR action )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">FOR </span>COMPILE (FOR)
-      HERE <span style="color: #00ffff;">; </span>IMMEDIATE            <span style="color: #66f;">( save HERE for ENDFOR )</span>
+( compile time FOR action )
+: FOR COMPILE (FOR)
+      HERE ; IMMEDIATE            ( save HERE for ENDFOR )
 
 --&gt;
 </pre>
@@ -1274,23 +1275,23 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-3" id="text-2-8">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( ENDFOR runtime action .. the hard part! )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">(ENDF) </span>R&gt;                             <span style="color: #66f;">( fetch return address )</span>
-         R&gt; R&gt;                          <span style="color: #66f;">( step then end values )</span>
-         SWAP DUP R@ +!         <span style="color: #66f;">( add step value into variable )</span>
-         OVER OVER R@ @ SWAP       <span style="color: #66f;">( some stack rearrangement! )</span>
-         0&lt;                 <span style="color: #66f;">( sign of step value determines... )</span>
-         <span style="color: #00ffff;">IF </span>&gt; ELSE &lt; THEN              <span style="color: #66f;">( ..which test to apply )</span>
-         <span style="color: #00ffff;">IF </span>                          <span style="color: #66f;">( has the loop finished? )</span>
-           R&gt; DROP 2DROP           <span style="color: #66f;">( drop everything if it has )</span>
-           2+ &gt;R                 <span style="color: #66f;">( and skip the branch address )</span>
-         <span style="color: #00ffff;">ELSE</span>
-           SWAP &gt;R &gt;R               <span style="color: #66f;">( else resave end and step )</span>
-           @ &gt;R                                     <span style="color: #66f;">( and loop )</span>
-         <span style="color: #00ffff;">THEN </span>;                                        <span style="color: #66f;">( phew! )</span>
+<pre class="src src-forth">( ENDFOR runtime action .. the hard part! )
+: (ENDF) R&gt;                             ( fetch return address )
+         R&gt; R&gt;                          ( step then end values )
+         SWAP DUP R@ +!         ( add step value into variable )
+         OVER OVER R@ @ SWAP       ( some stack rearrangement! )
+         0&lt;                 ( sign of step value determines... )
+         IF &gt; ELSE &lt; THEN              ( ..which test to apply )
+         IF                           ( has the loop finished? )
+           R&gt; DROP 2DROP           ( drop everything if it has )
+           2+ &gt;R                 ( and skip the branch address )
+         ELSE
+           SWAP &gt;R &gt;R               ( else resave end and step )
+           @ &gt;R                                     ( and loop )
+         THEN ;                                        ( phew! )
 
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">ENDFOR </span>COMPILE (ENDF)                  <span style="color: #66f;">( compile time action )</span>
-         , <span style="color: #00ffff;">; </span>IMMEDIATE --&gt;            <span style="color: #66f;">( compile branch address )</span>
+: ENDFOR COMPILE (ENDF)                  ( compile time action )
+         , ; IMMEDIATE --&gt;            ( compile branch address )
 </pre>
 </div>
 </div>
@@ -1300,22 +1301,22 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-3" id="text-2-9">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( now define pascal for loop )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">for </span>next -1 ? error        <span style="color: #66f;">( need a variable name )</span>
-      find @                 <span style="color: #66f;">( save its address on stack )</span>
-      <span style="color: #00ffff;">next </span>39 ?error         <span style="color: #66f;">( next we need := )</span>
-      <span style="color: #00ffff;">next </span>expression        <span style="color: #66f;">( the start value expression )</span>
-      <span style="color: #7fffd4;">33 </span>?error              <span style="color: #66f;">( the next word must be 'to' )</span>
-      <span style="color: #00ffff;">next </span>expression        <span style="color: #66f;">( then end expression )</span>
-      type @ <span style="color: #7fffd4;">34 </span>=            <span style="color: #66f;">( optionally followed by 'by' )</span>
-      <span style="color: #00ffff;">IF </span>next expression     <span style="color: #66f;">( and a step expression )</span>
-      <span style="color: #00ffff;">ELSE </span>COMPILE ! THEN    <span style="color: #66f;">( otherwise step value of +! )</span>
-      <span style="color: #7fffd4;">26 </span>?error              <span style="color: #66f;">( must have 'do' next )</span>
-      COMPILE ROT COMPILE ROT COMPILE SWAP <span style="color: #66f;">( rearrange )</span>
-      ,                      <span style="color: #66f;">( compile variable address )</span>
-      <span style="color: #00ffff;">[COMPILE] </span><span style="color: #ffffff; font-weight: bold;">FOR </span>         <span style="color: #66f;">( then forth for )</span>
-      statex                 <span style="color: #66f;">( a looped statement )</span>
-      <span style="color: #00ffff;">[COMPILE] </span><span style="color: #ffffff; font-weight: bold;">ENDFOR </span>;     <span style="color: #66f;">( and we've finished )</span>
+<pre class="src src-forth">( now define pascal for loop )
+: for next -1 ? error        ( need a variable name )
+      find @                 ( save its address on stack )
+      next 39 ?error         ( next we need := )
+      next expression        ( the start value expression )
+      33 ?error              ( the next word must be 'to' )
+      next expression        ( then end expression )
+      type @ 34 =            ( optionally followed by 'by' )
+      IF next expression     ( and a step expression )
+      ELSE COMPILE ! THEN    ( otherwise step value of +! )
+      26 ?error              ( must have 'do' next )
+      COMPILE ROT COMPILE ROT COMPILE SWAP ( rearrange )
+      ,                      ( compile variable address )
+      [COMPILE] FOR          ( then forth for )
+      statex                 ( a looped statement )
+      [COMPILE] ENDFOR ;     ( and we've finished )
 --&gt;
 </pre>
 </div>
@@ -1326,22 +1327,22 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-3" id="text-2-10">
 <div class="org-src-container">
 
-<pre class="src src-forth"><span style="color: #66f;">( statement compiler )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">statement </span>next   <span style="color: #66f;">( get the first thing )</span>
+<pre class="src src-forth">( statement compiler )
+: statement next   ( get the first thing )
   type @
-  <span style="color: #00ffff;">CASE </span>-1 OF assign   <span style="color: #00ffff;">ENDOF</span>
-       <span style="color: #7fffd4;">20 </span>OF begin    <span style="color: #00ffff;">ENDOF</span>
-       <span style="color: #7fffd4;">22 </span>OF if       <span style="color: #00ffff;">ENDOF</span>
-       <span style="color: #7fffd4;">25 </span>OF while    <span style="color: #00ffff;">ENDOF</span>
-       <span style="color: #7fffd4;">27 </span>OF repeat   <span style="color: #00ffff;">ENDOF</span>
-       <span style="color: #7fffd4;">29 </span>OF write    <span style="color: #00ffff;">ENDOF</span>
-       <span style="color: #7fffd4;">30 </span>OF writeln  <span style="color: #00ffff;">ENDOF</span>
-       <span style="color: #7fffd4;">-2 </span>OF 1 perror ENDOF <span style="color: #66f;">( cannot be a constant )</span>
-     DEFAULT words swap U&lt;  <span style="color: #66f;">( is it a forth word? )</span>
-        <span style="color: #00ffff;">IF </span>function ELSE    <span style="color: #66f;">( treat as a function call )</span>
-           <span style="color: #7fffd4;">1 </span>perror THEN    <span style="color: #66f;">( else a syntax error )</span>
-     <span style="color: #00ffff;">ENDCASE</span>
-<span style="color: #00ffff;">; </span>--&gt;
+  CASE -1 OF assign   ENDOF
+       20 OF begin    ENDOF
+       22 OF if       ENDOF
+       25 OF while    ENDOF
+       27 OF repeat   ENDOF
+       29 OF write    ENDOF
+       30 OF writeln  ENDOF
+       -2 OF 1 perror ENDOF ( cannot be a constant )
+     DEFAULT words swap U&lt;  ( is it a forth word? )
+        IF function ELSE    ( treat as a function call )
+           1 perror THEN    ( else a syntax error )
+     ENDCASE
+; --&gt;
 </pre>
 </div>
 </div>
@@ -1352,16 +1353,16 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 <div class="outline-text-4" id="text-2-10-1">
 <div class="org-src-container">
 
-<pre class="src src-forth">FIND statement stmt !  <span style="color: #ffc0cb; font-weight: bold;">{ </span><span style="color: #eedd82;">resolve forward reference }</span>
+<pre class="src src-forth">FIND statement stmt !  { resolve forward reference }
 
-<span style="color: #66f;">( compile pascal statement in forth colon definition )</span>
-<span style="color: #00ffff;">: </span><span style="color: #ffffff; font-weight: bold;">{pascal </span>STATE @ 0= IF <span style="color: #00ff00;">." not available outside colon "</span>
-                        <span style="color: #00ff00;">." definition "</span> CR QUIT <span style="color: #00ffff;">THEN</span>
-          statement     <span style="color: #66f;">( call the compiler )</span>
-          <span style="color: #7fffd4;">18 </span>?error     <span style="color: #66f;">( exit on curly bracket )</span>
-<span style="color: #00ffff;">; IMMEDIATE</span>
+( compile pascal statement in forth colon definition )
+: {pascal STATE @ 0= IF ." not available outside colon "
+                        ." definition " CR QUIT THEN
+          statement     ( call the compiler )
+          18 ?error     ( exit on curly bracket )
+; IMMEDIATE
 
-<span style="color: #66f;">( ------ end of pascal extensions -------------------- )</span>
+( ------ end of pascal extensions -------------------- )
 </pre>
 </div>
 </div>
@@ -1376,9 +1377,9 @@ Notice that the result of evaluating an infix expression remains on the stack wh
 
 
 <colgroup>
-<col class="left"/>
+<col  class="left" />
 
-<col class="left"/>
+<col  class="left" />
 </colgroup>
 <tbody>
 <tr>

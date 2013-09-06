@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Building Retro</title>
-<!-- 2013-05-05 Sun 09:30 -->
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-<meta name="generator" content="Org-mode"/>
-<meta name="author" content="michal"/>
-<link rel="stylesheet" type="text/css" href="etc/style.css">
+<!-- 2013-09-03 Tue 23:44 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
 
 <script type="text/javascript" src="http://orgmode.org/org-info.js">
 /**
@@ -126,7 +127,8 @@ for the JavaScript code in this tag.
  }
 /*]]>*///-->
 </script>
-<script type="text/javascript" src="http://orgmode.org/mathjax/MathJax.js">
+<script type="text/javascript" src="http://orgmode.org/mathjax/MathJax.js"></script>
+<script type="text/javascript">
 <!--/*--><![CDATA[/*><!--*/
     MathJax.Hub.Config({
         // Only one of the two following lines, depending on user settings
@@ -254,7 +256,7 @@ for the JavaScript code in this tag.
 <li><a href="#sec-5-4-4">5.4.4. DEF <code>.data</code></a></li>
 <li><a href="#sec-5-4-5">5.4.5. DEF <code>.primitive</code></a></li>
 <li><a href="#sec-5-4-6">5.4.6. classes for the words so far</a></li>
-<li><a href="#sec-5-4-7">5.4.7. docs for the words so far <code>{ looks like these can be inlined&#x2026;? }</code></a></li>
+<li><a href="#sec-5-4-7">5.4.7. docs for the words so far <code>{ looks like these can be inlined...? }</code></a></li>
 </ul>
 </li>
 <li><a href="#sec-5-5">5.5. Primitives : <code>dup</code> .. <code>!+</code></a>
@@ -706,9 +708,9 @@ A list of variables used by the metacompiler.
 
 
 <colgroup>
-<col class="left"/>
+<col  class="left" />
 
-<col class="left"/>
+<col  class="left" />
 </colgroup>
 <tbody>
 <tr>
@@ -1377,9 +1379,9 @@ Create a few constants, which determine the basic memory layout. It looks like:
 
 
 <colgroup>
-<col class="left"/>
+<col  class="left" />
 
-<col class="left"/>
+<col  class="left" />
 </colgroup>
 <tbody>
 <tr>
@@ -1576,7 +1578,7 @@ This bit assigns the classes to the variables that the metacompiler will later u
 </div>
 </div>
 <div id="outline-container-sec-5-4-7" class="outline-4">
-<h4 id="sec-5-4-7"><span class="section-number-4">5.4.7</span> <span class="todo TODO">TODO</span> docs for the words so far <code>{ looks like these can be inlined&#x2026;? }</code></h4>
+<h4 id="sec-5-4-7"><span class="section-number-4">5.4.7</span> <span class="todo TODO">TODO</span> docs for the words so far <code>{ looks like these can be inlined...? }</code></h4>
 <div class="outline-text-4" id="text-5-4-7">
 <div class="org-src-container">
 
@@ -1616,7 +1618,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 <div id="outline-container-sec-5-5-2" class="outline-4">
 <h4 id="sec-5-5-2"><span class="section-number-4">5.5.2</span> stack operations</h4>
 <div class="outline-text-4" id="text-5-5-2">
-</div><ol class="org-ol"><li>dup<br/><div class="outline-text-5" id="text-5-5-2-1">
+</div><ol class="org-ol"><li>dup<br  /><div class="outline-text-5" id="text-5-5-2-1">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">dup</span> <span style="color: #00ffff;">dup</span> <span style="color: #00ff00;">dup,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1626,7 +1628,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 </div>
 </li>
 
-<li>swap<br/><div class="outline-text-5" id="text-5-5-2-2">
+<li>swap<br  /><div class="outline-text-5" id="text-5-5-2-2">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">swap</span> <span style="color: #00ffff;">swap</span> <span style="color: #00ff00;">swap,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1635,7 +1637,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 </div>
 </div>
 </li>
-<li>drop<br/><div class="outline-text-5" id="text-5-5-2-3">
+<li>drop<br  /><div class="outline-text-5" id="text-5-5-2-3">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">drop</span> <span style="color: #00ffff;">drop</span> <span style="color: #00ff00;">drop,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1649,7 +1651,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 <div id="outline-container-sec-5-5-3" class="outline-4">
 <h4 id="sec-5-5-3"><span class="section-number-4">5.5.3</span> bitwise operations { also logical operations since true is -1 }</h4>
 <div class="outline-text-4" id="text-5-5-3">
-</div><ol class="org-ol"><li>and<br/><div class="outline-text-5" id="text-5-5-3-1">
+</div><ol class="org-ol"><li>and<br  /><div class="outline-text-5" id="text-5-5-3-1">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">and</span> <span style="color: #00ffff;">and</span> <span style="color: #00ff00;">and,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1659,7 +1661,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 </div>
 </li>
 
-<li>or<br/><div class="outline-text-5" id="text-5-5-3-2">
+<li>or<br  /><div class="outline-text-5" id="text-5-5-3-2">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">or</span> <span style="color: #00ffff;">or</span> <span style="color: #00ff00;">or,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1669,7 +1671,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 </div>
 </li>
 
-<li>xor<br/><div class="outline-text-5" id="text-5-5-3-3">
+<li>xor<br  /><div class="outline-text-5" id="text-5-5-3-3">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">xor</span> <span style="color: #00ffff;">xor</span> <span style="color: #00ff00;">xor,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1683,7 +1685,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 <div id="outline-container-sec-5-5-4" class="outline-4">
 <h4 id="sec-5-5-4"><span class="section-number-4">5.5.4</span> memory operations</h4>
 <div class="outline-text-4" id="text-5-5-4">
-</div><ol class="org-ol"><li>@<br/><div class="outline-text-5" id="text-5-5-4-1">
+</div><ol class="org-ol"><li>@<br  /><div class="outline-text-5" id="text-5-5-4-1">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">@</span> <span style="color: #00ffff;">@</span> <span style="color: #00ff00;">@,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1693,7 +1695,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 </div>
 </li>
 
-<li>!<br/><div class="outline-text-5" id="text-5-5-4-2">
+<li>!<br  /><div class="outline-text-5" id="text-5-5-4-2">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">!</span> <span style="color: #00ffff;">!</span> <span style="color: #00ff00;">!,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1707,7 +1709,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 <div id="outline-container-sec-5-5-5" class="outline-4">
 <h4 id="sec-5-5-5"><span class="section-number-4">5.5.5</span> arithmetic operations</h4>
 <div class="outline-text-4" id="text-5-5-5">
-</div><ol class="org-ol"><li>+<br/><div class="outline-text-5" id="text-5-5-5-1">
+</div><ol class="org-ol"><li>+<br  /><div class="outline-text-5" id="text-5-5-5-1">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">+</span> <span style="color: #00ffff;">+</span> <span style="color: #00ff00;">+,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1717,7 +1719,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 </div>
 </li>
 
-<li>-<br/><div class="outline-text-5" id="text-5-5-5-2">
+<li>-<br  /><div class="outline-text-5" id="text-5-5-5-2">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">-</span> <span style="color: #00ffff;">-</span> <span style="color: #00ff00;">-,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1727,7 +1729,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 </div>
 </li>
 
-<li>*<br/><div class="outline-text-5" id="text-5-5-5-3">
+<li>*<br  /><div class="outline-text-5" id="text-5-5-5-3">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">*</span> <span style="color: #00ffff;">*</span> <span style="color: #00ff00;">*,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1737,7 +1739,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 </div>
 </li>
 
-<li>/mod<br/><div class="outline-text-5" id="text-5-5-5-4">
+<li>/mod<br  /><div class="outline-text-5" id="text-5-5-5-4">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">/mod</span> <span style="color: #00ffff;">/mod</span> <span style="color: #00ff00;">/mod,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1747,7 +1749,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 </div>
 </li>
 
-<li>&lt;&lt; { shift left, or multiply by 2 }<br/><div class="outline-text-5" id="text-5-5-5-5">
+<li>&lt;&lt; { shift left, or multiply by 2 }<br  /><div class="outline-text-5" id="text-5-5-5-5">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">&lt;&lt;</span> <span style="color: #00ffff;">&lt;&lt;</span> <span style="color: #00ff00;">&lt;&lt;,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1757,7 +1759,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 </div>
 </li>
 
-<li>&gt;&gt; { shift right, or divide by 2 }<br/><div class="outline-text-5" id="text-5-5-5-6">
+<li>&gt;&gt; { shift right, or divide by 2 }<br  /><div class="outline-text-5" id="text-5-5-5-6">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">&gt;&gt;</span> <span style="color: #00ffff;">&gt;&gt;</span> <span style="color: #00ff00;">&gt;&gt;,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1767,7 +1769,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 </div>
 </li>
 
-<li>1-<br/><div class="outline-text-5" id="text-5-5-5-7">
+<li>1-<br  /><div class="outline-text-5" id="text-5-5-5-7">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">1-</span>  <span style="color: #00ffff;">1-</span>  <span style="color: #00ff00;">1-,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1777,7 +1779,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 </div>
 </li>
 
-<li>1+<br/><div class="outline-text-5" id="text-5-5-5-8">
+<li>1+<br  /><div class="outline-text-5" id="text-5-5-5-8">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> <span style="color: #00ffff;">1+</span>  <span style="color: #00ffff;">1+</span>  1+, <span style="color: #c63; font-weight: bold;">;</span>
@@ -1791,7 +1793,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 <div id="outline-container-sec-5-5-6" class="outline-4">
 <h4 id="sec-5-5-6"><span class="section-number-4">5.5.6</span> i/o operations</h4>
 <div class="outline-text-4" id="text-5-5-6">
-</div><ol class="org-ol"><li>out<br/><div class="outline-text-5" id="text-5-5-6-1">
+</div><ol class="org-ol"><li>out<br  /><div class="outline-text-5" id="text-5-5-6-1">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> out out <span style="color: #00ff00;">out,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1801,7 +1803,7 @@ These are functions that map directly to Ngaro instructions. We will use the ins
 </div>
 </li>
 
-<li>in<br/><div class="outline-text-5" id="text-5-5-6-2">
+<li>in<br  /><div class="outline-text-5" id="text-5-5-6-2">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">p:</span> in in <span style="color: #00ff00;">in,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -1978,16 +1980,16 @@ Continuing on, we now have the core of the actual colon compiler:
 <div id="outline-container-sec-5-7-1" class="outline-4">
 <h4 id="sec-5-7-1"><span class="section-number-4">5.7.1</span> | core compiler</h4>
 <div class="outline-text-4" id="text-5-7-1">
-</div><ol class="org-ol"><li>t: here     (  -a )  heap # @, ;<br/></li>
-<li>t: ,        ( n-  )  here !+ heap # !, ;<br/><div class="outline-text-5" id="text-5-7-1-2">
+</div><ol class="org-ol"><li>t: here     (  -a )  heap # @, ;<br  /></li>
+<li>t: ,        ( n-  )  here !+ heap # !, ;<br  /><div class="outline-text-5" id="text-5-7-1-2">
 <p>
 Note the use of "!+" in ",". This is a clean way of implementing this
 functionality.
 </p>
 </div>
 </li>
-<li>t: ;;       (  -  )  #9 , ;<br/></li>
-<li>t: t-;      (  -  )  ;; ;; compiler # off ;<br/><div class="outline-text-5" id="text-5-7-1-4">
+<li>t: ;;       (  -  )  #9 , ;<br  /></li>
+<li>t: t-;      (  -  )  ;; ;; compiler # off ;<br  /><div class="outline-text-5" id="text-5-7-1-4">
 <p>
 For terminating definitions. These are exposed as ";;" and ";", respectively.
 We allow the "t-" prefix to avoid confusion with the ";" provided by the
@@ -2008,8 +2010,8 @@ And back to the code:
 </p>
 </div>
 </li>
-<li>t: ($,)     ( a-a )  repeat @+ 0; , again ;<br/></li>
-<li>t: $        ( a-  )  ($,) drop, #0 , ;<br/><div class="outline-text-5" id="text-5-7-1-6">
+<li>t: ($,)     ( a-a )  repeat @+ 0; , again ;<br  /></li>
+<li>t: $        ( a-  )  ($,) drop, #0 , ;<br  /><div class="outline-text-5" id="text-5-7-1-6">
 <p>
 This is used to compile a string into memory. We'll see how it is used
 when we get to ":".
@@ -2021,8 +2023,8 @@ separate definition.
 </p>
 </div>
 </li>
-<li>t: push     ( n-  )  #5 , ;<br/></li>
-<li>t: pop      (  -n )  #6 , ;<br/><div class="outline-text-5" id="text-5-7-1-8">
+<li>t: push     ( n-  )  #5 , ;<br  /></li>
+<li>t: pop      (  -n )  #6 , ;<br  /><div class="outline-text-5" id="text-5-7-1-8">
 <p>
 These are exposed as macros; they lay down push, and pop, instructions when
 executed.
@@ -2051,9 +2053,9 @@ executed.
 <div id="outline-container-sec-5-8-1" class="outline-4">
 <h4 id="sec-5-8-1"><span class="section-number-4">5.8.1</span> | conditionals / flow control</h4>
 <div class="outline-text-4" id="text-5-8-1">
-</div><ol class="org-ol"><li>t: t-0;     ( n-n   ||   n- )  #25 , ;<br/></li>
-<li>t: t-repeat ( R: -    C: -a )  here ;<br/></li>
-<li>t: t-again  ( R: -    C: a- )  #8 , , ;<br/><div class="outline-text-5" id="text-5-8-1-3">
+</div><ol class="org-ol"><li>t: t-0;     ( n-n   ||   n- )  #25 , ;<br  /></li>
+<li>t: t-repeat ( R: -    C: -a )  here ;<br  /></li>
+<li>t: t-again  ( R: -    C: a- )  #8 , , ;<br  /><div class="outline-text-5" id="text-5-8-1-3">
 <p>
 Primitive flow control and conditionals. At this point we have to use
 these, as there's no quotes in the initial kernel.
@@ -2406,9 +2408,9 @@ a structure of:
 
 
 <colgroup>
-<col class="right"/>
+<col  class="right" />
 
-<col class="left"/>
+<col  class="left" />
 </colgroup>
 <tbody>
 <tr>
@@ -2608,7 +2610,7 @@ Allow for comments. Eats everything up to a ")", and then exits.
 </pre>
 </div>
 </div>
-<ol class="org-ol"><li><span class="todo TODO">TODO</span> t: [        (    -naa ) compiler # @, #8 , here #0 , here compiler # on ;<br/></li></ol>
+<ol class="org-ol"><li><span class="todo TODO">TODO</span> t: [        (    -naa ) compiler # @, #8 , here #0 , here compiler # on ;<br  /></li></ol>
 </div>
 
 <div id="outline-container-sec-5-13-4" class="outline-4">
@@ -2633,7 +2635,7 @@ Allow for comments. Eats everything up to a ")", and then exits.
 </pre>
 </div>
 </div>
-<ol class="org-ol"><li><span class="todo TODO">TODO</span> t: ]        ( naa-q   ) push, ;; here swap, !, compiler # !, pop, .data ;<br/><div class="outline-text-5" id="text-5-13-4-1">
+<ol class="org-ol"><li><span class="todo TODO">TODO</span> t: ]        ( naa-q   ) push, ;; here swap, !, compiler # !, pop, .data ;<br  /><div class="outline-text-5" id="text-5-13-4-1">
 <p>
 Quotes are anonymous blocks of code. We create them using "[" and "]". The
 way they work is this:
@@ -2766,7 +2768,7 @@ soon)
 </div>
 
 <p>
-This replaces a <code>dup push &#x2026; pop</code> sequence:
+This replaces a <code>dup push ... pop</code> sequence:
 </p>
 
 <pre class="example">
@@ -3010,7 +3012,7 @@ bases later.
 <div id="outline-container-sec-5-17-3" class="outline-4">
 <h4 id="sec-5-17-3"><span class="section-number-4">5.17.3</span> | number parsing and display</h4>
 <div class="outline-text-4" id="text-5-17-3">
-</div><ol class="org-ol"><li>{ @base digits valid? digit? toDigit isNegative convert }&#xa0;&#xa0;&#xa0;<span class="tag"><span class="internal">internal</span></span><br/><div class="outline-text-5" id="text-5-17-3-1">
+</div><ol class="org-ol"><li>{ @base digits valid? digit? toDigit isNegative convert }&#xa0;&#xa0;&#xa0;<span class="tag"><span class="internal">internal</span></span><br  /><div class="outline-text-5" id="text-5-17-3-1">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">i:</span> @base    <span style="color: #66f;">( -n )</span> base # <span style="color: #00ff00;">@,</span> <span style="color: #c63; font-weight: bold;">;</span>
@@ -3038,7 +3040,7 @@ Various helpers.
 </p>
 </div>
 </li>
-<li>{ isNegative? }&#xa0;&#xa0;&#xa0;<span class="tag"><span class="internal">internal</span></span><br/><div class="outline-text-5" id="text-5-17-3-2">
+<li>{ isNegative? }&#xa0;&#xa0;&#xa0;<span class="tag"><span class="internal">internal</span></span><br  /><div class="outline-text-5" id="text-5-17-3-2">
 <div class="org-src-container">
 
 <pre class="src src-retro"><span style="color: #c63; font-weight: bold;">i:</span> isNegative? <span style="color: #66f;">( a-a )</span>
@@ -3071,7 +3073,7 @@ to 1. After conversion, we multiply by this to change the sign as needed.
 </pre>
 </div>
 </div>
-<ol class="org-ol"><li>t: toNumber ( $-n )<br/><div class="outline-text-5" id="text-5-17-4-1">
+<ol class="org-ol"><li>t: toNumber ( $-n )<br  /><div class="outline-text-5" id="text-5-17-4-1">
 <p>
 isNegative? #0 #value # !, (convert) drop, #value # @, negate? # @, *, ;
 </p>
@@ -3141,7 +3143,7 @@ provided.
 <div id="outline-container-sec-5-18-1" class="outline-4">
 <h4 id="sec-5-18-1"><span class="section-number-4">5.18.1</span> | startup</h4>
 <div class="outline-text-4" id="text-5-18-1">
-</div><ol class="org-ol"><li>t: boot         (  -  )<br/><div class="outline-text-5" id="text-5-18-1-1">
+</div><ol class="org-ol"><li>t: boot         (  -  )<br  /><div class="outline-text-5" id="text-5-18-1-1">
 <p>
 copytag # puts #32 putc version # puts
 </p>
@@ -3155,8 +3157,8 @@ Retro, but can be revectored to do other tasks.
 </p>
 </div>
 </li>
-<li>t: query        ( n-n ) #5 out, wait, #5 in, ;<br/></li>
-<li>t: run-on-boot  (  -  )<br/><div class="outline-text-5" id="text-5-18-1-3">
+<li>t: query        ( n-n ) #5 out, wait, #5 in, ;<br  /></li>
+<li>t: run-on-boot  (  -  )<br  /><div class="outline-text-5" id="text-5-18-1-3">
 <p>
 #-1 query memory # !,  ( Memory Size     )
 </p>
@@ -3931,9 +3933,9 @@ slightly different than the non-exposed one in the kernel.
 
 
 <colgroup>
-<col class="left"/>
+<col  class="left" />
 
-<col class="left"/>
+<col  class="left" />
 </colgroup>
 <tbody>
 <tr>
@@ -4239,19 +4241,19 @@ Compile a jump to a named function.
 <div id="outline-container-sec-6-13-1" class="outline-4">
 <h4 id="sec-6-13-1"><span class="section-number-4">6.13.1</span> <span class="todo TODO">TODO</span> | Now for more combinators.</h4>
 <div class="outline-text-4" id="text-6-13-1">
-</div><ol class="org-ol"><li>: []      (    -    ) ` [ ` ] ; immediate<br/><div class="outline-text-5" id="text-6-13-1-1">
+</div><ol class="org-ol"><li>: []      (    -    ) ` [ ` ] ; immediate<br  /><div class="outline-text-5" id="text-6-13-1-1">
 <p>
 Create an empty quote.
 </p>
 </div>
 </li>
-<li>: while   (   q-    ) [ repeat dup dip swap 0; drop again ] do drop ;<br/><div class="outline-text-5" id="text-6-13-1-2">
+<li>: while   (   q-    ) [ repeat dup dip swap 0; drop again ] do drop ;<br  /><div class="outline-text-5" id="text-6-13-1-2">
 <p>
 Execute quote until quote returns a flag of 0
 </p>
 </div>
 </li>
-<li>: curry   (  nq-q   ) [ [ ` [ ] dip .data ] dip , ` ] ;<br/><div class="outline-text-5" id="text-6-13-1-3">
+<li>: curry   (  nq-q   ) [ [ ` [ ] dip .data ] dip , ` ] ;<br  /><div class="outline-text-5" id="text-6-13-1-3">
 <p>
 Bind data and an action into a new quote. E.g., the following forms are
 identical in functionality:
@@ -4263,7 +4265,7 @@ identical in functionality:
 </p>
 </div>
 </li>
-<li>: take    (  qq-q   ) swap [ [ ` [ ] dip , ] dip .data ` ] ;<br/><div class="outline-text-5" id="text-6-13-1-4">
+<li>: take    (  qq-q   ) swap [ [ ` [ ] dip , ] dip .data ` ] ;<br  /><div class="outline-text-5" id="text-6-13-1-4">
 <p>
 Bind data and an action into a new quote. This is dlightly different
 than "curry" in that these forms are identical:
@@ -4275,43 +4277,43 @@ than "curry" in that these forms are identical:
 </p>
 </div>
 </li>
-<li>:  bi      (  xqq-   ) &amp;sip dip do ;<br/><div class="outline-text-5" id="text-6-13-1-5">
+<li>:  bi      (  xqq-   ) &amp;sip dip do ;<br  /><div class="outline-text-5" id="text-6-13-1-5">
 <p>
 Apply each quote to a copy of x
 </p>
 </div>
 </li>
-<li>:  bi*     ( xyqq-   ) &amp;dip dip do ;<br/><div class="outline-text-5" id="text-6-13-1-6">
+<li>:  bi*     ( xyqq-   ) &amp;dip dip do ;<br  /><div class="outline-text-5" id="text-6-13-1-6">
 <p>
 Apply q1 to x and q2 to y
 </p>
 </div>
 </li>
-<li>:  bi@     (  xyq-   ) dup bi* ;<br/><div class="outline-text-5" id="text-6-13-1-7">
+<li>:  bi@     (  xyq-   ) dup bi* ;<br  /><div class="outline-text-5" id="text-6-13-1-7">
 <p>
 Apply q to x and y
 </p>
 </div>
 </li>
-<li>:  tri     ( xqqq-   ) [ &amp;sip dip sip ] dip do ;<br/><div class="outline-text-5" id="text-6-13-1-8">
+<li>:  tri     ( xqqq-   ) [ &amp;sip dip sip ] dip do ;<br  /><div class="outline-text-5" id="text-6-13-1-8">
 <p>
 Apply each quote to a copy of x
 </p>
 </div>
 </li>
-<li>:  tri*    ( xyzqqq- ) [ [ swap &amp;dip dip ] dip dip ] dip do ;<br/><div class="outline-text-5" id="text-6-13-1-9">
+<li>:  tri*    ( xyzqqq- ) [ [ swap &amp;dip dip ] dip dip ] dip do ;<br  /><div class="outline-text-5" id="text-6-13-1-9">
 <p>
 Apply q1 to x, q2 to y, and q3 to z
 </p>
 </div>
 </li>
-<li>:  tri@    ( xyzq-   ) 2dup tri* ;<br/><div class="outline-text-5" id="text-6-13-1-10">
+<li>:  tri@    ( xyzq-   ) 2dup tri* ;<br  /><div class="outline-text-5" id="text-6-13-1-10">
 <p>
 Apply q to x, y, and z
 </p>
 </div>
 </li>
-<li>: cons    (  ab-q   ) 2push ` [ 2pop &amp;.data bi@ ` ] ;<br/><div class="outline-text-5" id="text-6-13-1-11">
+<li>: cons    (  ab-q   ) 2push ` [ 2pop &amp;.data bi@ ` ] ;<br  /><div class="outline-text-5" id="text-6-13-1-11">
 <p>
 Create a quote returning two data elements. These forms are
 identical:
@@ -4323,7 +4325,7 @@ identical:
 </p>
 </div>
 </li>
-<li>:  preserve ( aq-    ) swap [ @ ] sip [ [ do ] dip ] dip ! ;<br/><div class="outline-text-5" id="text-6-13-1-12">
+<li>:  preserve ( aq-    ) swap [ @ ] sip [ [ do ] dip ] dip ! ;<br  /><div class="outline-text-5" id="text-6-13-1-12">
 <p>
 Given a variable (a) and a quote (q), preserve the contents of (a) while
 executing the quote, and restore the original contents of (a) after
@@ -4339,7 +4341,7 @@ We'll see this in use later.
 </p>
 </div>
 </li>
-<li>:  when    (  nqq-n  )<br/><div class="outline-text-5" id="text-6-13-1-13">
+<li>:  when    (  nqq-n  )<br  /><div class="outline-text-5" id="text-6-13-1-13">
 <p>
 [ over swap do ] dip swap
 [ do -1 ] [ drop 0 ] if 0; pop 2drop ;
@@ -4407,7 +4409,7 @@ The "iter" combinator runs a quote (n) times and push counter to stack each time
 </p>
 </div>
 </li>
-<li>each@<br/><div class="outline-text-5" id="text-6-13-1-14">
+<li>each@<br  /><div class="outline-text-5" id="text-6-13-1-14">
 <p>
 And now onto "each@". This one is a complex combinator, in that it has
 differing stack effects based on the data types being passed to it. First the
@@ -4487,14 +4489,14 @@ We'll see this in use later.
 <div id="outline-container-sec-6-14-1" class="outline-4">
 <h4 id="sec-6-14-1"><span class="section-number-4">6.14.1</span> <span class="todo TODO">TODO</span> | memory blocks</h4>
 <div class="outline-text-4" id="text-6-14-1">
-</div><ol class="org-ol"><li>: copy   ( aan-  ) [ &amp;@+ dip !+ ] times 2drop ;<br/><div class="outline-text-5" id="text-6-14-1-1">
+</div><ol class="org-ol"><li>: copy   ( aan-  ) [ &amp;@+ dip !+ ] times 2drop ;<br  /><div class="outline-text-5" id="text-6-14-1-1">
 <p>
 This is used to copy a block of memory from one location to another. It is
 not intended for moving blocks backwards, and overlaps may be troublesome.
 </p>
 </div>
 </li>
-<li>: fill   ( ann-  ) swap !here [ @here swap !+ ] times drop ;<br/><div class="outline-text-5" id="text-6-14-1-2">
+<li>: fill   ( ann-  ) swap !here [ @here swap !+ ] times drop ;<br  /><div class="outline-text-5" id="text-6-14-1-2">
 <p>
 Fill a block of memory with a value. We use "here" to hold this value.
 </p>
@@ -4522,20 +4524,20 @@ Fill a block of memory with a value. We use "here" to hold this value.
 <div id="outline-container-sec-6-15-1" class="outline-4">
 <h4 id="sec-6-15-1"><span class="section-number-4">6.15.1</span> <span class="todo TODO">TODO</span> | conditionals</h4>
 <div class="outline-text-4" id="text-6-15-1">
-</div><ol class="org-ol"><li>: ahead  (   -a  ) 8 , here 0 , ;<br/><div class="outline-text-5" id="text-6-15-1-1">
+</div><ol class="org-ol"><li>: ahead  (   -a  ) 8 , here 0 , ;<br  /><div class="outline-text-5" id="text-6-15-1-1">
 <p>
 Compile a branch to 0, leaving a pointer to the branch target that we can set
 later.
 </p>
 </div>
 </li>
-<li>: if;    (  f-   ) ` not ` 0; ` drop ; compile-only<br/><div class="outline-text-5" id="text-6-15-1-2">
+<li>: if;    (  f-   ) ` not ` 0; ` drop ; compile-only<br  /><div class="outline-text-5" id="text-6-15-1-2">
 <p>
 Exits a function if TOS is not zero. Useful in unconditional loops.
 </p>
 </div>
 </li>
-<li>: within ( xlu-f ) &amp;over dip &lt;= &amp;&gt;= dip and ;<br/><div class="outline-text-5" id="text-6-15-1-3">
+<li>: within ( xlu-f ) &amp;over dip &lt;= &amp;&gt;= dip and ;<br  /><div class="outline-text-5" id="text-6-15-1-3">
 <p>
 Attempt to see if a value is within lower and upper bounds. This is inclusive.
 E.g.,
@@ -4587,15 +4589,15 @@ checked.
 <div id="outline-container-sec-6-16-1" class="outline-4">
 <h4 id="sec-6-16-1"><span class="section-number-4">6.16.1</span> data structures</h4>
 <div class="outline-text-4" id="text-6-16-1">
-</div><ol class="org-ol"><li>:  variable:  ( n"-  ) create , ;<br/></li>
-<li>:  variable   (  "-  ) 0 variable: ;<br/><div class="outline-text-5" id="text-6-16-1-2">
+</div><ol class="org-ol"><li>:  variable:  ( n"-  ) create , ;<br  /></li>
+<li>:  variable   (  "-  ) 0 variable: ;<br  /><div class="outline-text-5" id="text-6-16-1-2">
 <p>
 Variables are created using these. The first form takes an initial value from
 the stack; the second initializes the variable to zero.
 </p>
 </div>
 </li>
-<li>:  constant   ( n"-  ) create @last !d-&gt;xt ;<br/><div class="outline-text-5" id="text-6-16-1-3">
+<li>:  constant   ( n"-  ) create @last !d-&gt;xt ;<br  /><div class="outline-text-5" id="text-6-16-1-3">
 <p>
 Here we abuse the classes to create constants. We alter the xt field to hold
 the value of the constant, and let ".data" take care of the details. Trying to
@@ -4603,7 +4605,7 @@ execute a constant is not possible.
 </p>
 </div>
 </li>
-<li>: allot      (  n-  ) dup 0 &lt; [ +heap ] [ repeat 0; 1- 0 , again ] if ;<br/><div class="outline-text-5" id="text-6-16-1-4">
+<li>: allot      (  n-  ) dup 0 &lt; [ +heap ] [ repeat 0; 1- 0 , again ] if ;<br  /><div class="outline-text-5" id="text-6-16-1-4">
 <p>
 Allocate (or free) space in the heap. Pass a negative value to free, or a
 positive one to allocate space. This will zero out memory when allocating, but
@@ -4688,16 +4690,16 @@ data.
 <div id="outline-container-sec-6-17-1" class="outline-4">
 <h4 id="sec-6-17-1"><span class="section-number-4">6.17.1</span> numeric bases</h4>
 <div class="outline-text-4" id="text-6-17-1">
-</div><ol class="org-ol"><li>:  decimal ( - ) 10 !base ;<br/></li>
-<li>:  hex     ( - ) 16 !base ;<br/></li>
-<li>:  octal   ( - )  8 !base ;<br/></li>
-<li>:  binary  ( - )  2 !base ;<br/><div class="outline-text-5" id="text-6-17-1-4">
+</div><ol class="org-ol"><li>:  decimal ( - ) 10 !base ;<br  /></li>
+<li>:  hex     ( - ) 16 !base ;<br  /></li>
+<li>:  octal   ( - )  8 !base ;<br  /></li>
+<li>:  binary  ( - )  2 !base ;<br  /><div class="outline-text-5" id="text-6-17-1-4">
 <p>
 Change the current base. Nothing fancy here.
 </p>
 </div>
 </li>
-<li>toString<br/><div class="outline-text-5" id="text-6-17-1-5">
+<li>toString<br  /><div class="outline-text-5" id="text-6-17-1-5">
 <p>
 {{
   create buf   32 allot
@@ -4770,19 +4772,19 @@ Convert a number into a string. This uses "numbers" from the kernel.
 <div id="outline-container-sec-6-18-1" class="outline-4">
 <h4 id="sec-6-18-1"><span class="section-number-4">6.18.1</span> <span class="todo TODO">TODO</span> | output</h4>
 <div class="outline-text-4" id="text-6-18-1">
-</div><ol class="org-ol"><li>: clear (  - ) -1 putc ;<br/><div class="outline-text-5" id="text-6-18-1-1">
+</div><ol class="org-ol"><li>: clear (  - ) -1 putc ;<br  /><div class="outline-text-5" id="text-6-18-1-1">
 <p>
 Clear the display.
 </p>
 </div>
 </li>
-<li>: space (  - ) 32 putc ;<br/><div class="outline-text-5" id="text-6-18-1-2">
+<li>: space (  - ) 32 putc ;<br  /><div class="outline-text-5" id="text-6-18-1-2">
 <p>
 Display a space character.
 </p>
 </div>
 </li>
-<li>: putn  ( n- ) toString puts ;<br/><div class="outline-text-5" id="text-6-18-1-3">
+<li>: putn  ( n- ) toString puts ;<br  /><div class="outline-text-5" id="text-6-18-1-3">
 <p>
 Display a number. This does not add a trailing space.
 </p>
@@ -4990,8 +4992,8 @@ default, simpler output.
 <div id="outline-container-sec-6-19-2" class="outline-4">
 <h4 id="sec-6-19-2"><span class="section-number-4">6.19.2</span> <span class="todo TODO">TODO</span> | prefix parsing</h4>
 <div class="outline-text-4" id="text-6-19-2">
-</div><ol class="org-ol"><li>: .parse  (  a- ) do ;<br/></li>
-<li>:  parsing (   - ) &amp;.parse reclass ;<br/><div class="outline-text-5" id="text-6-19-2-2">
+</div><ol class="org-ol"><li>: .parse  (  a- ) do ;<br  /></li>
+<li>:  parsing (   - ) &amp;.parse reclass ;<br  /><div class="outline-text-5" id="text-6-19-2-2">
 <p>
 {{
 </p>
@@ -5137,7 +5139,7 @@ for us.
 <div id="outline-container-sec-6-20-2" class="outline-4">
 <h4 id="sec-6-20-2"><span class="section-number-4">6.20.2</span> <span class="todo TODO">TODO</span> | vocabularies</h4>
 <div class="outline-text-4" id="text-6-20-2">
-</div><ol class="org-ol"><li>And now for vocabularies. This is where things get trickier.<br/><div class="outline-text-5" id="text-6-20-2-1">
+</div><ol class="org-ol"><li>And now for vocabularies. This is where things get trickier.<br  /><div class="outline-text-5" id="text-6-20-2-1">
 <p>
 create dicts 64 allot
 </p>
@@ -5159,19 +5161,19 @@ have to build the strings manually.
 </p>
 </div>
 </li>
-<li>:  seal   (  - ) last repeat @ 0; @active over @ =if 0 swap ! ;; then again ;<br/><div class="outline-text-5" id="text-6-20-2-2">
+<li>:  seal   (  - ) last repeat @ 0; @active over @ =if 0 swap ! ;; then again ;<br  /><div class="outline-text-5" id="text-6-20-2-2">
 <p>
 Close off a vocabulary.
 </p>
 </div>
 </li>
-<li>:  revert (  - ) @prior 0; !last 0 !prior ;<br/><div class="outline-text-5" id="text-6-20-2-3">
+<li>:  revert (  - ) @prior 0; !last 0 !prior ;<br  /><div class="outline-text-5" id="text-6-20-2-3">
 <p>
 Revert to the prior vocabulary.
 </p>
 </div>
 </li>
-<li>:  safety (  - ) "%%" header immediate &amp;revert @last !d-&gt;xt ;<br/><div class="outline-text-5" id="text-6-20-2-4">
+<li>:  safety (  - ) "%%" header immediate &amp;revert @last !d-&gt;xt ;<br  /><div class="outline-text-5" id="text-6-20-2-4">
 <p>
 Create an initial word in every vocabulary named "%%" that will revert us to
 the prior (hopefully global) vocabulary. This gives us a saftey net to help
@@ -5187,25 +5189,25 @@ The above stuff is hidden away from the global dictionary&#x2026;
 </p>
 </div>
 </li>
-<li>:  %%     (  - ) revert ;<br/><div class="outline-text-5" id="text-6-20-2-5">
+<li>:  %%     (  - ) revert ;<br  /><div class="outline-text-5" id="text-6-20-2-5">
 <p>
 Top-level version of "%%".
 </p>
 </div>
 </li>
-<li>:  &lt;%&gt;    ( a- ) @last !prior !last ;<br/><div class="outline-text-5" id="text-6-20-2-6">
+<li>:  &lt;%&gt;    ( a- ) @last !prior !last ;<br  /><div class="outline-text-5" id="text-6-20-2-6">
 <p>
 Save the current vocabulary, and open a new one. This does not nest.
 </p>
 </div>
 </li>
-<li>: .chain ( a- ) @dicts &amp;drop &amp;&lt;%&gt; if ;<br/><div class="outline-text-5" id="text-6-20-2-7">
+<li>: .chain ( a- ) @dicts &amp;drop &amp;&lt;%&gt; if ;<br  /><div class="outline-text-5" id="text-6-20-2-7">
 <p>
 The class for handling vocabularies. You shouldn't need to use this directly.
 </p>
 </div>
 </li>
-<li>: chain: ( "- ) create 0 , &amp;.chain reclass @last !active safety ;<br/><div class="outline-text-5" id="text-6-20-2-8">
+<li>: chain: ( "- ) create 0 , &amp;.chain reclass @last !active safety ;<br  /><div class="outline-text-5" id="text-6-20-2-8">
 <p>
 Create a new vocabulary. This is not nestable. The global dictionary is still
 visible when a new vocabulary is created, so you can still access everything
@@ -5213,44 +5215,44 @@ defined prior to this.
 </p>
 </div>
 </li>
-<li>: ;chain (  - ) seal @last @active [ !last ] [ !d-&gt;xt ] bi ;<br/><div class="outline-text-5" id="text-6-20-2-9">
+<li>: ;chain (  - ) seal @last @active [ !last ] [ !d-&gt;xt ] bi ;<br  /><div class="outline-text-5" id="text-6-20-2-9">
 <p>
 Close off a vocabulary, hiding its contents from the global dictionary.
 </p>
 </div>
 </li>
-<li>: :with  ( a- ) 0; @dicts 1+ dicts + ! dicts ++ ;<br/><div class="outline-text-5" id="text-6-20-2-10">
+<li>: :with  ( a- ) 0; @dicts 1+ dicts + ! dicts ++ ;<br  /><div class="outline-text-5" id="text-6-20-2-10">
 <p>
 Given an xt of a vocabulary, add it to the search order.
 </p>
 </div>
 </li>
-<li>: with   ( "- ) ' :with ;<br/><div class="outline-text-5" id="text-6-20-2-11">
+<li>: with   ( "- ) ' :with ;<br  /><div class="outline-text-5" id="text-6-20-2-11">
 <p>
 Parse for a vocabulary name and add it to the search order.
 </p>
 </div>
 </li>
-<li>:  without ( - ) @dicts 0; 1- !dicts ;<br/><div class="outline-text-5" id="text-6-20-2-12">
+<li>:  without ( - ) @dicts 0; 1- !dicts ;<br  /><div class="outline-text-5" id="text-6-20-2-12">
 <p>
 Remove the most recently added vocabulary from the search order.
 </p>
 </div>
 </li>
-<li>: global  ( - ) 0 !dicts ;<br/><div class="outline-text-5" id="text-6-20-2-13">
+<li>: global  ( - ) 0 !dicts ;<br  /><div class="outline-text-5" id="text-6-20-2-13">
 <p>
 Remove all vocabularies from the search order.
 </p>
 </div>
 </li>
-<li>: findInChain ( $a-df ) :with find without ;<br/><div class="outline-text-5" id="text-6-20-2-14">
+<li>: findInChain ( $a-df ) :with find without ;<br  /><div class="outline-text-5" id="text-6-20-2-14">
 <p>
 Search for a name in a specific vocabulary. Returns a dictionary header
 and a flag.
 </p>
 </div>
 </li>
-<li>: with|  ( "- )<br/><div class="outline-text-5" id="text-6-20-2-15">
+<li>: with|  ( "- )<br  /><div class="outline-text-5" id="text-6-20-2-15">
 <p>
 global
 repeat
@@ -5269,7 +5271,7 @@ encountered.
 </p>
 </div>
 </li>
-<li>: rename: ( a"- )<br/><div class="outline-text-5" id="text-6-20-2-16">
+<li>: rename: ( a"- )<br  /><div class="outline-text-5" id="text-6-20-2-16">
 <p>
 create dup xt-&gt;d swap :hide
 [ @d-&gt;xt @last !d-&gt;xt ] [ @d-&gt;class @last !d-&gt;class ] bi ;
@@ -5474,7 +5476,7 @@ hide "   <span style="color: #66f;">( next we define __" and can use proper stri
 <div id="outline-container-sec-6-24-1" class="outline-4">
 <h4 id="sec-6-24-1"><span class="section-number-4">6.24.1</span> <span class="todo TODO">TODO</span> | formatted strings</h4>
 <div class="outline-text-4" id="text-6-24-1">
-</div><ol class="org-ol"><li>number display<br/><div class="outline-text-5" id="text-6-24-1-1">
+</div><ol class="org-ol"><li>number display<br  /><div class="outline-text-5" id="text-6-24-1-1">
 <p>
 {{
 </p>
@@ -5538,7 +5540,7 @@ needed.
 </div>
 </li>
 
-<li>: simple ( $- ) [ @ putc ] 2 ( STRING ) each@ ;<br/><div class="outline-text-5" id="text-6-24-1-2">
+<li>: simple ( $- ) [ @ putc ] 2 ( STRING ) each@ ;<br  /><div class="outline-text-5" id="text-6-24-1-2">
 <p>
 And here we have an example of that "each@" combinator. This applies a quote
 ("[ @ putc ]") to each item in a string (data type 2). Really, it's a nice
@@ -5546,7 +5548,7 @@ clean way to do things like this.
 </p>
 </div>
 </li>
-<li>: defer  ( q- ) update off do update on redraw ;<br/><div class="outline-text-5" id="text-6-24-1-3">
+<li>: defer  ( q- ) update off do update on redraw ;<br  /><div class="outline-text-5" id="text-6-24-1-3">
 <p>
 For performance, disable screen updates until the text is written to the
 output buffers. Won't hurt anything, and makes redraws much faster on some
@@ -5711,9 +5713,9 @@ Display all names in the dictionary, and any active vocabuaries.
 <div id="outline-container-sec-6-27-1" class="outline-4">
 <h4 id="sec-6-27-1"><span class="section-number-4">6.27.1</span> <span class="todo TODO">TODO</span> | Just about done&#x2026;</h4>
 <div class="outline-text-4" id="text-6-27-1">
-</div><ol class="org-ol"><li>: reset   ( &#x2026;-  ) depth repeat 0; 1- nip again ;<br/></li>
+</div><ol class="org-ol"><li>: reset   ( &#x2026;-  ) depth repeat 0; 1- nip again ;<br  /></li>
 
-<li>: .s      (    -  )<br/><div class="outline-text-5" id="text-6-27-1-2">
+<li>: .s      (    -  )<br  /><div class="outline-text-5" id="text-6-27-1-2">
 <p>
 depth [ "\n&lt;%d&gt; " puts ] sip 0;
 heap  [ dup [ swap , ] times
@@ -5725,60 +5727,60 @@ Display the stack. I'd love a better way of doing this, but so far this seems to
 </p>
 </div>
 </li>
-<li>: save     (  -  ) 1 4 out wait ;<br/><div class="outline-text-5" id="text-6-27-1-3">
+<li>: save     (  -  ) 1 4 out wait ;<br  /><div class="outline-text-5" id="text-6-27-1-3">
 <p>
 Save the image (if the VM supports it)
 </p>
 </div>
 </li>
-<li>: bye      (  -  ) cr -9 5 out wait ;<br/><div class="outline-text-5" id="text-6-27-1-4">
+<li>: bye      (  -  ) cr -9 5 out wait ;<br  /><div class="outline-text-5" id="text-6-27-1-4">
 <p>
 Shut down the VM
 </p>
 </div>
 </li>
-<li>getToken<br/></li>
-<li>:  getToken ( "-$ ) 32 accept tib tempString ;<br/><div class="outline-text-5" id="text-6-27-1-6">
+<li>getToken<br  /></li>
+<li>:  getToken ( "-$ ) 32 accept tib tempString ;<br  /><div class="outline-text-5" id="text-6-27-1-6">
 <p>
 Read a whitespace delimited token, and add it to the temporary string buffer.
 </p>
 </div>
 </li>
-<li>include<br/></li>
-<li>:  :include ( $-  ) 2 4 out wait ;<br/></li>
-<li>:  include  ( "-  ) getToken :include ;<br/><div class="outline-text-5" id="text-6-27-1-9">
+<li>include<br  /></li>
+<li>:  :include ( $-  ) 2 4 out wait ;<br  /></li>
+<li>:  include  ( "-  ) getToken :include ;<br  /><div class="outline-text-5" id="text-6-27-1-9">
 <p>
 If you VM supports reading input from files, these will let you include files directly.
 </p>
 </div>
 </li>
-<li>: time     (  -n ) -8 5 out wait 5 in ;<br/><div class="outline-text-5" id="text-6-27-1-10">
+<li>: time     (  -n ) -8 5 out wait 5 in ;<br  /><div class="outline-text-5" id="text-6-27-1-10">
 <p>
 Returns the current time (or a bogus value) as Unix epoch time.
 </p>
 </div>
 </li>
-<li>: delay    ( n-  ) time + [ dup time &gt; ] while drop ;<br/><div class="outline-text-5" id="text-6-27-1-11">
+<li>: delay    ( n-  ) time + [ dup time &gt; ] while drop ;<br  /><div class="outline-text-5" id="text-6-27-1-11">
 <p>
 If your VM supports the time query, this will allow you to delay execution for approximately the number of seconds specified.
 </p>
 </div>
 </li>
-<li>: getEnv   ( a$- ) -10 5 out wait ;<br/><div class="outline-text-5" id="text-6-27-1-12">
+<li>: getEnv   ( a$- ) -10 5 out wait ;<br  /><div class="outline-text-5" id="text-6-27-1-12">
 <p>
 If your VM supports access to the host environment, this will let you query it.
 </p>
 </div>
 </li>
-<li>later<br/></li>
-<li>:  later    (  -  ) 2pop swap 2push ;<br/><div class="outline-text-5" id="text-6-27-1-14">
+<li>later<br  /></li>
+<li>:  later    (  -  ) 2pop swap 2push ;<br  /><div class="outline-text-5" id="text-6-27-1-14">
 <p>
 A fun thing. Defer execution until the caller returns. For instance,
 </p>
 </div>
 </li>
-<li>:  a 1 putn later 2 putn ;<br/></li>
-<li>:  b 3 putn a 4 putn ;<br/><div class="outline-text-5" id="text-6-27-1-16">
+<li>:  a 1 putn later 2 putn ;<br  /></li>
+<li>:  b 3 putn a 4 putn ;<br  /><div class="outline-text-5" id="text-6-27-1-16">
 <p>
 b
 </p>
@@ -5788,9 +5790,9 @@ With this, the core language is done. If you don't want/need the extra vocabular
 </p>
 </div>
 </li>
-<li>doc{<br/></li>
+<li>doc{<br  /></li>
 
-<li>:  doc{     ( "-  ) repeat getToken "}doc" compare if; again ;<br/><div class="outline-text-5" id="text-6-27-1-18">
+<li>:  doc{     ( "-  ) repeat getToken "}doc" compare if; again ;<br  /><div class="outline-text-5" id="text-6-27-1-18">
 <p>
 This is used to allow embedding of documentation into the source files. An example of its usage:
 </p>

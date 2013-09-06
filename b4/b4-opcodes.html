@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title></title>
-<!-- 2013-06-14 Fri 08:20 -->
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-<meta name="generator" content="Org-mode"/>
-<meta name="author" content="michal"/>
+<title>b4-opcodes</title>
+<!-- 2013-09-03 Tue 23:44 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
 <link rel="stylesheet" type="text/css" href="/etc/style.css">
 <script type="text/javascript">
 /*
@@ -57,7 +58,7 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title"></h1>
+<h1 class="title">b4-opcodes</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
@@ -126,7 +127,7 @@ The following is a small virtual machine with an instruction set inspired by the
 <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">next</span>( self : machine ) : u32;
   <span style="color: #00ffff;">begin</span>
     result := self.ram[ self.regs.i ];
-    inc( self.regs.i )
+    inc( self.regs.i );
   <span style="color: #00ffff;">end</span>;
 
 <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">step</span>( self : machine );
@@ -148,6 +149,7 @@ The following is a small virtual machine with an instruction set inspired by the
         <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> op <span style="color: #00ffff;">in</span> s4 <span style="color: #00ffff;">then</span> push(( op - $F0 ) * $40000 )
         <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> op <span style="color: #00ffff;">in</span> s5 <span style="color: #00ffff;">then</span> pass; <span style="color: #66f;">{ </span><span style="color: #66f;">ignore reserved bytecodes </span><span style="color: #66f;">}</span>
         regs.q := op;
+        inc( regs.p );
       <span style="color: #00ffff;">end</span>;
   <span style="color: #00ffff;">end</span>;
 </pre>
