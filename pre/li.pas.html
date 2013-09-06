@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>li.pas</title>
+<!-- 2013-09-05 Thu 20:49 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">li.pas</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. imports</a></li>
+<li><a href="#sec-2">2. node types</a></li>
+<li><a href="#sec-3">3. forward declarations for implementation</a></li>
+<li><a href="#sec-4">4. internal tools</a></li>
+<li><a href="#sec-5">5. node constructors</a></li>
+<li><a href="#sec-6">6. line tracker</a></li>
+<li><a href="#sec-7">7. read from the prompt</a></li>
+<li><a href="#sec-8">8. read<sub>value</sub> ( recursive descent parser )</a></li>
+<li><a href="#sec-9">9. {&#x2013; read<sub>value</sub> &gt;&gt; read<sub>string</sub> &#x2013;}</a></li>
+<li><a href="#sec-10">10. {&#x2013; read<sub>value</sub> &gt;&gt; read<sub>integer</sub> &#x2013;}</a></li>
+<li><a href="#sec-11">11. {&#x2013; read<sub>value</sub> &gt;&gt; read<sub>list</sub> &#x2013;}</a></li>
+<li><a href="#sec-12">12. {&#x2013; read<sub>value</sub> &gt;&gt; read<sub>symbol</sub>&#x2013; }</a></li>
+<li><a href="#sec-13">13. readvalue (main code)</a></li>
+<li><a href="#sec-14">14. expression evaluator</a></li>
+<li><a href="#sec-15">15. print</a></li>
+<li><a href="#sec-16">16. repl</a></li>
+<li><a href="#sec-17">17. initialization (set up null, endl)</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> imports</h2>
+<div class="outline-text-2" id="text-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$mode objfpc</span><span style="color: #66f;">}{</span><span style="color: #66f;">$i xpc.inc</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">li</span>;
+<span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">uses</span> classes, xpc, ascii, ll, num;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> node types</h2>
+<div class="outline-text-2" id="text-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span>
+  kinds = ( kINT, kSYM, kSTR, kLIS, kEND, kNUL, kOBJ );
+  <span style="color: #66f;">{</span><span style="color: #66f;">&#7;TODO: come back to this once I have syntax</span>
+<span style="color: #66f;">     for algebraic data types </span><span style="color: #66f;">}</span>
+  node = <span style="color: #ff00ff;">class</span> kind : kinds <span style="color: #00ffff;">end</span>;
+  nodelist = specialize ll.list&lt; node &gt;;
+  LisNode = <span style="color: #ff00ff;">class</span>( node )
+    lis : nodelist;
+    <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">create</span>( _lis : nodelist );
+  <span style="color: #00ffff;">end</span>;
+  IntNode = <span style="color: #ff00ff;">class</span>( node )
+    int : <span style="color: #ff00ff;">integer</span>;
+    <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">create</span>( _int : <span style="color: #ff00ff;">integer</span> );
+  <span style="color: #00ffff;">end</span>;
+  SymNode = <span style="color: #ff00ff;">class</span>( node )
+    sym : <span style="color: #ff00ff;">String</span>;
+    <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">create</span>( _sym : <span style="color: #ff00ff;">string</span> );
+  <span style="color: #00ffff;">end</span>;
+  StrNode = <span style="color: #ff00ff;">class</span>( node )
+    str : <span style="color: #ff00ff;">String</span>;
+    <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">create</span>( _str : <span style="color: #ff00ff;">string</span>  );
+  <span style="color: #00ffff;">end</span>;
+  ObjNode = <span style="color: #ff00ff;">class</span>( node )
+    obj : TObject;
+    <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">create</span>( _obj : TObject );
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> forward declarations for implementation</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span> chargen = procedure( <span style="color: #ff00ff;">var</span> ch : <span style="color: #ff00ff;">char</span> ) <span style="color: #00ffff;">is</span> nested;
+<span style="color: #ff00ff;">var</span>
+  null : node;
+  endl : node; <span style="color: #66f;">// </span><span style="color: #66f;">end of list marker. never actually assigned</span>
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">read_value</span>( <span style="color: #ff00ff;">const</span>  next : chargen ) : node;
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">print</span>( value : node );
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">repl</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> internal tools</h2>
+<div class="outline-text-2" id="text-4">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">implementation</span>
+
+  <span style="color: #ff00ff;">const</span> whitespace = [ #0 .. #32 ];
+
+  <span style="color: #ff00ff;">var</span> done       : <span style="color: #ff00ff;">boolean</span> = false;
+  <span style="color: #ff00ff;">var</span> sym_minus  : <span style="color: #ff00ff;">string</span> = <span style="color: #00ff00;">'-'</span>;
+  <span style="color: #ff00ff;">const</span>
+    prompt0 = <span style="color: #00ff00;">'li&gt; '</span>;
+    prompt1 = <span style="color: #00ff00;">'..&gt; '</span>;
+
+  <span style="color: #66f;">{</span><span style="color: #66f;">$IFDEF DEBUG</span><span style="color: #66f;">}</span>
+  <span style="color: #ff00ff;">const</span> debug_mode = true;
+  <span style="color: #66f;">{</span><span style="color: #66f;">$ELSE</span><span style="color: #66f;">}</span>
+  <span style="color: #ff00ff;">const</span> debug_mode = false;
+  <span style="color: #66f;">{</span><span style="color: #66f;">$ENDIF</span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">debug</span>( msg : <span style="color: #ff00ff;">string</span> ); <span style="color: #00ffff;">inline</span>;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #66f;">{</span><span style="color: #66f;">$IFDEF DEBUG</span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">if</span> debug_mode <span style="color: #00ffff;">then</span> writeln( msg )
+    <span style="color: #66f;">{</span><span style="color: #66f;">$ENDIF</span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> node constructors</h2>
+<div class="outline-text-2" id="text-5">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">intnode.create</span>( _int: <span style="color: #ff00ff;">integer</span> );
+<span style="color: #00ffff;">begin</span>
+  self.kind          := kint;
+  self.int           := _int;
+<span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">symnode.create</span>( _sym: <span style="color: #ff00ff;">string</span> );
+<span style="color: #00ffff;">begin</span>
+  self.kind          := ksym;
+  self.sym           := _sym;
+<span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">strnode.create</span>( _str: <span style="color: #ff00ff;">string</span>  );
+<span style="color: #00ffff;">begin</span>
+  self.kind          := kstr;
+  self.str           := _str;
+<span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">lisnode.create</span>( _lis: nodelist );
+<span style="color: #00ffff;">begin</span>
+  self.kind          := klis;
+  self.lis           := _lis;
+<span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">objnode.create</span>( _obj: TObject );
+<span style="color: #00ffff;">begin</span>
+  self.kind          := kobj;
+  self.obj           := _obj;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> line tracker</h2>
+<div class="outline-text-2" id="text-6">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">var</span>
+  lx      : <span style="color: #ff00ff;">integer</span> = 0;  <span style="color: #66f;">// </span><span style="color: #66f;">line number</span>
+  ly      : <span style="color: #ff00ff;">integer</span> = 0;  <span style="color: #66f;">// </span><span style="color: #66f;">colunn number</span>
+  depth   : <span style="color: #ff00ff;">integer</span> = 0;  <span style="color: #66f;">// </span><span style="color: #66f;">to decide which prompt to show</span>
+  line    : <span style="color: #ff00ff;">string</span>;       <span style="color: #66f;">// </span><span style="color: #66f;">the last line read from input</span>
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">error</span>( <span style="color: #ff00ff;">const</span> err: <span style="color: #ff00ff;">string</span> );
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">write</span>( <span style="color: #00ff00;">'error at line '</span>, ly, <span style="color: #00ff00;">', column '</span>, lx, <span style="color: #00ff00;">': '</span> );
+  writeln( err );
+  halt;
+<span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">error </span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> read from the prompt</h2>
+<div class="outline-text-2" id="text-7">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">from_prompt</span>( <span style="color: #ff00ff;">var</span> ch : <span style="color: #ff00ff;">char</span> );
+
+  <span style="color: #66f;">{ </span><span style="color: #66f;">basically, we use this prompt to do our own buffering because</span>
+<span style="color: #66f;">  the input from the shell is line-oriented. :/ I tried just using</span>
+<span style="color: #66f;">  read, but couldn't get more than two of [ eof, eoln, read ]</span>
+<span style="color: #66f;">  working at any given time. :/ So... if i just go with readln,</span>
+<span style="color: #66f;">  it handles eoln, and I can just test for eof. </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">prompt</span>;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #66f;">{ </span><span style="color: #66f;">write the prompt first, because eof() blocks. </span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">if</span> depth &gt; 0 <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">write</span>( prompt1 ) <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">write</span>( prompt0 );
+    <span style="color: #00ffff;">if</span> eof <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">begin</span>
+      ch := ascii.EOT;
+      line := ch;
+      done := true;
+      <span style="color: #00ffff;">if</span> depth &gt; 0 <span style="color: #00ffff;">then</span> error( <span style="color: #00ff00;">'unexpected end of file'</span> );
+      writeln;
+      halt; <span style="color: #66f;">{ </span><span style="color: #66f;">todo : remove this once depth-checking works correctly </span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">end</span> <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">begin</span>
+      readln( line );
+      line := line + ascii.LF; <span style="color: #66f;">{ </span><span style="color: #66f;">so we can do proper lookahead. </span><span style="color: #66f;">}</span>
+      inc( ly );
+      lx := 0;
+    <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">while</span> lx + 1 &gt; length( line ) <span style="color: #00ffff;">do</span> prompt;
+  inc( lx );
+  ch := line[ lx ];
+  debug( <span style="color: #00ff00;">'[ line '</span> + n2s( ly ) + <span style="color: #00ff00;">', col '</span> + n2s( lx ) + <span style="color: #00ff00;">' : '</span> +  ch + <span style="color: #00ff00;">']'</span> );
+<span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">next( ch ) </span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> read<sub>value</sub> ( recursive descent parser )</h2>
+<div class="outline-text-2" id="text-8">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">read_value</span>( <span style="color: #ff00ff;">const</span> next : chargen ) : node;
+  <span style="color: #ff00ff;">var</span>
+    i   : <span style="color: #ff00ff;">integer</span> = 0;
+    buf : <span style="color: #ff00ff;">string</span>;
+    esc : <span style="color: #ff00ff;">boolean</span> = false;
+    ch  : <span style="color: #ff00ff;">char</span> = #0;
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">bufch</span>;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">not</span> esc <span style="color: #00ffff;">then</span>
+    <span style="color: #00ffff;">begin</span>
+      inc( i );
+      setlength( buf, i );
+      buf[ i ] := ch;
+    <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">bufch </span><span style="color: #66f;">}</span>
+
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">unbuf</span>( kind : kinds ): node;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">case</span> kind <span style="color: #00ffff;">of</span>
+      kStr : result := StrNode.create( buf );
+      kSym : result := SymNode.create( buf );
+    <span style="color: #00ffff;">else</span>
+      <span style="color: #00ffff;">begin</span>
+        writeln(<span style="color: #00ff00;">'don''t know how to unbuf kind:'</span>, kind);
+        halt;
+      <span style="color: #00ffff;">end</span>
+    <span style="color: #00ffff;">end</span>;
+    i := 0;
+    setlength( buf, 0 );
+  <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">unbuf </span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> {&#x2013; read<sub>value</sub> &gt;&gt; read<sub>string</sub> &#x2013;}</h2>
+<div class="outline-text-2" id="text-9">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">read_string</span> : node;
+  <span style="color: #ff00ff;">var</span>
+  esc : <span style="color: #ff00ff;">boolean</span> = false;
+  eos : <span style="color: #ff00ff;">boolean</span> = false;
+<span style="color: #00ffff;">begin</span>
+  inc( depth );
+  <span style="color: #00ffff;">repeat</span>
+    next( ch );
+    <span style="color: #00ffff;">if</span> esc <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">begin</span>
+      bufch;
+      esc := false;
+    <span style="color: #00ffff;">end</span> <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">case</span> ch <span style="color: #00ffff;">of</span>
+      <span style="color: #00ff00;">'\'</span> : esc := true;
+      <span style="color: #00ff00;">'"'</span> : eos := true;
+      <span style="color: #00ffff;">else</span> bufch;
+    <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">until</span> eos;
+  next( ch );
+  dec( depth );
+  result := unbuf( kSTR );
+<span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">read_string </span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><span class="section-number-2">10</span> {&#x2013; read<sub>value</sub> &gt;&gt; read<sub>integer</sub> &#x2013;}</h2>
+<div class="outline-text-2" id="text-10">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">read_integer</span> : <span style="color: #ff00ff;">integer</span>;
+  <span style="color: #ff00ff;">var</span>
+  x      : <span style="color: #ff00ff;">integer</span> = 0;
+  base   : byte = 10;
+  digits : <span style="color: #ff00ff;">set</span> <span style="color: #00ffff;">of</span> <span style="color: #ff00ff;">char</span> = [ <span style="color: #00ff00;">'0'</span> .. <span style="color: #00ff00;">'9'</span> ];
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">if</span> ch = <span style="color: #00ff00;">'0'</span> <span style="color: #00ffff;">then</span>
+    <span style="color: #00ffff;">begin</span>
+      next( ch ); <span style="color: #66f;">{ </span><span style="color: #66f;">consuming the 0 </span><span style="color: #66f;">}</span>
+      <span style="color: #00ffff;">case</span> ch <span style="color: #00ffff;">of</span>
+        <span style="color: #00ff00;">'x'</span> : <span style="color: #00ffff;">begin</span>
+                base := 16;
+                digits := digits + [ <span style="color: #00ff00;">'A'</span>..<span style="color: #00ff00;">'F'</span> ] + [ <span style="color: #00ff00;">'a'</span>..<span style="color: #00ff00;">'f'</span> ];
+              <span style="color: #00ffff;">end</span>;
+        <span style="color: #00ff00;">'b'</span> : <span style="color: #00ffff;">begin</span> base := 2; digits := [ <span style="color: #00ff00;">'0'</span>, <span style="color: #00ff00;">'1'</span> ] <span style="color: #00ffff;">end</span>;
+        <span style="color: #00ff00;">'o'</span> : <span style="color: #00ffff;">begin</span> base := 8; digits := [ <span style="color: #00ff00;">'0'</span>..<span style="color: #00ff00;">'8'</span> ] <span style="color: #00ffff;">end</span>;
+        <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">not</span> (ch <span style="color: #00ffff;">in</span> whitespace) <span style="color: #00ffff;">then</span>
+          error( <span style="color: #00ff00;">'invalid digit after 0: "'</span> + ch + <span style="color: #00ff00;">'"'</span> );
+      <span style="color: #00ffff;">end</span> <span style="color: #66f;">{ </span><span style="color: #66f;">case </span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">while</span> ( ch <span style="color: #00ffff;">in</span> digits ) <span style="color: #00ffff;">do</span>
+    <span style="color: #00ffff;">begin</span>
+      x := x * base;
+      <span style="color: #00ffff;">case</span> ch <span style="color: #00ffff;">of</span>
+        <span style="color: #00ff00;">'0'</span> : x := x + $0;  <span style="color: #00ff00;">'8'</span>      : x := x + $8;
+        <span style="color: #00ff00;">'1'</span> : x := x + $1;  <span style="color: #00ff00;">'9'</span>      : x := x + $9;
+        <span style="color: #00ff00;">'2'</span> : x := x + $2;  <span style="color: #00ff00;">'A'</span>, <span style="color: #00ff00;">'a'</span> : x := x + $A;
+        <span style="color: #00ff00;">'3'</span> : x := x + $3;  <span style="color: #00ff00;">'B'</span>, <span style="color: #00ff00;">'b'</span> : x := x + $B;
+        <span style="color: #00ff00;">'4'</span> : x := x + $4;  <span style="color: #00ff00;">'C'</span>, <span style="color: #00ff00;">'c'</span> : x := x + $C;
+        <span style="color: #00ff00;">'5'</span> : x := x + $5;  <span style="color: #00ff00;">'D'</span>, <span style="color: #00ff00;">'d'</span> : x := x + $D;
+        <span style="color: #00ff00;">'6'</span> : x := x + $6;  <span style="color: #00ff00;">'E'</span>, <span style="color: #00ff00;">'e'</span> : x := x + $E;
+        <span style="color: #00ff00;">'7'</span> : x := x + $7;  <span style="color: #00ff00;">'F'</span>, <span style="color: #00ff00;">'f'</span> : x := x + $F;
+      <span style="color: #00ffff;">else</span> error( <span style="color: #00ff00;">'unexpected character in number: '</span> + ch )
+      <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">case </span><span style="color: #66f;">}</span>
+      next( ch )
+    <span style="color: #00ffff;">end</span>;
+  result := x
+<span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">read_integer </span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-11" class="outline-2">
+<h2 id="sec-11"><span class="section-number-2">11</span> {&#x2013; read<sub>value</sub> &gt;&gt; read<sub>list</sub> &#x2013;}</h2>
+<div class="outline-text-2" id="text-11">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">read_list</span> : node;
+  <span style="color: #ff00ff;">var</span> this : node; res : nodelist;
+<span style="color: #00ffff;">begin</span>
+  inc( depth );
+  debug(<span style="color: #00ff00;">'---read_list---'</span>);
+  this := read_value( next );
+  <span style="color: #00ffff;">if</span> this = endl <span style="color: #00ffff;">then</span>
+    <span style="color: #00ffff;">begin</span>
+      result := null;
+      debug(<span style="color: #00ff00;">'-- result was null --'</span>);
+    <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">else</span>
+    <span style="color: #00ffff;">begin</span>
+      res := nodelist.create;
+      <span style="color: #00ffff;">repeat</span>
+        res.append( this );
+        this := read_value( next )
+      <span style="color: #00ffff;">until</span> this = endl;
+      result := lisnode.create( res );
+      debug(<span style="color: #00ff00;">'-- result was list of '</span> + n2s( res.length ) + <span style="color: #00ff00;">' items --'</span>)
+    <span style="color: #00ffff;">end</span>;
+  dec( depth );
+<span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">read_list </span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-12" class="outline-2">
+<h2 id="sec-12"><span class="section-number-2">12</span> {&#x2013; read<sub>value</sub> &gt;&gt; read<sub>symbol</sub>&#x2013; }</h2>
+<div class="outline-text-2" id="text-12">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">read_symbol</span> : node;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">while</span> <span style="color: #00ffff;">not</span> ( ch <span style="color: #00ffff;">in</span> whitespace ) <span style="color: #00ffff;">do</span>
+    <span style="color: #00ffff;">begin</span>
+        bufch;
+        next( ch );
+      <span style="color: #00ffff;">end</span>;
+    result := unbuf( kSYM )
+  <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">read_symbol </span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-13" class="outline-2">
+<h2 id="sec-13"><span class="section-number-2">13</span> readvalue (main code)</h2>
+<div class="outline-text-2" id="text-13">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">begin</span> <span style="color: #66f;">{ </span><span style="color: #66f;">read_value </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">while</span> ch <span style="color: #00ffff;">in</span> whitespace <span style="color: #00ffff;">do</span> next( ch ); <span style="color: #66f;">{ </span><span style="color: #66f;">skip whitespace </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">case</span> ch <span style="color: #00ffff;">of</span>
+    <span style="color: #00ff00;">';'</span> :      <span style="color: #00ffff;">begin</span>
+                 <span style="color: #00ffff;">repeat</span> next( ch ) <span style="color: #00ffff;">until</span> ch = ascii.lf;
+                 result := read_value( next ); <span style="color: #66f;">// </span><span style="color: #66f;">recurse</span>
+               <span style="color: #00ffff;">end</span>;
+    <span style="color: #00ff00;">'"'</span> :      result := read_string;
+    <span style="color: #00ff00;">'0'</span>..<span style="color: #00ff00;">'9'</span> : result := IntNode.create( read_integer );
+    <span style="color: #00ff00;">'-'</span> :      <span style="color: #00ffff;">begin</span>
+                 next( ch );
+                 <span style="color: #00ffff;">if</span> ch <span style="color: #00ffff;">in</span> whitespace <span style="color: #00ffff;">then</span> result := SymNode.create( sym_minus )
+                 <span style="color: #00ffff;">else</span> result := IntNode.create( read_integer * -1 )
+              <span style="color: #00ffff;">end</span>;
+    <span style="color: #00ff00;">'('</span> :     <span style="color: #00ffff;">begin</span> next( ch ); result := read_list() <span style="color: #00ffff;">end</span>;
+    <span style="color: #00ff00;">')'</span> :     <span style="color: #00ffff;">begin</span> next( ch ); result := endl <span style="color: #00ffff;">end</span>;
+    ascii.EOT: <span style="color: #00ffff;">begin</span> result := null; done := true; <span style="color: #00ffff;">end</span>;
+    <span style="color: #00ffff;">else</span> result := read_symbol
+  <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">case </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">if</span> debug_mode <span style="color: #00ffff;">then</span> writeln( <span style="color: #00ff00;">'read_value -&gt; '</span>, result.kind );
+<span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">read_value </span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-14" class="outline-2">
+<h2 id="sec-14"><span class="section-number-2">14</span> <span class="todo TODO">TODO</span> expression evaluator</h2>
+<div class="outline-text-2" id="text-14">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">// </span><span style="color: #66f;">&#7; TODO : evaluate</span>
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">evaluate</span>( value : node ) : node;
+<span style="color: #00ffff;">begin</span>
+  result := value;
+<span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">evaluate </span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-15" class="outline-2">
+<h2 id="sec-15"><span class="section-number-2">15</span> print</h2>
+<div class="outline-text-2" id="text-15">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">print</span>( value : node );
+
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">print_list</span>( ln : lisnode );
+    <span style="color: #ff00ff;">var</span> each : node; first : <span style="color: #ff00ff;">boolean</span> = true;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">write</span>( <span style="color: #00ff00;">'('</span> );
+    <span style="color: #00ffff;">for</span> each <span style="color: #00ffff;">in</span> ln.lis <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">begin</span>
+      <span style="color: #00ffff;">if</span> first <span style="color: #00ffff;">then</span> first := false
+      <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">write</span>( <span style="color: #00ff00;">' '</span> );
+      print( each )
+    <span style="color: #00ffff;">end</span>;
+    <span style="color: #00ffff;">write</span>( <span style="color: #00ff00;">')'</span> );
+  <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">print_list </span><span style="color: #66f;">}</span>
+
+<span style="color: #00ffff;">begin</span> <span style="color: #66f;">{ </span><span style="color: #66f;">print </span><span style="color: #66f;">}</span>
+  assert( assigned( value ));
+  <span style="color: #00ffff;">case</span> value.kind <span style="color: #00ffff;">of</span>
+    kINT : <span style="color: #00ffff;">write</span>(( value <span style="color: #00ffff;">as</span> intnode ).int );
+    kSYM : <span style="color: #00ffff;">write</span>(( value <span style="color: #00ffff;">as</span> symnode ).sym );
+    kSTR : <span style="color: #00ffff;">write</span>( <span style="color: #00ff00;">'"'</span>, ( value <span style="color: #00ffff;">as</span> strnode ).str, <span style="color: #00ff00;">'"'</span> );
+    kNUL : <span style="color: #00ffff;">write</span>( <span style="color: #00ff00;">'null'</span> );
+    kLIS : print_list(( value <span style="color: #00ffff;">as</span> lisnode ));
+    <span style="color: #00ffff;">else</span>
+      writeln( <span style="color: #00ff00;">'{ unknown kind : '</span>, <span style="color: #ff00ff;">integer</span>(value.kind), <span style="color: #00ff00;">' }'</span> );
+  <span style="color: #00ffff;">end</span>;
+<span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">print </span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-16" class="outline-2">
+<h2 id="sec-16"><span class="section-number-2">16</span> repl</h2>
+<div class="outline-text-2" id="text-16">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">repl</span>;
+  <span style="color: #ff00ff;">var</span> val : node;
+<span style="color: #00ffff;">begin</span>
+  <span style="color: #00ffff;">repeat</span>
+    <span style="color: #66f;">{ </span><span style="color: #66f;">we can't inline the temp value ( val ) because read_value</span>
+<span style="color: #66f;">      is also responsible for showing the prompt, and we need to</span>
+<span style="color: #66f;">      keep the prompt and reply outputs separate. </span><span style="color: #66f;">}</span>
+    val := read_value( @from_prompt );
+    print( evaluate( val ));
+    writeln;
+  <span style="color: #00ffff;">until</span> done;
+<span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">repl </span><span style="color: #66f;">}</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-17" class="outline-2">
+<h2 id="sec-17"><span class="section-number-2">17</span> initialization (set up null, endl)</h2>
+<div class="outline-text-2" id="text-17">
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">begin</span>
+  null := node.create;
+  null.kind := kNUL;
+  endl := node.create;
+  endl.kind := kEND;
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
