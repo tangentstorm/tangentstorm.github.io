@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>hellopas: implish pascal compiler spike</title>
+<!-- 2013-09-18 Wed 05:47 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/javascript" src="http://orgmode.org/mathjax/MathJax.js"></script>
+<script type="text/javascript">
+<!--/*--><![CDATA[/*><!--*/
+    MathJax.Hub.Config({
+        // Only one of the two following lines, depending on user settings
+        // First allows browser-native MathML display, second forces HTML/CSS
+        //  config: ["MMLorHTML.js"], jax: ["input/TeX"],
+            jax: ["input/TeX", "output/HTML-CSS"],
+        extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js",
+                     "TeX/noUndefined.js"],
+        tex2jax: {
+            inlineMath: [ ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"], ["\\begin{displaymath}","\\end{displaymath}"] ],
+            skipTags: ["script","noscript","style","textarea","pre","code"],
+            ignoreClass: "tex2jax_ignore",
+            processEscapes: false,
+            processEnvironments: true,
+            preview: "TeX"
+        },
+        showProcessingMessages: true,
+        displayAlign: "center",
+        displayIndent: "2em",
+
+        "HTML-CSS": {
+             scale: 100,
+             availableFonts: ["STIX","TeX"],
+             preferredFont: "TeX",
+             webFont: "TeX",
+             imageFont: "TeX",
+             showMathMenu: true,
+        },
+        MMLorHTML: {
+             prefer: {
+                 MSIE:    "MML",
+                 Firefox: "MML",
+                 Opera:   "HTML",
+                 other:   "HTML"
+             }
+        }
+    });
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">hellopas: implish pascal compiler spike</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. pascal source</a></li>
+<li><a href="#sec-2">2. expected parse tree</a></li>
+<li><a href="#sec-3">3. expected assembler output</a></li>
+<li><a href="#sec-4">4. <code>[0/5]</code> assembler semantics</a>
+<ul>
+<li><a href="#sec-4-1">4.1. <code>[0/7]</code> macros ("." prefix)</a>
+<ul>
+<li><a href="#sec-4-1-1">4.1.1. .prog</a></li>
+<li><a href="#sec-4-1-2">4.1.2. .data</a></li>
+<li><a href="#sec-4-1-3">4.1.3. .code</a></li>
+<li><a href="#sec-4-1-4">4.1.4. .repeat</a></li>
+<li><a href="#sec-4-1-5">4.1.5. .again</a></li>
+<li><a href="#sec-4-1-6">4.1.6. .main</a></li>
+<li><a href="#sec-4-1-7">4.1.7. .end</a></li>
+</ul>
+</li>
+<li><a href="#sec-4-2">4.2. labels and symbols (":" syntax)</a></li>
+<li><a href="#sec-4-3">4.3. instructions</a></li>
+<li><a href="#sec-4-4">4.4. numeric literals</a></li>
+<li><a href="#sec-4-5">4.5. strings ('"' .. '"')</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. parser for the assembly language</a></li>
+<li><a href="#sec-6">6. grammar for the pascal subset</a></li>
+<li><a href="#sec-7">7. <code>[0/9]</code> translate grammar symbols to associated combinators</a>
+<ul>
+<li><a href="#sec-7-1">7.1. string -&gt; lit(st)</a></li>
+<li><a href="#sec-7-2">7.2. quoted symbol -&gt; case insensitive keyword</a></li>
+<li><a href="#sec-7-3">7.3. normal symbol -&gt; sub(sym)</a></li>
+<li><a href="#sec-7-4">7.4. ":" -&gt; define a rule</a>
+<ul>
+<li><a href="#sec-7-4-1">7.4.1. ".name" -&gt; fragment</a></li>
+<li><a href="#sec-7-4-2">7.4.2. "NAME" -&gt; token</a></li>
+<li><a href="#sec-7-4-3">7.4.3. "name" -&gt; rule (produces a node)n</a></li>
+</ul>
+</li>
+<li><a href="#sec-7-5">7.5. "|" -&gt; alt([&#x2026;])</a></li>
+<li><a href="#sec-7-6">7.6. "-" -&gt; any (charset)</a></li>
+<li><a href="#sec-7-7">7.7. "+" -&gt; rep([&#x2026;])</a></li>
+<li><a href="#sec-7-8">7.8. "!" -&gt; hide([&#x2026;])</a></li>
+<li><a href="#sec-7-9">7.9. "~" -&gt; neg([&#x2026;])</a></li>
+</ul>
+</li>
+<li><a href="#sec-8">8. transform pascal parse tree</a></li>
+<li><a href="#sec-9">9. template for pascal -&gt; assembler</a></li>
+<li><a href="#sec-10">10. template combinators</a>
+<ul>
+<li><a href="#sec-10-1">10.1. default: emit each expression in turn</a></li>
+<li><a href="#sec-10-2">10.2. "," -&gt; emit a newline and indent</a></li>
+<li><a href="#sec-10-3">10.3. (\ list sep) -&gt; emit (eval list), separated by sep</a></li>
+<li><a href="#sec-10-4">10.4. {name} -&gt; call template that maches (eval name)</a></li>
+<li><a href="#sec-10-5">10.5. (% name (args..) &#x2026;) -&gt; define a template rule</a></li>
+<li><a href="#sec-10-6">10.6. (&gt;&gt; &#x2026;) -&gt; increase indent while emitting the values</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> <span class="done DONE">DONE</span> pascal source</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+My goal here is to get implish to compile 'hello world' down to ngaro instructions, and have the resulting image run successfully in a web browser.
+</p>
+
+<p>
+Here is the program:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">program</span> <span style="color: #ffffff; font-weight: bold;">hello</span>;
+<span style="color: #00ffff;">begin</span>
+  WriteLn(<span style="color: #00ff00;">'hello, world.'</span>)
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> <span class="todo TODO">TODO</span> expected parse tree</h2>
+<div class="outline-text-2" id="text-2">
+<div class="org-src-container">
+
+<pre class="src src-elisp">'(program (IDENT <span style="color: #00ff00;">"hello"</span>)
+          (<span style="color: #00ffff;">block</span> (writeln (STRING <span style="color: #00ff00;">"hello, world."</span>))) )
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> <span class="todo TODO">TODO</span> expected assembler output</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+
+<pre class="src src-asm"><span style="color: #00ffff;">.prog</span> hello
+<span style="color: #00ffff;">.data</span>
+:$0 <span style="color: #00ff00;">"hello, world."</span>
+<span style="color: #00ffff;">.code</span>                  <span style="color: #66f;">; </span><span style="color: #66f;">runtime ported from assembler_lib.rx</span>
+:wait                  <span style="color: #66f;">; </span><span style="color: #66f;">( - ) used for talking to the ports</span>
+    <span style="color: #00ffff;">LIT</span> 0
+    <span style="color: #00ffff;">LIT</span> 0
+    <span style="color: #00ffff;">OUT</span>
+    <span style="color: #00ffff;">WAIT</span>
+  <span style="color: #00ffff;">RET</span>
+
+:putc                  <span style="color: #66f;">; </span><span style="color: #66f;">( c - )</span>
+  <span style="color: #00ffff;">ZRET</span>                 <span style="color: #66f;">; </span><span style="color: #66f;">discard char #0 and return</span>
+    <span style="color: #00ffff;">LIT</span> 1
+    <span style="color: #00ffff;">LIT</span> 2
+    <span style="color: #00ffff;">OUT</span>                <span style="color: #66f;">; </span><span style="color: #66f;">send character to terminal</span>
+    <span style="color: #00ffff;">RUN</span> wait
+  <span style="color: #00ffff;">RET</span>
+
+:(puts)                <span style="color: #66f;">; </span><span style="color: #66f;">( $ - a ) a points to end of string</span>
+  <span style="color: #00ffff;">.repeat</span>
+    <span style="color: #00ffff;">DUP</span>
+    <span style="color: #00ffff;">GET</span>
+  <span style="color: #00ffff;">ZRET</span>                 <span style="color: #66f;">; </span><span style="color: #66f;">break the loop on char #0</span>
+    <span style="color: #00ffff;">RUN</span> putc
+    <span style="color: #00ffff;">LIT</span> 1
+    <span style="color: #00ffff;">ADD</span>                <span style="color: #66f;">; </span><span style="color: #66f;">move to next char in string</span>
+  <span style="color: #00ffff;">.again</span>
+
+:puts                  <span style="color: #66f;">; </span><span style="color: #66f;">( $ - )</span>
+    <span style="color: #00ffff;">RUN</span> (puts)
+    <span style="color: #00ffff;">DROP</span>
+  <span style="color: #00ffff;">RET</span>
+
+:cr                    <span style="color: #66f;">; </span><span style="color: #66f;">( - )</span>
+    <span style="color: #00ffff;">LIT</span> 10
+    <span style="color: #00ffff;">RUN</span> putc
+  <span style="color: #00ffff;">RET</span>
+
+<span style="color: #00ffff;">.main</span>
+    <span style="color: #00ffff;">LIT</span> $0
+    <span style="color: #00ffff;">RUN</span> puts
+    <span style="color: #00ffff;">RUN</span> cr
+<span style="color: #00ffff;">.end</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> <span class="todo TODO">TODO</span> <code>[0/5]</code> assembler semantics</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> <span class="todo TODO">TODO</span> <code>[0/7]</code> macros ("." prefix)</h3>
+<div class="outline-text-3" id="text-4-1">
+</div><div id="outline-container-sec-4-1-1" class="outline-4">
+<h4 id="sec-4-1-1"><span class="section-number-4">4.1.1</span> <span class="todo TODO">TODO</span> .prog</h4>
+<div class="outline-text-4" id="text-4-1-1">
+<ul class="org-ul">
+<li>Skip next symbol (ignore the program name).
+</li>
+<li>Write two NOP (leaving space for a jump to .main)
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-4-1-2" class="outline-4">
+<h4 id="sec-4-1-2"><span class="section-number-4">4.1.2</span> <span class="todo TODO">TODO</span> .data</h4>
+<div class="outline-text-4" id="text-4-1-2">
+<p>
+No effect.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-1-3" class="outline-4">
+<h4 id="sec-4-1-3"><span class="section-number-4">4.1.3</span> <span class="todo TODO">TODO</span> .code</h4>
+<div class="outline-text-4" id="text-4-1-3">
+<p>
+While the current location is &lt;= 32, write NOPS (because the first 32 values are reserved for .
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-1-4" class="outline-4">
+<h4 id="sec-4-1-4"><span class="section-number-4">4.1.4</span> <span class="todo TODO">TODO</span> .repeat</h4>
+<div class="outline-text-4" id="text-4-1-4">
+<p>
+Push the current location to a stack so .again can jump back.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-1-5" class="outline-4">
+<h4 id="sec-4-1-5"><span class="section-number-4">4.1.5</span> <span class="todo TODO">TODO</span> .again</h4>
+<div class="outline-text-4" id="text-4-1-5">
+<p>
+Pop location (stored by repeat) and jump backward.a
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-1-6" class="outline-4">
+<h4 id="sec-4-1-6"><span class="section-number-4">4.1.6</span> <span class="todo TODO">TODO</span> .main</h4>
+<div class="outline-text-4" id="text-4-1-6">
+<p>
+Update the first two instructions of the image (left blank by .prog) so they jump to this location.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-1-7" class="outline-4">
+<h4 id="sec-4-1-7"><span class="section-number-4">4.1.7</span> <span class="todo TODO">TODO</span> .end</h4>
+<div class="outline-text-4" id="text-4-1-7">
+<p>
+Write the assembled file to disk and exit.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> <span class="todo TODO">TODO</span> labels and symbols (":" syntax)</h3>
+<div class="outline-text-3" id="text-4-2">
+<ul class="org-ul">
+<li>Can contain any symbol, up to space
+</li>
+<li>Store current location in a runtime list.
+</li>
+<li>If the symbol starts with "$", increment address by 1 before recording. This is so we can skip over the length field in strings.
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> <span class="todo TODO">TODO</span> instructions</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+Syntactically, these can be treated like predefined labels, since they just emit numbers.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-4-4" class="outline-3">
+<h3 id="sec-4-4"><span class="section-number-3">4.4</span> <span class="todo TODO">TODO</span> numeric literals</h3>
+<div class="outline-text-3" id="text-4-4">
+<p>
+Write directly to the image as 32-bit signed ints.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-4-5" class="outline-3">
+<h3 id="sec-4-5"><span class="section-number-3">4.5</span> <span class="todo TODO">TODO</span> strings ('"' .. '"')</h3>
+<div class="outline-text-3" id="text-4-5">
+<ul class="org-ul">
+<li>One character per 32-bit cell as in retro. (for now, anyway)
+</li>
+<li>The assembler should store the length of the string, but also terminate it with a 0. (This is what free pascal does, too).
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> <span class="todo TODO">TODO</span> parser for the assembly language</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+All the tokens in the assembler syntax are already recognized by the implish reader, so they could be read from a file or just created directly as symbols. The only thing special to do is add a function that extracts the prefix characters.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> <span class="done DONE">DONE</span> grammar for the pascal subset</h2>
+<div class="outline-text-2" id="text-6">
+<div class="org-src-container">
+
+<pre class="src src-elisp">(lang hello-pascal
+   (lexer
+      (: .Alpha (| (- <span style="color: #00ff00;">"a"</span> <span style="color: #00ff00;">"z"</span>) (- <span style="color: #00ff00;">"A"</span> <span style="color: #00ff00;">"Z"</span>)))
+      (: .Digit (- <span style="color: #00ff00;">"0"</span> <span style="color: #00ff00;">"9"</span>))
+      (: IDENT .Alpha (+ .Alpha .Digit))
+      (: STRING
+         (! <span style="color: #00ff00;">"'"</span>)         <span style="color: #66f;">; </span><span style="color: #66f;">drop leading quote</span>
+         (* (| <span style="color: #00ff00;">"''"</span>      <span style="color: #66f;">; </span><span style="color: #66f;">escape quotes by doubling them</span>
+               (~ <span style="color: #00ff00;">"'"</span>))) <span style="color: #66f;">; </span><span style="color: #66f;">allow anything else inside the string</span>
+         (! <span style="color: #00ff00;">"'"</span>)))       <span style="color: #66f;">; </span><span style="color: #66f;">drop</span>
+   (rules
+      (: program
+         'PROGRAM IDENT  <span style="color: #66f;">; </span><span style="color: #66f;">quoted = case insensitive keyword</span>
+         block <span style="color: #00ff00;">"."</span> )
+      (: block
+         'BEGIN
+            writeln      <span style="color: #66f;">; </span><span style="color: #66f;">special syntactic form in pascal :/</span>
+         'END)
+      (: writeln 'WRITELN <span style="color: #00ff00;">"("</span> STRING <span style="color: #00ff00;">")"</span>) ) )
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> <span class="todo TODO">TODO</span> <code>[0/9]</code> translate grammar symbols to associated combinators</h2>
+<div class="outline-text-2" id="text-7">
+</div><div id="outline-container-sec-7-1" class="outline-3">
+<h3 id="sec-7-1"><span class="section-number-3">7.1</span> <span class="todo TODO">TODO</span> string -&gt; lit(st)</h3>
+</div>
+<div id="outline-container-sec-7-2" class="outline-3">
+<h3 id="sec-7-2"><span class="section-number-3">7.2</span> <span class="todo TODO">TODO</span> quoted symbol -&gt; case insensitive keyword</h3>
+</div>
+<div id="outline-container-sec-7-3" class="outline-3">
+<h3 id="sec-7-3"><span class="section-number-3">7.3</span> <span class="todo TODO">TODO</span> normal symbol -&gt; sub(sym)</h3>
+</div>
+<div id="outline-container-sec-7-4" class="outline-3">
+<h3 id="sec-7-4"><span class="section-number-3">7.4</span> <span class="todo TODO">TODO</span> ":" -&gt; define a rule</h3>
+<div class="outline-text-3" id="text-7-4">
+</div><div id="outline-container-sec-7-4-1" class="outline-4">
+<h4 id="sec-7-4-1"><span class="section-number-4">7.4.1</span> <span class="todo TODO">TODO</span> ".name" -&gt; fragment</h4>
+</div>
+<div id="outline-container-sec-7-4-2" class="outline-4">
+<h4 id="sec-7-4-2"><span class="section-number-4">7.4.2</span> <span class="todo TODO">TODO</span> "NAME" -&gt; token</h4>
+</div>
+<div id="outline-container-sec-7-4-3" class="outline-4">
+<h4 id="sec-7-4-3"><span class="section-number-4">7.4.3</span> <span class="todo TODO">TODO</span> "name" -&gt; rule (produces a node)n</h4>
+</div>
+</div>
+
+<div id="outline-container-sec-7-5" class="outline-3">
+<h3 id="sec-7-5"><span class="section-number-3">7.5</span> <span class="todo TODO">TODO</span> "|" -&gt; alt([&#x2026;])</h3>
+</div>
+<div id="outline-container-sec-7-6" class="outline-3">
+<h3 id="sec-7-6"><span class="section-number-3">7.6</span> <span class="todo TODO">TODO</span> "-" -&gt; any (charset)</h3>
+</div>
+<div id="outline-container-sec-7-7" class="outline-3">
+<h3 id="sec-7-7"><span class="section-number-3">7.7</span> <span class="todo TODO">TODO</span> "+" -&gt; rep([&#x2026;])</h3>
+</div>
+<div id="outline-container-sec-7-8" class="outline-3">
+<h3 id="sec-7-8"><span class="section-number-3">7.8</span> <span class="todo TODO">TODO</span> "!" -&gt; hide([&#x2026;])</h3>
+</div>
+<div id="outline-container-sec-7-9" class="outline-3">
+<h3 id="sec-7-9"><span class="section-number-3">7.9</span> <span class="todo TODO">TODO</span> "~" -&gt; neg([&#x2026;])</h3>
+</div>
+</div>
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> <span class="todo TODO">TODO</span> transform pascal parse tree</h2>
+<div class="outline-text-2" id="text-8">
+<ul class="org-ul">
+<li>collect the constant strings and assign labels ($0, etc) so i can move them all to the .data section.
+</li>
+<li>if 'writeln' is encountered, include the retro code
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> <span class="done DONE">DONE</span> template for pascal -&gt; assembler</h2>
+<div class="outline-text-2" id="text-9">
+<div class="org-src-container">
+
+<pre class="src src-lisp">(template hellopas-&gt;b4asm
+
+  (% program (iden data* code* main)
+     <span style="color: #00ff00;">".prog "</span> {iden} ,
+     <span style="color: #00ff00;">".data"</span> ,
+     (&gt;&gt; (\ data* <span style="color: #00ff00;">"\n"</span>)) ,
+     <span style="color: #00ff00;">".code"</span> ,
+     (&gt;&gt; (\ code* <span style="color: #00ff00;">"\n"</span>)) ,
+     <span style="color: #00ff00;">".main"</span> ,
+     (&gt;&gt; {main}) ,
+     <span style="color: #00ff00;">".end"</span> , )
+
+  (% block (stmt*)
+     (&gt;&gt; (\ stmt* <span style="color: #00ff00;">";\n"</span>)) )
+
+  (% writeln (strid)
+     <span style="color: #00ff00;">"LIT $"</span> {strid} ,
+     <span style="color: #00ff00;">"CALL puts"</span> ,
+     <span style="color: #00ff00;">"CALL cr"</span> , )
+
+  (% asm (label sym*)
+     <span style="color: #00ff00;">":"</span> {label} ,
+     (&gt;&gt; (\ sym* <span style="color: #00ff00;">"\n"</span>)) ) )
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><span class="section-number-2">10</span> <span class="todo TODO">TODO</span> template combinators</h2>
+<div class="outline-text-2" id="text-10">
+</div><div id="outline-container-sec-10-1" class="outline-3">
+<h3 id="sec-10-1"><span class="section-number-3">10.1</span> <span class="todo TODO">TODO</span> default: emit each expression in turn</h3>
+</div>
+<div id="outline-container-sec-10-2" class="outline-3">
+<h3 id="sec-10-2"><span class="section-number-3">10.2</span> <span class="todo TODO">TODO</span> "," -&gt; emit a newline and indent</h3>
+</div>
+<div id="outline-container-sec-10-3" class="outline-3">
+<h3 id="sec-10-3"><span class="section-number-3">10.3</span> <span class="todo TODO">TODO</span> (\ list sep) -&gt; emit (eval list), separated by sep</h3>
+<div class="outline-text-3" id="text-10-3">
+<p>
+if sep is "\n" then indent
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-10-4" class="outline-3">
+<h3 id="sec-10-4"><span class="section-number-3">10.4</span> <span class="todo TODO">TODO</span> {name} -&gt; call template that maches (eval name)</h3>
+</div>
+<div id="outline-container-sec-10-5" class="outline-3">
+<h3 id="sec-10-5"><span class="section-number-3">10.5</span> <span class="todo TODO">TODO</span> (% name (args..) &#x2026;) -&gt; define a template rule</h3>
+</div>
+<div id="outline-container-sec-10-6" class="outline-3">
+<h3 id="sec-10-6"><span class="section-number-3">10.6</span> <span class="todo TODO">TODO</span> (&gt;&gt; &#x2026;) -&gt; increase indent while emitting the values</h3>
+</div>
+</div>
+</div>
+</body>
+</html>
