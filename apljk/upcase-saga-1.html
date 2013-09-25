@@ -1,0 +1,865 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>The UpCase Saga: How I Learn New Programming Languages</title>
+<!-- 2013-09-25 Wed 17:01 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">The UpCase Saga: How I Learn New Programming Languages</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Introduction</a></li>
+<li><a href="#sec-2">2. Problem Statement and Intermediate Solutions</a></li>
+<li><a href="#sec-3">3. Blank Slate : A Quick Taste of J</a></li>
+<li><a href="#sec-4">4. On to <code>upcase</code></a></li>
+<li><a href="#sec-5">5. <code>a.</code> is for Alphabet</a></li>
+<li><a href="#sec-6">6. Hunting down <code>Ord</code></a></li>
+<li><a href="#sec-7">7. Take a left on Nub Street (or how to find <i>Copy</i> when what you want is <i>Select</i>)</a></li>
+<li><a href="#sec-8">8. From <i>Copy</i> to <i>Chr</i></a></li>
+<li><a href="#sec-9">9. Rummaging</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+J is so different from other programming languages that I might as well be a complete beginner, even though I've been programming for over 20 years.
+</p>
+
+<p>
+While my experience writing code doesn't help much with J, I've also accumulated experience about <i>how to learn</i> new languages, and <i>how to solve programming problems</i> in general.
+</p>
+
+<p>
+This is the story of how I tackled a small problem in an unfamilar language.
+</p>
+
+<p>
+<b>Note:</b> this article is about a <i>learning process</i>, not about the actual code. J is cryptic, and my "beginner J" code is probably terrible. I will explain the basic ideas as I go along, but try to focus on the general approach to problem solving and don't worry too much about understanding the code.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Problem Statement and Intermediate Solutions</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+My goal was to implement a J verb (basically a function) to make all the lower-case letters in an ASCII string uppercase, while leaving other characters unchanged.
+</p>
+
+<p>
+It took me an hour to produce this:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">string =. '"Please, Sir, could you make this upper case?" said Pip.'
+(chr=.{&amp;a.) s -32&amp;* e.&amp;((ord 'a')+(i.26))  s=.(ord=.a.&amp;i.) string
+</pre>
+</div>
+
+<p>
+If you type that into the J terminal, you get:
+</p>
+
+<pre class="example">
+"PLEASE, SIR, COULD YOU MAKE THIS UPPER CASE?" SAID PIP.
+</pre>
+
+<p>
+The above code is just an expression, not a verb, but once I got that far, I used one of J's built-in routines to "simplify" it for me:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">upcase =. [: ([: {&amp;a. ] - [: 32&amp;* e.&amp;(97+i.26)) a.&amp;i.
+</pre>
+</div>
+
+<p>
+I <i>told</i> you J was cryptic.
+</p>
+
+<p>
+I can't fully explain this line myself yet, but I <i>can</i> tell you how I came up with it, starting almost from scratch.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Blank Slate : A Quick Taste of J</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Code in general is often unreadable to the untrained eye, and part of learning a language is adjusting to the visual shape of the code.
+</p>
+
+<p>
+For me, even python was difficult to read until I got used to looking at it, and I was coming from <i>perl</i>, another notoriously cryptic language.
+</p>
+
+<p>
+From a <i>learning to learn</i> perspective, J has the advantage of a large vocabulary comprised almost entirely of ASCII punctuation characters, many of which have at least six different meanings &#x2013; so I have a tendency to forget what I've learned and have to re-learn it. :)
+</p>
+
+<p>
+For example, the character <code>\plus</code> can be used to form any of the following three verbs: { <code>\plus</code>  <code>\plus.</code>  <code>\plus:</code> }, each of which has separate meanings depending on whether it's used in a prefix ("monadic") or infix ("dyadic") context.
+</p>
+
+<p>
+Dyadic <code>1 \plus 1</code> means <i>one plus one</i>, and monadic <code>+ 1</code> means something like <i>positive one</i> <sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup>. In J, <i>every</i> verb has two meanings like this.
+</p>
+
+<p>
+Further, J generalizes each verb to work with multi-dimensional arrays. For example, dyadic <code>x \plus. y</code> is the <i>greatest common denominator</i> verb.
+</p>
+
+<p>
+The following transcript of an interactive J session shows how these concepts are combined.
+</p>
+
+<p>
+<b>Note</b>: J is available for free from <a href="http://jsoftware.com/">http://jsoftware.com/</a> if you want to follow along.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   NB. Input lines are indented in the J terminal.
+
+   8 +. 5 6 7 8 9 10 11 12     NB. GCD(8,5) GCD(8,6) ... GCD(8,12)
+1 2 1 8 1 2 1 4
+
+   12 11 10 9 8 7 6 +. 6 7 8 9 10 11 12  NB. GCD(12,6) GCD(11,7) ...
+6 1 2 9 2 1 6
+
+   NB. Ranges can be generated with monadic ' i. ' ('Integers')
+   NB. Dyadic ; composes values into an array (so an array of arrays below)
+   NB. The symbol '_7' is the literal value 'negative seven'
+   NB. So this line shows how to construct 4 different ranges:
+   (i. 7)  ;  (i. _7)  ;  (6 + i. 7) ;  (6 + i. _7)
+┌─────────────┬─────────────┬────────────────┬────────────────┐
+│0 1 2 3 4 5 6│6 5 4 3 2 1 0│6 7 8 9 10 11 12│12 11 10 9 8 7 6│
+└─────────────┴─────────────┴────────────────┴────────────────┘
+
+   NB. Now we can simplify our earlier expressions.
+   8 +. 5 + i.8   NB. Strict right-to-left evaluation: (8 +. (5 + (i. 8)))
+1 2 1 8 1 2 1 4
+
+   (6 + i. _7) +. 6 + i. 7
+6 1 2 9 2 1 6
+
+   NB. If that's too readable for you, you can skip the whitespace... :)
+   (6+i._7)+.6+i.7
+6 1 2 9 2 1 6
+</pre>
+</div>
+
+<p>
+That's enough to get the basic idea of J code: very little syntax, just a lot of verbs to make things happen.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> On to <code>upcase</code></h2>
+<div class="outline-text-2" id="text-4">
+<p>
+I learned the basic concept of converting an ASCII string to upper case a <i>long</i> time ago. Here's how I first implemented it in turbo pascal, probably around 1992 (again, you don't really need to understand the code):
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">upstr</span>( s : <span style="color: #ff00ff;">string</span> ) : <span style="color: #ff00ff;">string</span>;
+    <span style="color: #ff00ff;">var</span> count : byte;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">for</span> count := 1 <span style="color: #00ffff;">to</span> length( s ) <span style="color: #00ffff;">do</span>
+      s[ count ] := upcase( s[ count ] );
+    upstr := s;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+Basically, in turbo pascal, <code>upcase(ch:char):char</code> was built-in, so I just had to loop through a string and apply <code>upcase</code> to each character.<sup><a id="fnr.2" name="fnr.2" class="footref" href="#fn.2">2</a></sup>
+</p>
+
+<p>
+If I'd had to write <code>upcase</code> myself, though, it probably would have looked like this:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">upcase</span>( ch : <span style="color: #ff00ff;">char</span> ) : <span style="color: #ff00ff;">char</span>;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> ch <span style="color: #00ffff;">in</span> [<span style="color: #00ff00;">'a'</span>..<span style="color: #00ff00;">'z'</span>] <span style="color: #00ffff;">then</span> 
+      upcase := ord(ch) + (ord(<span style="color: #00ff00;">'A'</span>) - chr(<span style="color: #00ff00;">'a'</span>)) 
+    <span style="color: #00ffff;">else</span>
+      upcase := ch;   <span style="color: #66f;">{ </span><span style="color: #66f;">Or in moden-day pascal, 'result := ...' </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+The functions <code>Ord</code> and <code>Chr</code> are primitives.<sup><a id="fnr.3" name="fnr.3" class="footref" href="#fn.3">3</a></sup> <code>Ord(ch)</code> converts a character into a number and <code>Chr(x)</code> converts a number to the equivalent character.
+</p>
+
+<p>
+Eight bit characters are indistinguishable from any other bytes in memory<sup><a id="fnr.4" name="fnr.4" class="footref" href="#fn.4">4</a></sup>, and in languages like C, there is no distinction between a <code>byte</code> and a <code>character</code>.  Pascal made the distinction at compile time, for type safety, but there is no actual machine code required to perform the operations.
+</p>
+
+<p>
+J, on the other hand, is a dynamically typed language, where numbers and strings have different internal representations (probably differing at least by an extra byte encoding the type) and have to be explicitly converted.
+</p>
+
+<p>
+My hunch was that if I could figure out how to implement <code>Ord</code> and <code>Chr</code> in J, the rest of the problem would be easy.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> <code>a.</code> is for Alphabet</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+I knew J supported strings, but I didn't know exacly how they worked.
+</p>
+
+<p>
+The first rule of learning a programming language is to get familiar with its documentation.
+</p>
+
+<p>
+You don't have to memorize every word, or even read it all at once. Just know what resources are available, and remember where to find them.
+</p>
+
+<p>
+With J, I often start with the <a href="http://www.jsoftware.com/help/dictionary/vocabul.htm">vocabulary page</a>, because it lists all the symbols and their names. <sup><a id="fnr.5" name="fnr.5" class="footref" href="#fn.5">5</a></sup> 
+</p>
+
+<p>
+There's nothing on the vocabulary page about strings, but there is an entry for <a href="http://www.jsoftware.com/help/dictionary/dadot.htm ">a. <i>Alphabet</i> &frasl; <i>Ace</i> </a>, and following the link confirmed that it was a predefined array representing the character set.
+</p>
+
+<p>
+I typed it in the J terminal, and saw a bunch of garbage:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   a.    NB. output manually edited to reove many non-ascii characters
+\001\002\003\004\005\006\007\010        
+\013\014  ... \037!"#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?@ABCDEFGHIJKLMNO
+PQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~....
+</pre>
+</div>
+
+<p>
+Given this array, <code>chr(n)</code> would just mean retrieving the the <i>nth</i> item, and <code>ord(ch)</code> would involve searching through the array to find the index of the given character.
+</p>
+
+<p>
+In the languages I'm used to, this would probably might mean typing <code>a[65]</code> and <code>a.index('a')</code>, but J has a completely different syntax that I can never remember.
+</p>
+
+<p>
+Often, when you're learning something, the documentation will explain something, but you won't have enough experience to really understand what you're reading.
+</p>
+
+<p>
+With J in particular, I have a bad tendency to gloss over examples in the docs because I often don't even understand the mathematical concepts they're trying to illustrate.
+</p>
+
+<p>
+In this case, the page for <code>a.</code> showed an example for displaying the printable ascii characters:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   1 2 3 { 8 32 $ a.                    NB. From the J docs for a.
+ !"#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?
+@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_
+`abcdefghijklmnopqrstuvwxyz{|}~
+</pre>
+</div>
+
+<p>
+I actually understand enough J that I should have known what this was doing:
+</p>
+
+<ul class="org-ul">
+<li>Dyadic <code>x $ y</code> (<a href="http://www.jsoftware.com/help/dictionary/d210.htm">Shape</a>) reshapes array <code>y</code> to the dimensions specified by <code>x</code>.
+</li>
+<li>Dyadic <code>x { y</code> (<a href="http://www.jsoftware.com/help/dictionary/d520.htm">From</a>) extracts the elements specified in <code>x</code> from array <code>y</code>. 
+</li>
+</ul>
+
+<p>
+So in this case, the  <code>8 32 $ a.</code> arranges the characters of <code>a.</code> into an 8 &times; 32 grid, and then the <code>1 2 3 { ...</code> part extracts the second, third, and fourth rows (array indices start at 0).
+</p>
+
+<p>
+Had I paid more attention, I would have seen immediately that the way to write <code>chr(n)</code> (or at least <code>a[n])</code> in J is <code>n{a.</code> .
+</p>
+
+<p>
+I did look at the example, but the way I mentally chunked it, I just saw "here's a way to arrange the ascii characters" without considering how it worked (or even really noticing which characters were involved).
+</p>
+
+<p>
+In any case, I was thinking more about <code>Ord</code> than <code>Chr</code> anyway, and I had a few guesses about how I might implement it.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> Hunting down <code>Ord</code></h2>
+<div class="outline-text-2" id="text-6">
+<p>
+Back on the <a href="http://www.jsoftware.com/help/dictionary/vocabul.htm">J Vocabulary</a> page, I did a quick search for the word "index" and saw <a href="http://www.jsoftware.com/help/dictionary/didot.htm">i. <i>Integers</i> &frasl; <i>Index Of</i> </a>.
+</p>
+
+<p>
+I happened to know that <code>A</code> is ASCII character #65 (confirmed by typing <code>ord('A')</code> into a python prompt) so here's what I expected to happen:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   'a' i. a.      NB. What I expected:
+65
+</pre>
+</div>
+
+<p>
+But instead:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   'a' i. a.      NB. What really happened:
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 ...
+</pre>
+</div>
+
+<p>
+This bears very little correspondence to any notion I have of an index.
+</p>
+
+<p>
+The docs explain <i>what</i> it's doing (sort of), but not <i>why</i>:
+</p>
+
+<blockquote>
+
+<div class="figure">
+<p>
+</p>
+</div>
+
+<p>
+If <code>rix</code> is the rank of an item of <code>x</code>, then the shape of the result of <code>x i. y</code> is <code>(-rix)}.$y</code> . Each atom of the result is either <code>#x</code> or the index of the first occurrence among the items of x of the corresponding <code>rix</code>-cell of <code>y</code>. 
+</p>
+
+<p>
+The comparison in <code>x i. y</code> is tolerant, and fit can be used to specify the tolerance, as in <code>i. !. t</code> . 
+</p>
+</blockquote>
+
+<p>
+I don't know yet what tolerance means or how to interpret <code>(-rix)}.$y</code> &#x2013; clearly these docs are written for people who are already familiar with array languages, and perhaps when I have more experience dealing with multi-dimensional arrays, this seemingly strange behavior will make perfect sense.
+</p>
+
+<p>
+And yet, this operation is called <i>Index Of</i>, and the practical result in this particular case is that it produces an array with a bunch of ones and one zero. I didn't count at the time, but the 0 is in the 98th slot, because <code>Ord('a')</code> = 97 (lower case).
+</p>
+
+<p>
+At this point, I rejected <code>i.</code> as a path to <code>Ord</code>, but I remembered there's a verb called <i>Copy</i>.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> Take a left on Nub Street (or how to find <i>Copy</i> when what you want is <i>Select</i>)</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+Usually, when I play around with J, I find myself searching for that <code>a[n]</code> syntax. We just saw that it's  <code>n{a</code>, but I usually forget this, and have to search for it again.
+</p>
+
+<p>
+What usually happens is that look through the vocabulary page for a word like "select" or "index", and, after trying:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   0 i. 'abc'     NB. hoping for 'a', but that's not what 'Index Of' means
+1 1 1
+</pre>
+</div>
+
+<p>
+I usually wind up looking at the definition of <a href="http://www.jsoftware.com/help/dictionary/d222.htm">~: <i>Nub Sieve</i> &frasl; <i>Not Equal</i> </a>, because the word "sieve" is the closest thing that matches my idea of selecting items from an array. That page says:
+</p>
+
+<blockquote>
+
+<div class="figure">
+<p>
+</p>
+</div>
+
+<p>
+<code>~:y</code> is the boolean list b such that <code>b#y</code> is the nub of <code>y</code>.
+</p>
+</blockquote>
+
+<p>
+Apparently, <i>nub</i> is their word for the unique value in an array:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   ~: 'Mississippi'             NB. the example from the "nub sieve" docs
+1 1 1 0 0 0 0 0 1 0 0
+
+   (~: 'Mississippi') # 'Mississippi'   NB. not in docs, but should be. :)
+Misp
+</pre>
+</div>
+
+<p>
+So a "nub sieve" isn't what I want, but it looks like this <code>#</code> thing is a bit like the generic "select" I'm looking for.
+</p>
+
+<p>
+This is line of searching is something I went through several times when I experimented casually with J in the past. How did I keep missing <code>#</code> when looking for my hypothetical <i>Select</i> operator?
+</p>
+
+<p>
+I kept missing it because <code>#</code> is named <a href="http://www.jsoftware.com/help/dictionary/d400.htm"># <i>Tally</i> &frasl; <i>Copy</i> </a>.
+</p>
+
+<blockquote>
+
+<div class="figure">
+<p>
+</p>
+</div>
+
+<p>
+If the arguments have an equal number of items, then <code>x#y</code> copies <code>+/x</code> items from <code>y</code>, with <code>i{x</code> repetitions of item <code>i{y</code> . Otherwise, if one is an atom it is repeated to make the item count of the arguments equal. 
+</p>
+
+<p>
+The complex left argument <code>a j. b</code> copies <code>a</code> items followed by <code>b</code> fills. The fit conjunction provides specified fills, as in <code>#!.f</code>
+</p>
+</blockquote>
+
+<p>
+Not knowing what <code>i{x</code> meant (again, <code>x[i]</code>, the thing I was usually searching for when I wound up here), the text above didn't usually make sense to me.
+</p>
+
+<p>
+As I sit here writing now, most of the documentation I read makes sense, but when I'm in "problem solving" mode, there just isn't time or room in my head to carefully analyze each page.
+</p>
+
+<p>
+Instead, I'm doing a broad search, attempting to find the pages that are most likely to answer my question, and glossing over anything that doesn't immediately match.
+</p>
+
+<p>
+This may seem like an inefficient and error-prone process compared to just working through a tutorial, but it works.
+</p>
+
+<p>
+Reading a tutorial is a bit like taking a guided tour of a city. You get to see some interesting things and travel in comfort, but everything you encounter has been prepared for you in advance.
+</p>
+
+<p>
+My approach is more like going to a new city and picking an arbitrary goal: <i>find the library</i> or <i>find a nice park</i>&#x2026;. and then just heading out to explore. I'll probably get lost a few times, and completely miss out on a few popular attractions at first, but eventually I get to know my way around the place, in a way a tourist probably never will.
+</p>
+
+<p>
+Anyway, in my wanderings through the "City of J", I kept setting out to <i>find the Select verb</i> and instead found myself over on <i>Nub Sieve avenue</i>, which of course eventually would bring me back to <i>Copy</i>.
+</p>
+
+<p>
+So why on earth is <i>Select</i> called <i>Copy</i>?
+</p>
+
+<p>
+Well of course, it <i>isn't</i>. What I thought of s <i>Select</i> is just <i>From</i> in J, and it's just the <code>{</code> symbol that keeps showing up: 
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   0 2 4 { 'abcdefg'
+ace
+</pre>
+</div>
+
+<p>
+But <i>Copy</i> can do the same thing in a pinch, if you also happen to find
+dyadic <code>e.</code> (called <a href="http://www.jsoftware.com/help/dictionary/dedot.htm"> <i>Member (In)</i> </a> in the J docs, but I would have called it <i>Element Of</i>).
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   NB. Selecting values directly with 'Copy':
+   1 0 1 0 1 0 0 # 'abcdefg'
+ace
+
+   NB. For each integer 0..6, is it an element of the array 0 2 4 ?
+   (i.7) e. 0 2 4
+1 0 1 0 1 0 0
+
+   NB. Combining those two ideas:
+   ((i.7) e. 0 2 4) # 'abcdefg'
+ace
+</pre>
+</div>
+
+<p>
+Obviously this so-called <i>Copy</i> thing this is pretty terrible compared to <code>{</code> , because <code>{</code> doesn't require you to know the length or to fill in all those zeros, but at least we know "the long way" to get to <i>Select</i>.
+</p>
+
+<p>
+But why on earth is it called <i>Copy</i>?!?
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   0 1 2 3 # 'abcd' 
+bccddd
+</pre>
+</div>
+
+<p>
+Oh.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> From <i>Copy</i> to <i>Chr</i></h2>
+<div class="outline-text-2" id="text-8">
+<p>
+So there I was, looking at:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   'a' i. a.
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 ...
+</pre>
+</div>
+
+<p>
+I remember my earlier discovery of <i>Copy</i> and think to myself that if I could swap the zeros and ones, then perhaps it would bring me closer to <code>Ord</code> or <code>Chr</code>.
+</p>
+
+<p>
+I look up how to do <i>Not</i> in the vocabulary. It's spelled <code>-.</code> in J, and it's really <code>1 - x</code>.<sup><a id="fnr.6" name="fnr.6" class="footref" href="#fn.6">6</a></sup>
+</p>
+
+<p>
+So now I can do:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   NB. Just using (8 32 $) here to reformat the results:
+
+   8 32 $        'a' i. a.      NB. My original data.
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+
+   8 32 $      -.'a' i. a.      NB. After applying not.
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+</pre>
+</div>
+
+
+<p>
+I didn't really know where I was going with this, yet, but I figured I could use <i>Copy</i> and the above pattern to get the letter 'a' back out of the alphabet. The first thing I tried happened to work:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   NB. ~ swaps the arguments of a verb so that  a. #~ x   becomes  x # a.
+   a. #~  -. 'a' i. a.
+a
+</pre>
+</div>
+
+<p>
+So at this point, I'd essentially implemented an identity function that was somewhere in the ballpark of <code>chr(ord(ch))</code>, but I needed to figure out how to extract the individual components.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> Rummaging</h2>
+<div class="outline-text-2" id="text-9">
+<p>
+My next few attempts didn't work at all. I figured if I could put an 'a' in and get an 'a' out, maybe I could do the same thing for an entire string.
+</p>
+
+<p>
+First I tried just replacing the string, and I <i>got an error</i>. I tried the exact same thing again and <i>got an error</i>.
+</p>
+
+
+<div class="org-src-container">
+
+<pre class="src src-j">   a.#~-.'apples'i.a.
+|domain error
+|   a.    #~-.'apples'i.a.
+
+   a.#~-.'apples'i.a.
+|domain error
+|   a.    #~-.'apples'i.a.
+</pre>
+</div>
+
+<p>
+Next I <i>tried some other stuff</i> and <i>some stuff happened</i>.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   'apples'i.a       NB. I forgot the . in a. but failed to notice
+'apples' i. a        NB. J is giving me back a symbolic expression,
+                     NB. presumably because 'a' is not defined. 
+                     NB. I wonder if maybe '' is for characters and
+                     NB. '"' is for strings, so try:
+
+   "apples"i.a       NB. but " is a verb in J, not part of a string.
+|syntax error        NB. 'a' is a string. there is no "character" type
+|       "apples"i.a
+
+   'apples'i.a       NB. The J terminal makes it easy to duplicate input.
+'apples' i. a        NB. I cursored up and pressed enter to duplicate the
+                     NB. line, and probably just automatically ran it to
+                     NB. make sure it acted the same, in case I had 
+                     NB. accidentally changed the history.
+
+   'apples'i./a      NB. / inserts a function between each element of a
+'apples' i./ a       NB. an array (so +/1 2 3 -&gt; 1+2+3). I have no idea 
+                     NB. what I was thinking about here that would have
+   'apples'i.~/a     NB. caused me to type it.
+'apples' i.~/ a
+</pre>
+</div>
+
+<p>
+It's hard to express my thought process at this point.
+</p>
+
+<p>
+The side comments I wrote above are things I'm observing as I write this document, but in the moment, I probably wasn't aware of any of it.
+</p>
+
+<p>
+In the moment, I had no idea why things weren't working, and was just trying lots of different things.
+</p>
+
+<p>
+This is basically <i>rummaging</i> here. I didn't have a clear idea what I was looking for, but I had a sense that <i>something was wrong</i>, and was mostly typing on autopilot. I probably issued all of the above commands within the span of 30 seconds or so.
+</p>
+
+<p>
+Eventually, my brain caught up to my fingers, I noticed the missing period in <code>a.</code>, and  typed what I really wanted to type:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">  'apples' i.a.      
+6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6
+6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6
+6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 0 6 6 6 4 6 6 6 6 6 6 3 6 6 6 1 6
+6 5 6 6 6 6 6 6 6 6 6 6 6 6 ...
+</pre>
+</div>
+
+<p>
+This result is also completely unexpected to me. 
+</p>
+
+<p>
+Once again, here is the description of dyadic <code>i.</code> (<i>Index Of</i>):
+</p>
+
+<blockquote>
+
+<div class="figure">
+<p>
+</p>
+</div>
+
+<p>
+If <code>rix</code> is the rank of an item of <code>x</code>, then the shape of the result of <code>x i. y</code> is <code>(-rix)}.$y</code> . Each atom of the result is either <code>#x</code> or the index of the first occurrence among the items of x of the corresponding <code>rix</code>-cell of <code>y</code>. 
+</p>
+
+<p>
+The comparison in <code>x i. y</code> is tolerant, and fit can be used to specify the tolerance, as in <code>i. !. t</code> . 
+</p>
+</blockquote>
+
+<p>
+I still don't understand why any of this would be useful, but I know <code>#x</code> means length (<i>Tally</i>) and 6 is the length of the string 'apples'.
+</p>
+
+<p>
+Siting here writing this, I can see that the indices of the string 'apples' are <code>0 1 2 3 4 5</code> and so <code>6</code> is a perfectly logical "not found".
+</p>
+
+<p>
+If you look closely, you can see that the numbers <code>0 1 3 4 5</code> all appear in that field of sixes, but <code>2</code> does not. That makes sense because:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   1 2 { 'apples'
+pp
+</pre>
+</div>
+
+<p>
+What's happening with the sixes is that given each ascii character, J is searching for its first position in the string 'apples'.
+</p>
+
+<p>
+In other words, I had the parameters backwards, and what I should have typed was this:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   a.i.'apples'
+97 112 112 108 101 115
+</pre>
+</div>
+
+<p>
+And in fact, that is exactly the definition I eventually came up with for <code>Ord</code>:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">ord =. a. &amp; i.    NB. The '&amp;' is an operator that transforms dyadic i. into
+                  NB. a new verb (which I assigned to the variable 'ord')
+                  NB. Now: (ord x) = ((a.&amp;i.) x) = (a. i. x)  
+                  NB. This transformation is called "partial application".
+
+   ord 'apples'
+97 112 112 108 101 115
+</pre>
+</div>
+
+<p>
+However, <i>in the moment</i>, the giant pile of sixes made no sense to me, and I wasn't able to follow this train of thought.
+</p>
+
+<p>
+Instead, my failed attempt to use double quotes for a string reminded me of the concept of <i>rank</i>, and so I took a wrong turn.
+</p>
+
+
+<p>
+(<b>to be continued&#x2026;</b>)
+</p>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
+the monadic verb <code>\plus x</code> actually produces the <a href="http://en.wikipedia.org/wiki/Complex_conjugate">complex conjugate</a> of <code>x</code>.
+</p></div>
+
+<div class="footdef"><sup><a id="fn.2" name="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara">
+In turbo pascal, strings were always 256 bytes, with the first byte representing a length. This <code>upstr</code> function takes a string by value, meaning all 256 bytes are copied onto the stack. Changing the signature to <code>procedure upstr( var s : string );</code> would have modified the string in place without making a copy, but I generally preferred the functional style, even back then.
+</p></div>
+
+<div class="footdef"><sup><a id="fn.3" name="fn.3" class="footnum" href="#fnr.3">3</a></sup> <p class="footpara">
+Pascal is case-insensitive, so <code>ord</code>, <code>Ord</code>, <code>ORD</code>, etc. all refer to the same thing.
+</p></div>
+
+<div class="footdef"><sup><a id="fn.4" name="fn.4" class="footnum" href="#fnr.4">4</a></sup> <p class="footpara">
+Characters at the time were 8 bits. ASCII only specifies 128 ncharacters, 32 of which are invisible control codes. If you were an american writing code for DOS back in the day, you probably had several printouts of the <a href="http://www.ascii-codes.com/">CP437</a> character set lying around.
+</p></div>
+
+<div class="footdef"><sup><a id="fn.5" name="fn.5" class="footnum" href="#fnr.5">5</a></sup> <p class="footpara">
+Looking back now, I wonder if the <a href="http://www.jsoftware.com/help/phrases/contents.htm">J phrasebook</a> might have been a more helpful starting point.
+</p></div>
+
+<div class="footdef"><sup><a id="fn.6" name="fn.6" class="footnum" href="#fnr.6">6</a></sup> <p class="footpara">
+Over and over in J, I find that the verb I want is just a specific instance of some more general operation. I introduced <code>+.</code> earlier as <i>greatest common divisor</i>, but it's also the logical <i>OR</i> operator. This might seem like some crazy operator overloading, but that's not the case: logical <i>OR</i> just happens to be a special case of <i>GCD</i>. 
+</p></div>
+
+
+</div>
+</div></div>
+</body>
+</html>
