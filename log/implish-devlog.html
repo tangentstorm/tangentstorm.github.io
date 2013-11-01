@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>implish devlog</title>
-<!-- 2013-09-06 Fri 14:02 -->
+<!-- 2013-11-01 Fri 04:08 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -63,17 +63,308 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. portig pre in picolisp</a>
+<li><a href="#sec-1">1. hello world</a></li>
+<li><a href="#sec-2">2. Walking the tree.</a>
 <ul>
-<li><a href="#sec-1-1">1.1. a rule database with compiled and uncompiled rules</a></li>
+<li><a href="#sec-2-1">2.1. walking the tree is what lisp does on its own :)</a></li>
 </ul>
+</li>
+<li><a href="#sec-3">3. zip in picolisp</a>
+<ul>
+<li><a href="#sec-3-1">3.1. NOTE . actually that was more like zipwith</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4. repeat loops</a>
+<ul>
+<li><a href="#sec-4-1">4.1. NOTE . wasn't a good idea to use "-" here!</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. some stuff i wrote earlier:</a></li>
+<li><a href="#sec-6">6. <code>[0/8]</code> Goals for building this system.</a>
+<ul>
+<li><a href="#sec-6-1">6.1. Make a small imperative meta-language</a></li>
+<li><a href="#sec-6-2">6.2. Port my grammar combinators (pre) to picolisp/implish</a></li>
+<li><a href="#sec-6-3">6.3. Port the PL0-&gt;Retro thing I did to implish/pre.</a></li>
+<li><a href="#sec-6-4">6.4. Write a full parser for pascal.</a></li>
+<li><a href="#sec-6-5">6.5. Generate free pascal code from the AST</a></li>
+<li><a href="#sec-6-6">6.6. Generate retro/ngaro code from the AST</a></li>
+<li><a href="#sec-6-7">6.7. Be able to transpile turbo pascal to run on retrovm.</a></li>
+<li><a href="#sec-6-8">6.8. learn how to use pilog (for type checking, etc)</a></li>
+<li><a href="#sec-6-9">6.9. and maybe coderef, too, at last?</a></li>
+</ul>
+</li>
+<li><a href="#sec-7">7. porting pre to picolisp</a></li>
+<li><a href="#sec-8">8. a rule database with compiled and uncompiled rules</a></li>
+<li><a href="#sec-9">9. NOTE . pre -&gt; imprex : parser combinators for implish</a></li>
+<li><a href="#sec-10">10. SCRAP . combinator groups</a></li>
+<li><a href="#sec-11">11. NOTE . standalone reader</a></li>
+<li><a href="#sec-12">12. NOTE . using the reader instead of combinators</a></li>
+<li><a href="#sec-13">13. NOTE . retro pascal = relational pascal? Or is that implish?</a></li>
+<li><a href="#sec-14">14. NOTE . Next steps: test suite for eval(), parser combinators for implish</a></li>
+<li><a href="#sec-15">15. NOTE . roots of lisp</a></li>
+<li><a href="#sec-16">16. NOTE . the plan</a></li>
+<li><a href="#sec-17">17. talk about garbage collection and cheney's algorithm</a></li>
+<li><a href="#sec-18">18. NOTE . lisp mostly working for implish :)</a></li>
+<li><a href="#sec-19">19. NOTE . implish != lisp</a></li>
+<li><a href="#sec-20">20. NOTE . implish to pascal</a></li>
+<li><a href="#sec-21">21. NOTE . pascal-APL hybrid links</a></li>
+<li><a href="#sec-22">22. NOTE . from implish to PL/0, retro pascal, wejal, and beyond.</a></li>
+<li><a href="#sec-23">23. NOTE . impworld</a></li>
+<li><a href="#sec-24">24. <code>[0/3]</code> So what actually needs reconciling?</a>
+<ul>
+<li><a href="#sec-24-1">24.1. read from event-driven prompt</a></li>
+<li><a href="#sec-24-2">24.2. expose worker objects</a></li>
+<li><a href="#sec-24-3">24.3. compile a grammar</a></li>
+</ul>
+</li>
+<li><a href="#sec-25">25. NOTE . imperative/command syntax</a></li>
+<li><a href="#sec-26">26. NOTE . The role of parentheses in implish.</a></li>
+<li><a href="#sec-27">27. NOTE . squeak keyword message chains (impossible without parens)</a></li>
+<li><a href="#sec-28">28. NOTE . more notes on precedence</a></li>
+<li><a href="#sec-29">29. NOTE . breaking j precedence</a></li>
+<li><a href="#sec-30">30. NOTE . bootstrap process</a></li>
+<li><a href="#sec-31">31. LINK . hello pascal spike</a></li>
+<li><a href="#sec-32">32. end</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><a id="nyn9md0178g0" name="nyn9md0178g0"></a><span class="section-number-2">1</span> hello world</h2>
+<div class="outline-text-2" id="text-1">
+
+<p>
+Suppose we have the following program:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-picolisp">'((program hello)
+  (begin
+    (writeln "hello world")))
+</pre>
+</div>
+
+<p>
+This corresponds to the pascal code:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">program</span> <span style="color: #ffffff; font-weight: bold;">hello</span>;
+<span style="color: #00ffff;">begin</span>
+  writeln(<span style="color: #00ff00;">'hello world'</span>)
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+
+<p>
+Or in retro:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">:</span> hello <span style="color: #00ff00;">"hello world"</span> puts cr <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+
+<p>
+How can we translate it?
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><a id="4cxbd77178g0" name="4cxbd77178g0"></a><span class="section-number-2">2</span> Walking the tree.</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><a id="qn3i2cb178g0" name="qn3i2cb178g0"></a><span class="section-number-3">2.1</span> walking the tree is what lisp does on its own :)</h3>
+<div class="outline-text-3" id="text-2-1">
+
+<p>
+It's kind of interesting&#x2026; all the normal dispatch stuff you have to do even in a high level language like python or haskell just goes away.
+</p>
+
+<p>
+I was writing this whole big case statement like:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-picolisp">(case symbol
+   ('repeat ...)
+   ('while ...)
+   ('if ...) ... )
+</pre>
+</div>
+
+<p>
+&#x2026; but then i realized i could just make them all functions.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><a id="b7r4kfb178g0" name="b7r4kfb178g0"></a><span class="section-number-2">3</span> <span class="done DONE">DONE</span> zip in picolisp</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+
+<pre class="src src-picolisp">(de zip (F A B)
+   (if (and A B)
+      (cons (F (car A) (car B))
+         (zip F (cdr A) (cdr B)) ) ) )
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><a id="ky7cvi3098g0" name="ky7cvi3098g0"></a><span class="section-number-3">3.1</span> NOTE . actually that was more like zipwith</h3>
+<div class="outline-text-3" id="text-3-1">
+
+<p>
+The goal of the zip routine was to help me make the function that I eventually called <code>qd</code>&#x2026; Basically a way to define special forms that didn't evaluate their arguments.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><a id="v6w1zhb178g0" name="v6w1zhb178g0"></a><span class="section-number-2">4</span> <span class="done DONE">DONE</span> repeat loops</h2>
+<div class="outline-text-2" id="text-4">
+
+<div class="org-src-container">
+
+<pre class="src src-picolisp" id="interpret">(de repeat -
+   (let (Block (car -)
+         Cond  (cdr -) )
+      (eval Block)
+      (while (not (eval Cond))
+         (eval Block) ) ) )
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><a id="hr4bdn3098g0" name="hr4bdn3098g0"></a><span class="section-number-3">4.1</span> NOTE . wasn't a good idea to use "-" here!</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+I caught the error before it caused a problem, but with picolisp's dynamic interpreter, pretty sure this would have replaced the "-" function&#x2026; Whoops!
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><a id="ta01zf1088g0" name="ta01zf1088g0"></a><span class="section-number-2">5</span> <span class="done DONE">DONE</span> some stuff i wrote earlier:</h2>
+<div class="outline-text-2" id="text-5">
+
+<p>
+This file seems to be turning into more of a blog than a program&#x2026; maybe that's how i should write things?
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-picolisp">(de writeln @
+   (pass println) )
+
+(de program (Name)
+   (writeln) )
+
+(de begin @ (rest)) # just pass through
+</pre>
+</div>
+
+<p>
+&lt;top level&gt; -&gt; ":" (contents) ";"
+(program hello) -&gt; "hello"
+(begin &#x2026;) -&gt;
+writeln -&gt;
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><a id="q0fjyv4098g0" name="q0fjyv4098g0"></a><span class="section-number-2">6</span> <code>[0/8]</code> Goals for building this system.</h2>
+<div class="outline-text-2" id="text-6">
+</div>
+<div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><span class="section-number-3">6.1</span> <span class="todo TODO">TODO</span> Make a small imperative meta-language</h3>
+<div class="outline-text-3" id="text-6-1">
+<ul class="org-ul">
+<li>Quoting, quasiquoting, and unquoting should be easy.
+</li>
+<li>Two 'ambient' global stacks, as in forth.
+</li>
+<li>Queues for message passing, pretty much everywhere.
+</li>
+<li>Main data stack should be nested, though.
+</li>
+<li>Allow and encourage left to right, mixfix notation.
+<ul class="org-ul">
+<li>possibly  prefix: infix :suffix ?
+</li>
+</ul>
+</li>
+<li>Keep the language <i>simple</i> and small.
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><a id="a2u33eu098g0" name="a2u33eu098g0"></a><span class="section-number-2">1</span> portig pre in picolisp</h2>
-<div class="outline-text-2" id="text-1">
+<div id="outline-container-sec-6-2" class="outline-3">
+<h3 id="sec-6-2"><span class="section-number-3">6.2</span> <span class="todo TODO">TODO</span> Port my grammar combinators (pre) to picolisp/implish</h3>
+<div class="outline-text-3" id="text-6-2">
+<p>
+This way I can begin creating a parser for retro pascal (and other things).
+</p>
+</div>
+</div>
+<div id="outline-container-sec-6-3" class="outline-3">
+<h3 id="sec-6-3"><span class="section-number-3">6.3</span> <span class="todo TODO">TODO</span> Port the PL0-&gt;Retro thing I did to implish/pre.</h3>
+</div>
+<div id="outline-container-sec-6-4" class="outline-3">
+<h3 id="sec-6-4"><span class="section-number-3">6.4</span> <span class="todo TODO">TODO</span> Write a full parser for pascal.</h3>
+<div class="outline-text-3" id="text-6-4">
+<p>
+Probably I can base this on the grammar I have for oberon already.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-6-5" class="outline-3">
+<h3 id="sec-6-5"><span class="section-number-3">6.5</span> <span class="todo TODO">TODO</span> Generate free pascal code from the AST</h3>
+<div class="outline-text-3" id="text-6-5">
+<p>
+This way I can use implish as a meta-programming environment.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-6-6" class="outline-3">
+<h3 id="sec-6-6"><span class="section-number-3">6.6</span> <span class="todo TODO">TODO</span> Generate retro/ngaro code from the AST</h3>
+<div class="outline-text-3" id="text-6-6">
+<p>
+This way I can use implish in the browser.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-6-7" class="outline-3">
+<h3 id="sec-6-7"><span class="section-number-3">6.7</span> <span class="todo TODO">TODO</span> Be able to transpile turbo pascal to run on retrovm.</h3>
+</div>
+
+<div id="outline-container-sec-6-8" class="outline-3">
+<h3 id="sec-6-8"><span class="section-number-3">6.8</span> <span class="todo TODO">TODO</span> learn how to use pilog (for type checking, etc)</h3>
+</div>
+
+<div id="outline-container-sec-6-9" class="outline-3">
+<h3 id="sec-6-9"><a id="rgc6cx5098g0" name="rgc6cx5098g0"></a><span class="section-number-3">6.9</span> <span class="todo TODO">TODO</span> and maybe coderef, too, at last?</h3>
+<div class="outline-text-3" id="text-6-9">
+<p>
+Since I'm parsing and I want to dig into pilog and the database stuff, I think this would be a good time to start building a database of my old code. And while I'm making a database of my own code, I might as well make databases for retro and picolisp too.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><a id="a2u33eu098g0" name="a2u33eu098g0"></a><span class="section-number-2">7</span> porting pre to picolisp</h2>
+<div class="outline-text-2" id="text-7">
 
 <p>
 I haven't produced much since this morning, but I've learned a lot about picolisp.
@@ -83,10 +374,10 @@ I haven't produced much since this morning, but I've learned a lot about picolis
 Originally, I was thinking I'd do a straight object oriented port of the matcher and pattern classes, but with pilog available, I think using the inference engine is a more interesting choice.
 </p>
 </div>
-
-<div id="outline-container-sec-1-1" class="outline-3">
-<h3 id="sec-1-1"><a id="76g677v098g0" name="76g677v098g0"></a><span class="section-number-3">1.1</span> a rule database with compiled and uncompiled rules</h3>
-<div class="outline-text-3" id="text-1-1">
+</div>
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><a id="76g677v098g0" name="76g677v098g0"></a><span class="section-number-2">8</span> a rule database with compiled and uncompiled rules</h2>
+<div class="outline-text-2" id="text-8">
 
 <p>
 I'm thinking I build my grammar by adding rules to the database. Like:
@@ -94,11 +385,11 @@ I'm thinking I build my grammar by adding rules to the database. Like:
 
 <div class="org-src-container">
 
-<pre class="src src-picolisp">(be <span style="color: #ffffff; font-weight: bold;">rule</span>
+<pre class="src src-picolisp">(be rule
    (repeat node (Block Cond)
-      (<span style="color: #00ff00;">"repeat"</span> <span style="color: #ff00ff; font-weight: bold;">^</span>
-         (<span style="color: #00ffff;">&gt;</span> Block = block )
-         <span style="color: #00ff00;">"until"</span> ! Cond = expr ) ) )
+      ("repeat" ^
+         (&gt; Block = block )
+         "until" ! Cond = expr ) ) )
 </pre>
 </div>
 
@@ -118,9 +409,9 @@ This would be converted to an ast with my grammar combinators:
 
 <pre class="src src-picolisp">'(node:
     (seq:
-       (lit: <span style="color: #00ff00;">"repeat"</span>)
+       (lit: "repeat")
        (sub: block)
-       (hide: (lit: <span style="color: #00ff00;">"until"</span>))
+       (hide: (lit: "until"))
        (sub: cond) ))
 </pre>
 </div>
@@ -142,6 +433,665 @@ Yeah. I like this. I need sleep though, so I'll have to do it tomorrow.
 </p>
 </div>
 </div>
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><a id="a6l4sk00c8g0" name="a6l4sk00c8g0"></a><span class="section-number-2">9</span> NOTE . pre -&gt; imprex : parser combinators for implish</h2>
+<div class="outline-text-2" id="text-9">
+
+<p>
+I started rewriting <code>pre.pas</code> to make it act more like a database plus virtual machine. Along the way, I renamed it and moved it to the implish repo.
+</p>
+
+<p>
+Here's the basic idea: you can still use the combinators to construct things, but invoking them returns a RuleID referencing a record in a table.
+</p>
+
+<p>
+So when you compile foo([a,b,c,d]), pascal's order of operations is going to evaluate a, b, c, and d in some order (fpc doesn't guarantee any particular order) and storing each of them in the database. Then the ids are passed to foo.
+</p>
+
+<p>
+Foo will now simply write a record indicating that it's a foo rule, and and the length of the sub-array. The position of that record will be the the RuleId it returns.
+</p>
+
+<p>
+Then, it can just record the arguments.
+</p>
+
+<p>
+Some of those arguments might also be strings. For each string in the list, foo() will ensure there's an ID for it in the string literal table (creating one if it doesn't already exist).
+</p>
+</div>
+</div>
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><a id="8si844s0d8g0" name="8si844s0d8g0"></a><span class="section-number-2">10</span> SCRAP . combinator groups</h2>
+<div class="outline-text-2" id="text-10">
+
+<p>
+nul, eoi : nothing
+any : setid
+lit : strid
+</p>
+
+<p>
+alt, seq, rep, neg, opt, orp,  : len
+def, tok, skip, node           : name, len
+</p>
+
+<p>
+sub : name -&gt; id
+act : action, len
+tok : name, len
+hide : len
+virt : strid
+</p>
+</div>
+</div>
+<div id="outline-container-sec-11" class="outline-2">
+<h2 id="sec-11"><a id="mht9x4s0d8g0" name="mht9x4s0d8g0"></a><span class="section-number-2">11</span> NOTE . standalone reader</h2>
+<div class="outline-text-2" id="text-11">
+<p>
+Spent much of today implementing a generic reader for implish. It's pretty much identical to what you'd write to make a reader for lisp, too. I even added a quote construct.
+</p>
+
+<p>
+The code is similar to my older reader, li.pas, but also incorporates my ideas about using in-memory tables. I started from scratch, but I borrowed chunks of code where needed, and used the older system as a reference. The main differences are:
+</p>
+
+<ul class="org-ul">
+<li>It's less buggy.
+</li>
+<li>It looks a bit more like borland-style pascal code.
+</li>
+<li>It uses relational style (kind, index) pairs for values instead of variants or instances.
+</li>
+<li>It uses simple cons cells instead of rings.
+</li>
+<li>It allows three delimiters: parens, brackets, and braces; and ensures they're correctly balanced.
+</li>
+<li>It handles error reporting much more cleanly (in my opinion).
+</li>
+<li>It doesn't support hex literals, at least for now.
+</li>
+<li>It supports quoting.
+</li>
+</ul>
+
+<p>
+Overall, I'm happy with it, and am ready to start work on the evaluator.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-12" class="outline-2">
+<h2 id="sec-12"><a id="zdn4uvs0d8g0" name="zdn4uvs0d8g0"></a><span class="section-number-2">12</span> NOTE . using the reader instead of combinators</h2>
+<div class="outline-text-2" id="text-12">
+<p>
+It seemed to me that when I tried to write combinators in pascal, I found myself fighting the language.
+</p>
+
+<p>
+At first, I thought that dropping objects would make my life easier, but the more worked I did on the self-compiling combinators for implish, the more of a mess I seemed to have on my hands. I started to <i>wish</i> I had objects, just so I could inherit some of the repetetive code. Most of the constructors just pass a ther corresponding typecode and then their arguments to a common <code>compile</code> function, and it would have been nice to have macros for that.
+</p>
+
+<p>
+Also, I'm tired of having to repeat the declarations of all my functions in the module's interface. There's simply no need for that most of the time. And there's <i>really</i> no need to put private and protected class methods in the interface, or to force you to repeat the declaration of an interface in every class that implements it.
+</p>
+
+<p>
+Pascal on its own is a language that has some flaws and is definitely in need of modernization. Object Pascal brings quite a few benefits compared to C++ (better strings, better exceptions, better classes, interfaces) and the syntax is much more readable (especially with pointers). C++ seems to have a  more powerful template/generics system (at least compared to free pascal. Not sure about delphi), and it has leapfrogged a bit when it comes to lambdas (though delphi supports lambda).
+</p>
+
+<p>
+Er&#x2026; Didn't mean to get into a comparison there. What I wanted to say was that probably the biggest complaint I have against modern pascal is the module syntax. The fact that it <i>has</i> modules is awesome, and a huge plus. But there's simply no need for the "declare everything twice" syntax.
+</p>
+
+<p>
+AnsiStrings are another place where pascal wins big compared to c and c++ in terms of implementation, but falls short when it comes to syntax. The double quote is a much better delimiter simply because it doesn't appear regularly in english words. Simply changing that (as oberon did) would make a huge improvemen. (Using 1 for the base string index is of course fairly annoying too.)
+</p>
+
+<p>
+I digress.
+</p>
+
+<p>
+The combinator idea is nice, but it's really about creating an implicit, expressive declarative language, and that's not what pascal is about. Rather, pascal is meant to be an explicit, imperative, procedural language where you're telling the computer exactly what to do and how to do it.
+</p>
+
+<p>
+In other words, combinators make sense for a nice expressive language like wejal or implish or even retro, but maybe not so much for pascal.
+</p>
+
+<p>
+For pascal, I think it makes sense to keep things simple, and perhaps even drop objects completely.
+</p>
+
+<p>
+However, a lot of what you can do with objects can also be done with relations, and if you could do relational operations on types, a lot of problems would just go away.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-13" class="outline-2">
+<h2 id="sec-13"><a id="u9zkqvu0d8g0" name="u9zkqvu0d8g0"></a><span class="section-number-2">13</span> NOTE . retro pascal = relational pascal? Or is that implish?</h2>
+<div class="outline-text-2" id="text-13">
+
+<p>
+I'm not sure objects would go away completely, but I think maybe they could be largely replaced by relations &#x2013; especially if you have lookup tables that contain functions. (I mean that's pretty much what a class is already. The only difference is that the virtual method tables would be instances of (or at least derived from) the general purpose tables I'd be using for everything else.
+</p>
+
+<p>
+And of course, you could use it for plain old procedural stuff too.
+</p>
+
+<p>
+I'm not sure. Perhaps what I'm talking about here is implish and minrel&#x2026; And maybe wejal.
+</p>
+
+<p>
+One thing I do know is that retro pascal will absolutely be the <i>target</i> language for these things. I want a very clean and easy to understand formal model for telling the computer how to do things. And pascal gives me that.
+</p>
+
+<p>
+That doesn't mean I want to constantly be telling the computer how to do everything. I want to be able to declare what I want and let it figure out the best way to do it&#x2026; But in the end, I want to be able to see its plans.
+</p>
+
+<p>
+Of course, I have other reasons for wanting retro pascal, which have to do with portability and teaching and writing scripts for claritygame, but I've been through those reasons plenty of times (at least in my head! I feel certain I've written it down though) and I don't need to go into it here.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-14" class="outline-2">
+<h2 id="sec-14"><a id="qubalev0d8g0" name="qubalev0d8g0"></a><span class="section-number-2">14</span> NOTE . Next steps: test suite for eval(), parser combinators for implish</h2>
+<div class="outline-text-2" id="text-14">
+<p>
+Okay, so I've got a reader. Now I want to evaluate what it reads.
+Ideally, I'd like to use it to implement these parser combinators and have them actually parse something.
+</p>
+
+<p>
+I also want to get the reader part under test. My friend darkf has some tests for his rust implementation of an s-expression parser, and he said I could borrow them.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-15" class="outline-2">
+<h2 id="sec-15"><a id="a11ex9z0e8g0" name="a11ex9z0e8g0"></a><span class="section-number-2">15</span> NOTE . roots of lisp</h2>
+<div class="outline-text-2" id="text-15">
+
+<p>
+these are paul graham's interpretation of john mccarthy's famous old paper.
+</p>
+
+<ul class="org-ul">
+<li>quote x -&gt; x
+</li>
+<li>atom  x -&gt; bool
+</li>
+<li>eq x y -&gt; bool
+</li>
+<li>car c -&gt; c.car
+</li>
+<li>cdr c -&gt; c.cdr
+</li>
+<li>cons a b -&gt; c
+</li>
+<li>cond -&gt; first thing to return true
+</li>
+<li>def n -&gt; name
+</li>
+<li>lambda &#x2026; -&gt; function
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-16" class="outline-2">
+<h2 id="sec-16"><a id="nfpegnw0f8g0" name="nfpegnw0f8g0"></a><span class="section-number-2">16</span> NOTE . the plan</h2>
+<div class="outline-text-2" id="text-16">
+
+<p>
+so i think i've decided on how implish is going to work.
+</p>
+
+<p>
+If you wrap tokens () you'll get lisp, so:
+</p>
+
+<pre class="example">
+(+ 1 2 3)
+-&gt; 6
+</pre>
+
+<p>
+With [ ], tokens will be executed immediately, as in forth, and operate on an implicit stack. So:
+</p>
+
+<pre class="example">
+[ 1 2 3 + ]
+-&gt; [ 1 5 ]
+</pre>
+
+<p>
+Anything inside { } will be evaluated according to a custom evaluator.
+</p>
+
+<p>
+The default will just quote everything.
+</p>
+
+<p>
+I may also add some kind of line-based syntax for those kinds of blocks.
+The idea is you can use these quoted blocks to write programs in whatever language you like, and then it'll get parsed into an AST, which you can then compile down to instructions.
+</p>
+
+<p>
+The idea is you can mix languages up like in template haskell.
+</p>
+
+<p>
+Ahhh <a href="http://xahlee.info/comp/unicode_matching_brackets.html">http://xahlee.info/comp/unicode_matching_brackets.html</a>
+</p>
+</div>
+</div>
+<div id="outline-container-sec-17" class="outline-2">
+<h2 id="sec-17"><a id="5cm58c01f8g0" name="5cm58c01f8g0"></a><span class="section-number-2">17</span> <span class="todo TODO">TODO</span> talk about garbage collection and cheney's algorithm</h2>
+<div class="outline-text-2" id="text-17">
+</div>
+</div>
+<div id="outline-container-sec-18" class="outline-2">
+<h2 id="sec-18"><a id="onxbrck0k8g0" name="onxbrck0k8g0"></a><span class="section-number-2">18</span> NOTE . lisp mostly working for implish :)</h2>
+<div class="outline-text-2" id="text-18">
+<p>
+Over the past couple days, I've been implementing the LISP evalutator described in John McCarthy's original paper from 1960.
+</p>
+
+<p>
+Aside from a lack of garbage collection and whatever bugs are left, I now have a simple lisp system working.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-19" class="outline-2">
+<h2 id="sec-19"><a id="q8c9npk0k8g0" name="q8c9npk0k8g0"></a><span class="section-number-2">19</span> NOTE . implish != lisp</h2>
+<div class="outline-text-2" id="text-19">
+<p>
+Implish borrows a lot from lisp, but it isn't lisp. It isn't even <i>a</i> lisp.
+</p>
+
+<p>
+What I picture for implish is a blend of forth, lisp, and j/apl/qnial.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-20" class="outline-2">
+<h2 id="sec-20"><a id="8o2jbfz0h8g0" name="8o2jbfz0h8g0"></a><span class="section-number-2">20</span> NOTE . implish to pascal</h2>
+<div class="outline-text-2" id="text-20">
+
+<p>
+So what do I need to do here, to get implish up and running well enough to implement retro pascal?
+</p>
+
+<p>
+I guess I need to finish working through the core axioms of lisp today.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-21" class="outline-2">
+<h2 id="sec-21"><a id="0lqf1sd0l8g0" name="0lqf1sd0l8g0"></a><span class="section-number-2">21</span> NOTE . pascal-APL hybrid links</h2>
+<div class="outline-text-2" id="text-21">
+
+<p>
+from #learnprogramming:
+</p>
+
+<p>
+23:52:37 @tangentstorm what do you get if you cross APL and pascal?
+23:52:41 @tangentstorm <a href="http://www.cs.washington.edu/research/zpl/comicbook/comicbook.html">http://www.cs.washington.edu/research/zpl/comicbook/comicbook.html</a>
+23:52:42 tamper tangentstorm's url: <a href="http://bit.ly/14Wl0rD">http://bit.ly/14Wl0rD</a> - Title: Comic Book
+23:55:03 @tangentstorm or do you get.. <a href="http://www.nial.com/AboutNial.html">http://www.nial.com/AboutNial.html</a> ?
+23:55:05 tamper tangentstorm's url: <a href="http://bit.ly/14Wlb6p">http://bit.ly/14Wlb6p</a>
+23:58:55 @tangentstorm i think perhaps sisal is in the same ballpark, but maybe without all the crazy
+                       operators:
+23:58:56 @tangentstorm <a href="http://www2.cmp.uea.ac.uk/~jrwg/Sisal/01.Introduction.html">http://www2.cmp.uea.ac.uk/~jrwg/Sisal/01.Introduction.html</a>
+23:58:58 tamper tangentstorm's url: <a href="http://bit.ly/14Wlw9d">http://bit.ly/14Wlw9d</a>
+23:59:36 @tangentstorm but then again, perhaps you get vector pascal:
+                       <a href="http://www.dcs.gla.ac.uk/~wpc/reports/compilers/compilerindex/x25.html">http://www.dcs.gla.ac.uk/~wpc/reports/compilers/compilerindex/x25.html</a>
+23:59:37 tamper tangentstorm's url: <a href="http://bit.ly/14Wlz4T">http://bit.ly/14Wlz4T</a>
+</p>
+</div>
+</div>
+<div id="outline-container-sec-22" class="outline-2">
+<h2 id="sec-22"><a id="q17dbvd0l8g0" name="q17dbvd0l8g0"></a><span class="section-number-2">22</span> NOTE . from implish to PL/0, retro pascal, wejal, and beyond.</h2>
+<div class="outline-text-2" id="text-22">
+
+<p>
+So now I have implish but I need to figure out how to get there from here. Implish will probably change considerably as I go along. What will remain constant is pascal.
+</p>
+
+<p>
+I think my goal should be to support PL/0, then oberon-07, then oberon and oberon-2 so I can start to incorporate the oberon codebase.
+</p>
+
+<p>
+I also need the presentation layer. In fact, that's probably more important than anything else, but I needed a language to write my stuff in.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-23" class="outline-2">
+<h2 id="sec-23"><a id="gqbj0v30n8g0" name="gqbj0v30n8g0"></a><span class="section-number-2">23</span> NOTE . impworld</h2>
+<div class="outline-text-2" id="text-23">
+<p>
+So: I dug up that RETP.PAS prototype I made a few months back in turbo pascal. It's got concurrency (via multiple MachineObj instances), shows fun stuff on the screen, and as of today is working under free pascal.
+</p>
+
+<p>
+I'm calling it 'impworld'.
+</p>
+
+<p>
+My goal now is to integrate the thing with implish, because I want to use the little stack machines as a base class for parser objects. Not the little grammar combinators, but the actual parser.
+</p>
+
+<p>
+My next step is to figure out how best to reconcile this with the main implish codebase.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-24" class="outline-2">
+<h2 id="sec-24"><span class="section-number-2">24</span> <code>[0/3]</code> So what actually needs reconciling?</h2>
+<div class="outline-text-2" id="text-24">
+</div><div id="outline-container-sec-24-1" class="outline-3">
+<h3 id="sec-24-1"><span class="section-number-3">24.1</span> <span class="todo TODO">TODO</span> read from event-driven prompt</h3>
+<div class="outline-text-3" id="text-24-1">
+<p>
+First, right now, the implish interpreter is reading directly from stdin, but what it <i>should</i> do is read from an event-driven shell prompt. Probably not actually the one in impworld, since I have a much nicer editor in my ui module (or linenoise if it turns out i haven't integrated it yet.)
+</p>
+</div>
+</div>
+<div id="outline-container-sec-24-2" class="outline-3">
+<h3 id="sec-24-2"><span class="section-number-3">24.2</span> <span class="todo TODO">TODO</span> expose worker objects</h3>
+<div class="outline-text-3" id="text-24-2">
+<p>
+Second, I need to figure out how to expose these objects to the implish system. I'm thinking there's probably just going to be an interface or set of interfaces you can implement to expose objects or routines to the interpreter. It might also make sense to do something with free pascal's 'message' methods, too.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-24-3" class="outline-3">
+<h3 id="sec-24-3"><span class="section-number-3">24.3</span> <span class="todo TODO">TODO</span> compile a grammar</h3>
+<div class="outline-text-3" id="text-24-3">
+<p>
+Once I can create worker/agent/machine objects and stick them in cons cells, the next step is to actually compile a grammar.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-25" class="outline-2">
+<h2 id="sec-25"><a id="67mf4970n8g0" name="67mf4970n8g0"></a><span class="section-number-2">25</span> NOTE . imperative/command syntax</h2>
+<div class="outline-text-2" id="text-25">
+
+<p>
+I think basically what I want is a forth system, but not quite so free-form. There should be clear end delimiters, for example. So probably more like Joy or smalltalk blocks, syntactically. This would be the nested stack language part of implish.
+</p>
+
+<p>
+Here is smalltalk block syntax:
+</p>
+
+<pre class="example">
+[ :a :b | a + b ]
+</pre>
+
+<p>
+I like that. So how about mixing it with forth?
+</p>
+
+<p>
+I think it makes sense to use [: &#x2026;] though, and an actual type signature:
+</p>
+
+<pre class="example">
+: add [: int int -&gt; int ; \+ ]
+</pre>
+
+<p>
+Here, the \+ is just my made up notation for a postfix binary addition operator, since I still want infix notation overall.
+</p>
+
+<p>
+You could name the things if you want, but you don't have to:
+</p>
+
+<pre class="example">
+: add [: a:int b:int -&gt; int ; a b \+ ]
+</pre>
+
+<p>
+The minimal definition would look like this:
+</p>
+
+<pre class="example">
+: add [ \+ ]
+</pre>
+
+<p>
+So now to use it, you could say:
+</p>
+
+<pre class="example">
+[ 1 2 add ]
+</pre>
+
+<p>
+And this would evaluate to 3.
+</p>
+
+<p>
+So the grammar here (in antlr syntax) is:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-antlr"><span style="color: #ffffff; font-weight: bold;">def</span> <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">":"</span> <span style="color: #ff00ff;">iden</span> <span style="color: #00ff00;">'['</span> <span style="color: #ff00ff;">sig</span>?  <span style="color: #ff00ff;">expr</span>* <span style="color: #00ff00;">']'</span> <span style="color: #00ffff;">;</span>
+<span style="color: #ffffff; font-weight: bold;">sig</span> <span style="color: #00ffff;">:</span> <span style="color: #00ffff;">(</span><span style="color: #00ff00;">':'</span> <span style="color: #00ffff;">((</span><span style="color: #ff00ff;">iden</span> <span style="color: #00ff00;">':'</span><span style="color: #00ffff;">)?</span> <span style="color: #ff00ff;">type</span> <span style="color: #00ffff;">)*</span> <span style="color: #00ff00;">'-&gt;'</span> <span style="color: #ff00ff;">type</span>* <span style="color: #00ff00;">';'</span><span style="color: #00ffff;">)</span> <span style="color: #00ffff;">;</span>
+</pre>
+</div>
+
+<p>
+I was going to use '|' for the separator but I kind of don't want to, because '|' kind of makes sense as 'or' in a type declaration.
+</p>
+
+<p>
+Although I suppose I could use the word 'or', or the symbol, or use a sort of set-like notation, where the | appears inside { &#x2026; }.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-26" class="outline-2">
+<h2 id="sec-26"><a id="t0vhvv70n8g0" name="t0vhvv70n8g0"></a><span class="section-number-2">26</span> NOTE . The role of parentheses in implish.</h2>
+<div class="outline-text-2" id="text-26">
+
+<p>
+Basically, I think parens are grouping constructs, just as in smalltalk, but <i>quoted</i> parens can be used for abstract syntax trees.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-27" class="outline-2">
+<h2 id="sec-27"><a id="igy1l320o8g0" name="igy1l320o8g0"></a><span class="section-number-2">27</span> NOTE . squeak keyword message chains (impossible without parens)</h2>
+<div class="outline-text-2" id="text-27">
+
+<p>
+00:30:27 tangentstorm hey all. if I have a method b: in Class A that returns a ClassB instance. and b has a b: method, is there a way to write  (ClassA
+                      a:x) b:y   without the parens?
+00:36:12 tangentstorm okay.. nm.. the answer is no. ;)
+00:36:14 tangentstorm <a href="http://blog.3plus4.org/2007/08/30/message-chains/">http://blog.3plus4.org/2007/08/30/message-chains/</a>
+</p>
+</div>
+</div>
+<div id="outline-container-sec-28" class="outline-2">
+<h2 id="sec-28"><a id="c6wgn220o8g0" name="c6wgn220o8g0"></a><span class="section-number-2">28</span> NOTE . more notes on precedence</h2>
+<div class="outline-text-2" id="text-28">
+
+<p>
+02:24:57 tangentstorm since smalltalk can't chain those keyword messages, i actually don't know of any language that does precedence rules like how i'm
+                      picturing implish.
+02:25:22 tangentstorm this kind of surprises me.
+02:26:10 darkf are you doing x ((a: 1) (b: 2)) or (x (a: 1)) (b: 2) ?
+02:26:40 tangentstorm neither.
+02:26:49 tangentstorm the x is just there because smalltalk requires it.
+02:26:59 darkf okay
+02:27:07 darkf so you are passing it in implicitly or concatenatively or something
+02:27:21 tangentstorm what i want to do is:     imp&gt; repeat: whatever until: whatever .
+02:27:43 tangentstorm but have that be nestable.
+02:29:13 tangentstorm i'm thinking maybe  repeat: [ x := 0 repeat: x := x + 1 * 2 until: x &gt; 10 ] until: false
+02:29:53 tangentstorm it might need another [ ] inside. not sure yet.
+02:33:16 tangentstorm i think messages would be like:    x .a: 1 b: 2   for   (send x .a:b: (1 2))
+02:34:10 tangentstorm but if you had an  .a: message that returned another object and you wanted to send that the message  .b: &#x2026;
+02:34:30 tangentstorm then it would be   x .a: 1 .b: 2
+02:34:49 tangentstorm for  (send (send x .a: (1)) .b (2))
+02:36:51 tangentstorm i'm not sure. the general idea is that, as much as possible, i want you to be able to modify the thing to the left of your cursor
+                      only by appending.
+02:37:19 tangentstorm so like an infix concatenative language.
+02:38:29 tangentstorm hrm. except i'm perfectly okay with unary prefix operators
+02:39:18 tangentstorm maybe i shouldn't be&#x2026;
+02:39:34  * tangentstorm thinks
+02:40:41 tangentstorm it's easy to distinguish prefix uses from infix uses unambiguously.
+02:41:39 tangentstorm allowing both infix and suffix would leave your parser in an ambiguous state though
+02:42:09 tangentstorm like if ! meant both mod and factorial, then   x ! means one thing, and then adding  'y' after it changes the meaning completely.
+02:42:37 tangentstorm whereas  !x   and  x!y   are  easy to distinguish.
+02:43:01 tangentstorm even 1 + !x   vs   1 + x ! y
+02:44:43 tangentstorm but i would like a syntactic sugar that allows turning the prefix into a suffix i guess.
+02:45:31 tangentstorm possibly   x y &#x00ad;  -&gt;  x-y   and   x y \&#x00ad; -&gt; x _y
+02:47:23 tangentstorm maybe that's just dumb. i don't know. back to work ;)
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-29" class="outline-2">
+<h2 id="sec-29"><a id="cdy23620o8g0" name="cdy23620o8g0"></a><span class="section-number-2">29</span> NOTE . breaking j precedence</h2>
+<div class="outline-text-2" id="text-29">
+
+<p>
+00:41:03 tangentstorm what would break in j/apl/etc if expressions were evaluated left to right instead of right to left?
+00:41:18 tangentstorm (besides legacy code, obviously)
+01:51:24 fftw ) ;: '1:(] * &lt;:)@.* 5'
+01:51:24 jconn fftw: <del>--</del>-+-+-+-+&#x2013;+-+&#x2013;+-+-+
+01:51:24 jconn fftw: |1:||(|]|*|&lt;:|)|@.|*|5|
+01:51:24 jconn fftw: <del>--</del>-+-+-+-+&#x2013;+-+&#x2013;+-+-+
+01:51:31 fftw ) |. ;: '1:(] * &lt;:)@.* 5'
+01:51:32 jconn fftw: <del>-</del>-+&#x2013;+-+&#x2013;+-+-+-+-+&#x2013;+
+01:51:32 jconn fftw: |5|*|@.|)|&lt;:|*|]|(||1:|
+01:51:32 jconn fftw: <del>-</del>-+&#x2013;+-+&#x2013;+-+-+-+-+&#x2013;+
+01:51:38 fftw ) &gt; |. ;: '1:(] * &lt;:)@.* 5'
+01:51:38 jconn fftw: 5
+01:51:38 jconn fftw: *
+01:51:38 jconn fftw: @.
+01:51:38 jconn fftw: )
+01:51:38 jconn fftw: &lt;:
+01:51:38 jconn fftw: &#x2026;
+01:51:41 fftw ) , |. ;: '1:(] * &lt;:)@.* 5'
+01:51:41 jconn fftw: <del>-</del>-+&#x2013;+-+&#x2013;+-+-+-+-+&#x2013;+
+01:51:42 jconn fftw: |5|*|@.|)|&lt;:|*|]|(||1:|
+01:51:42 jconn fftw: <del>-</del>-+&#x2013;+-+&#x2013;+-+-+-+-+&#x2013;+
+01:51:59 fftw tangentstorm: nah, I don't like how it looks
+01:53:08 fftw )  ; |. ;: '1:(] * &lt;:)@.* 5'
+01:53:09 jconn fftw: 5*@.)&lt;:*](1:
+01:54:01 tangentstorm gonna take me a while to parse that :)
+01:55:22  * tangentstorm has no idea what he's looking at :(
+01:57:02 fftw so perhaps reversing the parsing order is not that good idea (although I've didn't parsed it from right to left, rather parsed it and
+              then reversed)
+01:57:58 tangentstorm the thing is i'm a mere mortal that wouldn't know how to write the code in the first place
+01:58:46 tangentstorm i mostly use j for a calculator and to produce sequences of things. i had a start on making tetris at one point.
+01:58:59 tangentstorm <a href="https://github.com/tangentstorm/tangentlabs/blob/master/j/tetris.ijs">https://github.com/tangentstorm/tangentlabs/blob/master/j/tetris.ijs</a>
+01:59:23 tangentstorm but that was a while ago and looking at it now i have no idea what it means :)
+02:00:41 tangentstorm it looks ilke   ;: is tokenizing the quoted code?
+02:00:59 tangentstorm ) ;: +/1 2 3 * 2
+02:00:59 jconn tangentstorm: |domain error
+02:00:59 jconn tangentstorm: |       ;:+/1 2 3*2
+02:01:05 tangentstorm ) ;: '<del>/1 2 3 * 2'
+02:01:06 jconn tangentstorm: +-</del>-+&#x2013;&#x2014;+-+-+
+02:01:06 jconn tangentstorm: |+|/|1 2 3|*|2|
+02:01:06 jconn tangentstorm: <del>-</del>-+&#x2013;&#x2014;+-+-+
+02:01:10 tangentstorm ok
+02:02:17 fftw tangentstorm: I believe the order of evaluation is not the most strange thing in J for mere mortal.
+02:02:24 tangentstorm ) ; |. ;: '<del><i>1 2 3 * 2'
+02:02:25 jconn tangentstorm: 2*1 2 3</i></del>
+02:02:29 fftw Perhaps it's a last hard thing to think of
+02:19:23 tangentstorm ) %2*i.10
+02:19:23 jconn tangentstorm: _ 0.5 0.25 0.166667 0.125 0.1 0.0833333 0.0714286 0.0625 0.0555556
+02:19:38 tangentstorm ) (%2)*i.10
+02:19:39 jconn tangentstorm: 0 0.5 1 1.5 2 2.5 3 3.5 4 4.5
+02:19:47 tangentstorm ) (i.10) % 2
+02:19:48 jconn tangentstorm: 0 0.5 1 1.5 2 2.5 3 3.5 4 4.5
+02:19:55 tangentstorm is there abetter way to write that?
+02:20:17 tangentstorm ) 0.5*i.10
+02:20:17 jconn tangentstorm: 0 0.5 1 1.5 2 2.5 3 3.5 4 4.5
+02:20:21 tangentstorm :/
+02:50:31 fftw ) *: 3 4 5
+02:50:31 jconn fftw: 9 16 25
+02:50:36 fftw ) -: 3 4 5
+02:50:36 jconn fftw: 1.5 2 2.5
+02:50:46 fftw ) -: i.10
+02:50:46 jconn fftw: 0 0.5 1 1.5 2 2.5 3 3.5 4 4.5
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-30" class="outline-2">
+<h2 id="sec-30"><a id="lsn6ql90o8g0" name="lsn6ql90o8g0"></a><span class="section-number-2">30</span> NOTE . bootstrap process</h2>
+<div class="outline-text-2" id="text-30">
+<p>
+04:59:03  * tangentstorm needs some advice/feedback.
+05:00:55 darkf on what?
+05:01:13 tangentstorm at the core of my current interpreter for implish, i have:   repeat print(eval(readnext(val))) until val.kind = err.;
+05:01:22 tangentstorm <a href="https://github.com/tangentstorm/implish/blob/master/imp.pas#L1235">https://github.com/tangentstorm/implish/blob/master/imp.pas#L1235</a>
+05:02:08 tangentstorm so when readnext() needs more input, it calls the prompt routine.
+05:02:48 tangentstorm and the prompt is a loop that's polling for keypresses and whatnot.
+05:03:39 darkf ok
+05:04:01 tangentstorm everything's great as long as what i'm doing is a single thread of execution.
+05:05:30 tangentstorm but what i would like is to be able to write things that are more or less long running processes.
+05:05:38 tangentstorm at the prompt.
+05:05:42 tangentstorm so spawn a thread, basically.
+05:07:07 tangentstorm the threads can be running just fine inside the prompt loop.
+05:08:07 tangentstorm because i can just say:  repeat prompt.step; for worker in workers do worker.step until prompt.done;
+05:08:42 tangentstorm you get what i'm saying? there's no inversion of control here.
+05:09:25 tangentstorm parsing is very fast because it's only going to process one line at a time before it calls the prompt again.
+05:09:44 tangentstorm but the eval() step could take any amount of time.
+05:10:05 darkf and your interpreter is single threaded?
+05:10:42 tangentstorm yeah, it is now. so now i'm trying to decide between adding a second thread or whatever.
+05:10:51 darkf ah
+05:11:06 tangentstorm like the way python deals with it is to
+05:11:15 tangentstorm just block the prompt.
+05:12:23 tangentstorm so like if you type  import wx; app = wx.App(); win = wx.Frame(); app.MainLoop() or whatever, then the python prompt is dead to
+                      you until the app finishes.
+05:12:37 darkf right
+05:12:51 darkf but you'd like to have threads going on
+05:13:02 darkf backgrounded, while still having your REPL
+05:13:07 tangentstorm whereas in smalltalk you have the whole event driven system in place before you even see the prompt.
+05:13:39 tangentstorm yeah, or same thing if you run pycrust or whatever and have the prompt running inside wxpython already.
+05:14:04 darkf without some way to suspend execution (coroutines or VM) i think you have to have a second thread
+05:15:14 tangentstorm yeah, so i'm trying to choose between those now.
+05:15:27 darkf depends on your goal I guess
+</p>
+
+
+<p>
+05:24:07 tangentstorm i think maybe what i will do here is replace eval() with a worker that does the evaluation.
+05:24:57 tangentstorm then when i get my grammar combinators working, the parser will run on a worker too
+05:26:26 tangentstorm the prompt can already run as a worker, so if i do that, the event loop can just be the outermost thing.
+05:28:43 tangentstorm that's kind of cool then&#x2026; i will make my current parser a conditional include.
+05:30:07 tangentstorm so phase 1 uses the bootstrap parser to generate a bottom up parser, then we recompile using the generated code.
+05:30:15  * tangentstorm likes it.
+</p>
+
+<p>
+05:31:05 tangentstorm hrm. or even just a top down parser running on a vm. that's probably simpler for now.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-31" class="outline-2">
+<h2 id="sec-31"><a id="uwghhag0p8g0" name="uwghhag0p8g0"></a><span class="section-number-2">31</span> LINK . <a href="../imp/hellopas.html">hello pascal spike</a></h2>
+<div class="outline-text-2" id="text-31">
+</div>
+</div>
+
+<div id="outline-container-sec-32" class="outline-2">
+<h2 id="sec-32"><span class="section-number-2">32</span> end</h2>
 </div>
 </div>
 </body>
