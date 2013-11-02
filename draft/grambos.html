@@ -3,8 +3,8 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title>index</title>
-<!-- 2013-11-01 Fri 04:08 -->
+<title>grammar combinators</title>
+<!-- 2013-09-25 Wed 17:01 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -58,23 +58,71 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">index</h1>
+<h1 class="title">grammar combinators</h1>
 <p>
-misc j articles
+the basic concepts are:
 </p>
 
 <ul class="org-ul">
-<li><a href="verbarrays.html">verbarrays.html</a>
+<li>each operation is a function that both takes and returns a vorunati marker, which is the new parse state.
 </li>
-<li><a href="strip-ws.html">strip-ws.html</a>
+<li><i>vo</i> indicates an unfinished computation. it allows a function to resume paused work.
 </li>
-<li><a href="rpn-in-j.html">rpn-in-j.html</a>
+<li><i>ru</i> is never sent to the functions. it indicates that the system is waiting for more input.
 </li>
-<li><a href="upcase-saga-1.html">upcase-saga-1.html</a>
+<li><i>ti</i> indicates that the input so far has been matched, and the procedure should try to match too.
 </li>
-<li><a href="perfect-numbers.html">perfect-numbers.html</a>
+<li><i>na</i> indicates that the parser is bactracking, and the procedure should undo any side effects it performed in the <i>ti</i> step (if possible).
 </li>
 </ul>
+
+<p>
+The vorunati symbols are used in two separate ways in implish: to describe the state of a worker process, and to describe the current state of a parse attempt. Therefore, a parser process has two separate vorunati values: one to describethe parse attempt (where ti indicates forward matching and na indicates backtracking) and one to indicate the state of the process as a whole (where ti indicates the parser has finished (sucessfully or with error conditions), and na indicates an internal error).
+</p>
+
+<ul class="org-ul">
+<li>and -&gt;
+</li>
+<li>alt -&gt;
+</li>
+<li>fetch next input token
+</li>
+<li>input token matches literal symbol?
+</li>
+<li>input token in set of symbols?
+</li>
+<li>logically negate tos
+</li>
+<li>push input pointer
+</li>
+<li>pop input pointer (backtrack)
+</li>
+<li>gosub
+</li>
+<li>return
+</li>
+<li>new tag
+</li>
+<li>end tag
+</li>
+
+<li>token matchers
+</li>
+</ul>
+
+<p>
+function lit.ti( c : char ) : vor;
+  begin
+    if self.ch = c then result := na
+  end;
+</p>
+
+<p>
+function lit.na( c : char ) : vor;
+  begin
+    if self.ch = c then result := na
+  end;
+</p>
 </div>
 </body>
 </html>

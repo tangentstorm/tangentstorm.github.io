@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>metarp.ml</title>
+<!-- 2013-11-01 Fri 04:08 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">metarp.ml</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. goal #1 : compile 'hello world'</a></li>
+<li><a href="#sec-2">2. plan of attack : spike solution</a></li>
+<li><a href="#sec-3">3. a simple tree type</a></li>
+<li><a href="#sec-4">4. a variant type</a></li>
+</ul>
+</div>
+</div>
+<p>
+#+title meta retro pascal
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><a id="7tn4ghc1s9g0" name="7tn4ghc1s9g0"></a><span class="section-number-2">1</span> goal #1 : compile 'hello world'</h2>
+<div class="outline-text-2" id="text-1">
+
+<p>
+our goal is to implement a complete compiler for (at least) the following retro pascal program:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">program</span> <span style="color: #ffffff; font-weight: bold;">hello</span>;
+<span style="color: #ff00ff;">var</span> s : <span style="color: #ff00ff;">string</span>;
+<span style="color: #00ffff;">begin</span>
+  writeln(<span style="color: #00ff00;">'hello world'</span>);
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><a id="1ui74jc1s9g0" name="1ui74jc1s9g0"></a><span class="section-number-2">2</span> plan of attack : spike solution</h2>
+<div class="outline-text-2" id="text-2">
+
+<ul class="org-ul">
+<li><b>self hosting</b> - everything we do gets translated to b4
+<ul class="org-ul">
+<li><i>so keep every step simple</i>
+</li>
+</ul>
+</li>
+
+<li>pipeline:
+<ul class="org-ul">
+<li>a pascal grammar, implemented with grammar combinators
+<ul class="org-ul">
+<li>grammar interpreter (incremental top-down recursive descent)
+<ul class="org-ul">
+<li>algebraic type for structured imperative programming
+<ul class="org-ul">
+<li>singly-typed intermediate language (basically pl/0)
+</li>
+</ul>
+</li>
+<li>algebraic type for ALU + stack-based expressions
+<ul class="org-ul">
+<li>opcode interpreter in sml for testing/prototyping
+</li>
+<li>output to string for assembly by pascal program
+</li>
+</ul>
+</li>
+<li>imperative tree building routines (using tree + cursor)
+<ul class="org-ul">
+<li>the tree builder is implemented in the b4 language
+</li>
+</ul>
+</li>
+<li>algebraic type for grammars (using the vm language)
+</li>
+<li>parser routine for each combinator, compiled down to b4
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>transformation rules for the pascal grammar
+</li>
+<li>code generator for the transformed tree
+<ul class="org-ul">
+<li>templates
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><a id="fdk8tya1s9g0" name="fdk8tya1s9g0"></a><span class="section-number-2">3</span> a simple tree type</h2>
+<div class="outline-text-2" id="text-3">
+
+<div class="org-src-container">
+
+<pre class="src src-sml"><span style="color: #00ffff;">datatype</span> 'a <span style="font-weight: bold;">tree</span> = T <span style="color: #00ffff;">of</span> 'a * 'a tree list ;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><a id="7bgdvib1s9g0" name="7bgdvib1s9g0"></a><span class="section-number-2">4</span> a variant type</h2>
+<div class="outline-text-2" id="text-4">
+
+<p>
+Basically, i'm going to ignore the standard ml type system so we can implement our own.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sml"><span style="color: #00ffff;">type</span> <span style="font-weight: bold;">kind</span> = int ;
+<span style="color: #00ffff;">datatype</span> <span style="font-weight: bold;">variant</span>
+   = N                              <span style="color: #66f;">(* </span><span style="color: #66f;">null type </span><span style="color: #66f;">*)</span>
+   | K  <span style="color: #00ffff;">of</span> kind tree                <span style="color: #66f;">(* </span><span style="color: #66f;">type definitions </span><span style="color: #66f;">*)</span>
+   | V  <span style="color: #00ffff;">of</span> kind * int               <span style="color: #66f;">(* </span><span style="color: #66f;">value </span><span style="color: #66f;">*)</span>
+   | R  <span style="color: #00ffff;">of</span> kind * int               <span style="color: #66f;">(* </span><span style="color: #66f;">references </span><span style="color: #66f;">*)</span>
+   | A  <span style="color: #00ffff;">of</span> kind * variant array     <span style="color: #66f;">(* </span><span style="color: #66f;">array </span><span style="color: #66f;">*)</span>
+   | F0 <span style="color: #00ffff;">of</span> kind * variant tree      <span style="color: #66f;">(* </span><span style="color: #66f;">function with 0 args </span><span style="color: #66f;">*)</span>
+   | F1 <span style="color: #00ffff;">of</span> kind * variant tree * kind         <span style="color: #66f;">(* </span><span style="color: #66f;">... 1 arg  </span><span style="color: #66f;">*)</span>
+   | F2 <span style="color: #00ffff;">of</span> kind * variant tree * kind * kind  <span style="color: #66f;">(* </span><span style="color: #66f;">... 2 args </span><span style="color: #66f;">*)</span>
+   ;
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

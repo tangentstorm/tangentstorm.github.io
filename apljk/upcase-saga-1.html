@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>The UpCase Saga: How I Learn New Programming Languages</title>
-<!-- 2013-10-16 Wed 13:03 -->
+<!-- 2013-11-01 Fri 04:08 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -245,8 +245,8 @@ If I'd had to write <code>upcase</code> myself, though, it probably would have l
 
 <pre class="src src-pascal"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">upcase</span>( ch : <span style="color: #ff00ff;">char</span> ) : <span style="color: #ff00ff;">char</span>;
   <span style="color: #00ffff;">begin</span>
-    <span style="color: #00ffff;">if</span> ch <span style="color: #00ffff;">in</span> [<span style="color: #00ff00;">'a'</span>..<span style="color: #00ff00;">'z'</span>] <span style="color: #00ffff;">then</span> 
-      upcase := ord(ch) + (ord(<span style="color: #00ff00;">'A'</span>) - chr(<span style="color: #00ff00;">'a'</span>)) 
+    <span style="color: #00ffff;">if</span> ch <span style="color: #00ffff;">in</span> [<span style="color: #00ff00;">'a'</span>..<span style="color: #00ff00;">'z'</span>] <span style="color: #00ffff;">then</span>
+      upcase := ord(ch) + (ord(<span style="color: #00ff00;">'A'</span>) - chr(<span style="color: #00ff00;">'a'</span>))
     <span style="color: #00ffff;">else</span>
       upcase := ch;   <span style="color: #66f;">{ </span><span style="color: #66f;">Or in moden-day pascal, 'result := ...' </span><span style="color: #66f;">}</span>
   <span style="color: #00ffff;">end</span>;
@@ -286,7 +286,7 @@ You don't have to memorize every word, or even read it all at once. Just know wh
 </p>
 
 <p>
-With J, I often start with the <a href="http://www.jsoftware.com/help/dictionary/vocabul.htm">vocabulary page</a>, because it lists all the symbols and their names. <sup><a id="fnr.5" name="fnr.5" class="footref" href="#fn.5">5</a></sup> 
+With J, I often start with the <a href="http://www.jsoftware.com/help/dictionary/vocabul.htm">vocabulary page</a>, because it lists all the symbols and their names. <sup><a id="fnr.5" name="fnr.5" class="footref" href="#fn.5">5</a></sup>
 </p>
 
 <p>
@@ -300,7 +300,7 @@ I typed it in the J terminal, and saw a bunch of garbage:
 <div class="org-src-container">
 
 <pre class="src src-j">   a.    NB. output manually edited to reove many non-ascii characters
-\001\002\003\004\005\006\007\010        
+\001\002\003\004\005\006\007\010
 \013\014  ... \037!"#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?@ABCDEFGHIJKLMNO
 PQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~....
 </pre>
@@ -342,7 +342,7 @@ I actually understand enough J that I should have known what this was doing:
 <ul class="org-ul">
 <li>Dyadic <code>x $ y</code> (<a href="http://www.jsoftware.com/help/dictionary/d210.htm">Shape</a>) reshapes array <code>y</code> to the dimensions specified by <code>x</code>.
 </li>
-<li>Dyadic <code>x { y</code> (<a href="http://www.jsoftware.com/help/dictionary/d520.htm">From</a>) extracts the elements specified in <code>x</code> from array <code>y</code>. 
+<li>Dyadic <code>x { y</code> (<a href="http://www.jsoftware.com/help/dictionary/d520.htm">From</a>) extracts the elements specified in <code>x</code> from array <code>y</code>.
 </li>
 </ul>
 
@@ -408,11 +408,11 @@ The docs explain <i>what</i> it's doing (sort of), but not <i>why</i>:
 </div>
 
 <p>
-If <code>rix</code> is the rank of an item of <code>x</code>, then the shape of the result of <code>x i. y</code> is <code>(-rix)}.$y</code> . Each atom of the result is either <code>#x</code> or the index of the first occurrence among the items of x of the corresponding <code>rix</code>-cell of <code>y</code>. 
+If <code>rix</code> is the rank of an item of <code>x</code>, then the shape of the result of <code>x i. y</code> is <code>(-rix)}.$y</code> . Each atom of the result is either <code>#x</code> or the index of the first occurrence among the items of x of the corresponding <code>rix</code>-cell of <code>y</code>.
 </p>
 
 <p>
-The comparison in <code>x i. y</code> is tolerant, and fit can be used to specify the tolerance, as in <code>i. !. t</code> . 
+The comparison in <code>x i. y</code> is tolerant, and fit can be used to specify the tolerance, as in <code>i. !. t</code> .
 </p>
 </blockquote>
 
@@ -497,7 +497,7 @@ I kept missing it because <code>#</code> is named <a href="http://www.jsoftware.
 </div>
 
 <p>
-If the arguments have an equal number of items, then <code>x#y</code> copies <code>+/x</code> items from <code>y</code>, with <code>i{x</code> repetitions of item <code>i{y</code> . Otherwise, if one is an atom it is repeated to make the item count of the arguments equal. 
+If the arguments have an equal number of items, then <code>x#y</code> copies <code>+/x</code> items from <code>y</code>, with <code>i{x</code> repetitions of item <code>i{y</code> . Otherwise, if one is an atom it is repeated to make the item count of the arguments equal.
 </p>
 
 <p>
@@ -538,7 +538,7 @@ So why on earth is <i>Select</i> called <i>Copy</i>?
 </p>
 
 <p>
-Well of course, it <i>isn't</i>. What I thought of s <i>Select</i> is just <i>From</i> in J, and it's just the <code>{</code> symbol that keeps showing up: 
+Well of course, it <i>isn't</i>. What I thought of s <i>Select</i> is just <i>From</i> in J, and it's just the <code>{</code> symbol that keeps showing up:
 </p>
 
 <div class="org-src-container">
@@ -579,7 +579,7 @@ But why on earth is it called <i>Copy</i>?!?
 
 <div class="org-src-container">
 
-<pre class="src src-j">   0 1 2 3 # 'abcd' 
+<pre class="src src-j">   0 1 2 3 # 'abcd'
 bccddd
 </pre>
 </div>
@@ -691,7 +691,7 @@ Next I <i>tried some other stuff</i> and <i>some stuff happened</i>.
 
 <pre class="src src-j">   'apples'i.a       NB. I forgot the . in a. but failed to notice
 'apples' i. a        NB. J is giving me back a symbolic expression,
-                     NB. presumably because 'a' is not defined. 
+                     NB. presumably because 'a' is not defined.
                      NB. I wonder if maybe '' is for characters and
                      NB. '"' is for strings, so try:
 
@@ -702,11 +702,11 @@ Next I <i>tried some other stuff</i> and <i>some stuff happened</i>.
    'apples'i.a       NB. The J terminal makes it easy to duplicate input.
 'apples' i. a        NB. I cursored up and pressed enter to duplicate the
                      NB. line, and probably just automatically ran it to
-                     NB. make sure it acted the same, in case I had 
+                     NB. make sure it acted the same, in case I had
                      NB. accidentally changed the history.
 
    'apples'i./a      NB. / inserts a function between each element of a
-'apples' i./ a       NB. an array (so +/1 2 3 -&gt; 1+2+3). I have no idea 
+'apples' i./ a       NB. an array (so +/1 2 3 -&gt; 1+2+3). I have no idea
                      NB. what I was thinking about here that would have
    'apples'i.~/a     NB. caused me to type it.
 'apples' i.~/ a
@@ -735,7 +735,7 @@ Eventually, my brain caught up to my fingers, I noticed the missing period in <c
 
 <div class="org-src-container">
 
-<pre class="src src-j">  'apples' i.a.      
+<pre class="src src-j">  'apples' i.a.
 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6
 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6
 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 0 6 6 6 4 6 6 6 6 6 6 3 6 6 6 1 6
@@ -744,7 +744,7 @@ Eventually, my brain caught up to my fingers, I noticed the missing period in <c
 </div>
 
 <p>
-This result is also completely unexpected to me. 
+This result is also completely unexpected to me.
 </p>
 
 <p>
@@ -759,11 +759,11 @@ Once again, here is the description of dyadic <code>i.</code> (<i>Index Of</i>):
 </div>
 
 <p>
-If <code>rix</code> is the rank of an item of <code>x</code>, then the shape of the result of <code>x i. y</code> is <code>(-rix)}.$y</code> . Each atom of the result is either <code>#x</code> or the index of the first occurrence among the items of x of the corresponding <code>rix</code>-cell of <code>y</code>. 
+If <code>rix</code> is the rank of an item of <code>x</code>, then the shape of the result of <code>x i. y</code> is <code>(-rix)}.$y</code> . Each atom of the result is either <code>#x</code> or the index of the first occurrence among the items of x of the corresponding <code>rix</code>-cell of <code>y</code>.
 </p>
 
 <p>
-The comparison in <code>x i. y</code> is tolerant, and fit can be used to specify the tolerance, as in <code>i. !. t</code> . 
+The comparison in <code>x i. y</code> is tolerant, and fit can be used to specify the tolerance, as in <code>i. !. t</code> .
 </p>
 </blockquote>
 
@@ -809,7 +809,7 @@ And in fact, that is exactly the definition I eventually came up with for <code>
 
 <pre class="src src-j">ord =. a. &amp; i.    NB. The '&amp;' is an operator that transforms dyadic i. into
                   NB. a new verb (which I assigned to the variable 'ord')
-                  NB. Now: (ord x) = ((a.&amp;i.) x) = (a. i. x)  
+                  NB. Now: (ord x) = ((a.&amp;i.) x) = (a. i. x)
                   NB. This transformation is called "partial application".
 
    ord 'apples'
@@ -872,7 +872,7 @@ Looking back now, I wonder if the <a href="http://www.jsoftware.com/help/phrases
 </p></div>
 
 <div class="footdef"><sup><a id="fn.6" name="fn.6" class="footnum" href="#fnr.6">6</a></sup> <p class="footpara">
-Over and over in J, I find that the verb I want is just a specific instance of some more general operation. I introduced <code>+.</code> earlier as <i>greatest common divisor</i>, but it's also the logical <i>OR</i> operator. This might seem like some crazy operator overloading, but that's not the case: logical <i>OR</i> just happens to be a special case of <i>GCD</i>. 
+Over and over in J, I find that the verb I want is just a specific instance of some more general operation. I introduced <code>+.</code> earlier as <i>greatest common divisor</i>, but it's also the logical <i>OR</i> operator. This might seem like some crazy operator overloading, but that's not the case: logical <i>OR</i> just happens to be a special case of <i>GCD</i>.
 </p></div>
 
 

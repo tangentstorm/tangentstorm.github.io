@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>b+ trees</title>
-<!-- 2013-06-12 Wed 05:58 -->
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-<meta name="generator" content="Org-mode"/>
-<meta name="author" content="michal j wallace"/>
+<!-- 2013-10-19 Sat 04:33 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal j wallace" />
 <link rel="stylesheet" type="text/css" href="/etc/style.css">
 
 <script type="text/javascript" src="http://orgmode.org/org-info.js">
@@ -327,7 +328,7 @@ for the JavaScript code in this tag.
 </div>
 </div>
 <div id="outline-container-sec-3" class="outline-2">
-<h2 id="sec-3"><span class="section-number-2">3</span> Implementation (roughly following <a href="http://en.wikipedia.org/wiki/B+_tree">wikipedia: B+ Trees</a>)</h2>
+<h2 id="sec-3"><span class="section-number-2">3</span> Implementation (roughly following <a href="http://en.wikipedia.org/wiki/B%2B_tree">wikipedia: B+ Trees</a>)</h2>
 <div class="outline-text-2" id="text-3">
 </div><div id="outline-container-sec-3-1" class="outline-3">
 <h3 id="sec-3-1"><span class="section-number-3">3.1</span> <span class="todo TODO">TODO</span> <code>[6/8]</code> Node class</h3>
@@ -364,7 +365,7 @@ for the JavaScript code in this tag.
 <div id="outline-container-sec-3-1-2" class="outline-4">
 <h4 id="sec-3-1-2"><span class="section-number-4">3.1.2</span> <span class="done DONE">DONE</span> <code>[1/1]</code> location</h4>
 <div class="outline-text-4" id="text-3-1-2">
-</div><ol class="org-ol"><li><span class="done DONE">DONE</span> TNode.locate<br/><div class="outline-text-5" id="text-3-1-2-1">
+</div><ol class="org-ol"><li><span class="done DONE">DONE</span> TNode.locate<br  /><div class="outline-text-5" id="text-3-1-2-1">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="imp"><span style="color: #66f;">{ </span><span style="color: #66f;">Find first child key less the new key. It is important that</span>
@@ -416,7 +417,7 @@ for the JavaScript code in this tag.
 <div id="outline-container-sec-3-1-3" class="outline-4">
 <h4 id="sec-3-1-3"><span class="section-number-4">3.1.3</span> <span class="done DONE">DONE</span> <code>[9/9]</code> insertion</h4>
 <div class="outline-text-4" id="text-3-1-3">
-</div><ol class="org-ol"><li><span class="done DONE">DONE</span> TNode.put<br/><div class="outline-text-5" id="text-3-1-3-1">
+</div><ol class="org-ol"><li><span class="done DONE">DONE</span> TNode.put<br  /><div class="outline-text-5" id="text-3-1-3-1">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="imp"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TNode.put</span>( key : TKey; val : TVal );
@@ -432,7 +433,7 @@ for the JavaScript code in this tag.
 </div>
 </div>
 </li>
-<li><span class="done DONE">DONE</span> TNode.inskey<br/><div class="outline-text-5" id="text-3-1-3-2">
+<li><span class="done DONE">DONE</span> TNode.inskey<br  /><div class="outline-text-5" id="text-3-1-3-2">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="imp"><span style="color: #66f;">{ </span><span style="color: #66f;">insert key </span><span style="color: #66f;">}</span>
@@ -464,7 +465,7 @@ for the JavaScript code in this tag.
 </div>
 </div>
 </li>
-<li><span class="done DONE">DONE</span> TNode.rebalance<br/><div class="outline-text-5" id="text-3-1-3-3">
+<li><span class="done DONE">DONE</span> TNode.rebalance<br  /><div class="outline-text-5" id="text-3-1-3-3">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="imp"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TNode.rebalance</span>;
@@ -475,7 +476,7 @@ for the JavaScript code in this tag.
 </div>
 </div>
 </li>
-<li><span class="done DONE">DONE</span> TNode.full<br/><div class="outline-text-5" id="text-3-1-3-4">
+<li><span class="done DONE">DONE</span> TNode.full<br  /><div class="outline-text-5" id="text-3-1-3-4">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="imp"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TNode.full</span> : <span style="color: #ff00ff;">boolean</span>;
@@ -486,7 +487,7 @@ for the JavaScript code in this tag.
 </div>
 </div>
 </li>
-<li><span class="done DONE">DONE</span> TNode.split<br/><div class="outline-text-5" id="text-3-1-3-5">
+<li><span class="done DONE">DONE</span> TNode.split<br  /><div class="outline-text-5" id="text-3-1-3-5">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="imp"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TNode.split</span>;
@@ -511,7 +512,7 @@ for the JavaScript code in this tag.
 </div>
 </div>
 </li>
-<li><span class="done DONE">DONE</span> <a id="copyhalf" name="copyhalf"></a><br/><div class="outline-text-5" id="text-3-1-3-6">
+<li><span class="done DONE">DONE</span> <a id="copyhalf" name="copyhalf"></a><br  /><div class="outline-text-5" id="text-3-1-3-6">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="copyhalf"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">copyhalf</span>;
@@ -532,7 +533,7 @@ for the JavaScript code in this tag.
 </div>
 </div>
 </li>
-<li><span class="done DONE">DONE</span> TNode.isroot<br/><div class="outline-text-5" id="text-3-1-3-7">
+<li><span class="done DONE">DONE</span> TNode.isroot<br  /><div class="outline-text-5" id="text-3-1-3-7">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="imp"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TNode.isroot</span> : <span style="color: #ff00ff;">boolean</span>;
@@ -543,7 +544,7 @@ for the JavaScript code in this tag.
 </div>
 </div>
 </li>
-<li><span class="done DONE">DONE</span> TNode.isinner<br/><div class="outline-text-5" id="text-3-1-3-8">
+<li><span class="done DONE">DONE</span> TNode.isinner<br  /><div class="outline-text-5" id="text-3-1-3-8">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="imp"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TNode.isinner</span> : <span style="color: #ff00ff;">boolean</span>;
@@ -555,7 +556,7 @@ for the JavaScript code in this tag.
 </div>
 </li>
 
-<li><span class="done DONE">DONE</span> firstkey<br/><div class="outline-text-5" id="text-3-1-3-9">
+<li><span class="done DONE">DONE</span> firstkey<br  /><div class="outline-text-5" id="text-3-1-3-9">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="imp"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TNode.firstkey</span> : TKey;
@@ -566,7 +567,7 @@ for the JavaScript code in this tag.
 </div>
 </div>
 </li>
-<li><span class="done DONE">DONE</span> addchild<br/><div class="outline-text-5" id="text-3-1-3-10">
+<li><span class="done DONE">DONE</span> addchild<br  /><div class="outline-text-5" id="text-3-1-3-10">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="imp"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TNode.addchild</span>( key : TKey; kid : TNode );
