@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>pascal grammar components</title>
+<!-- 2013-11-04 Mon 16:59 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">pascal grammar components</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Retro Pascal Grammar Components</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Retro Pascal Grammar Components</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+In retro pascal, all code lives in some sort of module, which (at the very least) has a <i>name</i>, a list of <i>imports</i>, a number of <i>declarations</i>, and then a <i>block</i> of code.
+</p>
+
+<p>
+This is an abstract description of the outermost part of the retro pascal grammar, and therefore the topmost node in a parse tree. It's "abstract" because it omits any details about the actual syntax used. It contains only the information relevant to a compiler or interpreter.
+</p>
+
+<p>
+We can specify this more formally by creating a class in object pascal:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="type:TModule"><span style="color: #ff00ff;">type</span>
+  TModule = <span style="color: #ff00ff;">class</span> (TSyntaxNode, IModule)
+    <span style="color: #00ffff;">protected</span>
+      _imports : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> TImport; 
+      _decls   : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> IDecl;
+    <span style="color: #00ffff;">published</span>
+      <span style="color: #00ffff;">property</span> <span style="color: #00ffff;">name</span>    : IIdent;
+      <span style="color: #00ffff;">property</span> imports[ i : cardinal ] : TImport;
+      <span style="color: #00ffff;">property</span> decls[ i : cardinal ] : IDecl;
+      <span style="color: #00ffff;">property</span> block   : TBlock;
+    <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+None of the referenced types are peredefined &#x2013; we'll fill them in as we go along, through a process of stepwise refinement.
+</p>
+
+<p>
+We will put off defining <code>TSyntaxNode</code> (and its associated interface, <code>ISyntaxNode</code>) until the end. For now, we can use a pair of empty definitions:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="type:xSyntaxNode"><span style="color: #ff00ff;">type</span> <span style="color: #66f;">{ </span><span style="color: #66f;">temporary definitions </span><span style="color: #66f;">}</span>
+  ISyntaxNode = <span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">end</span>;
+  IModule = <span style="color: #00ffff;">interface</span> (ISyntaxNode) <span style="color: #00ffff;">end</span>;
+  TSyntaxNode = <span style="color: #ff00ff;">class</span> (TComponent, ISyntaxNode);
+</pre>
+</div>
+
+<p>
+Eventually we will add methods and properties to this interface, and all the nodes in the tree will implement it.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="type:TModuleDeps"><span style="color: #ff00ff;">type</span>
+
+  IIdent = <span style="color: #00ffff;">interface</span> (ISyntaxNode)
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetName</span> : <span style="color: #ff00ff;">string</span>;
+    <span style="color: #00ffff;">property</span> <span style="color: #00ffff;">name</span> : <span style="color: #ff00ff;">string</span> <span style="color: #00ffff;">read</span> GetName;
+  <span style="color: #00ffff;">end</span>;
+
+  IDecl = <span style="color: #00ffff;">interface</span> (IIdent)
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetKind</span>  : <span style="color: #ff00ff;">integer</span>;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetDefn</span> : ISyntaxNode;
+    <span style="color: #00ffff;">property</span> kind : <span style="color: #ff00ff;">integer</span> <span style="color: #00ffff;">read</span> GetKind;
+    <span style="color: #00ffff;">property</span> defn : ISyntaxNode <span style="color: #00ffff;">read</span> GetDefn;
+  <span style="color: #00ffff;">end</span>;
+
+  TDecl = <span style="color: #ff00ff;">class</span> (TSyntaxNode, IDecl)
+    <span style="color: #00ffff;">published</span>
+      <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetName</span> : <span style="color: #ff00ff;">String</span>;
+      <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetKind</span> : <span style="color: #ff00ff;">integer</span>;
+      <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetDefn</span> : ISyntaxNode;
+    <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #66f;">{ </span><span style="color: #66f;">A module, with opitonal nickname. </span><span style="color: #66f;">}</span>
+  TImport = <span style="color: #ff00ff;">class</span> (TDecl)
+    <span style="color: #00ffff;">public</span>
+      <span style="color: #00ffff;">property</span> abbrev : IIdent; <span style="color: #66f;">{ </span><span style="color: #66f;">optional abbreviation </span><span style="color: #66f;">}</span>
+      <span style="color: #00ffff;">property</span> module : IModule;
+    <span style="color: #00ffff;">end</span>;
+
+  IStmt = <span style="color: #00ffff;">interface</span> (ISyntaxNode)
+  <span style="color: #00ffff;">end</span>;
+
+  TBlock = <span style="color: #ff00ff;">class</span> (TComponent, ISyntaxNode)
+    <span style="color: #00ffff;">published</span>
+      stmts : GArray&lt;IStmt&gt;;
+    <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="methods"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TDecl.GetKind</span> : <span style="color: #ff00ff;">integer</span>;
+  <span style="color: #00ffff;">begin</span>
+    result := 0
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TDecl.GetName</span> : <span style="color: #ff00ff;">string</span>;
+  <span style="color: #00ffff;">begin</span>
+    result := <span style="color: #00ff00;">''</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TDecl.GetDefn</span> : ISyntaxNode;
+  <span style="color: #00ffff;">begin</span>
+    result := nil
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$mode delphi</span><span style="color: #66f;">}</span>
+<span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">uPasGram</span>;
+<span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">uses</span> classes, arrays;
+&lt;&lt;<span style="color: #ff00ff;">type</span>:xSyntaxNode&gt;&gt;
+&lt;&lt;<span style="color: #ff00ff;">type</span>:TModuleDeps&gt;&gt;
+&lt;&lt;<span style="color: #ff00ff;">type</span>:TModule&gt;&gt;
+<span style="color: #00ffff;">implementation</span>
+  &lt;&lt;@methods&gt;&gt;
+<span style="color: #00ffff;">end</span>.
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
