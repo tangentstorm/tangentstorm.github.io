@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>pascal grammar components</title>
-<!-- 2013-11-04 Mon 17:03 -->
+<!-- 2013-11-04 Mon 18:39 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -63,8 +63,14 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. Retro Pascal Grammar Components</a></li>
+<li><a href="#sec-1">1. Retro Pascal Grammar Components</a>
+<ul>
+<li><a href="#sec-1-1">1.1. Statement Nodes</a></li>
+<li><a href="#sec-1-2">1.2. Expression Nodes</a></li>
+</ul>
+</li>
 <li><a href="#sec-2">2. implementation</a></li>
+<li><a href="#sec-3">3. ouput ( upasgram.pas )</a></li>
 </ul>
 </div>
 </div>
@@ -89,7 +95,7 @@ We can specify this more formally by creating a class in object pascal:
 <pre class="src src-pascal" id="type:TModule"><span style="color: #ff00ff;">type</span>
   TModule = <span style="color: #ff00ff;">class</span> (TSyntaxNode, IModule)
     <span style="color: #00ffff;">protected</span>
-      _imports : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> TImport; 
+      _imports : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> TImport;
       _decls   : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> IDecl;
     <span style="color: #00ffff;">published</span>
       <span style="color: #00ffff;">property</span> <span style="color: #00ffff;">name</span>    : IIdent;
@@ -105,20 +111,48 @@ None of the referenced types are peredefined &#x2013; we'll fill them in as we g
 </p>
 
 <p>
-We will put off defining <code>TSyntaxNode</code> (and its associated interface, <code>ISyntaxNode</code>) until the end. For now, we can use a pair of empty definitions:
+We will put off defining <code>TSyntaxNode</code> (and its associated interface, <code>ISyntaxNode</code>) until the end. For now, we can use a pair definitions that do nothing bu define a <code>kind</code> property. This is basically a way to implement
 </p>
 
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="type:xSyntaxNode"><span style="color: #ff00ff;">type</span> <span style="color: #66f;">{ </span><span style="color: #66f;">temporary definitions </span><span style="color: #66f;">}</span>
-  ISyntaxNode = <span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">end</span>;
-  IModule = <span style="color: #00ffff;">interface</span> (ISyntaxNode) <span style="color: #00ffff;">end</span>;
-  TSyntaxNode = <span style="color: #ff00ff;">class</span> (TComponent, ISyntaxNode);
+
+  ISyntaxNode = <span style="color: #00ffff;">interface</span>
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetKind</span> : <span style="color: #ff00ff;">integer</span>;
+    <span style="color: #00ffff;">property</span> kind : <span style="color: #ff00ff;">integer</span> <span style="color: #00ffff;">read</span> GetKind;
+  <span style="color: #00ffff;">end</span>;
+
+  TSyntaxNode = <span style="color: #ff00ff;">class</span> (TComponent, ISyntaxNode)
+    <span style="color: #00ffff;">public</span>
+      <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetKind</span> : <span style="color: #ff00ff;">integer</span>;
+    <span style="color: #00ffff;">published</span>
+      <span style="color: #00ffff;">property</span> kind : <span style="color: #ff00ff;">integer</span> <span style="color: #00ffff;">read</span> GetKind;
+    <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
 
 <p>
 Eventually we will add methods and properties to this interface, and all the nodes in the tree will implement it.
+</p>
+
+<p>
+The <code>IModule</code> interface is mostly just so we can refer to it from the definition for the <code>TImport</code> class below. In general, when we need to create cyclic relationships between types, we will use interfaces to break the cycle. (We could also use forward class declarations. This is just my personal preference.)
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="type:IModule"><span style="color: #ff00ff;">type</span>
+  IModule = <span style="color: #00ffff;">interface</span> (ISyntaxNode) <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+With these in place, we can now fill in the next few declarations.
+</p>
+
+<p>
+I'm making heavy use of properties here because I'd like to take advantage of runtime type information. And possibly even provide some design time components for working with these nodes in Lazarus.
 </p>
 
 <div class="org-src-container">
@@ -131,43 +165,148 @@ Eventually we will add methods and properties to this interface, and all the nod
   <span style="color: #00ffff;">end</span>;
 
   IDecl = <span style="color: #00ffff;">interface</span> (IIdent)
-    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetKind</span>  : <span style="color: #ff00ff;">integer</span>;
     <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetDefn</span> : ISyntaxNode;
-    <span style="color: #00ffff;">property</span> kind : <span style="color: #ff00ff;">integer</span> <span style="color: #00ffff;">read</span> GetKind;
     <span style="color: #00ffff;">property</span> defn : ISyntaxNode <span style="color: #00ffff;">read</span> GetDefn;
   <span style="color: #00ffff;">end</span>;
 
   TDecl = <span style="color: #ff00ff;">class</span> (TSyntaxNode, IDecl)
     <span style="color: #00ffff;">published</span>
       <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetName</span> : <span style="color: #ff00ff;">String</span>;
-      <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetKind</span> : <span style="color: #ff00ff;">integer</span>;
       <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetDefn</span> : ISyntaxNode;
     <span style="color: #00ffff;">end</span>;
 
-  <span style="color: #66f;">{ </span><span style="color: #66f;">A module, with opitonal nickname. </span><span style="color: #66f;">}</span>
+  <span style="color: #66f;">{ </span><span style="color: #66f;">A module name, with optional abbreviation. </span><span style="color: #66f;">}</span>
   TImport = <span style="color: #ff00ff;">class</span> (TDecl)
     <span style="color: #00ffff;">public</span>
-      <span style="color: #00ffff;">property</span> abbrev : IIdent; <span style="color: #66f;">{ </span><span style="color: #66f;">optional abbreviation </span><span style="color: #66f;">}</span>
+      <span style="color: #00ffff;">property</span> abbrev : IIdent;
       <span style="color: #00ffff;">property</span> module : IModule;
     <span style="color: #00ffff;">end</span>;
 
   IStmt = <span style="color: #00ffff;">interface</span> (ISyntaxNode)
   <span style="color: #00ffff;">end</span>;
 
-  TBlock = <span style="color: #ff00ff;">class</span> (TComponent, ISyntaxNode)
+  TBlock = <span style="color: #ff00ff;">class</span> (TSyntaxNode, IStmt)
     <span style="color: #00ffff;">published</span>
       stmts : GArray&lt;IStmt&gt;;
     <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
 </div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> Statement Nodes</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+There are several kinds of <code>IStmt</code> besides <code>TBlock</code>.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="type:xStatement"><span style="color: #ff00ff;">type</span>
+
+  IExpr = <span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">end</span>;
+  ILhsExpr = <span style="color: #00ffff;">interface</span> (IExpr) <span style="color: #00ffff;">end</span>;
+  IOrdExpr = <span style="color: #00ffff;">interface</span> (IExpr) <span style="color: #00ffff;">end</span>;
+  IBoolExpr = <span style="color: #00ffff;">interface</span> (IExpr) <span style="color: #00ffff;">end</span>;
+
+  TAssignStmt = <span style="color: #ff00ff;">class</span>
+    <span style="color: #00ffff;">protected</span>
+      _lhs : ILhsExpr;
+      _rhs : IExpr;
+    <span style="color: #00ffff;">published</span>
+      <span style="color: #00ffff;">property</span> lhs : ILhsExpr <span style="color: #00ffff;">read</span> _lhs;
+      <span style="color: #00ffff;">property</span> rhs : IExpr <span style="color: #00ffff;">read</span> _rhs;
+    <span style="color: #00ffff;">end</span>;
+
+  TIfThenStmt = <span style="color: #ff00ff;">class</span>
+    <span style="color: #00ffff;">protected</span>
+      _cond : IBoolExpr;
+      _then,
+      _else : IStmt;
+    <span style="color: #00ffff;">published</span>
+      <span style="color: #00ffff;">property</span> cond     : IBoolExpr <span style="color: #00ffff;">read</span> _cond;
+      <span style="color: #00ffff;">property</span> thenPart : IStmt <span style="color: #00ffff;">read</span> _then;
+      <span style="color: #00ffff;">property</span> elsePart : IStmt <span style="color: #00ffff;">read</span> _else;
+    <span style="color: #00ffff;">end</span>;
+
+  TCasePair   = <span style="color: #ff00ff;">class</span> (TSyntaxNode)
+    <span style="color: #00ffff;">protected</span>
+      _expr : IExpr;
+      _stmt : IStmt;
+    <span style="color: #00ffff;">published</span>
+      <span style="color: #00ffff;">property</span> expr : IExpr <span style="color: #00ffff;">read</span> _expr;
+      <span style="color: #00ffff;">property</span> stmt : IStmt <span style="color: #00ffff;">read</span> _stmt;
+   <span style="color: #00ffff;">end</span>;
+
+  TCaseStmt   = <span style="color: #ff00ff;">class</span> (TSyntaxNode)
+    <span style="color: #00ffff;">protected</span>
+      _expr  : IStmt;
+      _cases : GArray&lt;TCasePair&gt;;
+    <span style="color: #00ffff;">published</span>
+      <span style="color: #00ffff;">property</span> expr : IExpr;
+      <span style="color: #00ffff;">property</span> cases : GArray&lt;TCasePair&gt; <span style="color: #00ffff;">read</span> _cases;
+    <span style="color: #00ffff;">end</span>;
+
+  TWhileDoStmt  = <span style="color: #ff00ff;">class</span> (TSyntaxNode)
+    <span style="color: #00ffff;">protected</span>
+      _cond : IBoolExpr;
+      _stmt : IStmt;
+    <span style="color: #00ffff;">published</span>
+      <span style="color: #00ffff;">property</span> cond : IBoolExpr <span style="color: #00ffff;">read</span> _cond;
+      <span style="color: #00ffff;">property</span> stmt : IStmt <span style="color: #00ffff;">read</span> _stmt;
+    <span style="color: #00ffff;">end</span>;
+
+  TRepeatUntilStmt  = <span style="color: #ff00ff;">class</span> (TSyntaxNode)
+    <span style="color: #00ffff;">protected</span>
+      _stmt : IStmt;
+      _cond : IBoolExpr;
+    <span style="color: #00ffff;">published</span>
+      <span style="color: #00ffff;">property</span> stmt : IStmt <span style="color: #00ffff;">read</span> _stmt;
+      <span style="color: #00ffff;">property</span> cond : IBoolExpr <span style="color: #00ffff;">read</span> _cond;
+    <span style="color: #00ffff;">end</span>;
+
+  TForDirection = (forUpTo, forDnTo);
+
+  TForToStmt  = <span style="color: #ff00ff;">class</span> (TSyntaxNode)
+    <span style="color: #00ffff;">protected</span>
+      _stmt : IStmt;
+      _cond : IBoolExpr;
+      _dir  : TForDirection;
+    <span style="color: #00ffff;">published</span>
+      <span style="color: #00ffff;">property</span> stmt : IStmt <span style="color: #00ffff;">read</span> _stmt;
+      <span style="color: #00ffff;">property</span> cond : IBoolExpr <span style="color: #00ffff;">read</span> _cond;
+      <span style="color: #00ffff;">property</span> direction : TForDirection <span style="color: #00ffff;">read</span> _dir;
+    <span style="color: #00ffff;">end</span>;
+
+  <span style="color: #66f;">{ </span><span style="color: #66f;">If we're doing ISO pascal, it should include GOTO. </span><span style="color: #66f;">}</span>
+  TLabel  = <span style="color: #ff00ff;">integer</span>;
+  TGotoStmt  = <span style="color: #ff00ff;">class</span> (TSyntaxNode)
+    <span style="color: #00ffff;">protected</span>
+      _target : TLabel;
+    <span style="color: #00ffff;">published</span>
+      <span style="color: #00ffff;">property</span> target : TLabel <span style="color: #00ffff;">read</span> _target;
+    <span style="color: #00ffff;">end</span>;
+</pre>
 </div>
+</div>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> Expression Nodes</h3>
+<div class="outline-text-3" id="text-1-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal"></pre>
+</div>
+</div>
+</div>
+</div>
+
 <div id="outline-container-sec-2" class="outline-2">
 <h2 id="sec-2"><span class="section-number-2">2</span> implementation</h2>
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="methods"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TDecl.GetKind</span> : <span style="color: #ff00ff;">integer</span>;
+<pre class="src src-pascal" id="methods"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TSyntaxNode.GetKind</span> : <span style="color: #ff00ff;">integer</span>;
   <span style="color: #00ffff;">begin</span>
     result := 0
   <span style="color: #00ffff;">end</span>;
@@ -183,16 +322,21 @@ Eventually we will add methods and properties to this interface, and all the nod
   <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
-
-
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> ouput ( upasgram.pas )</h2>
+<div class="outline-text-2" id="text-3">
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">$mode delphi</span><span style="color: #66f;">}</span>
 <span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">uPasGram</span>;
 <span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">uses</span> classes, arrays;
-&lt;&lt;<span style="color: #ff00ff;">type</span>:xSyntaxNode&gt;&gt;
-&lt;&lt;<span style="color: #ff00ff;">type</span>:TModuleDeps&gt;&gt;
-&lt;&lt;<span style="color: #ff00ff;">type</span>:TModule&gt;&gt;
+  &lt;&lt;<span style="color: #ff00ff;">type</span>:xSyntaxNode&gt;&gt;
+  &lt;&lt;<span style="color: #ff00ff;">type</span>:IModule&gt;&gt;
+  &lt;&lt;<span style="color: #ff00ff;">type</span>:TModuleDeps&gt;&gt;
+  &lt;&lt;<span style="color: #ff00ff;">type</span>:TModule&gt;&gt;
+  &lt;&lt;<span style="color: #ff00ff;">type</span>:xStatement&gt;&gt;
 <span style="color: #00ffff;">implementation</span>
   &lt;&lt;@methods&gt;&gt;
 <span style="color: #00ffff;">end</span>.
