@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>pascal grammar components</title>
-<!-- 2013-11-05 Tue 01:34 -->
+<!-- 2013-11-05 Tue 19:25 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -462,7 +462,7 @@ There are a number of places in the pascal grammar where you can declare a numbe
   TTypedDecl = <span style="color: #ff00ff;">class</span> (TDecl, ITyped)
     <span style="color: #00ffff;">protected</span>
       _typeRef : IType;
-    <span style="color: #00ffff;">published</span> 
+    <span style="color: #00ffff;">published</span>
       <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetTypeRef</span> : IType;
       <span style="color: #00ffff;">property</span> typeRef : IType <span style="color: #00ffff;">read</span> GetTypeRef;
     <span style="color: #00ffff;">end</span>;
@@ -492,7 +492,7 @@ There are a number of places in the pascal grammar where you can declare a numbe
        _tagField : TDecl;
        _variants : GArray&lt;TGroupDecl&gt;;
        <span style="color: #66f;">{ </span><span style="color: #66f;">!! The tagField/variants properties are very rough here.</span>
-<span style="color: #66f;">            I will probably refine them when it comes time to </span>
+<span style="color: #66f;">            I will probably refine them when it comes time to</span>
 <span style="color: #66f;">            actually implement variant records. </span><span style="color: #66f;">}</span>
      <span style="color: #00ffff;">published</span>
        <span style="color: #00ffff;">property</span> groups   : GArray&lt;TGroupDecl&gt; <span style="color: #00ffff;">read</span> _groups;
@@ -526,9 +526,20 @@ There are a number of places in the pascal grammar where you can declare a numbe
 <div id="outline-container-sec-1-7" class="outline-3">
 <h3 id="sec-1-7"><span class="section-number-3">1.7</span> procedure and function definitions</h3>
 <div class="outline-text-3" id="text-1-7">
+<p>
+Procedures and functions are just miniature versions of entire programs.
+</p>
+
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="type:xProcDefs"><span style="color: #66f;">{ </span><span style="color: #66f;">todo : procedure and function defs </span><span style="color: #66f;">}</span>
+<pre class="src src-pascal" id="type:xProcDefs"><span style="color: #ff00ff;">type</span>
+  TProcedure = <span style="color: #ff00ff;">class</span> (TSyntaxNode)
+    <span style="color: #00ffff;">protected</span>
+    <span style="color: #00ffff;">end</span>;
+
+  TFunction = <span style="color: #ff00ff;">class</span> (TSyntaxNode)
+    <span style="color: #00ffff;">protected</span>
+    <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
 </div>
