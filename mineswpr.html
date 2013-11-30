@@ -4,89 +4,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>mineswpr : minesweeper for retro</title>
-<!-- 2013-09-03 Tue 23:44 -->
+<!-- 2013-11-29 Fri 23:35 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal j wallace" />
 <link rel="stylesheet" type="text/css" href="/etc/style.css">
-
-<script type="text/javascript" src="http://orgmode.org/org-info.js">
-/**
- *
- * @source: http://orgmode.org/org-info.js
- *
- * @licstart  The following is the entire license notice for the
- *  JavaScript code in http://orgmode.org/org-info.js.
- *
- * Copyright (C) 2012-2013  Sebastian Rose
- *
- *
- * The JavaScript code in this tag is free software: you can
- * redistribute it and/or modify it under the terms of the GNU
- * General Public License (GNU GPL) as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version.  The code is distributed WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
- *
- * As additional permission under GNU GPL version 3 section 7, you
- * may distribute non-source (e.g., minimized or compacted) forms of
- * that code without the copy of the GNU GPL normally required by
- * section 4, provided you include this license notice and a URL
- * through which recipients can access the Corresponding Source.
- *
- * @licend  The above is the entire license notice
- * for the JavaScript code in http://orgmode.org/org-info.js.
- *
- */
-</script>
-
 <script type="text/javascript">
-
 /*
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
 Copyright (C) 2012-2013 Free Software Foundation, Inc.
-
-The JavaScript code in this tag is free software: you can
-redistribute it and/or modify it under the terms of the GNU
-General Public License (GNU GPL) as published by the Free Software
-Foundation, either version 3 of the License, or (at your option)
-any later version.  The code is distributed WITHOUT ANY WARRANTY;
-without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
-
-As additional permission under GNU GPL version 3 section 7, you
-may distribute non-source (e.g., minimized or compacted) forms of
-that code without the copy of the GNU GPL normally required by
-section 4, provided you include this license notice and a URL
-through which recipients can access the Corresponding Source.
-
-
-@licend  The above is the entire license notice
-for the JavaScript code in this tag.
-*/
-
-<!--/*--><![CDATA[/*><!--*/
-org_html_manager.set("TOC_DEPTH", "3");
-org_html_manager.set("LINK_HOME", "");
-org_html_manager.set("LINK_UP", "");
-org_html_manager.set("LOCAL_TOC", "1");
-org_html_manager.set("VIEW_BUTTONS", "0");
-org_html_manager.set("MOUSE_HINT", "underline");
-org_html_manager.set("FIXED_TOC", "0");
-org_html_manager.set("TOC", "0");
-org_html_manager.set("VIEW", "info");
-org_html_manager.setup();  // activate after the parameters are set
-/*]]>*///-->
-</script>
-<script type="text/javascript">
-/*
-@licstart  The following is the entire license notice for the
-JavaScript code in this tag.
-
-Copyright (C) 2012  Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -144,23 +72,23 @@ for the JavaScript code in this tag.
 </li>
 <li><a href="#sec-2">2. the game</a>
 <ul>
-<li><a href="#sec-2-1">2.1. variables</a></li>
-<li><a href="#sec-2-2">2.2. grid-setup</a></li>
-<li><a href="#sec-2-3">2.3. point-methods</a></li>
-<li><a href="#sec-2-4">2.4. cell methods</a></li>
-<li><a href="#sec-2-5">2.5. grid methods</a></li>
-<li><a href="#sec-2-6">2.6. floodfill</a></li>
-<li><a href="#sec-2-7">2.7. event handlers</a></li>
-<li><a href="#sec-2-8">2.8. user actions</a></li>
-<li><a href="#sec-2-9">2.9. minefield words</a></li>
-<li><a href="#sec-2-10">2.10. draw the cells</a></li>
-<li><a href="#sec-2-11">2.11. draw the playing field</a></li>
-<li><a href="#sec-2-12">2.12. command parser</a></li>
-<li><a href="#sec-2-13">2.13. retro shell enhancements</a></li>
+<li><a href="#sec-2-1">2.1. <span class="done DONE">DONE</span> variables</a></li>
+<li><a href="#sec-2-2">2.2. <span class="done DONE">DONE</span> grid-setup</a></li>
+<li><a href="#sec-2-3">2.3. <span class="done DONE">DONE</span> point-methods</a></li>
+<li><a href="#sec-2-4">2.4. <span class="done DONE">DONE</span> cell methods</a></li>
+<li><a href="#sec-2-5">2.5. <span class="done DONE">DONE</span> grid methods</a></li>
+<li><a href="#sec-2-6">2.6. <span class="done DONE">DONE</span> floodfill</a></li>
+<li><a href="#sec-2-7">2.7. <span class="done DONE">DONE</span> event handlers</a></li>
+<li><a href="#sec-2-8">2.8. <span class="done DONE">DONE</span> user actions</a></li>
+<li><a href="#sec-2-9">2.9. <span class="done DONE">DONE</span> minefield words</a></li>
+<li><a href="#sec-2-10">2.10. <span class="done DONE">DONE</span> draw the cells</a></li>
+<li><a href="#sec-2-11">2.11. <span class="done DONE">DONE</span> draw the playing field</a></li>
+<li><a href="#sec-2-12">2.12. <span class="done DONE">DONE</span> command parser</a></li>
+<li><a href="#sec-2-13">2.13. <span class="done DONE">DONE</span> retro shell enhancements</a></li>
 </ul>
 </li>
 <li><a href="#sec-3">3. OUTPUT</a></li>
-<li><a href="#sec-4">4. refile these</a>
+<li><a href="#sec-4">4. <span class="todo TODO">TODO</span> refile these</a>
 <ul>
 <li><a href="#sec-4-1">4.1. objects</a></li>
 <li><a href="#sec-4-2">4.2. virtual terminal words</a></li>
