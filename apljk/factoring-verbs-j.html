@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>factoring out verbs in J</title>
+<!-- 2013-12-10 Tue 17:09 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">factoring out verbs in J</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. bottom up programming</a></li>
+<li><a href="#sec-2">2. leftmost nouns</a></li>
+<li><a href="#sec-3">3. extracting a noun-verb trains without a final extra verb.</a></li>
+<li><a href="#sec-4">4. extending the chain on the left.</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> bottom up programming</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Often it's convenient to construct a J program from the 'bottom up', starting with an input value and applying transformations one at a time, interactively in the REPL.
+</p>
+
+<p>
+For example, if we wanted to construct a function to calculate the calculate the sum of the first <code>y</code> square numbers, our session might look like this:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   i.10                        <span style="color: #66f;">NB. first 10 non-negative integers</span>
+0 1 2 3 4 5 6 7 8 9
+   &gt;: i.10                     <span style="color: #66f;">NB. first 10 positive integers</span>
+1 2 3 4 5 6 7 8 9 10
+   *: &gt;: i.10                  <span style="color: #66f;">NB. first 10 square numbers.</span>
+1 4 9 16 25 36 49 64 81 100
+   +/ *: &gt;: i.10               <span style="color: #66f;">NB. sum of first 10 squares.</span>
+385
+   +/ *: &gt;: i. <span style="color: #eedd82;">y</span>=.10           <span style="color: #66f;">NB. explicit named paremeter</span>
+385
+   (3 : <span style="color: #00ff00;">'+/ *: &gt;: i. y'</span>) 10    <span style="color: #66f;">NB. explicit definition.</span>
+385
+   (3 : <span style="color: #00ff00;">'+/ *: &gt;: i. y'</span>)       <span style="color: #66f;">NB. discard the parameter.</span>
+3 : <span style="color: #00ff00;">'+/ *: &gt;: i. y'</span>
+   (13 : <span style="color: #00ff00;">'+/ *: &gt;: i. y'</span>)      <span style="color: #66f;">NB. (optionally) convert to tacit form.</span>
+[: +/ [: *: [: &gt;: i.
+   <span style="color: #ffffff; font-weight: bold;">sumsq</span>=:13 :<span style="color: #00ff00;">'+/ *: &gt;: i. y'</span>  <span style="color: #66f;">NB. give it a name.</span>
+   sumsq 10                    <span style="color: #66f;">NB. double check that it worked.</span>
+385
+</pre>
+</div>
+
+<p>
+Surrounding a phrase with <code>(3 : '...')</code> is a simple way to extract a new verb. Of course, if the verb in question contains a string, its quote characters will have to be doubled:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   <span style="color: #00ff00;">'a,b,c'</span>             <span style="color: #66f;">NB. a string of comma separated values</span>
+a,b,c
+   <span style="color: #00ff00;">','</span>, <span style="color: #00ff00;">'a,b,c'</span>        <span style="color: #66f;">NB. append to leading comma</span>
+,a,b,c
+
+   &lt;;._1<span style="color: #00ff00;">','</span>, <span style="color: #00ff00;">'a,b,c'</span>   <span style="color: #66f;">NB. cut and box on comma characters.</span>
+&#9484;&#9472;&#9516;&#9472;&#9516;&#9472;&#9488;
+&#9474;a&#9474;b&#9474;c&#9474;
+&#9492;&#9472;&#9524;&#9472;&#9524;&#9472;&#9496;
+                       <span style="color: #66f;">NB. quoting here gets a bit messy:</span>
+   (3 : <span style="color: #00ff00;">'&lt;;._1 '','' , y'</span>) <span style="color: #00ff00;">'a,b,c'</span>
+&#9484;&#9472;&#9516;&#9472;&#9516;&#9472;&#9488;
+&#9474;a&#9474;b&#9474;c&#9474;
+&#9492;&#9472;&#9524;&#9472;&#9524;&#9472;&#9496;
+</pre>
+</div>
+
+<p>
+In this <i>particular</i> case, it's cleaner to surround the target phrase with <code>([: ... ])</code> :
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   ([: &lt;;._1 <span style="color: #00ff00;">','</span> , ]) <span style="color: #00ff00;">'a,b,c'</span>
+&#9484;&#9472;&#9516;&#9472;&#9516;&#9472;&#9488;
+&#9474;a&#9474;b&#9474;c&#9474;
+&#9492;&#9472;&#9524;&#9472;&#9524;&#9472;&#9496;
+</pre>
+</div>
+
+<p>
+Note, however, that <code>[:</code> and <code>]</code> are not magical tacit function delimeters. They are just normal verbs, that to form the train we want in <i>this</i> particular case. Applying them blindly often leads to disaster:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   +/ *: &gt;: i. 10           <span style="color: #66f;">NB. sum of first y squares (derived above)</span>
+385
+   ([: +/ *: &gt;: i. ]) 10    <span style="color: #66f;">NB. here, ([: ... ]) changes the meaning.</span>
+|domain error
+|       ([:+/*:&gt;:i.])10
+</pre>
+</div>
+
+<p>
+In this article we'll explore tools for factoring out verbs in a number of different situations.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> leftmost nouns</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Suppose we want to construct the first <code>y</code> odd numbers:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">            i. <span style="color: #eedd82;">y</span> =. 5       <span style="color: #66f;">NB. take the first y cardinals.</span>
+0 1 2 3 4
+        2 * i. <span style="color: #eedd82;">y</span> =. 5       <span style="color: #66f;">NB. double them</span>
+0 2 4 6 8
+    1 + 2 * i. <span style="color: #eedd82;">y</span> =. 5       <span style="color: #66f;">NB. and add one.</span>
+1 3 5 7 9
+</pre>
+</div>
+
+<p>
+This can be written more concisely as:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">      &gt;: +: i. <span style="color: #eedd82;">y</span> =. 5   <span style="color: #66f;">NB. one more than double first y cardinals</span>
+1 3 5 7 9
+</pre>
+</div>
+
+<p>
+We can ask J to convert this to tacit form for us:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">     13 : <span style="color: #00ff00;">'&gt;: +: i. y'</span>    <span style="color: #66f;">NB. explicit to tacit conversion.</span>
+[: &gt;: [: +: i.
+     ([: &gt;: [: +: i.) 5   <span style="color: #66f;">NB. usage requires parens.</span>
+  1 3 5 7 9
+</pre>
+</div>
+
+<p>
+Alternatively, we can insert the <code>@:</code> conjunction between each item of our shortened form:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   &gt;: +: i. 5              <span style="color: #66f;">NB. shown above.</span>
+1 3 5 7 9
+   &gt;: (+: @: i.) 5         <span style="color: #66f;">NB. @: ('at') is function composition</span>
+1 3 5 7 9
+   (&gt;: @: +: @: i.) 5      <span style="color: #66f;">NB. @: applied again.</span>
+1 3 5 7 9
+   (&gt;:@:+:@:i.) 5          <span style="color: #66f;">NB. The spaces can be removed.</span>
+1 3 5 7 9
+</pre>
+</div>
+
+<p>
+The phrase <code>(f @: g) y</code> serves more or less the same purpose as <code>([: f g) y</code>, but it doesn't require parentheses. It has a small advantage when extracting a function from a phrase because the transformation can be made by introducing only one new symbol at a time:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   &gt;: +: i. 5              <span style="color: #66f;">NB. shown above.</span>
+1 3 5 7 9
+   &gt;: +: @: i. 5           <span style="color: #66f;">NB. @: works even without parens</span>
+1 3 5 7 9
+   &gt;: @: +: @: i. 5        <span style="color: #66f;">NB. @: applied again.</span>
+1 3 5 7 9
+   &gt;:@:+:@:i. 5            <span style="color: #66f;">NB. (Optionally) remove spaces.</span>
+1 3 5 7 9
+   (&gt;:@:+:@:i.) 5          <span style="color: #66f;">NB. Extract the function.</span>
+1 3 5 7 9
+</pre>
+</div>
+
+<p>
+However, what happens if we simply ask J to translate our original, longer sentence?
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   1 + 2 * i. <span style="color: #eedd82;">y</span>=. 5
+1 3 5 7 9
+   13 : <span style="color: #00ff00;">'1 + 2 * i. y'</span>       <span style="color: #66f;">NB. explicit to tacit</span>
+  1 + 2 * i.
+    (1 + 2 * i.) 5           <span style="color: #66f;">NB. shortened form.</span>
+  1 3 5 7 9
+</pre>
+</div>
+
+<p>
+To me, this seems much clearer than either of the previous tacit forms.
+</p>
+
+<p>
+It works because of the following equivalences when x and y are nouns:
+</p>
+
+<pre class="example">
+(x f g) y  &lt;--&gt;   x f (g y)
+</pre>
+
+<p>
+We can derive this tacit form ourselves by applying this rule twice to our original sentence.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   1 + 2 * i. <span style="color: #eedd82;">y</span>=. 5
+1 3 5 7 9
+   1 + 2 * (i. y)       <span style="color: #66f;">NB. because j executes right to left</span>
+1 3 5 7 9
+   1 + (2 * i.) y       <span style="color: #66f;">NB. apply rule where (k=2 f=* g =i.)</span>
+1 3 5 7 9
+   (1 + (2 * i.)) y     <span style="color: #66f;">NB. and again where (k=1 f=+ g=(2 * i.))</span>
+1 3 5 7 9
+   (1 + 2 * i.) y       <span style="color: #66f;">NB. the inner parens can be removed.</span>
+1 3 5 7 9
+</pre>
+</div>
+
+<p>
+To summarize, whenever you want to extract a verb from an alternating sequence of nouns and verbs that starting with a noun and ending with a double verb, you can simply surround the whole thing with parentheses.
+</p>
+
+<pre class="example">
+n0 v0 n1 v1 .. ni vi v(i+1) y &lt;--&gt; (n0 v0 n1 v1 .. ni vi v(i+1)) y
+</pre>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> extracting a noun-verb trains without a final extra verb.</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+If the phrase follows this pattern but doesn't end with two verbs, you can simply add <code>]</code> to the end of the sequence:
+</p>
+
+<p>
+For example:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">     2 * 1 + <span style="color: #eedd82;">y</span> =. 5        <span style="color: #66f;">NB. follows the pattern, but no trailing verb.</span>
+  12
+     2 * 1 + <span style="color: #eedd82;">y</span> =. 5        <span style="color: #66f;">NB. adding parens here will not work.</span>
+|syntax error
+|   (2   *1+)<span style="color: #eedd82;">y</span>=.5
+     2 * 1 + ] <span style="color: #eedd82;">y</span> =. 5      <span style="color: #66f;">NB. but if we insert a placeholder verb...</span>
+  12
+     (2 * 1 + ]) <span style="color: #eedd82;">y</span> =. 5    <span style="color: #66f;">NB. then we can extract the train easily.</span>
+  12
+</pre>
+</div>
+
+<p>
+There are many simple identities between the verbs in J,  so you often have the choice of expressing the same idea in multiple ways.
+</p>
+
+<pre class="example">
+&gt;: y &lt;--&gt; (1 +  y)               one more
+&lt;: y &lt;--&gt; (1 +  y)               one less
++: y &lt;--&gt; (2 *  y)               double
+-: y &lt;--&gt; (2 %~ y)               half
+*: y &lt;--&gt; (2 ^~ y) &lt;--&gt; *~ y     square
+%: y &lt;--&gt; (2 ^. y)               square root
+</pre>
+
+<p>
+If the final noun and verb together hav a shorter representation, then you can simply replace it with the shorter form:
+</p>
+
+
+<div class="org-src-container">
+
+<pre class="src src-j">     2 * 1 + <span style="color: #eedd82;">y</span> =. 5        <span style="color: #66f;">NB. Need one more verb... or one /less/.</span>
+12
+     2 * &gt;: <span style="color: #eedd82;">y</span> =. 5         <span style="color: #66f;">NB. &gt;: y &lt;--&gt; (1 +  y)</span>
+12
+   (2 * &gt;:) <span style="color: #eedd82;">y</span> =. 5         <span style="color: #66f;">NB. Now it can be cleanly parenthesized.</span>
+12
+</pre>
+</div>
+
+<p>
+If the final noun-verb combination doesn't have a simple form, you can bond the noun to the verb using the <code>&amp;</code> adverb.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   2 * 3 + <span style="color: #eedd82;">y</span> =. 5         <span style="color: #66f;">NB. No builtin for 3 + y</span>
+16
+   2 * 3 &amp; + y            <span style="color: #66f;">NB. '&amp;' bonds the '3' to the '+'</span>
+16
+   (2 * 3 &amp; +) y          <span style="color: #66f;">NB. Now the phrase can be extracted.</span>
+16
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> extending the chain on the left.</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+What if we need to do further processing to the left?
+</p>
+
+<p>
+For example, what if we want a function that finds the first <code>y</code> odd numbers, but returns them in reversed order?
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   (1 + 2 * i.) y       <span style="color: #66f;">NB. our solution so far...</span>
+1 3 5 7 9
+   |. (1 + 2 * i.) y    <span style="color: #66f;">NB. but reversed.</span>
+9 7 5 3 1
+   (|. 1 + 2 * i.) y    <span style="color: #66f;">NB. not what we want. :/</span>
+1 3 5 7 9
+   ((|. 1) + 2 * i.) y  <span style="color: #66f;">NB. (it applied the |. to the first noun.)</span>
+1 3 5 7 9
+</pre>
+</div>
+
+<p>
+Fortunately, this is also an easy fix. We can extend the parentheses to the left by first prepending a cap (<code>[:</code>).
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   ([: |. 1 + 2 * i.) y
+9 7 5 3 1
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
