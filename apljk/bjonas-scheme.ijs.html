@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>code review : BJonas' Interpreter Experiment in J</title>
+<!-- 2013-12-29 Sun 10:20 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">code review : BJonas' Interpreter Experiment in J</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. code review : BJonas' Interpreter Experiment in J</a></li>
+<li><a href="#sec-2">2. tokenizer and reader</a></li>
+<li><a href="#sec-3">3. mutable places</a></li>
+<li><a href="#sec-4">4. default environment</a></li>
+<li><a href="#sec-5">5. evaluator</a></li>
+<li><a href="#sec-6">6. putting it together</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> code review : BJonas' Interpreter Experiment in J</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This is an attempt to understand the small interpreter created by BJonas and posted to the J wiki. (It's at <a href="http://www.jsoftware.com/jwiki/Scripts/Scheme">jwiki/Scripts/Scheme</a>, but the full text of that page has been reproduced here.
+</p>
+
+
+<p>
+Quoted text and the actual code belong to BJonas. Each section is quoted verbatim, but I re-arranged the sections themselves so they were juxtaposed with the original code. His code and text sections look like this:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j"><span style="color: #66f;">NB. interpreter experiment in J by zsban</span>
+</pre>
+</div>
+
+<blockquote>
+<p>
+This is a simple interpreter that can evaluate basic scheme expressions.
+</p>
+
+<p>
+Currently the following expressions exist: lambdas, function calls, variables, <code>if</code>, <code>set!</code>, numeric literals.
+</p>
+
+<p>
+The library has a few simple arithmetic functions bounded. Proper lambdas seem to work (now really, after I've fixed <code>envfind</code>), except that varargs are not supported.
+</p>
+
+<p>
+Most library functions and types like lists and vectors are missing. There's also no type distinctness or quote. These, however, could be easy to implement. Macros would be harder, but also possible; though some derived expression types could be coded directly in J. <code>call/cc</code> would be impossible to implement this way, and a garbage collector would be very difficult as well.
+</p>
+
+<p>
+The interpreter has the following parts. [&#x2026;]
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> tokenizer and reader</h2>
+<div class="outline-text-2" id="text-2">
+<blockquote>
+
+<div class="figure">
+<p>
+</p>
+</div>
+
+<p>
+The <code>tok</code> verb splits a scheme code string to tokens, but doesn't actually decode those tokens.
+</p>
+</blockquote>
+
+<div class="org-src-container">
+
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">spcp</span> =: e.&amp;(9 10 11 12 13 32{<span style="color: #7fffd4;">a.</span>)
+
+<span style="color: #ffffff; font-weight: bold;">tok1</span> =: (((~:1&amp;|.)@:spcp+.(+.1&amp;|.)@:(e.&amp;<span style="color: #00ff00;">'()'</span>))&lt;;.2])
+<span style="color: #ffffff; font-weight: bold;">tok</span> =: ((#~-.@:spcp@:{.@:&gt;"0)@:tok1@:(,&amp;<span style="color: #00ff00;">' '</span>)) ::[:
+</pre>
+</div>
+
+
+<p>
+Ok. <code>spcp</code> is a monad that simply checks whether its <code>y</code> argument corresponds to any of the numbered ascii characters (all of which represent whitespace). My guess is the name is a mnemonic for 'space predicate', following the lisp tradition.
+</p>
+
+<p>
+As for the other two, my eyes still aren't used to looking at code packed this densely, so I'm going to try to expand them a bit. First, <code>tok1</code>:
+</p>
+
+<pre class="example">
+tok1 =: (((~: 1&amp;|.)@:spcp +. (+. 1&amp;|.)@:(e.&amp;'()'))  &lt;;.2  ])
+</pre>
+
+<p>
+The overall structure is:
+</p>
+
+<pre class="example">
+((a b)@:c  d  (d b)@:e) f ]
+</pre>
+
+<p>
+It's used as a monad, and this is what it does:
+</p>
+
+<pre class="example">
+   tok1 '(one  ((  two)     three) (four))'
+┌─┬───┬──┬─┬─┬──┬───┬─┬─────┬─────┬─┬─┬─┬────┬─┬─┐
+│(│one│  │(│(│  │two│)│     │three│)│ │(│four│)│)│
+└─┴───┴──┴─┴─┴──┴───┴─┴─────┴─────┴─┴─┴─┴────┴─┴─┘
+</pre>
+
+
+<p>
+The primary verb here is  <code>&lt;;.2</code>, where <code>;.</code> is the (<a href="http://www.jsoftware.com/help/dictionary/d331.htm">dyadic cut conjunction</a>). With a verb on the left (monadic <code>&lt;</code>, meaning <a href="http://www.jsoftware.com/help/dictionary/d010.htm">box</a>), and the number 2 on the right, <code>;.</code> produces a new verb that takes an array of values on the right and an array of booleans on the left. The booleans indicate where to cut the values before applying the verb.
+</p>
+
+<p>
+So the fork on the left (the a&#x2026;e slots) is just checking for spaces and parentheses (in <i>its</i> left and right sides, respectively). Dyadic <code>+.</code> is boolean 'or', <code>~:</code> is xor/not-equal, and <code>1&amp;|.</code> is shifting the input one character to the left. So the right side says cut before and after each paren character, and the left side says cut on whitespace, but only if we're not <i>already in</i> whitespace.
+</p>
+
+<p>
+So now this gets used in <code>tok</code>, which I'll expand for readability here:
+</p>
+
+<pre class="example">
+tok =: ((  #~    -.@: spcp@: {.@: &gt;   "0  ) @: tok1 @: (,&amp;' ')) :: [:
+</pre>
+
+<p>
+The use of the <code>::</code> conjunction (<i>adverse</i>) is surprising to me. It's purpose is to specify what to do when the verb on the left throws an error. Since <code>[:</code> itself throws an error, I don't yet understand why he's doing this.
+</p>
+
+<p>
+The rest is one long pipeline. Reading right to left: 
+</p>
+
+<ul class="org-ul">
+<li>append a space to the input and run <code>tok1</code>
+</li>
+<li>let <code>tok1</code> cut the string into boxes
+</li>
+<li>for each box:
+<ul class="org-ul">
+<li>open the box
+</li>
+<li>ignore the first character
+</li>
+<li>check the rest to see if they're spaces
+</li>
+<li>invert the result (<code>-.</code> means boolean 'not')
+</li>
+<li>strip the spaces (make 1 copy for nonspaces, 0 copies for spaces)
+</li>
+</ul>
+</li>
+</ul>
+
+<p>
+Fair enough!
+</p>
+
+<blockquote>
+
+<div class="figure">
+<p>
+</p>
+</div>
+
+<p>
+The <code>rdr</code> verb reads a scheme code string to a tree, but the leafs of the tree are still the undecoded tokens.
+</p>
+</blockquote>
+
+<div class="org-src-container">
+
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">rdrc</span> =: (<span style="color: #00ff00;">'()'</span>i.{.@:&gt;)
+<span style="color: #ffffff; font-weight: bold;">rdrs</span> =: rdrb`rdre`rdra@.(rdrc@:{.)
+<span style="color: #ffffff; font-weight: bold;">rdrb</span> =: (&lt;@:}: , rdrs@:&gt;@:{:) @: rdrs@:}.
+<span style="color: #ffffff; font-weight: bold;">rdre</span> =: &lt;@:}.
+<span style="color: #ffffff; font-weight: bold;">rdra</span> =: {. , rdrs@:}.
+<span style="color: #ffffff; font-weight: bold;">rdr1</span> =: {.@:rdrs@:(,&amp;(&lt;<span style="color: #00ff00;">')'</span>))
+
+<span style="color: #ffffff; font-weight: bold;">rdr</span> =: (rdr1 @: tok) ::[:
+</pre>
+</div>
+
+<pre class="example">
+echo rdr '(lambda (x) (+ 1 (* x x) x))'
+</pre>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> mutable places</h2>
+<div class="outline-text-2" id="text-3">
+<blockquote>
+
+<div class="figure">
+<p>
+</p>
+</div>
+
+<p>
+The <code>placmak</code>, <code>placref</code>, and <code>placset</code> functions create, get, and set the contents of mutable cells: these cells are used to implement <code>set!</code>. The cells are indexed by integers, and are never destroyed, so we don't have garbage-collection.
+</p>
+</blockquote>
+
+<div class="org-src-container">
+
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">placv</span> =: i.0
+<span style="color: #ffffff; font-weight: bold;">placmak</span> =: 3 :<span style="color: #00ff00;">'&lt;:#placv=:placv,&lt;y'</span>
+<span style="color: #ffffff; font-weight: bold;">placref</span> =: 3 :<span style="color: #00ff00;">'&gt;y{placv'</span>
+<span style="color: #ffffff; font-weight: bold;">placset</span> =: 4 :<span style="color: #00ff00;">'0:placv=:(&lt;y) x}placv'</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> default environment</h2>
+<div class="outline-text-2" id="text-4">
+<blockquote>
+
+<div class="figure">
+<p>
+</p>
+</div>
+
+<p>
+The environment is a rank 2 array whose first column contains the boxed names of variables in the environment, and second column has the boxed indices of the cell in the cell vector that will always contain the contents of that variable.
+</p>
+</blockquote>
+
+<div class="org-src-container">
+
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">denv</span> =: i.0 2
+<span style="color: #ffffff; font-weight: bold;">denvadd</span> =: 4 :<span style="color: #00ff00;">'0:denv=:denv,(,x);placmak y'</span>
+<span style="color: #00ff00;">'+'</span> denvadd +/@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'-'</span> denvadd ({.-+/@:}.)`(-@:{.)@.(1=#)@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'*'</span> denvadd */@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'/'</span> denvadd ({.%*/@:}.)`(%@:{.)@.(1=#)@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'floor'</span> denvadd &lt;.@:{.@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'exp'</span> denvadd ^@:{.@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'log'</span> denvadd ^.@:{.@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'&lt;'</span> denvadd ([:*./2&lt;/\])@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'='</span> denvadd ([:*./2=/\])@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'&lt;='</span> denvadd ([:*./2&lt;:/\])@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'not'</span> denvadd -.@:{.@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'g0'</span> denvadd 0
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> evaluator</h2>
+<div class="outline-text-2" id="text-5">
+<blockquote>
+
+<div class="figure">
+<p>
+</p>
+</div>
+
+<p>
+Scheme procedures are represented as J gerunds of monadic functions that accept a list of boxed scheme arguments as its argument. The <code>lambda</code> verb creates such a function from the environment and the function body.
+</p>
+</blockquote>
+
+<div class="org-src-container">
+
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">runl</span> =: [ &lt;@:run"_ 0 &gt;@:]
+<span style="color: #ffffff; font-weight: bold;">envfind</span> =: ([:&gt;[:{:[{~{."1@:[i:])
+<span style="color: #ffffff; font-weight: bold;">match</span> =: ([ , &lt;@:placmak@:&gt;@:])"0
+<span style="color: #ffffff; font-weight: bold;">lambda1</span> =: 2 :<span style="color: #00ff00;">'&gt;@:{: (u , (&gt;@:{.v)match y) runl (&lt;@:}.v)'</span>
+<span style="color: #66f;">NB.lambda1 =: 2 :'(u , (&gt;@:{.v)match y) ; (&lt;@:}.v) ; 9'</span>
+
+<span style="color: #ffffff; font-weight: bold;">lambda</span> =: 4 :<span style="color: #00ff00;">'(x lambda1 y)`(i.0)'</span>
+</pre>
+</div>
+
+
+<blockquote>
+
+<div class="figure">
+<p>
+</p>
+</div>
+
+<p>
+The <code>run</code> verb runs a scheme source tree (returned by <code>rdr</code>) in an environment.
+</p>
+
+<p>
+This function dispatches to one of the six functions <code>runnum</code>, <code>runsym</code>, <code>runset</code>, <code>runcall</code>, <code>runif</code>, <code>runlambda</code> depending on the type of the expression.
+</p>
+</blockquote>
+
+<div class="org-src-container">
+
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">runnum</span> =: {.@:,@:(_.&amp;".)@:&gt;@:]
+<span style="color: #ffffff; font-weight: bold;">runsym</span> =: placref @: envfind
+<span style="color: #ffffff; font-weight: bold;">runset</span> =: [: 0: ([envfind 1{&gt;@:]) placset ([run 2{&gt;@:])
+<span style="color: #ffffff; font-weight: bold;">runcall</span> =: [: (&gt;@:{. 4 :<span style="color: #00ff00;">'x@.0 y'</span> }.) runl
+<span style="color: #ffffff; font-weight: bold;">runif</span> =: [ run ([:-.[run 1{&gt;@:]) { ((&lt;<span style="color: #00ff00;">'0'</span>),~2}.&gt;@:])
+<span style="color: #ffffff; font-weight: bold;">runlambda</span> =: [ lambda }.@:&gt;@:]
+
+<span style="color: #ffffff; font-weight: bold;">keywd</span> =: (<span style="color: #00ff00;">'lambda'</span>;<span style="color: #00ff00;">'if'</span>;<span style="color: #00ff00;">'set!'</span>)&amp;i.
+<span style="color: #ffffff; font-weight: bold;">runo</span> =: runlambda`runif`runset`runcall@.(keywd@:{.@:&gt;@:])
+<span style="color: #ffffff; font-weight: bold;">runa</span> =: runsym`runnum@.(((e.&amp;<span style="color: #00ff00;">'0123456789+-'</span>@:{.@:&gt;)&gt;(e.&amp;(+`-)))@:])
+
+<span style="color: #ffffff; font-weight: bold;">run</span> =: runo`runa@.(1=L.@:])
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> putting it together</h2>
+<div class="outline-text-2" id="text-6">
+<div class="org-src-container">
+
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">eval</span> =: denv&amp;run @: rdr ::[:
+
+echo eval 0 :0
+        (((lambda (fact) (set! fact
+                (lambda (n) (if (&lt; n 1) 1 (* n (fact (- n 1)))))) fact) 0) 5)
+<span style="color: #00ffff;">)</span>
+echo eval <span style="color: #00ff00;">'((lambda (a) ((lambda (a) a) 2)) 5)'</span> <span style="color: #66f;">NB. must give 2</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
