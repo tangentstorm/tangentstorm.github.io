@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>code review : BJonas' Interpreter Experiment in J</title>
-<!-- 2013-12-29 Sun 10:20 -->
+<!-- 2013-12-29 Sun 12:14 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -133,8 +133,8 @@ The <code>tok</code> verb splits a scheme code string to tokens, but doesn't act
 <div class="org-src-container">
 
 <pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">spcp</span> =: e.&amp;(9 10 11 12 13 32{<span style="color: #7fffd4;">a.</span>)
-
 <span style="color: #ffffff; font-weight: bold;">tok1</span> =: (((~:1&amp;|.)@:spcp+.(+.1&amp;|.)@:(e.&amp;<span style="color: #00ff00;">'()'</span>))&lt;;.2])
+
 <span style="color: #ffffff; font-weight: bold;">tok</span> =: ((#~-.@:spcp@:{.@:&gt;"0)@:tok1@:(,&amp;<span style="color: #00ff00;">' '</span>)) ::[:
 </pre>
 </div>
@@ -246,9 +246,283 @@ The <code>rdr</code> verb reads a scheme code string to a tree, but the leafs of
 </pre>
 </div>
 
+<p>
+Here we see the mysterious <code>::[:</code> again. More importantly, it's just composing <code>rdr1</code> with <code>tok</code>.
+</p>
+
+<p>
+This is a simple a recursive descent parser. Let's follow the call chain, starting with <code>rdr</code>:
+</p>
+
+<ul class="org-ul">
+<li><code>rdr</code> applies <code>tok</code> to the input, then applies <code>rdr1</code> to the result
+</li>
+<li><code>rdr1</code> appends a boxed right paren to the chain of tokens, then calls <code>rdrs</code> and takes the head of the result.
+</li>
+<li><code>rdrs</code> selects the first token and then, based on the result of <code>rdrc</code>, calls either <code>rdrb</code>, <code>rdre</code>, or <code>rdra</code>.
+</li>
+<li><code>rdrc</code> simply unboxes a token and returns the index of its first character in the string '()':
+<ul class="org-ul">
+<li>'(' yields 0, so the 'b' in <code>rdrb</code> stands for <i>begin</i>.
+</li>
+<li>')' yields 1, so the 'e' in <code>rdre</code> stands for <i>end</i>.
+</li>
+<li>anything else yields 2 so the 'a' in <code>rdra</code> means <i>any</i>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>
+Presumably the input is a well-formed s-expression, so the first token is going to be an opening paren. So let's look at <code>rdrb</code>:
+</p>
+
 <pre class="example">
-echo rdr '(lambda (x) (+ 1 (* x x) x))'
+rdrb =: (&lt;@:}: , rdrs@:&gt;@:{:) @: rdrs@:}.
 </pre>
+
+<p>
+This is a pipeline. From right to left, behead the input (so remove the opening paren token), then call <code>rdrs</code> on the rest of the tokens.
+</p>
+
+<p>
+Let's trace it through with a specific example:
+</p>
+
+<pre class="example">
+   ]ts =: '(';'a';'(';'b';'c';')';')'
+┌─┬─┬─┬─┬─┬─┬─┐
+│(│a│(│b│c│)│)│
+└─┴─┴─┴─┴─┴─┴─┘
+</pre>
+
+<p>
+So far, we've chopped off the first '(' and are now looking at an 'a'. So we need to push <code>rdrb</code> onto a mental stack for a moment, and look at <code>rdra</code>, since that's what <code>rdrs</code> is going to call when it sees an 'a'.
+</p>
+
+<pre class="example">
+rdra =: {. , rdrs@:}.
+</pre>
+
+<p>
+This is a fork. It's going to append the head of the list (the boxed 'a') to the result of running <code>rdrs</code> on the tail. So we're recursing again. Since the tail starts with '(', we're doing another <code>rdrb</code>, then two <code>rdra</code> calls for the 'b' and 'c'. All of these cases are recursive, so at this point we're several levels deep into the call stack for each token. We only start to unwind the stack once we hit the first ')'.
+</p>
+
+<p>
+Calling <code>rdrs</code> with ')' as the first token invokes <code>rdre</code>:
+</p>
+
+<pre class="example">
+rdre =: &lt;@:}.
+</pre>
+
+<p>
+This will behead the token stream (removing the leading ')' token) and then put the entire rest of the token stream inside a new box.
+</p>
+
+<p>
+So in our example, we're looking at:
+</p>
+
+<pre class="example">
+   ')';')';')'
+┌─┬─┬─┐
+│)│)│)│
+└─┴─┴─┘
+</pre>
+
+<p>
+(The extra ')' would have been appended by <code>rdr1</code>)
+</p>
+
+<p>
+And the result will be:
+</p>
+
+<pre class="example">
+   rdre ')';')';')'
+┌─────┐
+│┌─┬─┐│
+││)│)││
+│└─┴─┘│
+└─────┘
+</pre>
+
+<p>
+This is returned up the chain to the innermost call of <code>rdra</code> for the 'c' token, where <code>rdra</code> simply appends it to the 'c'.
+</p>
+
+<pre class="example">
+   (&lt;'c') , rdre ')';')';')'
+┌─┬─────┐
+│c│┌─┬─┐│
+│ ││)│)││
+│ │└─┴─┘│
+└─┴─────┘
+</pre>
+
+<p>
+Same thing happens for 'b':
+</p>
+
+<pre class="example">
+   ] sofar =. (&lt;'b'), (&lt;'c'), rdre ')';')';')'
+┌─┬─┬─────┐
+│b│c│┌─┬─┐│
+│ │ ││)│)││
+│ │ │└─┴─┘│
+└─┴─┴─────┘
+</pre>
+
+<p>
+And now we're back at the innermost call of <code>rdrb</code>.
+</p>
+
+<pre class="example">
+rdrb =: (&lt;@:}: , rdrs@:&gt;@:{:) @: rdrs@:}.
+                              ^^^^^^^^^^^ this part is done.
+</pre>
+
+<p>
+This leaves us with the fork, which we'll apply to the structure above.
+</p>
+
+<pre class="example">
+(&lt;@:}: , rdrs@:&gt;@:{:)
+</pre>
+
+<p>
+The left side curtails and boxes:
+</p>
+
+<pre class="example">
+   &lt;@:}: sofar
+┌─────┐
+│┌─┬─┐│
+││b│c││
+│└─┴─┘│
+└─────┘
+</pre>
+
+<p>
+The right side takes the tail of the array, unboxes it, and calls <code>rdrs</code> on that recursively.
+</p>
+
+<p>
+Note that f you're used to thinking of the head and tail of a <i>list</i>, remember that in J, the tail is the last item in the array, <i>not</i> a chain of nested cons cells.
+</p>
+
+<p>
+So, we can build up the result from right to left ourselves:
+</p>
+
+<pre class="example">
+   {: sofar
+┌─────┐
+│┌─┬─┐│
+││)│)││
+│└─┴─┘│
+└─────┘
+</pre>
+
+<pre class="example">
+   &gt;@:{: sofar
+┌─┬─┐
+│)│)│
+└─┴─┘
+</pre>
+
+<pre class="example">
+   rdrs@:&gt;@:{: sofar
+┌───┐
+│┌─┐│
+││)││
+│└─┘│
+└───┘
+</pre>
+
+<p>
+Now we can complete the fork by appending this value to the the result on the left side:
+</p>
+
+<pre class="example">
+   ] sofar2 =. (&lt;@:}: , rdrs@:&gt;@:{:) sofar
+┌─────┬───┐
+│┌─┬─┐│┌─┐│
+││b│c│││)││
+│└─┴─┘│└─┘│
+└─────┴───┘
+</pre>
+
+<p>
+So this is the result of the inner call to <code>rdrb</code> and now we climb back up the call stack to <code>rdra</code>, which simply appends this value to the 'a' token:
+</p>
+
+<pre class="example">
+   ] sofar3 =. (&lt;'a'), sofar2
+┌─┬─────┬───┐
+│a│┌─┬─┐│┌─┐│
+│ ││b│c│││)││
+│ │└─┴─┘│└─┘│
+└─┴─────┴───┘
+</pre>
+
+<p>
+And now we're back where we started with <code>rdrb</code>. 
+</p>
+
+<pre class="example">
+rdrb =: (&lt;@:}: , rdrs@:&gt;@:{:) @: rdrs@:}.
+                              ^^^^^^^^^^^ here again but at top level
+</pre>
+
+<pre class="example">
+   (&lt;@:}: , rdrs@:&gt;@:{:) sofar3
+┌─────────┬┐
+│┌─┬─────┐││
+││a│┌─┬─┐│││
+││ ││b│c││││
+││ │└─┴─┘│││
+│└─┴─────┘││
+└─────────┴┘
+</pre>
+
+<p>
+Finally, we walk back up to <code>rdr1</code>, which returns the head.
+</p>
+
+<pre class="example">
+   {. (&lt;@:}: , rdrs@:&gt;@:{:) sofar3
+┌─────────┐
+│┌─┬─────┐│
+││a│┌─┬─┐││
+││ ││b│c│││
+││ │└─┴─┘││
+│└─┴─────┘│
+└─────────┘
+</pre>
+
+
+<p>
+The following test string was commented out in the code:
+</p>
+
+<pre class="example">
+   echo rdr '(lambda (x) (+ 1 (* x x) x))'
+┌────────────────────────────┐
+│┌──────┬───┬───────────────┐│
+││lambda│┌─┐│┌─┬─┬───────┬─┐││
+││      ││x│││+│1│┌─┬─┬─┐│x│││
+││      │└─┘││ │ ││*│x│x││ │││
+││      │   ││ │ │└─┴─┴─┘│ │││
+││      │   │└─┴─┴───────┴─┘││
+│└──────┴───┴───────────────┘│
+└────────────────────────────┘
+</pre>
+
+<p>
+So now we have the recursive descent parser.
+</p>
 </div>
 </div>
 <div id="outline-container-sec-3" class="outline-2">
