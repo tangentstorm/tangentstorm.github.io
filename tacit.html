@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Notes on tacit programming style in J</title>
+<!-- 2013-12-10 Tue 17:07 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Notes on tacit programming style in J</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. leftmost constants:</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> leftmost constants:</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+There are many simple identities between the verbs in J, so oftien you have the choice of expressing the same idea in multiple ways.
+</p>
+
+<pre class="example">
+&gt;: y &lt;--&gt; (1 +  y)               one more
+&lt;: y &lt;--&gt; (1 +  y)               one less
++: y &lt;--&gt; (2 *  y)               double
+-: y &lt;--&gt; (2 %~ y)               half
+*: y &lt;--&gt; (2 ^~ y) &lt;--&gt; *~ y     square
+%: y &lt;--&gt; (2 ^. y)               square root
+</pre>
+
+<p>
+Suppose we want to construct the first <code>y</code> odd numbers:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">            i. <span style="color: #eedd82;">y</span> =. 5       <span style="color: #66f;">NB. take the first y cardinals.</span>
+0 1 2 3 4
+        2 * i. <span style="color: #eedd82;">y</span> =. 5       <span style="color: #66f;">NB. double them</span>
+0 2 4 6 8
+    1 + 2 * i. <span style="color: #eedd82;">y</span> =. 5       <span style="color: #66f;">NB. and add one.</span>
+1 3 5 7 9
+</pre>
+</div>
+
+<p>
+This can be written more concisely as:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">      &gt;: +: i. <span style="color: #eedd82;">y</span> =. 5   <span style="color: #66f;">NB. one more than double first y cardinals</span>
+1 3 5 7 9
+</pre>
+</div>
+
+<p>
+We can ask J to convert this to tacit form for us:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">     13 : <span style="color: #00ff00;">'&gt;: +: i. y'</span>    <span style="color: #66f;">NB. explicit to tacit conversion.</span>
+[: &gt;: [: +: i.
+     ([: &gt;: [: +: i.) 5   <span style="color: #66f;">NB. usage requires parens.</span>
+  1 3 5 7 9
+</pre>
+</div>
+
+<p>
+What happens if we do the same for our original, longer verb?
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   13 : <span style="color: #00ff00;">'1 + 2 * i. y'</span>
+1 + 2 * i.
+  (1 + 2 * i.) 5
+1 3 5 7 9
+</pre>
+</div>
+
+<p>
+This works because of the rule for noun-verb-verb trains:
+</p>
+
+<pre class="example">
+(k f g) y &lt;--&gt; k f (g y)
+</pre>
+</div>
+</div>
+</div>
+</body>
+</html>

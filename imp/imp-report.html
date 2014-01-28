@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>The Implish Language Report</title>
-<!-- 2013-09-05 Thu 19:54 -->
+<!-- 2014-01-28 Tue 09:44 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012  Free Software Foundation, Inc.
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -64,27 +64,39 @@ for the JavaScript code in this tag.
 <div id="text-table-of-contents">
 <ul>
 <li><a href="#sec-1">1. Introduction</a></li>
-<li><a href="#sec-2">2. Lexical Analysis</a></li>
-<li><a href="#sec-3">3. Notation</a></li>
-<li><a href="#sec-4">4. control flow</a>
+<li><a href="#sec-2">2. Motivation</a></li>
+<li><a href="#sec-3">3. example programs</a>
 <ul>
-<li><a href="#sec-4-1">4.1. repeat:until:</a></li>
-<li><a href="#sec-4-2">4.2. while:do:</a></li>
-<li><a href="#sec-4-3">4.3. if:then:elif:*else:?</a></li>
-<li><a href="#sec-4-4">4.4. for:in:(while:|until:|if:)?do:</a></li>
-<li><a href="#sec-4-5">4.5. case:of:</a></li>
+<li><a href="#sec-3-1">3.1. helloworld</a>
+<ul>
+<li><a href="#sec-3-1-1">3.1.1. forthlike version</a></li>
+<li><a href="#sec-3-1-2">3.1.2. lisplike version</a></li>
+<li><a href="#sec-3-1-3">3.1.3. discussion</a></li>
 </ul>
 </li>
-<li><a href="#sec-5">5. behavior</a></li>
-<li><a href="#sec-6">6. the pipeline</a>
+</ul>
+</li>
+<li><a href="#sec-4">4. Lexical Analysis</a></li>
+<li><a href="#sec-5">5. Notation</a></li>
+<li><a href="#sec-6">6. control flow</a>
 <ul>
-<li><a href="#sec-6-1">6.1. lexing    :: [Char] -&gt; [Token]</a></li>
-<li><a href="#sec-6-2">6.2. parsing   :: [Token] -&gt; Tree</a></li>
-<li><a href="#sec-6-3">6.3. imports   :: Tree -&gt; [Tree]</a></li>
-<li><a href="#sec-6-4">6.4. typecheck :: Tree -&gt; Tree | Error</a></li>
-<li><a href="#sec-6-5">6.5. codegen   :: Tree -&gt; [OpCode]</a></li>
-<li><a href="#sec-6-6">6.6. running   :: [OpCode] -&gt; IO</a></li>
-<li><a href="#sec-6-7">6.7. interpret :: (Tree, State) -&gt; (Tree, State)</a></li>
+<li><a href="#sec-6-1">6.1. repeat:until:</a></li>
+<li><a href="#sec-6-2">6.2. while:do:</a></li>
+<li><a href="#sec-6-3">6.3. if:then:elif:*else:?</a></li>
+<li><a href="#sec-6-4">6.4. for:in:(while:|until:|if:)?do:</a></li>
+<li><a href="#sec-6-5">6.5. case:of:</a></li>
+</ul>
+</li>
+<li><a href="#sec-7">7. behavior</a></li>
+<li><a href="#sec-8">8. the pipeline</a>
+<ul>
+<li><a href="#sec-8-1">8.1. lexing    :: [Char] -&gt; [Token]</a></li>
+<li><a href="#sec-8-2">8.2. parsing   :: [Token] -&gt; Tree</a></li>
+<li><a href="#sec-8-3">8.3. imports   :: Tree -&gt; [Tree]</a></li>
+<li><a href="#sec-8-4">8.4. typecheck :: Tree -&gt; Tree | Error</a></li>
+<li><a href="#sec-8-5">8.5. codegen   :: Tree -&gt; [OpCode]</a></li>
+<li><a href="#sec-8-6">8.6. running   :: [OpCode] -&gt; IO</a></li>
+<li><a href="#sec-8-7">8.7. interpret :: (Tree, State) -&gt; (Tree, State)</a></li>
 </ul>
 </li>
 </ul>
@@ -99,10 +111,67 @@ for the JavaScript code in this tag.
 </p>
 </div>
 </div>
-
 <div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> Lexical Analysis</h2>
+<h2 id="sec-2"><span class="section-number-2">2</span> Motivation</h2>
 <div class="outline-text-2" id="text-2">
+<p>
+I wanted to make a language that was extensible and easy to bootstrap, combining the best ideas of lisp, forth, and smalltalk.
+</p>
+
+<ul class="org-ul">
+<li>minimal syntax
+</li>
+<li>support for quoting and templating
+</li>
+<li>blend of functional, logical, and imperative control flows
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> example programs</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> helloworld</h3>
+<div class="outline-text-3" id="text-3-1">
+</div><div id="outline-container-sec-3-1-1" class="outline-4">
+<h4 id="sec-3-1-1"><span class="section-number-4">3.1.1</span> forthlike version</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<div class="org-src-container">
+
+<pre class="src src-implish">"hello world" writeln
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-1-2" class="outline-4">
+<h4 id="sec-3-1-2"><span class="section-number-4">3.1.2</span> lisplike version</h4>
+<div class="outline-text-4" id="text-3-1-2">
+<div class="org-src-container">
+
+<pre class="src src-implish">(writeln "hello world")
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-1-3" class="outline-4">
+<h4 id="sec-3-1-3"><span class="section-number-4">3.1.3</span> discussion</h4>
+<div class="outline-text-4" id="text-3-1-3">
+<p>
+By default, items are simply placed on a stack, and (as in forth) verbs take their arguments immediately.
+</p>
+
+<p>
+Parentheses allow execution of the first token to be deferred until the entire list is parsed.
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Lexical Analysis</h2>
+<div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 
 <pre class="src src-antlr"><span style="color: #ffffff; font-weight: bold;">COMMENT</span>
@@ -128,9 +197,9 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-sec-3" class="outline-2">
-<h2 id="sec-3"><span class="section-number-2">3</span> Notation</h2>
-<div class="outline-text-2" id="text-3">
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Notation</h2>
+<div class="outline-text-2" id="text-5">
 <p>
 Implish has a simple, flexible syntax.
 </p>
@@ -146,9 +215,10 @@ Implish has a simple, flexible syntax.
   <span style="color: #00ffff;">;</span>
 
 <span style="color: #ffffff; font-weight: bold;">block</span>
-  <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'['</span> <span style="color: #ff00ff;">program</span> <span style="color: #00ff00;">']'</span>  <span style="color: #66f;">// </span><span style="color: #66f;">ordered block (list/array/etc)</span>
-  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'('</span> <span style="color: #ff00ff;">program</span> <span style="color: #00ff00;">')'</span>  <span style="color: #66f;">// </span><span style="color: #66f;">inline block (expresssions, etc)</span>
-  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'{'</span> <span style="color: #ff00ff;">program</span> <span style="color: #00ff00;">'}'</span>  <span style="color: #66f;">// </span><span style="color: #66f;">unordered block (dict, set, etc)</span>
+  <span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'['</span> <span style="color: #ff00ff;">program</span> <span style="color: #00ff00;">']'</span>  <span style="color: #66f;">// </span><span style="color: #66f;">quotation (also list, tuple, etc)</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'('</span> <span style="color: #ff00ff;">program</span> <span style="color: #00ff00;">')'</span>  <span style="color: #66f;">// </span><span style="color: #66f;">prefix block (lisp-like expressions)</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'{'</span> <span style="color: #ff00ff;">program</span> <span style="color: #00ff00;">'}'</span>  <span style="color: #66f;">// </span><span style="color: #66f;">lambda</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">':'</span> <span style="color: #ff00ff;">iden</span> <span style="color: #00ff00;">'|'</span> <span style="color: #ff00ff;">program</span> <span style="color: #00ff00;">';'</span>  <span style="color: #66f;">// </span><span style="color: #66f;">function definitons</span>
   <span style="color: #00ffff;">;</span>
 
 <span style="color: #ffffff; font-weight: bold;">quote</span>
@@ -172,56 +242,56 @@ Implish has a simple, flexible syntax.
 </div>
 </div>
 
-<div id="outline-container-sec-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> control flow</h2>
-<div class="outline-text-2" id="text-4">
-</div><div id="outline-container-sec-4-1" class="outline-3">
-<h3 id="sec-4-1"><span class="section-number-3">4.1</span> repeat:until:</h3>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> control flow</h2>
+<div class="outline-text-2" id="text-6">
+</div><div id="outline-container-sec-6-1" class="outline-3">
+<h3 id="sec-6-1"><span class="section-number-3">6.1</span> repeat:until:</h3>
 </div>
-<div id="outline-container-sec-4-2" class="outline-3">
-<h3 id="sec-4-2"><span class="section-number-3">4.2</span> while:do:</h3>
+<div id="outline-container-sec-6-2" class="outline-3">
+<h3 id="sec-6-2"><span class="section-number-3">6.2</span> while:do:</h3>
 </div>
-<div id="outline-container-sec-4-3" class="outline-3">
-<h3 id="sec-4-3"><span class="section-number-3">4.3</span> if:then:elif:*else:?</h3>
+<div id="outline-container-sec-6-3" class="outline-3">
+<h3 id="sec-6-3"><span class="section-number-3">6.3</span> if:then:elif:*else:?</h3>
 </div>
-<div id="outline-container-sec-4-4" class="outline-3">
-<h3 id="sec-4-4"><span class="section-number-3">4.4</span> for:in:(while:|until:|if:)?do:</h3>
+<div id="outline-container-sec-6-4" class="outline-3">
+<h3 id="sec-6-4"><span class="section-number-3">6.4</span> for:in:(while:|until:|if:)?do:</h3>
 </div>
-<div id="outline-container-sec-4-5" class="outline-3">
-<h3 id="sec-4-5"><span class="section-number-3">4.5</span> case:of:</h3>
+<div id="outline-container-sec-6-5" class="outline-3">
+<h3 id="sec-6-5"><span class="section-number-3">6.5</span> case:of:</h3>
 </div>
 </div>
-<div id="outline-container-sec-5" class="outline-2">
-<h2 id="sec-5"><span class="section-number-2">5</span> behavior</h2>
-<div class="outline-text-2" id="text-5">
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> behavior</h2>
+<div class="outline-text-2" id="text-7">
 <p>
 Our goal here is to build up arbitrary data structures.
 </p>
 </div>
 </div>
-<div id="outline-container-sec-6" class="outline-2">
-<h2 id="sec-6"><span class="section-number-2">6</span> the pipeline</h2>
-<div class="outline-text-2" id="text-6">
-</div><div id="outline-container-sec-6-1" class="outline-3">
-<h3 id="sec-6-1"><span class="section-number-3">6.1</span> lexing    :: [Char] -&gt; [Token]</h3>
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> the pipeline</h2>
+<div class="outline-text-2" id="text-8">
+</div><div id="outline-container-sec-8-1" class="outline-3">
+<h3 id="sec-8-1"><span class="section-number-3">8.1</span> lexing    :: [Char] -&gt; [Token]</h3>
 </div>
-<div id="outline-container-sec-6-2" class="outline-3">
-<h3 id="sec-6-2"><span class="section-number-3">6.2</span> parsing   :: [Token] -&gt; Tree</h3>
+<div id="outline-container-sec-8-2" class="outline-3">
+<h3 id="sec-8-2"><span class="section-number-3">8.2</span> parsing   :: [Token] -&gt; Tree</h3>
 </div>
-<div id="outline-container-sec-6-3" class="outline-3">
-<h3 id="sec-6-3"><span class="section-number-3">6.3</span> imports   :: Tree -&gt; [Tree]</h3>
+<div id="outline-container-sec-8-3" class="outline-3">
+<h3 id="sec-8-3"><span class="section-number-3">8.3</span> imports   :: Tree -&gt; [Tree]</h3>
 </div>
-<div id="outline-container-sec-6-4" class="outline-3">
-<h3 id="sec-6-4"><span class="section-number-3">6.4</span> typecheck :: Tree -&gt; Tree | Error</h3>
+<div id="outline-container-sec-8-4" class="outline-3">
+<h3 id="sec-8-4"><span class="section-number-3">8.4</span> typecheck :: Tree -&gt; Tree | Error</h3>
 </div>
-<div id="outline-container-sec-6-5" class="outline-3">
-<h3 id="sec-6-5"><span class="section-number-3">6.5</span> codegen   :: Tree -&gt; [OpCode]</h3>
+<div id="outline-container-sec-8-5" class="outline-3">
+<h3 id="sec-8-5"><span class="section-number-3">8.5</span> codegen   :: Tree -&gt; [OpCode]</h3>
 </div>
-<div id="outline-container-sec-6-6" class="outline-3">
-<h3 id="sec-6-6"><span class="section-number-3">6.6</span> running   :: [OpCode] -&gt; IO</h3>
+<div id="outline-container-sec-8-6" class="outline-3">
+<h3 id="sec-8-6"><span class="section-number-3">8.6</span> running   :: [OpCode] -&gt; IO</h3>
 </div>
-<div id="outline-container-sec-6-7" class="outline-3">
-<h3 id="sec-6-7"><span class="section-number-3">6.7</span> interpret :: (Tree, State) -&gt; (Tree, State)</h3>
+<div id="outline-container-sec-8-7" class="outline-3">
+<h3 id="sec-8-7"><span class="section-number-3">8.7</span> interpret :: (Tree, State) -&gt; (Tree, State)</h3>
 </div>
 </div>
 </div>

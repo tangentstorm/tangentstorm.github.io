@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>code review : BJonas' Interpreter Experiment in J</title>
-<!-- 2013-12-29 Sun 12:14 -->
+<!-- 2014-01-28 Tue 09:44 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -69,6 +69,7 @@ for the JavaScript code in this tag.
 <li><a href="#sec-4">4. default environment</a></li>
 <li><a href="#sec-5">5. evaluator</a></li>
 <li><a href="#sec-6">6. putting it together</a></li>
+<li><a href="#sec-7">7. notes</a></li>
 </ul>
 </div>
 </div>
@@ -87,7 +88,7 @@ Quoted text and the actual code belong to BJonas. Each section is quoted verbati
 
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #66f;">NB. interpreter experiment in J by zsban</span>
+<pre class="src src-j">NB. interpreter experiment in J by zsban
 </pre>
 </div>
 
@@ -132,10 +133,10 @@ The <code>tok</code> verb splits a scheme code string to tokens, but doesn't act
 
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">spcp</span> =: e.&amp;(9 10 11 12 13 32{<span style="color: #7fffd4;">a.</span>)
-<span style="color: #ffffff; font-weight: bold;">tok1</span> =: (((~:1&amp;|.)@:spcp+.(+.1&amp;|.)@:(e.&amp;<span style="color: #00ff00;">'()'</span>))&lt;;.2])
+<pre class="src src-j">spcp =: e.&amp;(9 10 11 12 13 32{a.)
+tok1 =: (((~:1&amp;|.)@:spcp+.(+.1&amp;|.)@:(e.&amp;'()'))&lt;;.2])
 
-<span style="color: #ffffff; font-weight: bold;">tok</span> =: ((#~-.@:spcp@:{.@:&gt;"0)@:tok1@:(,&amp;<span style="color: #00ff00;">' '</span>)) ::[:
+tok =: ((#~-.@:spcp@:{.@:&gt;"0)@:tok1@:(,&amp;' ')) ::[:
 </pre>
 </div>
 
@@ -235,14 +236,14 @@ The <code>rdr</code> verb reads a scheme code string to a tree, but the leafs of
 
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">rdrc</span> =: (<span style="color: #00ff00;">'()'</span>i.{.@:&gt;)
-<span style="color: #ffffff; font-weight: bold;">rdrs</span> =: rdrb`rdre`rdra@.(rdrc@:{.)
-<span style="color: #ffffff; font-weight: bold;">rdrb</span> =: (&lt;@:}: , rdrs@:&gt;@:{:) @: rdrs@:}.
-<span style="color: #ffffff; font-weight: bold;">rdre</span> =: &lt;@:}.
-<span style="color: #ffffff; font-weight: bold;">rdra</span> =: {. , rdrs@:}.
-<span style="color: #ffffff; font-weight: bold;">rdr1</span> =: {.@:rdrs@:(,&amp;(&lt;<span style="color: #00ff00;">')'</span>))
+<pre class="src src-j">rdrc =: ('()'i.{.@:&gt;)
+rdrs =: rdrb`rdre`rdra@.(rdrc@:{.)
+rdrb =: (&lt;@:}: , rdrs@:&gt;@:{:) @: rdrs@:}.
+rdre =: &lt;@:}.
+rdra =: {. , rdrs@:}.
+rdr1 =: {.@:rdrs@:(,&amp;(&lt;')'))
 
-<span style="color: #ffffff; font-weight: bold;">rdr</span> =: (rdr1 @: tok) ::[:
+rdr =: (rdr1 @: tok) ::[:
 </pre>
 </div>
 
@@ -251,7 +252,7 @@ Here we see the mysterious <code>::[:</code> again. More importantly, it's just 
 </p>
 
 <p>
-This is a simple a recursive descent parser. Let's follow the call chain, starting with <code>rdr</code>:
+This is simply a recursive descent parser. Let's follow the call chain, starting with <code>rdr</code>:
 </p>
 
 <ul class="org-ul">
@@ -542,14 +543,28 @@ The <code>placmak</code>, <code>placref</code>, and <code>placset</code> functio
 
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">placv</span> =: i.0
-<span style="color: #ffffff; font-weight: bold;">placmak</span> =: 3 :<span style="color: #00ff00;">'&lt;:#placv=:placv,&lt;y'</span>
-<span style="color: #ffffff; font-weight: bold;">placref</span> =: 3 :<span style="color: #00ff00;">'&gt;y{placv'</span>
-<span style="color: #ffffff; font-weight: bold;">placset</span> =: 4 :<span style="color: #00ff00;">'0:placv=:(&lt;y) x}placv'</span>
+<pre class="src src-j">placv =: i.0
+placmak =: 3 :'&lt;:#placv=:placv,&lt;y'
+placref =: 3 :'&gt;y{placv'
+placset =: 4 :'0:placv=:(&lt;y) x}placv'
 </pre>
 </div>
+
+<p>
+These are fairly straightforward.
+</p>
+
+<p>
+The noun <code>placv</code> is initialized as an empty array, to which boxed values are appended when <code>placmak</code> is called. The <code>&lt;:#</code> symbols on the left of <code>placmak</code> cause it to return the index of the newly created cell.
+</p>
+
+<p>
+The other two functions simply get and set boxed values in this array.
+</p>
 </div>
 </div>
+
+
 <div id="outline-container-sec-4" class="outline-2">
 <h2 id="sec-4"><span class="section-number-2">4</span> default environment</h2>
 <div class="outline-text-2" id="text-4">
@@ -567,22 +582,26 @@ The environment is a rank 2 array whose first column contains the boxed names of
 
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">denv</span> =: i.0 2
-<span style="color: #ffffff; font-weight: bold;">denvadd</span> =: 4 :<span style="color: #00ff00;">'0:denv=:denv,(,x);placmak y'</span>
-<span style="color: #00ff00;">'+'</span> denvadd +/@:&gt;`<span style="color: #00ff00;">''</span>
-<span style="color: #00ff00;">'-'</span> denvadd ({.-+/@:}.)`(-@:{.)@.(1=#)@:&gt;`<span style="color: #00ff00;">''</span>
-<span style="color: #00ff00;">'*'</span> denvadd */@:&gt;`<span style="color: #00ff00;">''</span>
-<span style="color: #00ff00;">'/'</span> denvadd ({.%*/@:}.)`(%@:{.)@.(1=#)@:&gt;`<span style="color: #00ff00;">''</span>
-<span style="color: #00ff00;">'floor'</span> denvadd &lt;.@:{.@:&gt;`<span style="color: #00ff00;">''</span>
-<span style="color: #00ff00;">'exp'</span> denvadd ^@:{.@:&gt;`<span style="color: #00ff00;">''</span>
-<span style="color: #00ff00;">'log'</span> denvadd ^.@:{.@:&gt;`<span style="color: #00ff00;">''</span>
-<span style="color: #00ff00;">'&lt;'</span> denvadd ([:*./2&lt;/\])@:&gt;`<span style="color: #00ff00;">''</span>
-<span style="color: #00ff00;">'='</span> denvadd ([:*./2=/\])@:&gt;`<span style="color: #00ff00;">''</span>
-<span style="color: #00ff00;">'&lt;='</span> denvadd ([:*./2&lt;:/\])@:&gt;`<span style="color: #00ff00;">''</span>
-<span style="color: #00ff00;">'not'</span> denvadd -.@:{.@:&gt;`<span style="color: #00ff00;">''</span>
-<span style="color: #00ff00;">'g0'</span> denvadd 0
+<pre class="src src-j">denv =: i.0 2
+denvadd =: 4 :'0:denv=:denv,(,x);placmak y'
+'+' denvadd +/@:&gt;`''
+'-' denvadd ({.-+/@:}.)`(-@:{.)@.(1=#)@:&gt;`''
+'*' denvadd */@:&gt;`''
+'/' denvadd ({.%*/@:}.)`(%@:{.)@.(1=#)@:&gt;`''
+'floor' denvadd &lt;.@:{.@:&gt;`''
+'exp' denvadd ^@:{.@:&gt;`''
+'log' denvadd ^.@:{.@:&gt;`''
+'&lt;' denvadd ([:*./2&lt;/\])@:&gt;`''
+'=' denvadd ([:*./2=/\])@:&gt;`''
+'&lt;=' denvadd ([:*./2&lt;:/\])@:&gt;`''
+'not' denvadd -.@:{.@:&gt;`''
+'g0' denvadd 0
 </pre>
 </div>
+
+<p>
+These are also straightforward. The - and / verbs are longer than their + and * equivalents because they have special cases for one argument (producing negative values or an inverse).
+</p>
 </div>
 </div>
 <div id="outline-container-sec-5" class="outline-2">
@@ -602,15 +621,20 @@ Scheme procedures are represented as J gerunds of monadic functions that accept 
 
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">runl</span> =: [ &lt;@:run"_ 0 &gt;@:]
-<span style="color: #ffffff; font-weight: bold;">envfind</span> =: ([:&gt;[:{:[{~{."1@:[i:])
-<span style="color: #ffffff; font-weight: bold;">match</span> =: ([ , &lt;@:placmak@:&gt;@:])"0
-<span style="color: #ffffff; font-weight: bold;">lambda1</span> =: 2 :<span style="color: #00ff00;">'&gt;@:{: (u , (&gt;@:{.v)match y) runl (&lt;@:}.v)'</span>
-<span style="color: #66f;">NB.lambda1 =: 2 :'(u , (&gt;@:{.v)match y) ; (&lt;@:}.v) ; 9'</span>
+<pre class="src src-j">runl =: [ &lt;@:run"_ 0 &gt;@:]
+envfind =: ([:&gt;[:{:[{~{."1@:[i:])
+match =: ([ , &lt;@:placmak@:&gt;@:])"0
+lambda1 =: 2 :'&gt;@:{: (u , (&gt;@:{.v)match y) runl (&lt;@:}.v)'
+NB.lambda1 =: 2 :'(u , (&gt;@:{.v)match y) ; (&lt;@:}.v) ; 9'
 
-<span style="color: #ffffff; font-weight: bold;">lambda</span> =: 4 :<span style="color: #00ff00;">'(x lambda1 y)`(i.0)'</span>
+lambda =: 4 :'(x lambda1 y)`(i.0)'
 </pre>
 </div>
+
+<p>
+Okay so it looks like <code>runl</code> is a dyad that applies the verb <code>run</code> to each item in a list.
+</p>
+
 
 
 <blockquote>
@@ -631,18 +655,18 @@ This function dispatches to one of the six functions <code>runnum</code>, <code>
 
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">runnum</span> =: {.@:,@:(_.&amp;".)@:&gt;@:]
-<span style="color: #ffffff; font-weight: bold;">runsym</span> =: placref @: envfind
-<span style="color: #ffffff; font-weight: bold;">runset</span> =: [: 0: ([envfind 1{&gt;@:]) placset ([run 2{&gt;@:])
-<span style="color: #ffffff; font-weight: bold;">runcall</span> =: [: (&gt;@:{. 4 :<span style="color: #00ff00;">'x@.0 y'</span> }.) runl
-<span style="color: #ffffff; font-weight: bold;">runif</span> =: [ run ([:-.[run 1{&gt;@:]) { ((&lt;<span style="color: #00ff00;">'0'</span>),~2}.&gt;@:])
-<span style="color: #ffffff; font-weight: bold;">runlambda</span> =: [ lambda }.@:&gt;@:]
+<pre class="src src-j">runnum =: {.@:,@:(_.&amp;".)@:&gt;@:]
+runsym =: placref @: envfind
+runset =: [: 0: ([envfind 1{&gt;@:]) placset ([run 2{&gt;@:])
+runcall =: [: (&gt;@:{. 4 :'x@.0 y' }.) runl
+runif =: [ run ([:-.[run 1{&gt;@:]) { ((&lt;'0'),~2}.&gt;@:])
+runlambda =: [ lambda }.@:&gt;@:]
 
-<span style="color: #ffffff; font-weight: bold;">keywd</span> =: (<span style="color: #00ff00;">'lambda'</span>;<span style="color: #00ff00;">'if'</span>;<span style="color: #00ff00;">'set!'</span>)&amp;i.
-<span style="color: #ffffff; font-weight: bold;">runo</span> =: runlambda`runif`runset`runcall@.(keywd@:{.@:&gt;@:])
-<span style="color: #ffffff; font-weight: bold;">runa</span> =: runsym`runnum@.(((e.&amp;<span style="color: #00ff00;">'0123456789+-'</span>@:{.@:&gt;)&gt;(e.&amp;(+`-)))@:])
+keywd =: ('lambda';'if';'set!')&amp;i.
+runo =: runlambda`runif`runset`runcall@.(keywd@:{.@:&gt;@:])
+runa =: runsym`runnum@.(((e.&amp;'0123456789+-'@:{.@:&gt;)&gt;(e.&amp;(+`-)))@:])
 
-<span style="color: #ffffff; font-weight: bold;">run</span> =: runo`runa@.(1=L.@:])
+run =: runo`runa@.(1=L.@:])
 </pre>
 </div>
 </div>
@@ -652,15 +676,26 @@ This function dispatches to one of the six functions <code>runnum</code>, <code>
 <div class="outline-text-2" id="text-6">
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">eval</span> =: denv&amp;run @: rdr ::[:
+<pre class="src src-j">eval =: denv&amp;run @: rdr ::[:
 
 echo eval 0 :0
         (((lambda (fact) (set! fact
                 (lambda (n) (if (&lt; n 1) 1 (* n (fact (- n 1)))))) fact) 0) 5)
-<span style="color: #00ffff;">)</span>
-echo eval <span style="color: #00ff00;">'((lambda (a) ((lambda (a) a) 2)) 5)'</span> <span style="color: #66f;">NB. must give 2</span>
+)
+echo eval '((lambda (a) ((lambda (a) a) 2)) 5)' NB. must give 2
 </pre>
 </div>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> notes</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+<code>runl</code> looks similar to  (<code>run &amp;. &gt;</code>)&#x2026; how are they different?
+</p>
 </div>
 </div>
 </div>
