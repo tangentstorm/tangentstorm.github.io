@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>creating interactive programs</title>
-<!-- 2013-09-03 Tue 23:44 -->
+<!-- 2014-02-08 Sat 07:39 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012  Free Software Foundation, Inc.
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -68,14 +68,14 @@ for the JavaScript code in this tag.
 <li><a href="#sec-3">3. The core procedure: <code>interact</code></a></li>
 <li><a href="#sec-4">4. Definition of <code>context</code></a></li>
 <li><a href="#sec-5">5. Organizing pascal code</a></li>
-<li><a href="#sec-6">6. (put tangled code somewhere and link to it)</a></li>
+<li><a href="#sec-6">6. <span class="todo TODO">TODO</span> (put tangled code somewhere and link to it)</a></li>
 <li><a href="#sec-7">7. <code>TCtxFn</code> and <code>TCtx</code></a></li>
 <li><a href="#sec-8">8. A default Context: <code>NewEmptyCtx</code></a></li>
 <li><a href="#sec-9">9. Summary of the <code>core</code> module</a></li>
 <li><a href="#sec-10">10. Our first program: <code>stop</code></a></li>
 <li><a href="#sec-11">11. program: <code>exitloop</code></a></li>
 <li><a href="#sec-12">12. Why bother?</a></li>
-<li><a href="#sec-13">13. </a></li>
+<li><a href="#sec-13">13. <span class="todo TODO">TODO</span> </a></li>
 </ul>
 </div>
 </div>
@@ -185,7 +185,6 @@ All interactive or programs share this same basic structure, though of course th
 <div id="outline-container-sec-3" class="outline-2">
 <h2 id="sec-3"><a id="pbu33c00d5g0" name="pbu33c00d5g0"></a><span class="section-number-2">3</span> The core procedure: <code>interact</code></h2>
 <div class="outline-text-2" id="text-3">
-
 <p>
 The following general procedure describes the behavior of an arbitrary interactive program:
 </p>
@@ -218,7 +217,6 @@ In this case, the object is whatever the result of evaluating <code>context</cod
 <div id="outline-container-sec-4" class="outline-2">
 <h2 id="sec-4"><a id="56mczy10d5g0" name="56mczy10d5g0"></a><span class="section-number-2">4</span> Definition of <code>context</code></h2>
 <div class="outline-text-2" id="text-4">
-
 <p>
 We can choose to define <code>context</code> in a variety of ways:
 </p>
@@ -256,7 +254,6 @@ Before we explain what this means, let's take a moment and explain where to put 
 <div id="outline-container-sec-5" class="outline-2">
 <h2 id="sec-5"><a id="tv1ec650d5g0" name="tv1ec650d5g0"></a><span class="section-number-2">5</span> Organizing pascal code</h2>
 <div class="outline-text-2" id="text-5">
-
 <p>
 Pascal compilers are extraordinarily fast compared to compilers for other languages. In part, this is because the language is designed to be compilable in a single pass from top to bottom, without the need for any sort of intermediate tree representation.
 </p>
@@ -289,7 +286,6 @@ This file presents the code in the order that I would write it from scratch. At 
 <div id="outline-container-sec-7" class="outline-2">
 <h2 id="sec-7"><a id="omgap2c0d5g0" name="omgap2c0d5g0"></a><span class="section-number-2">7</span> <code>TCtxFn</code> and <code>TCtx</code></h2>
 <div class="outline-text-2" id="text-7">
-
 <p>
 <code>TCtxFn</code> is the type (<code>T</code>) of a function (<code>Fn</code>) that produces a context (<code>Ctx</code>).<sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup> 
 </p>
@@ -426,7 +422,6 @@ Since we need <code>always</code> to be a <code>TPredicate</code>, we have to do
 <div id="outline-container-sec-9" class="outline-2">
 <h2 id="sec-9"><a id="vrk2tm40d5g0" name="vrk2tm40d5g0"></a><span class="section-number-2">9</span> Summary of the <code>core</code> module</h2>
 <div class="outline-text-2" id="text-9">
-
 <p>
 Our code is now arranged like this:
 </p>
@@ -500,7 +495,6 @@ You might think that users would be happy with our work so far, and can probably
 <div id="outline-container-sec-11" class="outline-2">
 <h2 id="sec-11"><a id="fn6bqp21d5g0" name="fn6bqp21d5g0"></a><span class="section-number-2">11</span> program: <code>exitloop</code></h2>
 <div class="outline-text-2" id="text-11">
-
 <div class="org-src-container">
 
 <pre class="src src-pascal"><span style="color: #00ffff;">program</span> <span style="color: #ffffff; font-weight: bold;">exitloop</span>;

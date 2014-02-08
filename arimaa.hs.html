@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>An Arimaa Library for Haskell.</title>
-<!-- 2013-09-03 Tue 23:44 -->
+<!-- 2014-02-08 Sat 07:39 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012  Free Software Foundation, Inc.
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -110,13 +110,13 @@ See <a href="http://arimaa.com/arimaa/">http://arimaa.com/arimaa/</a>
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">{-# LANGUAGE TypeSynonymInstances, OverlappingInstances #-}
+<pre class="src src-haskell"><span style="color: #66f;">{-</span><span style="color: #66f;"># LANGUAGE TypeSynonymInstances, OverlappingInstances #-}</span>
 
-import Data.Array
-import Data.Char
-import qualified Data.Map as Map
-import qualified Data.String.Utils as DSU
-import Control.Monad.State
+<span style="color: #00ffff;">import</span> <span style="color: #ff00ff;">Data.Array</span>
+<span style="color: #00ffff;">import</span> <span style="color: #ff00ff;">Data.Char</span>
+<span style="color: #00ffff;">import</span> <span style="color: #00ffff;">qualified</span> <span style="color: #ff00ff;">Data.Map</span> <span style="color: #00ffff;">as</span> <span style="color: #ff00ff;">Map</span>
+<span style="color: #00ffff;">import</span> <span style="color: #00ffff;">qualified</span> <span style="color: #ff00ff;">Data.String.Utils</span> <span style="color: #00ffff;">as</span> <span style="color: #ff00ff;">DSU</span>
+<span style="color: #00ffff;">import</span> <span style="color: #ff00ff;">Control.Monad.State</span>
 </pre>
 </div>
 </div>
@@ -126,21 +126,21 @@ import Control.Monad.State
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
 
-<pre class="src src-haskell">data Animal = R | C | D | H | M | E 
-     deriving (Ord, Eq, Show)
-data Color = Gold | Silver deriving (Show, Eq)
-type Colored a = (Color, a)
-type Piece = Colored Animal
+<pre class="src src-haskell"><span style="color: #00ffff;">data</span> <span style="color: #ff00ff;">Animal</span> <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">R</span> <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">C</span> <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">D</span> <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">H</span> <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">M</span> <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">E</span> 
+     <span style="color: #00ffff;">deriving</span> (<span style="color: #ff00ff;">Ord</span>, <span style="color: #ff00ff;">Eq</span>, <span style="color: #ff00ff;">Show</span>)
+<span style="color: #00ffff;">data</span> <span style="color: #ff00ff;">Color</span> <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Gold</span> <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">Silver</span> <span style="color: #00ffff;">deriving</span> (<span style="color: #ff00ff;">Show</span>, <span style="color: #ff00ff;">Eq</span>)
+<span style="color: #00ffff;">type</span> <span style="color: #ff00ff;">Colored</span> a <span style="color: #eedd82;">=</span> (<span style="color: #ff00ff;">Color</span>, a)
+<span style="color: #00ffff;">type</span> <span style="color: #ff00ff;">Piece</span> <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Colored</span> <span style="color: #ff00ff;">Animal</span>
 
-showPiece (Gold, a)   = show a
-showPiece (Silver, a) = map toLower $ show a
+<span style="color: #ffffff; font-weight: bold;">showPiece</span> (<span style="color: #ff00ff;">Gold</span>, a)   <span style="color: #eedd82;">=</span> show a
+<span style="color: #ffffff; font-weight: bold;">showPiece</span> (<span style="color: #ff00ff;">Silver</span>, a) <span style="color: #eedd82;">=</span> map toLower <span style="color: #eedd82;">$</span> show a
 
 
-gold   a = (Gold, a)
-silver a = (Silver, a)
+<span style="color: #ffffff; font-weight: bold;">gold</span>   a <span style="color: #eedd82;">=</span> (<span style="color: #ff00ff;">Gold</span>, a)
+<span style="color: #ffffff; font-weight: bold;">silver</span> a <span style="color: #eedd82;">=</span> (<span style="color: #ff00ff;">Silver</span>, a)
 
-g = gold
-s = silver
+<span style="color: #ffffff; font-weight: bold;">g</span> <span style="color: #eedd82;">=</span> gold
+<span style="color: #ffffff; font-weight: bold;">s</span> <span style="color: #eedd82;">=</span> silver
 </pre>
 </div>
 </div>
@@ -153,11 +153,11 @@ s = silver
 <div class="outline-text-3" id="text-3-1">
 <div class="org-src-container">
 
-<pre class="src src-haskell">files = ['a'..'h']
-ranks = [1..8]
-type Square = (Char, Int)
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">files</span> <span style="color: #eedd82;">=</span> [<span style="color: #00ff00;">'a'</span><span style="color: #eedd82;">..</span><span style="color: #00ff00;">'h'</span>]
+<span style="color: #ffffff; font-weight: bold;">ranks</span> <span style="color: #eedd82;">=</span> [1<span style="color: #eedd82;">..</span>8]
+<span style="color: #00ffff;">type</span> <span style="color: #ff00ff;">Square</span> <span style="color: #eedd82;">=</span> (<span style="color: #ff00ff;">Char</span>, <span style="color: #ff00ff;">Int</span>)
 
-showSquare (x, y) = x : show y
+<span style="color: #ffffff; font-weight: bold;">showSquare</span> (x, y) <span style="color: #eedd82;">=</span> x <span style="color: #ff00ff;">:</span> show y
 </pre>
 </div>
 
@@ -172,14 +172,14 @@ As a special case, I'm putting "trap" in here, even though it evaluates to the s
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">data Content = Empty | Wall | Trap | A Piece
-instance Show Content where
-    show c = case c of
-               Empty     -&gt; " "
-               Trap      -&gt; "x"
-               Wall      -&gt; "#"
-               A (Gold, piece)   -&gt; show piece
-               A (Silver, piece) -&gt; map toLower $ show piece
+<pre class="src src-haskell"><span style="color: #00ffff;">data</span> <span style="color: #ff00ff;">Content</span> <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Empty</span> <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">Wall</span> <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">Trap</span> <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">A</span> <span style="color: #ff00ff;">Piece</span>
+<span style="color: #00ffff;">instance</span> <span style="color: #ff00ff;">Show</span> <span style="color: #ff00ff;">Content</span> <span style="color: #00ffff;">where</span>
+    show c <span style="color: #eedd82;">=</span> <span style="color: #00ffff;">case</span> c <span style="color: #00ffff;">of</span>
+               <span style="color: #ff00ff;">Empty</span>     <span style="color: #eedd82;">-&gt;</span> <span style="color: #00ff00;">" "</span>
+               <span style="color: #ff00ff;">Trap</span>      <span style="color: #eedd82;">-&gt;</span> <span style="color: #00ff00;">"x"</span>
+               <span style="color: #ff00ff;">Wall</span>      <span style="color: #eedd82;">-&gt;</span> <span style="color: #00ff00;">"#"</span>
+               <span style="color: #ff00ff;">A</span> (<span style="color: #ff00ff;">Gold</span>, piece)   <span style="color: #eedd82;">-&gt;</span> show piece
+               <span style="color: #ff00ff;">A</span> (<span style="color: #ff00ff;">Silver</span>, piece) <span style="color: #eedd82;">-&gt;</span> map toLower <span style="color: #eedd82;">$</span> show piece
 </pre>
 </div>
 </div>
@@ -193,14 +193,14 @@ Here we build an empty board, with a border around the edge.
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">type BoardShape =  Array Square Content
-data Board = Board BoardShape
-emptyBoard :: Board
-emptyBoard = Board $ array fullBounds
-           $ [ (sq, initSquare sq) | sq &lt;- range fullBounds ]
+<pre class="src src-haskell"><span style="color: #00ffff;">type</span> <span style="color: #ff00ff;">BoardShape</span> <span style="color: #eedd82;">=</span>  <span style="color: #ff00ff;">Array</span> <span style="color: #ff00ff;">Square</span> <span style="color: #ff00ff;">Content</span>
+<span style="color: #00ffff;">data</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Board</span> <span style="color: #ff00ff;">BoardShape</span>
+<span style="color: #ffffff; font-weight: bold;">emptyBoard</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Board</span>
+<span style="color: #ffffff; font-weight: bold;">emptyBoard</span> <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">$</span> array fullBounds
+           <span style="color: #eedd82;">$</span> [ (sq, initSquare sq) <span style="color: #eedd82;">|</span> sq <span style="color: #eedd82;">&lt;-</span> range fullBounds ]
 
-fullBounds = ((westOf 'a', 0), (eastOf 'h', 9))
-coreBounds = (('a', 1), ('h',8))
+<span style="color: #ffffff; font-weight: bold;">fullBounds</span> <span style="color: #eedd82;">=</span> ((westOf <span style="color: #00ff00;">'a'</span>, 0), (eastOf <span style="color: #00ff00;">'h'</span>, 9))
+<span style="color: #ffffff; font-weight: bold;">coreBounds</span> <span style="color: #eedd82;">=</span> ((<span style="color: #00ff00;">'a'</span>, 1), (<span style="color: #00ff00;">'h'</span>,8))
 </pre>
 </div>
 
@@ -210,17 +210,17 @@ This may come in handy for traps later on:
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">initSquare :: Square -&gt; Content
-initSquare sq@(x, y)
-  | (x &lt; 'a') = Wall
-  | (x &gt; 'h') = Wall
-  | (y &lt; 1)   = Wall
-  | (y &gt; 8)   = Wall
-  | isTrap sq = Trap
-  | otherwise = Empty
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">initSquare</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Square</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Content</span>
+<span style="color: #ffffff; font-weight: bold;">initSquare</span> sq<span style="color: #eedd82;">@</span>(x, y)
+  <span style="color: #eedd82;">|</span> (x <span style="color: #eedd82;">&lt;</span> <span style="color: #00ff00;">'a'</span>) <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Wall</span>
+  <span style="color: #eedd82;">|</span> (x <span style="color: #eedd82;">&gt;</span> <span style="color: #00ff00;">'h'</span>) <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Wall</span>
+  <span style="color: #eedd82;">|</span> (y <span style="color: #eedd82;">&lt;</span> 1)   <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Wall</span>
+  <span style="color: #eedd82;">|</span> (y <span style="color: #eedd82;">&gt;</span> 8)   <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Wall</span>
+  <span style="color: #eedd82;">|</span> isTrap sq <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Trap</span>
+  <span style="color: #eedd82;">|</span> otherwise <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Empty</span>
 
-eastOf file = chr $ (ord file) + 1
-westOf file = chr $ (ord file) - 1
+<span style="color: #ffffff; font-weight: bold;">eastOf</span> file <span style="color: #eedd82;">=</span> chr <span style="color: #eedd82;">$</span> (ord file) <span style="color: #eedd82;">+</span> 1
+<span style="color: #ffffff; font-weight: bold;">westOf</span> file <span style="color: #eedd82;">=</span> chr <span style="color: #eedd82;">$</span> (ord file) <span style="color: #eedd82;">-</span> 1
 </pre>
 </div>
 </div>
@@ -235,15 +235,15 @@ defined at <a href="http://arimaa.com/arimaa/learn/notation.html">http://arimaa.
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">render :: Board -&gt; String
-render (Board br) = DSU.join "\n" $ map row [9,8.. -1]
-    where row y | y == 9 || y== 0  = " +-----------------+"
-                | y == -1          = "   a b c d e f g h  \n"
-                | otherwise        = show y ++ "| " ++ cells y ++ " |"
-          cells y = DSU.join " " $ map (\x -&gt; show $ br ! (x, y)) files
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">render</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">String</span>
+<span style="color: #ffffff; font-weight: bold;">render</span> (<span style="color: #ff00ff;">Board</span> br) <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">DSU</span><span style="color: #eedd82;">.</span>join <span style="color: #00ff00;">"\n"</span> <span style="color: #eedd82;">$</span> map row [9,8<span style="color: #eedd82;">..</span> <span style="color: #eedd82;">-</span>1]
+    <span style="color: #00ffff;">where</span> row y <span style="color: #eedd82;">|</span> y <span style="color: #eedd82;">==</span> 9 <span style="color: #eedd82;">||</span> y<span style="color: #eedd82;">==</span> 0  <span style="color: #eedd82;">=</span> <span style="color: #00ff00;">" +-----------------+"</span>
+                <span style="color: #eedd82;">|</span> y <span style="color: #eedd82;">==</span> <span style="color: #eedd82;">-</span>1          <span style="color: #eedd82;">=</span> <span style="color: #00ff00;">"   a b c d e f g h  \n"</span>
+                <span style="color: #eedd82;">|</span> otherwise        <span style="color: #eedd82;">=</span> show y <span style="color: #eedd82;">++</span> <span style="color: #00ff00;">"| "</span> <span style="color: #eedd82;">++</span> cells y <span style="color: #eedd82;">++</span> <span style="color: #00ff00;">" |"</span>
+          cells y <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">DSU</span><span style="color: #eedd82;">.</span>join <span style="color: #00ff00;">" "</span> <span style="color: #eedd82;">$</span> map (<span style="color: #eedd82;">\</span>x <span style="color: #eedd82;">-&gt;</span> show <span style="color: #eedd82;">$</span> br <span style="color: #eedd82;">!</span> (x, y)) files
 
-instance Show (Board) where 
-   show = render
+<span style="color: #00ffff;">instance</span> <span style="color: #ff00ff;">Show</span> (<span style="color: #ff00ff;">Board</span>) <span style="color: #00ffff;">where</span> 
+   show <span style="color: #eedd82;">=</span> render
 </pre>
 </div>
 </div>
@@ -253,15 +253,15 @@ instance Show (Board) where
 <div class="outline-text-3" id="text-3-4">
 <div class="org-src-container">
 
-<pre class="src src-haskell">traps :: [Square]
-traps = [('c',3), ('c',6), ('f',3), ('f',6)]
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">traps</span> <span style="color: #eedd82;">::</span> [<span style="color: #ff00ff;">Square</span>]
+<span style="color: #ffffff; font-weight: bold;">traps</span> <span style="color: #eedd82;">=</span> [(<span style="color: #00ff00;">'c'</span>,3), (<span style="color: #00ff00;">'c'</span>,6), (<span style="color: #00ff00;">'f'</span>,3), (<span style="color: #00ff00;">'f'</span>,6)]
 
-isTrap :: Square -&gt; Bool
-isTrap ('c', 3) = True
-isTrap ('c', 6) = True
-isTrap ('f', 3) = True
-isTrap ('f', 6) = True
-isTrap others = False
+<span style="color: #ffffff; font-weight: bold;">isTrap</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Square</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Bool</span>
+<span style="color: #ffffff; font-weight: bold;">isTrap</span> (<span style="color: #00ff00;">'c'</span>, 3) <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">True</span>
+<span style="color: #ffffff; font-weight: bold;">isTrap</span> (<span style="color: #00ff00;">'c'</span>, 6) <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">True</span>
+<span style="color: #ffffff; font-weight: bold;">isTrap</span> (<span style="color: #00ff00;">'f'</span>, 3) <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">True</span>
+<span style="color: #ffffff; font-weight: bold;">isTrap</span> (<span style="color: #00ff00;">'f'</span>, 6) <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">True</span>
+<span style="color: #ffffff; font-weight: bold;">isTrap</span> others <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">False</span>
 </pre>
 </div>
 </div>
@@ -272,12 +272,12 @@ isTrap others = False
 <div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 
-<pre class="src src-haskell">data Direction = North | South | East | West
-  deriving (Eq)
-North @: (x, y) = (x, y + 1)
-South @: (x, y) = (x, y - 1)
-East  @: (x, y) = (eastOf x, y)
-West  @: (x, y) = (westOf x, y)
+<pre class="src src-haskell"><span style="color: #00ffff;">data</span> <span style="color: #ff00ff;">Direction</span> <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">North</span> <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">South</span> <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">East</span> <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">West</span>
+  <span style="color: #00ffff;">deriving</span> (<span style="color: #ff00ff;">Eq</span>)
+<span style="color: #ff00ff;">North</span> <span style="color: #ffffff; font-weight: bold;">@:</span> (x, y) <span style="color: #eedd82;">=</span> (x, y <span style="color: #eedd82;">+</span> 1)
+<span style="color: #ff00ff;">South</span> <span style="color: #ffffff; font-weight: bold;">@:</span> (x, y) <span style="color: #eedd82;">=</span> (x, y <span style="color: #eedd82;">-</span> 1)
+<span style="color: #ff00ff;">East</span>  <span style="color: #ffffff; font-weight: bold;">@:</span> (x, y) <span style="color: #eedd82;">=</span> (eastOf x, y)
+<span style="color: #ff00ff;">West</span>  <span style="color: #ffffff; font-weight: bold;">@:</span> (x, y) <span style="color: #eedd82;">=</span> (westOf x, y)
 </pre>
 </div>
 
@@ -287,35 +287,35 @@ test: East @ ('d',3) == ('e', 3)
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">instance (Show) Direction where
-    show North = "n"
-    show South = "s"
-    show East  = "e"
-    show West  = "w"
+<pre class="src src-haskell"><span style="color: #00ffff;">instance</span> (<span style="color: #ff00ff;">Show</span>) <span style="color: #ff00ff;">Direction</span> <span style="color: #00ffff;">where</span>
+    show <span style="color: #ff00ff;">North</span> <span style="color: #eedd82;">=</span> <span style="color: #00ff00;">"n"</span>
+    show <span style="color: #ff00ff;">South</span> <span style="color: #eedd82;">=</span> <span style="color: #00ff00;">"s"</span>
+    show <span style="color: #ff00ff;">East</span>  <span style="color: #eedd82;">=</span> <span style="color: #00ff00;">"e"</span>
+    show <span style="color: #ff00ff;">West</span>  <span style="color: #eedd82;">=</span> <span style="color: #00ff00;">"w"</span>
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">(&gt;&gt;:) :: Square -&gt; Square -&gt; Direction
-(x1, y1) &gt;&gt;: (x2, y2) = diff (ord x1 - ord x2, y1-y2)
-   where diff ( 1,  0) = West
-         diff (-1,  0) = East
-         diff ( 0,  1) = North
-         diff ( 0, -1) = South
-         diff _        = error "&gt;&gt;: only works for 2 numbers" 
+<pre class="src src-haskell">(<span style="color: #ffffff; font-weight: bold;">&gt;&gt;:</span>) <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Square</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Square</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Direction</span>
+(x1, y1) <span style="color: #eedd82;">&gt;&gt;:</span> (x2, y2) <span style="color: #eedd82;">=</span> diff (ord x1 <span style="color: #eedd82;">-</span> ord x2, y1<span style="color: #eedd82;">-</span>y2)
+   <span style="color: #00ffff;">where</span> diff ( 1,  0) <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">West</span>
+         diff (<span style="color: #eedd82;">-</span>1,  0) <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">East</span>
+         diff ( 0,  1) <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">North</span>
+         diff ( 0, <span style="color: #eedd82;">-</span>1) <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">South</span>
+         diff <span style="color: #00ffff;">_</span>        <span style="color: #eedd82;">=</span> error <span style="color: #00ff00;">"&gt;&gt;: only works for 2 numbers"</span> 
 
-cardinals :: [Direction]
-cardinals = [North, East, South, West]
+<span style="color: #ffffff; font-weight: bold;">cardinals</span> <span style="color: #eedd82;">::</span> [<span style="color: #ff00ff;">Direction</span>]
+<span style="color: #ffffff; font-weight: bold;">cardinals</span> <span style="color: #eedd82;">=</span> [<span style="color: #ff00ff;">North</span>, <span style="color: #ff00ff;">East</span>, <span style="color: #ff00ff;">South</span>, <span style="color: #ff00ff;">West</span>]
 
-neighborSquares :: Square -&gt; [(Direction, Square)]
-neighborSquares sq = [(dir, dir @: sq) | dir &lt;- cardinals ]
+<span style="color: #ffffff; font-weight: bold;">neighborSquares</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Square</span> <span style="color: #eedd82;">-&gt;</span> [(<span style="color: #ff00ff;">Direction</span>, <span style="color: #ff00ff;">Square</span>)]
+<span style="color: #ffffff; font-weight: bold;">neighborSquares</span> sq <span style="color: #eedd82;">=</span> [(dir, dir <span style="color: #eedd82;">@:</span> sq) <span style="color: #eedd82;">|</span> dir <span style="color: #eedd82;">&lt;-</span> cardinals ]
 
-rev :: Direction -&gt; Direction
-rev North = South
-rev East  = West
-rev South = North
-rev West  = East
+<span style="color: #ffffff; font-weight: bold;">rev</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Direction</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Direction</span>
+<span style="color: #ffffff; font-weight: bold;">rev</span> <span style="color: #ff00ff;">North</span> <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">South</span>
+<span style="color: #ffffff; font-weight: bold;">rev</span> <span style="color: #ff00ff;">East</span>  <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">West</span>
+<span style="color: #ffffff; font-weight: bold;">rev</span> <span style="color: #ff00ff;">South</span> <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">North</span>
+<span style="color: #ffffff; font-weight: bold;">rev</span> <span style="color: #ff00ff;">West</span>  <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">East</span>
 </pre>
 </div>
 </div>
@@ -329,22 +329,22 @@ Again, from the standard notation:
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">data Step
-   = Put Piece Square
-   | Kill Piece Square
-   | Move Piece Square Direction
-   | Resign
-   | Takeback
-   deriving (Eq)
+<pre class="src src-haskell"><span style="color: #00ffff;">data</span> <span style="color: #ff00ff;">Step</span>
+   <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Put</span> <span style="color: #ff00ff;">Piece</span> <span style="color: #ff00ff;">Square</span>
+   <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">Kill</span> <span style="color: #ff00ff;">Piece</span> <span style="color: #ff00ff;">Square</span>
+   <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">Move</span> <span style="color: #ff00ff;">Piece</span> <span style="color: #ff00ff;">Square</span> <span style="color: #ff00ff;">Direction</span>
+   <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">Resign</span>
+   <span style="color: #eedd82;">|</span> <span style="color: #ff00ff;">Takeback</span>
+   <span style="color: #00ffff;">deriving</span> (<span style="color: #ff00ff;">Eq</span>)
 
-instance (Show) Step where
-    show step = case step of
-        Put  p s   -&gt; sh p s
-        Kill p s   -&gt; sh p s ++ "x"
-        Move p s d -&gt; sh p s ++ show d
-        Resign     -&gt; "resign"
-        Takeback   -&gt; "takeback"
-        where sh p s = showPiece p ++ showSquare s
+<span style="color: #00ffff;">instance</span> (<span style="color: #ff00ff;">Show</span>) <span style="color: #ff00ff;">Step</span> <span style="color: #00ffff;">where</span>
+    show step <span style="color: #eedd82;">=</span> <span style="color: #00ffff;">case</span> step <span style="color: #00ffff;">of</span>
+        <span style="color: #ff00ff;">Put</span>  p s   <span style="color: #eedd82;">-&gt;</span> sh p s
+        <span style="color: #ff00ff;">Kill</span> p s   <span style="color: #eedd82;">-&gt;</span> sh p s <span style="color: #eedd82;">++</span> <span style="color: #00ff00;">"x"</span>
+        <span style="color: #ff00ff;">Move</span> p s d <span style="color: #eedd82;">-&gt;</span> sh p s <span style="color: #eedd82;">++</span> show d
+        <span style="color: #ff00ff;">Resign</span>     <span style="color: #eedd82;">-&gt;</span> <span style="color: #00ff00;">"resign"</span>
+        <span style="color: #ff00ff;">Takeback</span>   <span style="color: #eedd82;">-&gt;</span> <span style="color: #00ff00;">"takeback"</span>
+        <span style="color: #00ffff;">where</span> sh p s <span style="color: #eedd82;">=</span> showPiece p <span style="color: #eedd82;">++</span> showSquare s
 </pre>
 </div>
 
@@ -355,52 +355,52 @@ Parser is pretty simple:
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">parseStep :: String -&gt; Step
-parseStep s@(p:x:y:end)
-  | s == "takeback" = Takeback
-  | s == "resign"   = Resign 
-  | end == ""       = Put  pp (x, py)
-  | end == "x"      = Kill pp (x, py)
-  | otherwise       = Move pp (x, py) pd
-  where pp = parsePiece p
-        py = parseRank y
-        pd = parseDirection $ head end
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">parseStep</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">String</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Step</span>
+<span style="color: #ffffff; font-weight: bold;">parseStep</span> s<span style="color: #eedd82;">@</span>(p<span style="color: #ff00ff;">:</span>x<span style="color: #ff00ff;">:</span>y<span style="color: #ff00ff;">:</span>end)
+  <span style="color: #eedd82;">|</span> s <span style="color: #eedd82;">==</span> <span style="color: #00ff00;">"takeback"</span> <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Takeback</span>
+  <span style="color: #eedd82;">|</span> s <span style="color: #eedd82;">==</span> <span style="color: #00ff00;">"resign"</span>   <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Resign</span> 
+  <span style="color: #eedd82;">|</span> end <span style="color: #eedd82;">==</span> <span style="color: #00ff00;">""</span>       <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Put</span>  pp (x, py)
+  <span style="color: #eedd82;">|</span> end <span style="color: #eedd82;">==</span> <span style="color: #00ff00;">"x"</span>      <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Kill</span> pp (x, py)
+  <span style="color: #eedd82;">|</span> otherwise       <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Move</span> pp (x, py) pd
+  <span style="color: #00ffff;">where</span> pp <span style="color: #eedd82;">=</span> parsePiece p
+        py <span style="color: #eedd82;">=</span> parseRank y
+        pd <span style="color: #eedd82;">=</span> parseDirection <span style="color: #eedd82;">$</span> head end
 
 
-parsePiece :: Char -&gt; Piece
-parsePiece ch = case ch of 
-  -- gold pieces --
-  'E' -&gt; g E
-  'M' -&gt; g M
-  'H' -&gt; g H
-  'D' -&gt; g D
-  'C' -&gt; g C
-  'R' -&gt; g R
-  -- silver pieces --
-  'e' -&gt; s E
-  'm' -&gt; s M
-  'h' -&gt; s H
-  'd' -&gt; s D
-  'c' -&gt; s C
-  'r' -&gt; s R
+<span style="color: #ffffff; font-weight: bold;">parsePiece</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Char</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Piece</span>
+<span style="color: #ffffff; font-weight: bold;">parsePiece</span> ch <span style="color: #eedd82;">=</span> <span style="color: #00ffff;">case</span> ch <span style="color: #00ffff;">of</span> 
+  <span style="color: #66f;">-- </span><span style="color: #66f;">gold pieces --</span>
+  <span style="color: #00ff00;">'E'</span> <span style="color: #eedd82;">-&gt;</span> g <span style="color: #ff00ff;">E</span>
+  <span style="color: #00ff00;">'M'</span> <span style="color: #eedd82;">-&gt;</span> g <span style="color: #ff00ff;">M</span>
+  <span style="color: #00ff00;">'H'</span> <span style="color: #eedd82;">-&gt;</span> g <span style="color: #ff00ff;">H</span>
+  <span style="color: #00ff00;">'D'</span> <span style="color: #eedd82;">-&gt;</span> g <span style="color: #ff00ff;">D</span>
+  <span style="color: #00ff00;">'C'</span> <span style="color: #eedd82;">-&gt;</span> g <span style="color: #ff00ff;">C</span>
+  <span style="color: #00ff00;">'R'</span> <span style="color: #eedd82;">-&gt;</span> g <span style="color: #ff00ff;">R</span>
+  <span style="color: #66f;">-- </span><span style="color: #66f;">silver pieces --</span>
+  <span style="color: #00ff00;">'e'</span> <span style="color: #eedd82;">-&gt;</span> s <span style="color: #ff00ff;">E</span>
+  <span style="color: #00ff00;">'m'</span> <span style="color: #eedd82;">-&gt;</span> s <span style="color: #ff00ff;">M</span>
+  <span style="color: #00ff00;">'h'</span> <span style="color: #eedd82;">-&gt;</span> s <span style="color: #ff00ff;">H</span>
+  <span style="color: #00ff00;">'d'</span> <span style="color: #eedd82;">-&gt;</span> s <span style="color: #ff00ff;">D</span>
+  <span style="color: #00ff00;">'c'</span> <span style="color: #eedd82;">-&gt;</span> s <span style="color: #ff00ff;">C</span>
+  <span style="color: #00ff00;">'r'</span> <span style="color: #eedd82;">-&gt;</span> s <span style="color: #ff00ff;">R</span>
 
-parseRank :: Char -&gt; Int
-parseRank ch = case ch of
-  '1' -&gt; 1
-  '2' -&gt; 2
-  '3' -&gt; 3
-  '4' -&gt; 4
-  '5' -&gt; 5
-  '6' -&gt; 6
-  '7' -&gt; 7
-  '8' -&gt; 8
+<span style="color: #ffffff; font-weight: bold;">parseRank</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Char</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Int</span>
+<span style="color: #ffffff; font-weight: bold;">parseRank</span> ch <span style="color: #eedd82;">=</span> <span style="color: #00ffff;">case</span> ch <span style="color: #00ffff;">of</span>
+  <span style="color: #00ff00;">'1'</span> <span style="color: #eedd82;">-&gt;</span> 1
+  <span style="color: #00ff00;">'2'</span> <span style="color: #eedd82;">-&gt;</span> 2
+  <span style="color: #00ff00;">'3'</span> <span style="color: #eedd82;">-&gt;</span> 3
+  <span style="color: #00ff00;">'4'</span> <span style="color: #eedd82;">-&gt;</span> 4
+  <span style="color: #00ff00;">'5'</span> <span style="color: #eedd82;">-&gt;</span> 5
+  <span style="color: #00ff00;">'6'</span> <span style="color: #eedd82;">-&gt;</span> 6
+  <span style="color: #00ff00;">'7'</span> <span style="color: #eedd82;">-&gt;</span> 7
+  <span style="color: #00ff00;">'8'</span> <span style="color: #eedd82;">-&gt;</span> 8
 
-parseDirection :: Char -&gt; Direction
-parseDirection ch = case ch of
-  'n' -&gt; North
-  's' -&gt; South
-  'e' -&gt; East
-  'w' -&gt; West
+<span style="color: #ffffff; font-weight: bold;">parseDirection</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Char</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Direction</span>
+<span style="color: #ffffff; font-weight: bold;">parseDirection</span> ch <span style="color: #eedd82;">=</span> <span style="color: #00ffff;">case</span> ch <span style="color: #00ffff;">of</span>
+  <span style="color: #00ff00;">'n'</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">North</span>
+  <span style="color: #00ff00;">'s'</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">South</span>
+  <span style="color: #00ff00;">'e'</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">East</span>
+  <span style="color: #00ff00;">'w'</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">West</span>
 </pre>
 </div>
 </div>
@@ -418,9 +418,9 @@ I couldn't figure out how to convince the type system to let me make Board an in
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">apply :: (Board -&gt; Square -&gt; Content) -&gt; Board -&gt; Board
-apply f br = Board $ array fullBounds $ contents
-             where contents = [(sq, f br sq) | sq &lt;- range fullBounds]
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">apply</span> <span style="color: #eedd82;">::</span> (<span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Square</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Content</span>) <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span>
+<span style="color: #ffffff; font-weight: bold;">apply</span> f br <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">$</span> array fullBounds <span style="color: #eedd82;">$</span> contents
+             <span style="color: #00ffff;">where</span> contents <span style="color: #eedd82;">=</span> [(sq, f br sq) <span style="color: #eedd82;">|</span> sq <span style="color: #eedd82;">&lt;-</span> range fullBounds]
 </pre>
 </div>
 
@@ -431,10 +431,10 @@ Let's see how to define the popular 99of9 opening for gold. (see <a href="http:/
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">steps :: String -&gt; [Step]
-steps s = map parseStep $ DSU.split " " s
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">steps</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">String</span> <span style="color: #eedd82;">-&gt;</span> [<span style="color: #ff00ff;">Step</span>]
+<span style="color: #ffffff; font-weight: bold;">steps</span> s <span style="color: #eedd82;">=</span> map parseStep <span style="color: #eedd82;">$</span> <span style="color: #ff00ff;">DSU</span><span style="color: #eedd82;">.</span>split <span style="color: #00ff00;">" "</span> s
 
-open99of9 = steps "Ra1 Rb1 Rc1 Cd1 Ce1 Rf1 Rg1 Rh1 Ra2 Hb2 Dc2 Md2 Ee2 Df2 Hg2 Rh2"
+<span style="color: #ffffff; font-weight: bold;">open99of9</span> <span style="color: #eedd82;">=</span> steps <span style="color: #00ff00;">"Ra1 Rb1 Rc1 Cd1 Ce1 Rf1 Rg1 Rh1 Ra2 Hb2 Dc2 Md2 Ee2 Df2 Hg2 Rh2"</span>
 </pre>
 </div>
 
@@ -444,22 +444,22 @@ So now:
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">(//=) :: Board -&gt; [(Square, Content)] -&gt; Board
-(Board br) //= changes = Board $ br // changes
+<pre class="src src-haskell">(<span style="color: #ffffff; font-weight: bold;">//=</span>) <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> [(<span style="color: #ff00ff;">Square</span>, <span style="color: #ff00ff;">Content</span>)] <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span>
+(<span style="color: #ff00ff;">Board</span> br) <span style="color: #eedd82;">//=</span> changes <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">$</span> br <span style="color: #eedd82;">//</span> changes
 
-step :: Step -&gt; Board -&gt; Board
-step st br = case st of
-    Put  p sq     -&gt; br //= [(sq, A p)]    
-    Kill p sq     -&gt; todo
-    Move p sq d   -&gt; todo
-    Resign        -&gt; todo
-    Takeback      -&gt; todo
-  where
-    todo = br
+<span style="color: #ffffff; font-weight: bold;">step</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Step</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span>
+<span style="color: #ffffff; font-weight: bold;">step</span> st br <span style="color: #eedd82;">=</span> <span style="color: #00ffff;">case</span> st <span style="color: #00ffff;">of</span>
+    <span style="color: #ff00ff;">Put</span>  p sq     <span style="color: #eedd82;">-&gt;</span> br <span style="color: #eedd82;">//=</span> [(sq, <span style="color: #ff00ff;">A</span> p)]    
+    <span style="color: #ff00ff;">Kill</span> p sq     <span style="color: #eedd82;">-&gt;</span> todo
+    <span style="color: #ff00ff;">Move</span> p sq d   <span style="color: #eedd82;">-&gt;</span> todo
+    <span style="color: #ff00ff;">Resign</span>        <span style="color: #eedd82;">-&gt;</span> todo
+    <span style="color: #ff00ff;">Takeback</span>      <span style="color: #eedd82;">-&gt;</span> todo
+  <span style="color: #00ffff;">where</span>
+    todo <span style="color: #eedd82;">=</span> br
 
-doSteps :: [Step] -&gt; Board -&gt; Board
-doSteps []      br = br
-doSteps (s :ss) br = doSteps ss $ step s br
+<span style="color: #ffffff; font-weight: bold;">doSteps</span> <span style="color: #eedd82;">::</span> [<span style="color: #ff00ff;">Step</span>] <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span>
+<span style="color: #ffffff; font-weight: bold;">doSteps</span> <span style="color: #ff00ff;">[]</span>      br <span style="color: #eedd82;">=</span> br
+<span style="color: #ffffff; font-weight: bold;">doSteps</span> (s <span style="color: #ff00ff;">:</span>ss) br <span style="color: #eedd82;">=</span> doSteps ss <span style="color: #eedd82;">$</span> step s br
 </pre>
 </div>
 
@@ -469,13 +469,13 @@ How about the same for silver?
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">mirror :: Step -&gt; Step
-mirror (Put (Gold, p) (x, y)) = Put (Silver, p) (x, 9-y)
-mirror other = other
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">mirror</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Step</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Step</span>
+<span style="color: #ffffff; font-weight: bold;">mirror</span> (<span style="color: #ff00ff;">Put</span> (<span style="color: #ff00ff;">Gold</span>, p) (x, y)) <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Put</span> (<span style="color: #ff00ff;">Silver</span>, p) (x, 9<span style="color: #eedd82;">-</span>y)
+<span style="color: #ffffff; font-weight: bold;">mirror</span> other <span style="color: #eedd82;">=</span> other
 
-board99of9 = doSteps (gold ++ silver) emptyBoard
-     where gold   = open99of9
-           silver = map mirror gold
+<span style="color: #ffffff; font-weight: bold;">board99of9</span> <span style="color: #eedd82;">=</span> doSteps (gold <span style="color: #eedd82;">++</span> silver) emptyBoard
+     <span style="color: #00ffff;">where</span> gold   <span style="color: #eedd82;">=</span> open99of9
+           silver <span style="color: #eedd82;">=</span> map mirror gold
 </pre>
 </div>
 </div>
@@ -485,7 +485,7 @@ board99of9 = doSteps (gold ++ silver) emptyBoard
 <div class="outline-text-2" id="text-7">
 <div class="org-src-container">
 
-<pre class="src src-haskell">type PieceAt = (Piece, Square)
+<pre class="src src-haskell"><span style="color: #00ffff;">type</span> <span style="color: #ff00ff;">PieceAt</span> <span style="color: #eedd82;">=</span> (<span style="color: #ff00ff;">Piece</span>, <span style="color: #ff00ff;">Square</span>)
 </pre>
 </div>
 
@@ -495,17 +495,17 @@ contents br = [(sq, content br sq) | sq &lt;- range coreBounds]
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">content sq (Board br) = br ! sq
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">content</span> sq (<span style="color: #ff00ff;">Board</span> br) <span style="color: #eedd82;">=</span> br <span style="color: #eedd82;">!</span> sq
 </pre>
 </div>
 
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">neighbors :: Square -&gt; Board -&gt; [(Direction, PieceAt)]
-neighbors square br = [(dir, (pieceAt sq br, sq))
-                         | (dir, sq)  &lt;- neighborSquares square
-                         , isPiece $ content sq br]
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">neighbors</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Square</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> [(<span style="color: #ff00ff;">Direction</span>, <span style="color: #ff00ff;">PieceAt</span>)]
+<span style="color: #ffffff; font-weight: bold;">neighbors</span> square br <span style="color: #eedd82;">=</span> [(dir, (pieceAt sq br, sq))
+                         <span style="color: #eedd82;">|</span> (dir, sq)  <span style="color: #eedd82;">&lt;-</span> neighborSquares square
+                         , isPiece <span style="color: #eedd82;">$</span> content sq br]
 </pre>
 </div>
 
@@ -516,38 +516,38 @@ Enemitos = lesser enemies (spanglish ftw!)
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">enemitos :: PieceAt -&gt; Board -&gt; [(Direction, PieceAt)]
-enemitos ((c, a), sq) br = [n | n@(dir, ((c2, a2), _)) &lt;- neighbors sq br 
-                              , a2 &lt; a  &amp;&amp; c2 == opp c]
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">enemitos</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">PieceAt</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> [(<span style="color: #ff00ff;">Direction</span>, <span style="color: #ff00ff;">PieceAt</span>)]
+<span style="color: #ffffff; font-weight: bold;">enemitos</span> ((c, a), sq) br <span style="color: #eedd82;">=</span> [n <span style="color: #eedd82;">|</span> n<span style="color: #eedd82;">@</span>(dir, ((c2, a2), <span style="color: #00ffff;">_</span>)) <span style="color: #eedd82;">&lt;-</span> neighbors sq br 
+                              , a2 <span style="color: #eedd82;">&lt;</span> a  <span style="color: #eedd82;">&amp;&amp;</span> c2 <span style="color: #eedd82;">==</span> opp c]
 
-isPiece :: Content -&gt; Bool
-isPiece (A _) = True
-isPiece _     = False
+<span style="color: #ffffff; font-weight: bold;">isPiece</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Content</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Bool</span>
+<span style="color: #ffffff; font-weight: bold;">isPiece</span> (<span style="color: #ff00ff;">A</span> <span style="color: #00ffff;">_</span>) <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">True</span>
+<span style="color: #ffffff; font-weight: bold;">isPiece</span> <span style="color: #00ffff;">_</span>     <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">False</span>
 
-toPiece :: Content -&gt; Piece
-toPiece (A p) = p
-toPiece _     = error "not a piece!"
+<span style="color: #ffffff; font-weight: bold;">toPiece</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Content</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Piece</span>
+<span style="color: #ffffff; font-weight: bold;">toPiece</span> (<span style="color: #ff00ff;">A</span> p) <span style="color: #eedd82;">=</span> p
+<span style="color: #ffffff; font-weight: bold;">toPiece</span> <span style="color: #00ffff;">_</span>     <span style="color: #eedd82;">=</span> error <span style="color: #00ff00;">"not a piece!"</span>
 
-pieceAt :: Square -&gt; Board -&gt; Piece
-pieceAt sq br  = toPiece $ content sq br
+<span style="color: #ffffff; font-weight: bold;">pieceAt</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Square</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Piece</span>
+<span style="color: #ffffff; font-weight: bold;">pieceAt</span> sq br  <span style="color: #eedd82;">=</span> toPiece <span style="color: #eedd82;">$</span> content sq br
 
-pieceSquares br = [sq | sq &lt;- range coreBounds,  isPiece $ content sq br]
+<span style="color: #ffffff; font-weight: bold;">pieceSquares</span> br <span style="color: #eedd82;">=</span> [sq <span style="color: #eedd82;">|</span> sq <span style="color: #eedd82;">&lt;-</span> range coreBounds,  isPiece <span style="color: #eedd82;">$</span> content sq br]
 
-isEmpty sq br = case content sq br of
-                   Empty -&gt; True
-                   Trap  -&gt; True
-                   _     -&gt; False
+<span style="color: #ffffff; font-weight: bold;">isEmpty</span> sq br <span style="color: #eedd82;">=</span> <span style="color: #00ffff;">case</span> content sq br <span style="color: #00ffff;">of</span>
+                   <span style="color: #ff00ff;">Empty</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">True</span>
+                   <span style="color: #ff00ff;">Trap</span>  <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">True</span>
+                   <span style="color: #00ffff;">_</span>     <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">False</span>
 
-army :: Color -&gt; Board -&gt; [PieceAt]
-army c br =  [(pieceAt sq br, sq) | sq &lt;- pieceSquares br
-                                  , colorOf (pieceAt sq br) == c]
+<span style="color: #ffffff; font-weight: bold;">army</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Color</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> [<span style="color: #ff00ff;">PieceAt</span>]
+<span style="color: #ffffff; font-weight: bold;">army</span> c br <span style="color: #eedd82;">=</span>  [(pieceAt sq br, sq) <span style="color: #eedd82;">|</span> sq <span style="color: #eedd82;">&lt;-</span> pieceSquares br
+                                  , colorOf (pieceAt sq br) <span style="color: #eedd82;">==</span> c]
 
-colorOf :: (Color, a) -&gt; Color
-colorOf = fst
+<span style="color: #ffffff; font-weight: bold;">colorOf</span> <span style="color: #eedd82;">::</span> (<span style="color: #ff00ff;">Color</span>, a) <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Color</span>
+<span style="color: #ffffff; font-weight: bold;">colorOf</span> <span style="color: #eedd82;">=</span> fst
 
 
-isColor :: Color -&gt; (Color, a) -&gt; Bool
-isColor c = \x -&gt; colorOf x == c
+<span style="color: #ffffff; font-weight: bold;">isColor</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Color</span> <span style="color: #eedd82;">-&gt;</span> (<span style="color: #ff00ff;">Color</span>, a) <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Bool</span>
+<span style="color: #ffffff; font-weight: bold;">isColor</span> c <span style="color: #eedd82;">=</span> <span style="color: #eedd82;">\</span>x <span style="color: #eedd82;">-&gt;</span> colorOf x <span style="color: #eedd82;">==</span> c
 </pre>
 </div>
 </div>
@@ -560,8 +560,8 @@ isColor c = \x -&gt; colorOf x == c
 <div class="outline-text-3" id="text-8-1">
 <div class="org-src-container">
 
-<pre class="src src-haskell">validSteps :: Board -&gt; Color -&gt; [Step] -&gt; [Step]
-validSteps b c ss = [] -- TODO
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">validSteps</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Color</span> <span style="color: #eedd82;">-&gt;</span> [<span style="color: #ff00ff;">Step</span>] <span style="color: #eedd82;">-&gt;</span> [<span style="color: #ff00ff;">Step</span>]
+<span style="color: #ffffff; font-weight: bold;">validSteps</span> b c ss <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">[]</span> <span style="color: #66f;">-- </span><span style="color: #66f;">TODO</span>
 </pre>
 </div>
 
@@ -571,10 +571,10 @@ validPushes <del>+ validPulls +</del> validSteps
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">emcTestBoard = doSteps (steps "Ed3 me3 Ce4") emptyBoard
-emcE = head $ army Gold emcTestBoard
-emcM = head $ army Silver emcTestBoard 
-emcC = head $ tail $ army Gold emcTestBoard
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">emcTestBoard</span> <span style="color: #eedd82;">=</span> doSteps (steps <span style="color: #00ff00;">"Ed3 me3 Ce4"</span>) emptyBoard
+<span style="color: #ffffff; font-weight: bold;">emcE</span> <span style="color: #eedd82;">=</span> head <span style="color: #eedd82;">$</span> army <span style="color: #ff00ff;">Gold</span> emcTestBoard
+<span style="color: #ffffff; font-weight: bold;">emcM</span> <span style="color: #eedd82;">=</span> head <span style="color: #eedd82;">$</span> army <span style="color: #ff00ff;">Silver</span> emcTestBoard 
+<span style="color: #ffffff; font-weight: bold;">emcC</span> <span style="color: #eedd82;">=</span> head <span style="color: #eedd82;">$</span> tail <span style="color: #eedd82;">$</span> army <span style="color: #ff00ff;">Gold</span> emcTestBoard
 </pre>
 </div>
 
@@ -605,15 +605,15 @@ Which looks like this:
 <div class="outline-text-4" id="text-8-2-1">
 <div class="org-src-container">
 
-<pre class="src src-haskell">fore :: Color -&gt; Direction
-fore Gold   = North
-fore Silver = South
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">fore</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Color</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Direction</span>
+<span style="color: #ffffff; font-weight: bold;">fore</span> <span style="color: #ff00ff;">Gold</span>   <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">North</span>
+<span style="color: #ffffff; font-weight: bold;">fore</span> <span style="color: #ff00ff;">Silver</span> <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">South</span>
 
-back :: Color -&gt; Direction
-back = fore . opp
+<span style="color: #ffffff; font-weight: bold;">back</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Color</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Direction</span>
+<span style="color: #ffffff; font-weight: bold;">back</span> <span style="color: #eedd82;">=</span> fore <span style="color: #eedd82;">.</span> opp
 
-opp Gold = Silver
-opp Silver = Gold
+<span style="color: #ffffff; font-weight: bold;">opp</span> <span style="color: #ff00ff;">Gold</span> <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Silver</span>
+<span style="color: #ffffff; font-weight: bold;">opp</span> <span style="color: #ff00ff;">Silver</span> <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Gold</span>
 </pre>
 </div>
 </div>
@@ -623,8 +623,8 @@ opp Silver = Gold
 <div class="outline-text-4" id="text-8-2-2">
 <div class="org-src-container">
 
-<pre class="src src-haskell">emptyDirs :: PieceAt -&gt; Board -&gt; [Direction]
-emptyDirs (p, sq) br = [dir | dir &lt;- potentialDirs p, isEmpty (dir @: sq) br]
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">emptyDirs</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">PieceAt</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> [<span style="color: #ff00ff;">Direction</span>]
+<span style="color: #ffffff; font-weight: bold;">emptyDirs</span> (p, sq) br <span style="color: #eedd82;">=</span> [dir <span style="color: #eedd82;">|</span> dir <span style="color: #eedd82;">&lt;-</span> potentialDirs p, isEmpty (dir <span style="color: #eedd82;">@:</span> sq) br]
 </pre>
 </div>
 
@@ -636,12 +636,12 @@ test: [South, East]       == emptyDirs (('a', 5), (s R)) emptyBoard
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">potentialDirs :: Piece -&gt; [Direction]
-potentialDirs (color, pc) =
-   case pc of 
-      R  -&gt; (foreAndSides color) 
-      _  -&gt; (back color) : (foreAndSides color)
-   where foreAndSides color = fore color : [East, West]
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">potentialDirs</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Piece</span> <span style="color: #eedd82;">-&gt;</span> [<span style="color: #ff00ff;">Direction</span>]
+<span style="color: #ffffff; font-weight: bold;">potentialDirs</span> (color, pc) <span style="color: #eedd82;">=</span>
+   <span style="color: #00ffff;">case</span> pc <span style="color: #00ffff;">of</span> 
+      <span style="color: #ff00ff;">R</span>  <span style="color: #eedd82;">-&gt;</span> (foreAndSides color) 
+      <span style="color: #00ffff;">_</span>  <span style="color: #eedd82;">-&gt;</span> (back color) <span style="color: #ff00ff;">:</span> (foreAndSides color)
+   <span style="color: #00ffff;">where</span> foreAndSides color <span style="color: #eedd82;">=</span> fore color <span style="color: #ff00ff;">:</span> [<span style="color: #ff00ff;">East</span>, <span style="color: #ff00ff;">West</span>]
 </pre>
 </div>
 </div>
@@ -651,8 +651,8 @@ potentialDirs (color, pc) =
 <div class="outline-text-4" id="text-8-2-3">
 <div class="org-src-container">
 
-<pre class="src src-haskell">validMoves :: PieceAt -&gt; Board -&gt; [[Step]]
-validMoves pcAt@(p, sq) br = [[Move p sq d] | d &lt;- emptyDirs pcAt br ]
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">validMoves</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">PieceAt</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> [[<span style="color: #ff00ff;">Step</span>]]
+<span style="color: #ffffff; font-weight: bold;">validMoves</span> pcAt<span style="color: #eedd82;">@</span>(p, sq) br <span style="color: #eedd82;">=</span> [[<span style="color: #ff00ff;">Move</span> p sq d] <span style="color: #eedd82;">|</span> d <span style="color: #eedd82;">&lt;-</span> emptyDirs pcAt br ]
 </pre>
 </div>
 </div>
@@ -663,10 +663,10 @@ validMoves pcAt@(p, sq) br = [[Move p sq d] | d &lt;- emptyDirs pcAt br ]
 <div class="outline-text-3" id="text-8-3">
 <div class="org-src-container">
 
-<pre class="src src-haskell">-- &gt;&gt;&gt; validPushes emcE emcTestBoard
--- [[me3s,Ed3e],[me3e,Ed3e]]
--- &gt;&gt;&gt; validPulls emcE emcTestBoard
--- [[Ed3s,me3w],[Ed3n,me3w],[Ed3w,me3w]]
+<pre class="src src-haskell"><span style="color: #66f;">-- </span><span style="color: #66f;">&gt;&gt;&gt; validPushes emcE emcTestBoard</span>
+<span style="color: #66f;">-- </span><span style="color: #66f;">[[me3s,Ed3e],[me3e,Ed3e]]</span>
+<span style="color: #66f;">-- </span><span style="color: #66f;">&gt;&gt;&gt; validPulls emcE emcTestBoard</span>
+<span style="color: #66f;">-- </span><span style="color: #66f;">[[Ed3s,me3w],[Ed3n,me3w],[Ed3w,me3w]]</span>
 </pre>
 </div>
 
@@ -676,10 +676,10 @@ To push, move the enemy piece, then move your piece where the enemy started.
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">push :: PieceAt -&gt; Direction -&gt; Direction -&gt; Board -&gt; [Step]
-push (pc, sq) pcDir enDir br = [Move en enSq enDir, Move pc sq pcDir]
-   where en = pieceAt enSq br
-         enSq = pcDir @: sq
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">push</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">PieceAt</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Direction</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Direction</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> [<span style="color: #ff00ff;">Step</span>]
+<span style="color: #ffffff; font-weight: bold;">push</span> (pc, sq) pcDir enDir br <span style="color: #eedd82;">=</span> [<span style="color: #ff00ff;">Move</span> en enSq enDir, <span style="color: #ff00ff;">Move</span> pc sq pcDir]
+   <span style="color: #00ffff;">where</span> en <span style="color: #eedd82;">=</span> pieceAt enSq br
+         enSq <span style="color: #eedd82;">=</span> pcDir <span style="color: #eedd82;">@:</span> sq
 </pre>
 </div>
 
@@ -689,11 +689,11 @@ piece p1 can push adjacent enemy p2 if p1 &gt; p2 and p2 has adjacent empty squa
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">validPushes :: PieceAt -&gt; Board -&gt; [[Step]]
-validPushes pcAt@((c, a), sq) br = 
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">validPushes</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">PieceAt</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> [[<span style="color: #ff00ff;">Step</span>]]
+<span style="color: #ffffff; font-weight: bold;">validPushes</span> pcAt<span style="color: #eedd82;">@</span>((c, a), sq) br <span style="color: #eedd82;">=</span> 
    [push pcAt pcDir enDir br
-       | (pcDir, en) &lt;- enemitos pcAt br
-       , enDir &lt;- emptyDirs en br ]
+       <span style="color: #eedd82;">|</span> (pcDir, en) <span style="color: #eedd82;">&lt;-</span> enemitos pcAt br
+       , enDir <span style="color: #eedd82;">&lt;-</span> emptyDirs en br ]
 </pre>
 </div>
 
@@ -704,11 +704,11 @@ To pull, move your piece, then move the enemy to where your piece started.
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">pull :: PieceAt -&gt; Direction -&gt; Direction -&gt; Board -&gt; [Step]
-pull (pc, sq) pcDir enDir br = [Move pc sq pcDir, Move en enSq enDelta]
-   where en = pieceAt enSq br
-         enSq = enDir @: sq
-         enDelta = rev enDir
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">pull</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">PieceAt</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Direction</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Direction</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> [<span style="color: #ff00ff;">Step</span>]
+<span style="color: #ffffff; font-weight: bold;">pull</span> (pc, sq) pcDir enDir br <span style="color: #eedd82;">=</span> [<span style="color: #ff00ff;">Move</span> pc sq pcDir, <span style="color: #ff00ff;">Move</span> en enSq enDelta]
+   <span style="color: #00ffff;">where</span> en <span style="color: #eedd82;">=</span> pieceAt enSq br
+         enSq <span style="color: #eedd82;">=</span> enDir <span style="color: #eedd82;">@:</span> sq
+         enDelta <span style="color: #eedd82;">=</span> rev enDir
 </pre>
 </div>
 
@@ -718,11 +718,11 @@ piece p1 can pull adjacent enemy p2 if p1 &gt; p2 and p1 has adjacent empty squa
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">validPulls :: PieceAt -&gt; Board -&gt; [[Step]]
-validPulls pcAt@((c, a), sq) br = 
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">validPulls</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">PieceAt</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> [[<span style="color: #ff00ff;">Step</span>]]
+<span style="color: #ffffff; font-weight: bold;">validPulls</span> pcAt<span style="color: #eedd82;">@</span>((c, a), sq) br <span style="color: #eedd82;">=</span> 
    [pull pcAt pcDir enDir br
-       | (enDir, en) &lt;- enemitos pcAt br
-       , pcDir &lt;- emptyDirs pcAt br ]
+       <span style="color: #eedd82;">|</span> (enDir, en) <span style="color: #eedd82;">&lt;-</span> enemitos pcAt br
+       , pcDir <span style="color: #eedd82;">&lt;-</span> emptyDirs pcAt br ]
 </pre>
 </div>
 </div>
@@ -732,26 +732,26 @@ validPulls pcAt@((c, a), sq) br =
 <div class="outline-text-3" id="text-8-4">
 <div class="org-src-container">
 
-<pre class="src src-haskell">-- | is the piece frozen?
--- &gt;&gt;&gt; frozen emcE emcTestBoard
--- False
--- &gt;&gt;&gt; frozen emcM emcTestBoard
--- True
--- &gt;&gt;&gt;  frozen emcC emcTestBoard
--- False
-frozen pcAt br | hasFriend pcAt br = False
-               | otherwise = hasThreat pcAt br
+<pre class="src src-haskell"><span style="color: #228b22;">-- | is the piece frozen?</span>
+<span style="color: #228b22;">-- &gt;&gt;&gt; frozen emcE emcTestBoard</span>
+<span style="color: #228b22;">-- False</span>
+<span style="color: #228b22;">-- &gt;&gt;&gt; frozen emcM emcTestBoard</span>
+<span style="color: #228b22;">-- True</span>
+<span style="color: #228b22;">-- &gt;&gt;&gt;  frozen emcC emcTestBoard</span>
+<span style="color: #228b22;">-- False</span>
+<span style="color: #ffffff; font-weight: bold;">frozen</span> pcAt br <span style="color: #eedd82;">|</span> hasFriend pcAt br <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">False</span>
+               <span style="color: #eedd82;">|</span> otherwise <span style="color: #eedd82;">=</span> hasThreat pcAt br
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-haskell">hasFriend :: PieceAt -&gt; Board -&gt; Bool
-hasFriend ((c, _), sq) br = any (\(p, s) -&gt; isColor c p) $ map snd $ neighbors sq br
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">hasFriend</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">PieceAt</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Bool</span>
+<span style="color: #ffffff; font-weight: bold;">hasFriend</span> ((c, <span style="color: #00ffff;">_</span>), sq) br <span style="color: #eedd82;">=</span> any (<span style="color: #eedd82;">\</span>(p, s) <span style="color: #eedd82;">-&gt;</span> isColor c p) <span style="color: #eedd82;">$</span> map snd <span style="color: #eedd82;">$</span> neighbors sq br
 
-hasThreat :: PieceAt -&gt; Board -&gt; Bool
-hasThreat ((c, a), sq) br = any biggerEnemy $ map snd $ neighbors sq br
-   where biggerEnemy ((c2,  a2), _) = (a2 &gt; a) &amp;&amp; (not $ c2 == c)
+<span style="color: #ffffff; font-weight: bold;">hasThreat</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">PieceAt</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Bool</span>
+<span style="color: #ffffff; font-weight: bold;">hasThreat</span> ((c, a), sq) br <span style="color: #eedd82;">=</span> any biggerEnemy <span style="color: #eedd82;">$</span> map snd <span style="color: #eedd82;">$</span> neighbors sq br
+   <span style="color: #00ffff;">where</span> biggerEnemy ((c2,  a2), <span style="color: #00ffff;">_</span>) <span style="color: #eedd82;">=</span> (a2 <span style="color: #eedd82;">&gt;</span> a) <span style="color: #eedd82;">&amp;&amp;</span> (not <span style="color: #eedd82;">$</span> c2 <span style="color: #eedd82;">==</span> c)
 </pre>
 </div>
 </div>
@@ -761,8 +761,8 @@ hasThreat ((c, a), sq) br = any biggerEnemy $ map snd $ neighbors sq br
 <div class="outline-text-3" id="text-8-5">
 <div class="org-src-container">
 
-<pre class="src src-haskell">trapped :: PieceAt -&gt; Board -&gt; Bool
-trapped (p, sq) br = isTrap sq &amp;&amp; (not $ hasFriend (p, sq) br)
+<pre class="src src-haskell"><span style="color: #ffffff; font-weight: bold;">trapped</span> <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">PieceAt</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Board</span> <span style="color: #eedd82;">-&gt;</span> <span style="color: #ff00ff;">Bool</span>
+<span style="color: #ffffff; font-weight: bold;">trapped</span> (p, sq) br <span style="color: #eedd82;">=</span> isTrap sq <span style="color: #eedd82;">&amp;&amp;</span> (not <span style="color: #eedd82;">$</span> hasFriend (p, sq) br)
 </pre>
 </div>
 </div>
@@ -773,23 +773,23 @@ trapped (p, sq) br = isTrap sq &amp;&amp; (not $ hasFriend (p, sq) br)
 <div class="outline-text-2" id="text-9">
 <div class="org-src-container">
 
-<pre class="src src-haskell">type Move = (Color, [Step])
-data PlayState = PlayState {
-  board     :: Board,
-  moveNum   :: Int,
-  toMove    :: Color,
-  stepsLeft :: Int,
-  history   :: [Move],
-  future    :: [Move]
-} deriving Show
+<pre class="src src-haskell"><span style="color: #00ffff;">type</span> <span style="color: #ff00ff;">Move</span> <span style="color: #eedd82;">=</span> (<span style="color: #ff00ff;">Color</span>, [<span style="color: #ff00ff;">Step</span>])
+<span style="color: #00ffff;">data</span> <span style="color: #ff00ff;">PlayState</span> <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">PlayState</span> {
+  board     <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Board</span>,
+  moveNum   <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Int</span>,
+  toMove    <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Color</span>,
+  stepsLeft <span style="color: #eedd82;">::</span> <span style="color: #ff00ff;">Int</span>,
+  history   <span style="color: #eedd82;">::</span> [<span style="color: #ff00ff;">Move</span>],
+  future    <span style="color: #eedd82;">::</span> [<span style="color: #ff00ff;">Move</span>]
+} <span style="color: #00ffff;">deriving</span> <span style="color: #ff00ff;">Show</span>
 
-initState = PlayState {
-  board     = emptyBoard,
-  moveNum   = 1,
-  toMove    = Gold,
-  stepsLeft = 4,
-  history   = [],
-  future    = []
+<span style="color: #ffffff; font-weight: bold;">initState</span> <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">PlayState</span> {
+  board     <span style="color: #eedd82;">=</span> emptyBoard,
+  moveNum   <span style="color: #eedd82;">=</span> 1,
+  toMove    <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">Gold</span>,
+  stepsLeft <span style="color: #eedd82;">=</span> 4,
+  history   <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">[]</span>,
+  future    <span style="color: #eedd82;">=</span> <span style="color: #ff00ff;">[]</span>
 }
 </pre>
 </div>

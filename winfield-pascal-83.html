@@ -4,89 +4,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>pascal in forth ( excerpts from )</title>
-<!-- 2013-09-03 Tue 23:43 -->
+<!-- 2014-02-08 Sat 07:39 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Alan Winfield" />
 <link rel="stylesheet" type="text/css" href="/etc/style.css">
-
-<script type="text/javascript" src="http://orgmode.org/org-info.js">
-/**
- *
- * @source: http://orgmode.org/org-info.js
- *
- * @licstart  The following is the entire license notice for the
- *  JavaScript code in http://orgmode.org/org-info.js.
- *
- * Copyright (C) 2012-2013  Sebastian Rose
- *
- *
- * The JavaScript code in this tag is free software: you can
- * redistribute it and/or modify it under the terms of the GNU
- * General Public License (GNU GPL) as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version.  The code is distributed WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
- *
- * As additional permission under GNU GPL version 3 section 7, you
- * may distribute non-source (e.g., minimized or compacted) forms of
- * that code without the copy of the GNU GPL normally required by
- * section 4, provided you include this license notice and a URL
- * through which recipients can access the Corresponding Source.
- *
- * @licend  The above is the entire license notice
- * for the JavaScript code in http://orgmode.org/org-info.js.
- *
- */
-</script>
-
 <script type="text/javascript">
-
 /*
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
 Copyright (C) 2012-2013 Free Software Foundation, Inc.
-
-The JavaScript code in this tag is free software: you can
-redistribute it and/or modify it under the terms of the GNU
-General Public License (GNU GPL) as published by the Free Software
-Foundation, either version 3 of the License, or (at your option)
-any later version.  The code is distributed WITHOUT ANY WARRANTY;
-without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
-
-As additional permission under GNU GPL version 3 section 7, you
-may distribute non-source (e.g., minimized or compacted) forms of
-that code without the copy of the GNU GPL normally required by
-section 4, provided you include this license notice and a URL
-through which recipients can access the Corresponding Source.
-
-
-@licend  The above is the entire license notice
-for the JavaScript code in this tag.
-*/
-
-<!--/*--><![CDATA[/*><!--*/
-org_html_manager.set("TOC_DEPTH", "3");
-org_html_manager.set("LINK_HOME", "");
-org_html_manager.set("LINK_UP", "");
-org_html_manager.set("LOCAL_TOC", "1");
-org_html_manager.set("VIEW_BUTTONS", "0");
-org_html_manager.set("MOUSE_HINT", "underline");
-org_html_manager.set("FIXED_TOC", "0");
-org_html_manager.set("TOC", "0");
-org_html_manager.set("VIEW", "info");
-org_html_manager.setup();  // activate after the parameters are set
-/*]]>*///-->
-</script>
-<script type="text/javascript">
-/*
-@licstart  The following is the entire license notice for the
-JavaScript code in this tag.
-
-Copyright (C) 2012  Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -140,23 +68,23 @@ for the JavaScript code in this tag.
 <li><a href="#sec-1-1">1.1. Pascal in Forth</a></li>
 <li><a href="#sec-1-2">1.2. Basic Ideas</a></li>
 <li><a href="#sec-1-3">1.3. The Algorithm</a></li>
-<li><a href="#sec-1-4">1.4. fig 4 ( railroad diagram )</a></li>
+<li><a href="#sec-1-4">1.4. <span class="todo TODO">TODO</span> fig 4 ( railroad diagram )</a></li>
 <li><a href="#sec-1-5">1.5. <i>Fig 5.</i> the "begin" statement ( example outline only )</a></li>
 <li><a href="#sec-1-6">1.6. The Forth Basics</a></li>
 <li><a href="#sec-1-7">1.7. <code>[3/7]</code> { code for the tokenizer }</a>
 <ul>
-<li><a href="#sec-1-7-1">1.7.1. block 2000 - pascal extensions to forth</a></li>
-<li><a href="#sec-1-7-2">1.7.2. block 2001 - reseverd words</a></li>
-<li><a href="#sec-1-7-3">1.7.3. block 2002 - cfa table ( "code field address ")</a></li>
-<li><a href="#sec-1-7-4">1.7.4. block 2003</a></li>
-<li><a href="#sec-1-7-5">1.7.5. block 2004 variables for the parser</a></li>
-<li><a href="#sec-1-7-6">1.7.6. block 2005 - next ( parses for tokens )</a></li>
-<li><a href="#sec-1-7-7">1.7.7. block 2006 forth parser tweaks</a></li>
+<li><a href="#sec-1-7-1">1.7.1. <span class="done DONE">DONE</span> block 2000 - pascal extensions to forth</a></li>
+<li><a href="#sec-1-7-2">1.7.2. <span class="done DONE">DONE</span> block 2001 - reseverd words</a></li>
+<li><a href="#sec-1-7-3">1.7.3. <span class="done DONE">DONE</span> block 2002 - cfa table ( "code field address ")</a></li>
+<li><a href="#sec-1-7-4">1.7.4. <span class="todo TODO">TODO</span> block 2003</a></li>
+<li><a href="#sec-1-7-5">1.7.5. <span class="todo TODO">TODO</span> block 2004 variables for the parser</a></li>
+<li><a href="#sec-1-7-6">1.7.6. <span class="todo TODO">TODO</span> block 2005 - next ( parses for tokens )</a></li>
+<li><a href="#sec-1-7-7">1.7.7. <span class="todo TODO">TODO</span> block 2006 forth parser tweaks</a></li>
 </ul>
 </li>
 <li><a href="#sec-1-8">1.8. The Expression Compiler</a></li>
-<li><a href="#sec-1-9">1.9. Infix Expressions</a></li>
-<li><a href="#sec-1-10">1.10. { code for expression compiler }</a>
+<li><a href="#sec-1-9">1.9. <span class="done DONE">DONE</span> Infix Expressions</a></li>
+<li><a href="#sec-1-10">1.10. <span class="todo TODO">TODO</span> { code for expression compiler }</a>
 <ul>
 <li><a href="#sec-1-10-1">1.10.1. block 2009 number</a></li>
 <li><a href="#sec-1-10-2">1.10.2. block 2010 variables</a></li>
@@ -266,7 +194,7 @@ to print the conents of variable <code>i</code>, in a field width of 5. This sho
 </p>
 
 <p>
-Passing results back from Pascal defined words into Forth is not quite so straightforward, since a Pascal program cannot easily take values off (or leave them on) the stack. Pascal does all of its arithmetic with variables, so it would seem sensible to allow Pascal and Forth to share the same variables, and communicate results through them. In id:fig1, the array <code>list</code> was created in Forth, but manipulated in <code>sortlist</code> exactly as if it were a 1-dimensional Pascal <code>ARRAY</code>. A Forth definition to sort any list, whose address is supplied on the stack, might then be written as in <i>fig 2</i>:
+Passing results back from Pascal defined words into Forth is not quite so straightforward, since a Pascal program cannot easily take values off (or leave them on) the stack. Pascal does all of its arithmetic with variables, so it would seem sensible to allow Pascal and Forth to share the same variables, and communicate results through them. In <i>id:fig1</i>, the array <code>list</code> was created in Forth, but manipulated in <code>sortlist</code> exactly as if it were a 1-dimensional Pascal <code>ARRAY</code>. A Forth definition to sort any list, whose address is supplied on the stack, might then be written as in <i>fig 2</i>:
 </p>
 
 <pre class="example">

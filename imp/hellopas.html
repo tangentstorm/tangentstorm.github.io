@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>hellopas: implish pascal compiler spike</title>
-<!-- 2013-11-01 Fri 04:08 -->
+<!-- 2014-02-08 Sat 07:39 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012  Free Software Foundation, Inc.
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -106,68 +106,68 @@ for the JavaScript code in this tag.
 <div id="text-table-of-contents">
 <ul>
 <li><a href="#sec-1">1. Overview</a></li>
-<li><a href="#sec-2">2. pascal source</a></li>
-<li><a href="#sec-3">3. grammar for the pascal subset</a></li>
-<li><a href="#sec-4">4. expected parse tree</a></li>
-<li><a href="#sec-5">5. template for pascal -&gt; assembler</a></li>
-<li><a href="#sec-6">6. expected assembler output</a></li>
-<li><a href="#sec-7">7. <code>[2/4]</code> parser for the assembly language</a>
+<li><a href="#sec-2">2. <span class="done DONE">DONE</span> pascal source</a></li>
+<li><a href="#sec-3">3. <span class="done DONE">DONE</span> grammar for the pascal subset</a></li>
+<li><a href="#sec-4">4. <span class="done DONE">DONE</span> expected parse tree</a></li>
+<li><a href="#sec-5">5. <span class="done DONE">DONE</span> template for pascal -&gt; assembler</a></li>
+<li><a href="#sec-6">6. <span class="done DONE">DONE</span> expected assembler output</a></li>
+<li><a href="#sec-7">7. <span class="todo TODO">TODO</span> <code>[2/4]</code> parser for the assembly language</a>
 <ul>
-<li><a href="#sec-7-1">7.1. Expose the existing implish reader as a function.</a></li>
-<li><a href="#sec-7-2">7.2. Create functions for sym-&gt;chars and chars-&gt;sym</a></li>
-<li><a href="#sec-7-3">7.3. extract prefix characters from the tokens in the assembly</a></li>
+<li><a href="#sec-7-1">7.1. <span class="done DONE">DONE</span> Expose the existing implish reader as a function.</a></li>
+<li><a href="#sec-7-2">7.2. <span class="done DONE">DONE</span> Create functions for sym-&gt;chars and chars-&gt;sym</a></li>
+<li><a href="#sec-7-3">7.3. <span class="todo TODO">TODO</span> extract prefix characters from the tokens in the assembly</a></li>
 </ul>
 </li>
-<li><a href="#sec-8">8. loop through and process assembler tokens to produce a binary</a></li>
-<li><a href="#sec-9">9. <code>[0/7]</code> assembler semantics</a>
+<li><a href="#sec-8">8. <span class="todo TODO">TODO</span> loop through and process assembler tokens to produce a binary</a></li>
+<li><a href="#sec-9">9. <span class="todo TODO">TODO</span> <code>[0/7]</code> assembler semantics</a>
 <ul>
-<li><a href="#sec-9-1">9.1. expose an [array of uint32] type</a></li>
-<li><a href="#sec-9-2">9.2. <code>[0/7]</code> macros ("." prefix)</a>
+<li><a href="#sec-9-1">9.1. <span class="todo TODO">TODO</span> expose an [array of uint32] type</a></li>
+<li><a href="#sec-9-2">9.2. <span class="todo TODO">TODO</span> <code>[0/7]</code> macros ("." prefix)</a>
 <ul>
-<li><a href="#sec-9-2-1">9.2.1. .prog</a></li>
-<li><a href="#sec-9-2-2">9.2.2. .data</a></li>
-<li><a href="#sec-9-2-3">9.2.3. .code</a></li>
-<li><a href="#sec-9-2-4">9.2.4. .repeat</a></li>
-<li><a href="#sec-9-2-5">9.2.5. .again</a></li>
-<li><a href="#sec-9-2-6">9.2.6. .main</a></li>
-<li><a href="#sec-9-2-7">9.2.7. .end</a></li>
+<li><a href="#sec-9-2-1">9.2.1. <span class="todo TODO">TODO</span> .prog</a></li>
+<li><a href="#sec-9-2-2">9.2.2. <span class="todo TODO">TODO</span> .data</a></li>
+<li><a href="#sec-9-2-3">9.2.3. <span class="todo TODO">TODO</span> .code</a></li>
+<li><a href="#sec-9-2-4">9.2.4. <span class="todo TODO">TODO</span> .repeat</a></li>
+<li><a href="#sec-9-2-5">9.2.5. <span class="todo TODO">TODO</span> .again</a></li>
+<li><a href="#sec-9-2-6">9.2.6. <span class="todo TODO">TODO</span> .main</a></li>
+<li><a href="#sec-9-2-7">9.2.7. <span class="todo TODO">TODO</span> .end</a></li>
 </ul>
 </li>
-<li><a href="#sec-9-3">9.3. labels and symbols (":" syntax)</a></li>
-<li><a href="#sec-9-4">9.4. instructions</a></li>
-<li><a href="#sec-9-5">9.5. numeric literals</a></li>
-<li><a href="#sec-9-6">9.6. strings ('"' .. '"')</a></li>
-<li><a href="#sec-9-7">9.7. expose a blockwrite function to write the array to a file</a></li>
+<li><a href="#sec-9-3">9.3. <span class="todo TODO">TODO</span> labels and symbols (":" syntax)</a></li>
+<li><a href="#sec-9-4">9.4. <span class="todo TODO">TODO</span> instructions</a></li>
+<li><a href="#sec-9-5">9.5. <span class="todo TODO">TODO</span> numeric literals</a></li>
+<li><a href="#sec-9-6">9.6. <span class="todo TODO">TODO</span> strings ('"' .. '"')</a></li>
+<li><a href="#sec-9-7">9.7. <span class="todo TODO">TODO</span> expose a blockwrite function to write the array to a file</a></li>
 </ul>
 </li>
-<li><a href="#sec-10">10. template combinators</a>
+<li><a href="#sec-10">10. <span class="todo TODO">TODO</span> template combinators</a>
 <ul>
-<li><a href="#sec-10-1">10.1. default: emit each expression in turn</a></li>
-<li><a href="#sec-10-2">10.2. "," -&gt; emit a newline and indent</a></li>
-<li><a href="#sec-10-3">10.3. (\ list sep) -&gt; emit (eval list), separated by sep</a></li>
-<li><a href="#sec-10-4">10.4. {name} -&gt; call template that maches (eval name)</a></li>
-<li><a href="#sec-10-5">10.5. (% name (args..) &#x2026;) -&gt; define a template rule</a></li>
-<li><a href="#sec-10-6">10.6. (&gt;&gt; &#x2026;) -&gt; increase indent while emitting the values</a></li>
+<li><a href="#sec-10-1">10.1. <span class="todo TODO">TODO</span> default: emit each expression in turn</a></li>
+<li><a href="#sec-10-2">10.2. <span class="todo TODO">TODO</span> "," -&gt; emit a newline and indent</a></li>
+<li><a href="#sec-10-3">10.3. <span class="todo TODO">TODO</span> (\ list sep) -&gt; emit (eval list), separated by sep</a></li>
+<li><a href="#sec-10-4">10.4. <span class="todo TODO">TODO</span> {name} -&gt; call template that maches (eval name)</a></li>
+<li><a href="#sec-10-5">10.5. <span class="todo TODO">TODO</span> (% name (args..) &#x2026;) -&gt; define a template rule</a></li>
+<li><a href="#sec-10-6">10.6. <span class="todo TODO">TODO</span> (&gt;&gt; &#x2026;) -&gt; increase indent while emitting the values</a></li>
 </ul>
 </li>
-<li><a href="#sec-11">11. transform pascal parse tree</a></li>
-<li><a href="#sec-12">12. <code>[0/9]</code> translate grammar symbols to associated combinators</a>
+<li><a href="#sec-11">11. <span class="todo TODO">TODO</span> transform pascal parse tree</a></li>
+<li><a href="#sec-12">12. <span class="todo TODO">TODO</span> <code>[0/9]</code> translate grammar symbols to associated combinators</a>
 <ul>
-<li><a href="#sec-12-1">12.1. string -&gt; lit(st)</a></li>
-<li><a href="#sec-12-2">12.2. quoted symbol -&gt; case insensitive keyword</a></li>
-<li><a href="#sec-12-3">12.3. normal symbol -&gt; sub(sym)</a></li>
-<li><a href="#sec-12-4">12.4. ":" -&gt; define a rule</a>
+<li><a href="#sec-12-1">12.1. <span class="todo TODO">TODO</span> string -&gt; lit(st)</a></li>
+<li><a href="#sec-12-2">12.2. <span class="todo TODO">TODO</span> quoted symbol -&gt; case insensitive keyword</a></li>
+<li><a href="#sec-12-3">12.3. <span class="todo TODO">TODO</span> normal symbol -&gt; sub(sym)</a></li>
+<li><a href="#sec-12-4">12.4. <span class="todo TODO">TODO</span> ":" -&gt; define a rule</a>
 <ul>
-<li><a href="#sec-12-4-1">12.4.1. ".name" -&gt; fragment</a></li>
-<li><a href="#sec-12-4-2">12.4.2. "NAME" -&gt; token</a></li>
-<li><a href="#sec-12-4-3">12.4.3. "name" -&gt; rule (produces a node)n</a></li>
+<li><a href="#sec-12-4-1">12.4.1. <span class="todo TODO">TODO</span> ".name" -&gt; fragment</a></li>
+<li><a href="#sec-12-4-2">12.4.2. <span class="todo TODO">TODO</span> "NAME" -&gt; token</a></li>
+<li><a href="#sec-12-4-3">12.4.3. <span class="todo TODO">TODO</span> "name" -&gt; rule (produces a node)n</a></li>
 </ul>
 </li>
-<li><a href="#sec-12-5">12.5. "|" -&gt; alt([&#x2026;])</a></li>
-<li><a href="#sec-12-6">12.6. "-" -&gt; any (charset)</a></li>
-<li><a href="#sec-12-7">12.7. "+" -&gt; rep([&#x2026;])</a></li>
-<li><a href="#sec-12-8">12.8. "!" -&gt; hide([&#x2026;])</a></li>
-<li><a href="#sec-12-9">12.9. "~" -&gt; neg([&#x2026;])</a></li>
+<li><a href="#sec-12-5">12.5. <span class="todo TODO">TODO</span> "|" -&gt; alt([&#x2026;])</a></li>
+<li><a href="#sec-12-6">12.6. <span class="todo TODO">TODO</span> "-" -&gt; any (charset)</a></li>
+<li><a href="#sec-12-7">12.7. <span class="todo TODO">TODO</span> "+" -&gt; rep([&#x2026;])</a></li>
+<li><a href="#sec-12-8">12.8. <span class="todo TODO">TODO</span> "!" -&gt; hide([&#x2026;])</a></li>
+<li><a href="#sec-12-9">12.9. <span class="todo TODO">TODO</span> "~" -&gt; neg([&#x2026;])</a></li>
 </ul>
 </li>
 </ul>

@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>specter : component specification tester</title>
-<!-- 2013-09-03 Tue 23:44 -->
+<!-- 2014-02-08 Sat 07:39 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012  Free Software Foundation, Inc.
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -64,7 +64,7 @@ for the JavaScript code in this tag.
 <div id="text-table-of-contents">
 <ul>
 <li><a href="#sec-1">1. overview</a></li>
-<li><a href="#sec-2">2. define <i>Component</i></a></li>
+<li><a href="#sec-2">2. <span class="todo TODO">TODO</span> define <i>Component</i></a></li>
 <li><a href="#sec-3">3. philosophy</a></li>
 <li><a href="#sec-4">4. formal definition of transcript language</a></li>
 <li><a href="#sec-5">5. example implementation</a></li>
@@ -155,23 +155,23 @@ When the tests run, specter plays the role of the controlling actor, and communi
 <span style="color: #00ff00;">    """</span>
 
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">getnext</span>(iterator, default):
-        <span style="color: #00ffff;">try</span>: <span style="color: #00ffff;">return</span> iterator.next()
+        <span style="color: #00ffff;">try</span>: <span style="color: #00ffff;">return</span> iterator.<span style="color: #ff00ff; font-weight: bold;">next</span>()
         <span style="color: #00ffff;">except</span> <span style="color: #ff00ff;">StopIteration</span>: <span style="color: #00ffff;">return</span> default
 
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">chomp</span>(s):
         <span style="color: #00ffff;">return</span> line[:-1] <span style="color: #00ffff;">if</span> <span style="color: #ff00ff; font-weight: bold;">type</span>(s)==<span style="color: #ff00ff; font-weight: bold;">str</span> <span style="color: #00ffff;">and</span> line.endswith(<span style="color: #00ff00;">'\n'</span>) <span style="color: #00ffff;">else</span> line
 
-    end = <span style="color: #7fffd4;">None</span> <span style="color: #66f;"># i just like seeing it now. :)</span>
+    <span style="color: #eedd82;">end</span> = <span style="color: #7fffd4;">None</span> <span style="color: #66f;"># </span><span style="color: #66f;">i just like seeing it now. :)</span>
 
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">nxt</span>(): <span style="color: #00ffff;">return</span> chomp(getnext(stream, END))
 
-    done = <span style="color: #00ffff;">False</span>
+    <span style="color: #eedd82;">done</span> = <span style="color: #7fffd4;">False</span>
     <span style="color: #00ffff;">while</span> <span style="color: #00ffff;">not</span> done:
-        this = nxt()
+        <span style="color: #eedd82;">this</span> = nxt()
         <span style="color: #00ffff;">while</span> this != END:
-            line = this
+            <span style="color: #eedd82;">line</span> = this
             <span style="color: #00ffff;">while</span> line.endswith(<span style="color: #00ff00;">'\\'</span>) <span style="color: #00ffff;">and</span> this != END:
-                this = nxt()
+                <span style="color: #eedd82;">this</span> = nxt()
                 <span style="color: #00ffff;">if</span> this == END:
                     <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">SyntaxError</span>(<span style="color: #00ff00;">'expected another line'</span>)
                 line = line[:-1] + this()

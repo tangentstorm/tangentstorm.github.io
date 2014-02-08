@@ -4,89 +4,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>one red pixel on ngaro vm</title>
-<!-- 2013-09-03 Tue 23:44 -->
+<!-- 2014-02-08 Sat 07:39 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
 <link rel="stylesheet" type="text/css" href="/etc/style.css">
-
-<script type="text/javascript" src="http://orgmode.org/org-info.js">
-/**
- *
- * @source: http://orgmode.org/org-info.js
- *
- * @licstart  The following is the entire license notice for the
- *  JavaScript code in http://orgmode.org/org-info.js.
- *
- * Copyright (C) 2012-2013  Sebastian Rose
- *
- *
- * The JavaScript code in this tag is free software: you can
- * redistribute it and/or modify it under the terms of the GNU
- * General Public License (GNU GPL) as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option)
- * any later version.  The code is distributed WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
- *
- * As additional permission under GNU GPL version 3 section 7, you
- * may distribute non-source (e.g., minimized or compacted) forms of
- * that code without the copy of the GNU GPL normally required by
- * section 4, provided you include this license notice and a URL
- * through which recipients can access the Corresponding Source.
- *
- * @licend  The above is the entire license notice
- * for the JavaScript code in http://orgmode.org/org-info.js.
- *
- */
-</script>
-
 <script type="text/javascript">
-
 /*
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
 Copyright (C) 2012-2013 Free Software Foundation, Inc.
-
-The JavaScript code in this tag is free software: you can
-redistribute it and/or modify it under the terms of the GNU
-General Public License (GNU GPL) as published by the Free Software
-Foundation, either version 3 of the License, or (at your option)
-any later version.  The code is distributed WITHOUT ANY WARRANTY;
-without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
-
-As additional permission under GNU GPL version 3 section 7, you
-may distribute non-source (e.g., minimized or compacted) forms of
-that code without the copy of the GNU GPL normally required by
-section 4, provided you include this license notice and a URL
-through which recipients can access the Corresponding Source.
-
-
-@licend  The above is the entire license notice
-for the JavaScript code in this tag.
-*/
-
-<!--/*--><![CDATA[/*><!--*/
-org_html_manager.set("TOC_DEPTH", "3");
-org_html_manager.set("LINK_HOME", "");
-org_html_manager.set("LINK_UP", "");
-org_html_manager.set("LOCAL_TOC", "1");
-org_html_manager.set("VIEW_BUTTONS", "0");
-org_html_manager.set("MOUSE_HINT", "underline");
-org_html_manager.set("FIXED_TOC", "0");
-org_html_manager.set("TOC", "0");
-org_html_manager.set("VIEW", "info");
-org_html_manager.setup();  // activate after the parameters are set
-/*]]>*///-->
-</script>
-<script type="text/javascript">
-/*
-@licstart  The following is the entire license notice for the
-JavaScript code in this tag.
-
-Copyright (C) 2012  Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -135,22 +63,22 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. <code>[4/4]</code> the goal: get a single pixel to display over ngaro.js</a>
+<li><a href="#sec-1">1. <span class="done DONE">DONE</span> <code>[4/4]</code> the goal: get a single pixel to display over ngaro.js</a>
 <ul>
-<li><a href="#sec-1-1">1.1. pixel.rx : draw a red pixel on the screen</a></li>
-<li><a href="#sec-1-2">1.2. do it again, with the retro primitives</a>
+<li><a href="#sec-1-1">1.1. <span class="done DONE">DONE</span> pixel.rx : draw a red pixel on the screen</a></li>
+<li><a href="#sec-1-2">1.2. <span class="done DONE">DONE</span> do it again, with the retro primitives</a>
 <ul>
 <li><a href="#sec-1-2-1">1.2.1. Strike One.</a></li>
 <li><a href="#sec-1-2-2">1.2.2. Creating a word works.</a></li>
 <li><a href="#sec-1-2-3">1.2.3. so we might as well refactor it:</a></li>
 </ul>
 </li>
-<li><a href="#sec-1-3">1.3. now do same in raw ngaro machine code</a>
+<li><a href="#sec-1-3">1.3. <span class="done DONE">DONE</span> now do same in raw ngaro machine code</a>
 <ul>
-<li><a href="#sec-1-3-1">1.3.1. hand-coded machine instructions in retroImage.js</a></li>
+<li><a href="#sec-1-3-1">1.3.1. <span class="done DONE">DONE</span> hand-coded machine instructions in retroImage.js</a></li>
 </ul>
 </li>
-<li><a href="#sec-1-4">1.4. test program on existing ngaro vm</a>
+<li><a href="#sec-1-4">1.4. <span class="done DONE">DONE</span> test program on existing ngaro vm</a>
 <ul>
 <li><a href="#sec-1-4-1">1.4.1. NOTE wound up tesing pretty thoroughly with ngaro.js</a></li>
 <li><a href="#sec-1-4-2">1.4.2. SKIP <del>get the C one to compile on ubuntu</del></a></li>
@@ -298,7 +226,6 @@ This works:
 </div><div id="outline-container-sec-1-3-1" class="outline-4">
 <h4 id="sec-1-3-1"><a id="8gkg3o50ntf0" name="8gkg3o50ntf0"></a><span class="section-number-4">1.3.1</span> <span class="done DONE">DONE</span> hand-coded machine instructions in retroImage.js</h4>
 <div class="outline-text-4" id="text-1-3-1">
-
 <p>
 <i>(marking this done even though it doesn't show the pixel in js, because this was really a fact-finding task)</i>
 </p>

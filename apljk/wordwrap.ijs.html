@@ -3,8 +3,8 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title>wordwrap in j</title>
-<!-- 2014-01-28 Tue 09:44 -->
+<title>formal methods in j : wordwrap</title>
+<!-- 2014-02-08 Sat 07:39 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -58,34 +58,90 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">wordwrap in j</h1>
+<h1 class="title">formal methods in j : wordwrap</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. step : create some random token lengeths</a></li>
-<li><a href="#sec-2">2. step: introduce the width parameter</a></li>
-<li><a href="#sec-3">3. monadic train with hard coded width</a></li>
-<li><a href="#sec-4">4. final form : dyadic train</a></li>
-<li><a href="#sec-5">5. &#x2014; false starts  ---</a>
+<li><a href="#sec-1">1. word wrap : a formal specification</a></li>
+<li><a href="#sec-2">2. bad implementation</a>
 <ul>
-<li><a href="#sec-5-1">5.1. step : introduce gerund</a></li>
-<li><a href="#sec-5-2">5.2. step : boxing</a>
+<li><a href="#sec-2-1">2.1. step : create some random token lengeths</a></li>
+<li><a href="#sec-2-2">2.2. step: introduce the width parameter</a></li>
+<li><a href="#sec-2-3">2.3. monadic train with hard coded width</a></li>
+<li><a href="#sec-2-4">2.4. final form : dyadic train</a></li>
+<li><a href="#sec-2-5">2.5. &#x2014; false starts  ---</a>
 <ul>
-<li><a href="#sec-5-2-1">5.2.1. <span class="todo TODO">TODO</span> fix the paste :/</a></li>
+<li><a href="#sec-2-5-1">2.5.1. step : introduce gerund</a></li>
+<li><a href="#sec-2-5-2">2.5.2. step : boxing</a></li>
+<li><a href="#sec-2-5-3">2.5.3. step : hold or wrap</a></li>
+<li><a href="#sec-2-5-4">2.5.4. junk:</a></li>
 </ul>
 </li>
-<li><a href="#sec-5-3">5.3. step : hold or wrap</a></li>
-<li><a href="#sec-5-4">5.4. junk:</a></li>
 </ul>
 </li>
 </ul>
+</div>
+</div>
+<p>
+(this is completely unorganized)
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> word wrap : a formal specification</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+<b>inputs</b>:
+</p>
+
+<ul class="org-ul">
+<li><i>t</i> is an array of token lengths (all positive integers)
+</li>
+<li><i>w</i> is the length at which to wrap a line
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-j"><span style="color: #ff00ff; font-weight: bold;">assert</span> *./ t &gt; 0         <span style="color: #66f;">NB. all tokens have length &gt; 0</span>
+<span style="color: #ff00ff; font-weight: bold;">assert</span> w &gt; 0             <span style="color: #66f;">NB. the line wrap length is &gt; 0</span>
+<span style="color: #ff00ff; font-weight: bold;">assert</span> t &lt;: w            <span style="color: #66f;">NB. no individual token is longer than w</span>
+</pre>
+</div>
+
+<p>
+<b>outputs:</b>
+</p>
+
+<ul class="org-ul">
+<li><i>r</i> is a 2d array where each row contains the lengths of the tokens to put on each line. Rows can be padded with 0 to make them the same length.
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-j"><span style="color: #ff00ff; font-weight: bold;">assert</span> t -: (,r) -. 0    <span style="color: #66f;">NB. r is same as t, except with zeros</span>
+<span style="color: #ff00ff; font-weight: bold;">assert</span> w &gt;: +/"1 r       <span style="color: #66f;">NB. sum of each row in r is &lt;: w</span>
+
+<span style="color: #eedd82;">hds</span>=. (}.{."1 r),0
+<span style="color: #ff00ff; font-weight: bold;">assert</span> w &lt; +/"1 hds,. r  <span style="color: #66f;">NB.</span>
+</pre>
+</div>
 </div>
 </div>
 
-<div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> step : create some random token lengeths</h2>
-<div class="outline-text-2" id="text-1">
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> bad implementation</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+this looked promising but it can produce lines that are too long because it doesn't reset the sum after a wrap.
+</p>
+</div>
+
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> step : create some random token lengeths</h3>
+<div class="outline-text-3" id="text-2-1">
 <pre class="example">
    ] toklens =: &gt;:?.32$10    NB. ?. uses a fixed seed rng
 7 6 10 3 5 10 1 8 1 5 7 9 4 9 2 3 9 1 1 3 2 7 1 5 5 2 4 4 7 7 6 8
@@ -96,9 +152,9 @@ the / adverb inserts a verb between each item of an array
 </p>
 </div>
 </div>
-<div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> step: introduce the width parameter</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> step: introduce the width parameter</h3>
+<div class="outline-text-3" id="text-2-2">
 <p>
 okay so here's a stub for our function:
 </p>
@@ -114,9 +170,9 @@ The '[:' forces the verb in parens to evaluate as a monad, so the 32 is ignored 
 </div>
 </div>
 
-<div id="outline-container-sec-3" class="outline-2">
-<h2 id="sec-3"><span class="section-number-2">3</span> monadic train with hard coded width</h2>
-<div class="outline-text-2" id="text-3">
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> monadic train with hard coded width</h3>
+<div class="outline-text-3" id="text-2-3">
 <pre class="example">
    (&lt;/.~ ([: &lt;. 32 %~ +/\)) toklens
 +-------+-------+------------+-------------+--------+-----------+---+
@@ -126,9 +182,9 @@ The '[:' forces the verb in parens to evaluate as a monad, so the 32 is ignored 
 </div>
 </div>
 
-<div id="outline-container-sec-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> final form : dyadic train</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> final form : dyadic train</h3>
+<div class="outline-text-3" id="text-2-4">
 <p>
 refactor to dyadic train
 </p>
@@ -142,12 +198,12 @@ refactor to dyadic train
 </div>
 </div>
 
-<div id="outline-container-sec-5" class="outline-2">
-<h2 id="sec-5"><span class="section-number-2">5</span> &#x2014; false starts  ---</h2>
-<div class="outline-text-2" id="text-5">
-</div><div id="outline-container-sec-5-1" class="outline-3">
-<h3 id="sec-5-1"><span class="section-number-3">5.1</span> step : introduce gerund</h3>
-<div class="outline-text-3" id="text-5-1">
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> &#x2014; false starts  ---</h3>
+<div class="outline-text-3" id="text-2-5">
+</div><div id="outline-container-sec-2-5-1" class="outline-4">
+<h4 id="sec-2-5-1"><span class="section-number-4">2.5.1</span> step : introduce gerund</h4>
+<div class="outline-text-4" id="text-2-5-1">
 <p>
 This is a refactoring step.
 </p>
@@ -177,9 +233,9 @@ The point of this step was just to introduce the agenda structure without breaki
 </div>
 </div>
 
-<div id="outline-container-sec-5-2" class="outline-3">
-<h3 id="sec-5-2"><span class="section-number-3">5.2</span> step : boxing</h3>
-<div class="outline-text-3" id="text-5-2">
+<div id="outline-container-sec-2-5-2" class="outline-4">
+<h4 id="sec-2-5-2"><span class="section-number-4">2.5.2</span> step : boxing</h4>
+<div class="outline-text-4" id="text-2-5-2">
 <p>
 Now we can replace the '[:' with another verb, and conditionally select it instead.
 </p>
@@ -189,23 +245,21 @@ Now we can replace the '[:' with another verb, and conditionally select it inste
 <pre class="src src-j">   32 ([: ,`&lt; @. 0:  ]) toklens
 7 6 10 3 5 10 1 8 1 5 7 9 4 9 2 3 9 1 1 3 2 7 1 5 5 2 4 4 7 7 6 8
    32 ([: ,`&lt; @. 1:  ]) toklens
-   NB. (j shows the same thing, but boxed)
+   <span style="color: #66f;">NB. (j shows the same thing, but boxed)</span>
 </pre>
 </div>
 </div>
 
-<div id="outline-container-sec-5-2-1" class="outline-4">
-<h4 id="sec-5-2-1"><span class="section-number-4">5.2.1</span> <span class="todo TODO">TODO</span> fix the paste :/</h4>
-<div class="outline-text-4" id="text-5-2-1">
+<ol class="org-ol"><li><span class="todo TODO">TODO</span> fix the paste :/<br  /><div class="outline-text-5" id="text-2-5-2-1">
 <p>
 <i>for some reason i suddenly can't copy and paste the box drawing characters. :(</i>
 </p>
 </div>
+</li></ol>
 </div>
-</div>
-<div id="outline-container-sec-5-3" class="outline-3">
-<h3 id="sec-5-3"><span class="section-number-3">5.3</span> step : hold or wrap</h3>
-<div class="outline-text-3" id="text-5-3">
+<div id="outline-container-sec-2-5-3" class="outline-4">
+<h4 id="sec-2-5-3"><span class="section-number-4">2.5.3</span> step : hold or wrap</h4>
+<div class="outline-text-4" id="text-2-5-3">
 <p>
 We now want to replace the ',' and '&lt;' verbs with more sophisticated versions. I will break them out into two verbs:
 </p>
@@ -218,9 +272,9 @@ wrap =: &lt;
 </div>
 </div>
 
-<div id="outline-container-sec-5-4" class="outline-3">
-<h3 id="sec-5-4"><span class="section-number-3">5.4</span> junk:</h3>
-<div class="outline-text-3" id="text-5-4">
+<div id="outline-container-sec-2-5-4" class="outline-4">
+<h4 id="sec-2-5-4"><span class="section-number-4">2.5.4</span> junk:</h4>
+<div class="outline-text-4" id="text-2-5-4">
 <p>
 (as if wrapping into one long line
 </p>
@@ -233,6 +287,7 @@ wrap =: &lt;
 <p>
 (4 : ('t=.&gt;{:x'; 'echo x;_;t;_;y'; 'if. (+/t,y) &gt; 32 do. x;;y else. (}:x);t,y end.'))/ 1 2 3 4 5
 </p>
+</div>
 </div>
 </div>
 </div>

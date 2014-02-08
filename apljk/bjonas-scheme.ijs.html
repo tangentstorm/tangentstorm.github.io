@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>code review : BJonas' Interpreter Experiment in J</title>
-<!-- 2014-01-28 Tue 09:44 -->
+<!-- 2014-02-08 Sat 07:39 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -88,7 +88,7 @@ Quoted text and the actual code belong to BJonas. Each section is quoted verbati
 
 <div class="org-src-container">
 
-<pre class="src src-j">NB. interpreter experiment in J by zsban
+<pre class="src src-j"><span style="color: #66f;">NB. interpreter experiment in J by zsban</span>
 </pre>
 </div>
 
@@ -133,10 +133,10 @@ The <code>tok</code> verb splits a scheme code string to tokens, but doesn't act
 
 <div class="org-src-container">
 
-<pre class="src src-j">spcp =: e.&amp;(9 10 11 12 13 32{a.)
-tok1 =: (((~:1&amp;|.)@:spcp+.(+.1&amp;|.)@:(e.&amp;'()'))&lt;;.2])
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">spcp</span> =: e.&amp;(9 10 11 12 13 32{<span style="color: #7fffd4;">a.</span>)
+<span style="color: #ffffff; font-weight: bold;">tok1</span> =: (((~:1&amp;|.)@:spcp+.(+.1&amp;|.)@:(e.&amp;<span style="color: #00ff00;">'()'</span>))&lt;;.2])
 
-tok =: ((#~-.@:spcp@:{.@:&gt;"0)@:tok1@:(,&amp;' ')) ::[:
+<span style="color: #ffffff; font-weight: bold;">tok</span> =: ((#~-.@:spcp@:{.@:&gt;"0)@:tok1@:(,&amp;<span style="color: #00ff00;">' '</span>)) ::[:
 </pre>
 </div>
 
@@ -236,14 +236,14 @@ The <code>rdr</code> verb reads a scheme code string to a tree, but the leafs of
 
 <div class="org-src-container">
 
-<pre class="src src-j">rdrc =: ('()'i.{.@:&gt;)
-rdrs =: rdrb`rdre`rdra@.(rdrc@:{.)
-rdrb =: (&lt;@:}: , rdrs@:&gt;@:{:) @: rdrs@:}.
-rdre =: &lt;@:}.
-rdra =: {. , rdrs@:}.
-rdr1 =: {.@:rdrs@:(,&amp;(&lt;')'))
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">rdrc</span> =: (<span style="color: #00ff00;">'()'</span>i.{.@:&gt;)
+<span style="color: #ffffff; font-weight: bold;">rdrs</span> =: rdrb`rdre`rdra@.(rdrc@:{.)
+<span style="color: #ffffff; font-weight: bold;">rdrb</span> =: (&lt;@:}: , rdrs@:&gt;@:{:) @: rdrs@:}.
+<span style="color: #ffffff; font-weight: bold;">rdre</span> =: &lt;@:}.
+<span style="color: #ffffff; font-weight: bold;">rdra</span> =: {. , rdrs@:}.
+<span style="color: #ffffff; font-weight: bold;">rdr1</span> =: {.@:rdrs@:(,&amp;(&lt;<span style="color: #00ff00;">')'</span>))
 
-rdr =: (rdr1 @: tok) ::[:
+<span style="color: #ffffff; font-weight: bold;">rdr</span> =: (rdr1 @: tok) ::[:
 </pre>
 </div>
 
@@ -543,10 +543,10 @@ The <code>placmak</code>, <code>placref</code>, and <code>placset</code> functio
 
 <div class="org-src-container">
 
-<pre class="src src-j">placv =: i.0
-placmak =: 3 :'&lt;:#placv=:placv,&lt;y'
-placref =: 3 :'&gt;y{placv'
-placset =: 4 :'0:placv=:(&lt;y) x}placv'
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">placv</span> =: i.0
+<span style="color: #ffffff; font-weight: bold;">placmak</span> =: 3 :<span style="color: #00ff00;">'&lt;:#placv=:placv,&lt;y'</span>
+<span style="color: #ffffff; font-weight: bold;">placref</span> =: 3 :<span style="color: #00ff00;">'&gt;y{placv'</span>
+<span style="color: #ffffff; font-weight: bold;">placset</span> =: 4 :<span style="color: #00ff00;">'0:placv=:(&lt;y) x}placv'</span>
 </pre>
 </div>
 
@@ -582,20 +582,20 @@ The environment is a rank 2 array whose first column contains the boxed names of
 
 <div class="org-src-container">
 
-<pre class="src src-j">denv =: i.0 2
-denvadd =: 4 :'0:denv=:denv,(,x);placmak y'
-'+' denvadd +/@:&gt;`''
-'-' denvadd ({.-+/@:}.)`(-@:{.)@.(1=#)@:&gt;`''
-'*' denvadd */@:&gt;`''
-'/' denvadd ({.%*/@:}.)`(%@:{.)@.(1=#)@:&gt;`''
-'floor' denvadd &lt;.@:{.@:&gt;`''
-'exp' denvadd ^@:{.@:&gt;`''
-'log' denvadd ^.@:{.@:&gt;`''
-'&lt;' denvadd ([:*./2&lt;/\])@:&gt;`''
-'=' denvadd ([:*./2=/\])@:&gt;`''
-'&lt;=' denvadd ([:*./2&lt;:/\])@:&gt;`''
-'not' denvadd -.@:{.@:&gt;`''
-'g0' denvadd 0
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">denv</span> =: i.0 2
+<span style="color: #ffffff; font-weight: bold;">denvadd</span> =: 4 :<span style="color: #00ff00;">'0:denv=:denv,(,x);placmak y'</span>
+<span style="color: #00ff00;">'+'</span> denvadd +/@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'-'</span> denvadd ({.-+/@:}.)`(-@:{.)@.(1=#)@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'*'</span> denvadd */@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'/'</span> denvadd ({.%*/@:}.)`(%@:{.)@.(1=#)@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'floor'</span> denvadd &lt;.@:{.@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'exp'</span> denvadd ^@:{.@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'log'</span> denvadd ^.@:{.@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'&lt;'</span> denvadd ([:*./2&lt;/\])@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'='</span> denvadd ([:*./2=/\])@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'&lt;='</span> denvadd ([:*./2&lt;:/\])@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'not'</span> denvadd -.@:{.@:&gt;`<span style="color: #00ff00;">''</span>
+<span style="color: #00ff00;">'g0'</span> denvadd 0
 </pre>
 </div>
 
@@ -621,13 +621,13 @@ Scheme procedures are represented as J gerunds of monadic functions that accept 
 
 <div class="org-src-container">
 
-<pre class="src src-j">runl =: [ &lt;@:run"_ 0 &gt;@:]
-envfind =: ([:&gt;[:{:[{~{."1@:[i:])
-match =: ([ , &lt;@:placmak@:&gt;@:])"0
-lambda1 =: 2 :'&gt;@:{: (u , (&gt;@:{.v)match y) runl (&lt;@:}.v)'
-NB.lambda1 =: 2 :'(u , (&gt;@:{.v)match y) ; (&lt;@:}.v) ; 9'
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">runl</span> =: [ &lt;@:run"_ 0 &gt;@:]
+<span style="color: #ffffff; font-weight: bold;">envfind</span> =: ([:&gt;[:{:[{~{."1@:[i:])
+<span style="color: #ffffff; font-weight: bold;">match</span> =: ([ , &lt;@:placmak@:&gt;@:])"0
+<span style="color: #ffffff; font-weight: bold;">lambda1</span> =: 2 :<span style="color: #00ff00;">'&gt;@:{: (u , (&gt;@:{.v)match y) runl (&lt;@:}.v)'</span>
+<span style="color: #66f;">NB.lambda1 =: 2 :'(u , (&gt;@:{.v)match y) ; (&lt;@:}.v) ; 9'</span>
 
-lambda =: 4 :'(x lambda1 y)`(i.0)'
+<span style="color: #ffffff; font-weight: bold;">lambda</span> =: 4 :<span style="color: #00ff00;">'(x lambda1 y)`(i.0)'</span>
 </pre>
 </div>
 
@@ -655,18 +655,18 @@ This function dispatches to one of the six functions <code>runnum</code>, <code>
 
 <div class="org-src-container">
 
-<pre class="src src-j">runnum =: {.@:,@:(_.&amp;".)@:&gt;@:]
-runsym =: placref @: envfind
-runset =: [: 0: ([envfind 1{&gt;@:]) placset ([run 2{&gt;@:])
-runcall =: [: (&gt;@:{. 4 :'x@.0 y' }.) runl
-runif =: [ run ([:-.[run 1{&gt;@:]) { ((&lt;'0'),~2}.&gt;@:])
-runlambda =: [ lambda }.@:&gt;@:]
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">runnum</span> =: {.@:,@:(_.&amp;".)@:&gt;@:]
+<span style="color: #ffffff; font-weight: bold;">runsym</span> =: placref @: envfind
+<span style="color: #ffffff; font-weight: bold;">runset</span> =: [: 0: ([envfind 1{&gt;@:]) placset ([run 2{&gt;@:])
+<span style="color: #ffffff; font-weight: bold;">runcall</span> =: [: (&gt;@:{. 4 :<span style="color: #00ff00;">'x@.0 y'</span> }.) runl
+<span style="color: #ffffff; font-weight: bold;">runif</span> =: [ run ([:-.[run 1{&gt;@:]) { ((&lt;<span style="color: #00ff00;">'0'</span>),~2}.&gt;@:])
+<span style="color: #ffffff; font-weight: bold;">runlambda</span> =: [ lambda }.@:&gt;@:]
 
-keywd =: ('lambda';'if';'set!')&amp;i.
-runo =: runlambda`runif`runset`runcall@.(keywd@:{.@:&gt;@:])
-runa =: runsym`runnum@.(((e.&amp;'0123456789+-'@:{.@:&gt;)&gt;(e.&amp;(+`-)))@:])
+<span style="color: #ffffff; font-weight: bold;">keywd</span> =: (<span style="color: #00ff00;">'lambda'</span>;<span style="color: #00ff00;">'if'</span>;<span style="color: #00ff00;">'set!'</span>)&amp;i.
+<span style="color: #ffffff; font-weight: bold;">runo</span> =: runlambda`runif`runset`runcall@.(keywd@:{.@:&gt;@:])
+<span style="color: #ffffff; font-weight: bold;">runa</span> =: runsym`runnum@.(((e.&amp;<span style="color: #00ff00;">'0123456789+-'</span>@:{.@:&gt;)&gt;(e.&amp;(+`-)))@:])
 
-run =: runo`runa@.(1=L.@:])
+<span style="color: #ffffff; font-weight: bold;">run</span> =: runo`runa@.(1=L.@:])
 </pre>
 </div>
 </div>
@@ -676,13 +676,13 @@ run =: runo`runa@.(1=L.@:])
 <div class="outline-text-2" id="text-6">
 <div class="org-src-container">
 
-<pre class="src src-j">eval =: denv&amp;run @: rdr ::[:
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">eval</span> =: denv&amp;run @: rdr ::[:
 
 echo eval 0 :0
         (((lambda (fact) (set! fact
                 (lambda (n) (if (&lt; n 1) 1 (* n (fact (- n 1)))))) fact) 0) 5)
-)
-echo eval '((lambda (a) ((lambda (a) a) 2)) 5)' NB. must give 2
+<span style="color: #00ffff;">)</span>
+echo eval <span style="color: #00ff00;">'((lambda (a) ((lambda (a) a) 2)) 5)'</span> <span style="color: #66f;">NB. must give 2</span>
 </pre>
 </div>
 </div>

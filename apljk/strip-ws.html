@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>strip-ws</title>
-<!-- 2013-10-16 Wed 13:03 -->
+<!-- 2014-02-08 Sat 07:39 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012  Free Software Foundation, Inc.
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -78,10 +78,10 @@ here is what i came up with, and it does most of the job:
 
 <div class="org-src-container">
 
-<pre class="src src-j">wrap =. '['&amp;,,,&amp;']'  NB. bad!! should be '['&amp;,@,&amp;']'
-ws =. (3 : '32&lt;a.i.y')
-sh =. 3 : '}:"1 shr=.(sp,y),:(shl=.y,sp=.'' '')'
-strip =. [ #~ +./ @ws @sh
+<pre class="src src-j"><span style="color: #eedd82;">wrap</span> =. <span style="color: #00ff00;">'['</span>&amp;,,,&amp;<span style="color: #00ff00;">']'</span>  <span style="color: #66f;">NB. bad!! should be '['&amp;,@,&amp;']'</span>
+<span style="color: #eedd82;">ws</span> =. (3 : <span style="color: #00ff00;">'32&lt;a.i.y'</span>)
+<span style="color: #eedd82;">sh</span> =. 3 : <span style="color: #00ff00;">'}:"1 shr=.(sp,y),:(shl=.y,sp=.'' '')'</span>
+<span style="color: #eedd82;">strip</span> =. [ #~ +./ @ws @sh
 </pre>
 </div>
 
@@ -105,7 +105,6 @@ wrap =. '['&amp;,,,&amp;']'  NB. wrap'a' -&gt; [aa]   (not what i wanted!!)
 <div id="outline-container-sec-2" class="outline-2">
 <h2 id="sec-2"><a id="dku5ngv0q9g0" name="dku5ngv0q9g0"></a><span class="section-number-2">2</span> why wrap '['&amp;,,,&amp;']'  duplicates data</h2>
 <div class="outline-text-2" id="text-2">
-
 <p>
 let's see. it's a monadic train of three verbs <code>('['&amp;, ) (,) (,&amp;']')</code>
 </p>
@@ -143,7 +142,6 @@ wrap=.'['&amp;,@,&amp;']' NB. wrap'a' -&gt; [a]
 <div id="outline-container-sec-3" class="outline-2">
 <h2 id="sec-3"><a id="2p8krqw0q9g0" name="2p8krqw0q9g0"></a><span class="section-number-2">3</span> NOTE . still a bug though - my boolean operator is wrong.</h2>
 <div class="outline-text-2" id="text-3">
-
 <p>
 I don't want +/&#x2026; i want any case where the previous character is a space <i>and</i> the current character is a space. (emulating an initial ' ' simply by appending one.
 </p>

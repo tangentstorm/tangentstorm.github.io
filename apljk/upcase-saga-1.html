@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>The UpCase Saga: How I Learn New Programming Languages</title>
-<!-- 2013-11-01 Fri 04:08 -->
+<!-- 2014-02-08 Sat 07:39 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012  Free Software Foundation, Inc.
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -110,8 +110,8 @@ It took me an hour to produce this:
 
 <div class="org-src-container">
 
-<pre class="src src-j">string =. '"Please, Sir, could you make this upper case?" said Pip.'
-(chr=.{&amp;a.) s -32&amp;* e.&amp;((ord 'a')+(i.26))  s=.(ord=.a.&amp;i.) string
+<pre class="src src-j"><span style="color: #eedd82;">string</span> =. <span style="color: #00ff00;">'"Please, Sir, could you make this upper case?" said Pip.'</span>
+(<span style="color: #eedd82;">chr</span>=.{&amp;<span style="color: #7fffd4;">a.</span>) s -32&amp;* e.&amp;((ord <span style="color: #00ff00;">'a'</span>)+(i.26))  <span style="color: #eedd82;">s</span>=.(<span style="color: #eedd82;">ord</span>=.a.&amp;i.) string
 </pre>
 </div>
 
@@ -129,7 +129,7 @@ The above code is just an expression, not a verb, but once I got that far, I use
 
 <div class="org-src-container">
 
-<pre class="src src-j">upcase =. [: ([: {&amp;a. ] - [: 32&amp;* e.&amp;(97+i.26)) a.&amp;i.
+<pre class="src src-j"><span style="color: #eedd82;">upcase</span> =. [: ([: {&amp;<span style="color: #7fffd4;">a.</span> ] - [: 32&amp;* e.&amp;(97+i.26)) <span style="color: #7fffd4;">a.</span>&amp;i.
 </pre>
 </div>
 
@@ -179,33 +179,33 @@ The following transcript of an interactive J session shows how these concepts ar
 
 <div class="org-src-container">
 
-<pre class="src src-j">   NB. Input lines are indented in the J terminal.
+<pre class="src src-j">   <span style="color: #66f;">NB. Input lines are indented in the J terminal.</span>
 
-   8 +. 5 6 7 8 9 10 11 12     NB. GCD(8,5) GCD(8,6) ... GCD(8,12)
+   8 +. 5 6 7 8 9 10 11 12     <span style="color: #66f;">NB. GCD(8,5) GCD(8,6) ... GCD(8,12)</span>
 1 2 1 8 1 2 1 4
 
-   12 11 10 9 8 7 6 +. 6 7 8 9 10 11 12  NB. GCD(12,6) GCD(11,7) ...
+   12 11 10 9 8 7 6 +. 6 7 8 9 10 11 12  <span style="color: #66f;">NB. GCD(12,6) GCD(11,7) ...</span>
 6 1 2 9 2 1 6
 
-   NB. Ranges can be generated with monadic ' i. ' ('Integers')
-   NB. Dyadic ; composes values into an array (so an array of arrays below)
-   NB. The symbol '_7' is the literal value 'negative seven'
-   NB. So this line shows how to construct 4 different ranges:
+   <span style="color: #66f;">NB. Ranges can be generated with monadic ' i. ' ('Integers')</span>
+   <span style="color: #66f;">NB. Dyadic ; composes values into an array (so an array of arrays below)</span>
+   <span style="color: #66f;">NB. The symbol '_7' is the literal value 'negative seven'</span>
+   <span style="color: #66f;">NB. So this line shows how to construct 4 different ranges:</span>
    (i. 7)  ;  (i. _7)  ;  (6 + i. 7) ;  (6 + i. _7)
-┌─────────────┬─────────────┬────────────────┬────────────────┐
-│0 1 2 3 4 5 6│6 5 4 3 2 1 0│6 7 8 9 10 11 12│12 11 10 9 8 7 6│
-└─────────────┴─────────────┴────────────────┴────────────────┘
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;0 1 2 3 4 5 6&#9474;6 5 4 3 2 1 0&#9474;6 7 8 9 10 11 12&#9474;12 11 10 9 8 7 6&#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
 
-   NB. Now we can simplify our earlier expressions.
-   8 +. 5 + i.8   NB. Strict right-to-left evaluation: (8 +. (5 + (i. 8)))
+   <span style="color: #66f;">NB. Now we can simplify our earlier expressions.</span>
+   8 +. 5 + i.8   <span style="color: #66f;">NB. Strict right-to-left evaluation: (8 +. (5 + (i. 8)))</span>
 1 2 1 8 1 2 1 4
 
    (6 + i. _7) +. 6 + i. 7
 6 1 2 9 2 1 6
 
-   NB. If that's too readable for you, you can skip the whitespace... :)
-   (6+i._7)+.6+i.7
-6 1 2 9 2 1 6
+   <span style="color: #66f;">NB. If that's too readable for you, you can skip the whitespace... :)</span>
+<span style="color: #00ff00;">   (6+i._7)+.6+i.7</span>
+<span style="color: #00ff00;">6 1 2 9 2 1 6</span>
 </pre>
 </div>
 
@@ -290,7 +290,7 @@ With J, I often start with the <a href="http://www.jsoftware.com/help/dictionary
 </p>
 
 <p>
-There's nothing on the vocabulary page about strings, but there is an entry for <a href="http://www.jsoftware.com/help/dictionary/dadot.htm ">a. <i>Alphabet</i> &frasl; <i>Ace</i> </a>, and following the link confirmed that it was a predefined array representing the character set.
+There's nothing on the vocabulary page about strings, but there is an entry for <a href="http://www.jsoftware.com/help/dictionary/dadot.htm%20">a. <i>Alphabet</i> &frasl; <i>Ace</i> </a>, and following the link confirmed that it was a predefined array representing the character set.
 </p>
 
 <p>
@@ -299,10 +299,10 @@ I typed it in the J terminal, and saw a bunch of garbage:
 
 <div class="org-src-container">
 
-<pre class="src src-j">   a.    NB. output manually edited to reove many non-ascii characters
+<pre class="src src-j">   <span style="color: #7fffd4;">a.</span>    <span style="color: #66f;">NB. output manually edited to reove many non-ascii characters</span>
 \001\002\003\004\005\006\007\010
-\013\014  ... \037!"#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?@ABCDEFGHIJKLMNO
-PQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~....
+\013\014  ... \037!"#$%&amp;<span style="color: #00ff00;">'()*+,-./0123456789:;&lt;=&gt;?@ABCDEFGHIJKLMNO</span>
+<span style="color: #00ff00;">PQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~....</span>
 </pre>
 </div>
 
@@ -328,10 +328,10 @@ In this case, the page for <code>a.</code> showed an example for displaying the 
 
 <div class="org-src-container">
 
-<pre class="src src-j">   1 2 3 { 8 32 $ a.                    NB. From the J docs for a.
- !"#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?
-@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_
-`abcdefghijklmnopqrstuvwxyz{|}~
+<pre class="src src-j">   1 2 3 { 8 32 $ <span style="color: #7fffd4;">a.</span>                    <span style="color: #66f;">NB. From the J docs for a.</span>
+ !"#$%&amp;<span style="color: #00ff00;">'()*+,-./0123456789:;&lt;=&gt;?</span>
+<span style="color: #00ff00;">@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_</span>
+<span style="color: #00ff00;">`abcdefghijklmnopqrstuvwxyz{|}~&#127;</span>
 </pre>
 </div>
 
@@ -376,7 +376,7 @@ I happened to know that <code>A</code> is ASCII character #65 (confirmed by typi
 
 <div class="org-src-container">
 
-<pre class="src src-j">   'a' i. a.      NB. What I expected:
+<pre class="src src-j">   <span style="color: #00ff00;">'a'</span> i. <span style="color: #7fffd4;">a.</span>      <span style="color: #66f;">NB. What I expected:</span>
 65
 </pre>
 </div>
@@ -387,7 +387,7 @@ But instead:
 
 <div class="org-src-container">
 
-<pre class="src src-j">   'a' i. a.      NB. What really happened:
+<pre class="src src-j">   <span style="color: #00ff00;">'a'</span> i. <span style="color: #7fffd4;">a.</span>      <span style="color: #66f;">NB. What really happened:</span>
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 ...
 </pre>
 </div>
@@ -442,8 +442,8 @@ What usually happens is that look through the vocabulary page for a word like "s
 
 <div class="org-src-container">
 
-<pre class="src src-j">   0 i. 'abc'     NB. hoping for 'a', but that's not what 'Index Of' means
-1 1 1
+<pre class="src src-j">   0 i. <span style="color: #00ff00;">'abc'</span>     <span style="color: #66f;">NB. hoping for 'a', but that's not what 'Index Of' means</span>
+<span style="color: #00ff00;">1 1 1</span>
 </pre>
 </div>
 
@@ -469,10 +469,10 @@ Apparently, <i>nub</i> is their word for the unique value in an array:
 
 <div class="org-src-container">
 
-<pre class="src src-j">   ~: 'Mississippi'             NB. the example from the "nub sieve" docs
+<pre class="src src-j">   ~: <span style="color: #00ff00;">'Mississippi'</span>             <span style="color: #66f;">NB. the example from the "nub sieve" docs</span>
 1 1 1 0 0 0 0 0 1 0 0
 
-   (~: 'Mississippi') # 'Mississippi'   NB. not in docs, but should be. :)
+   (~: <span style="color: #00ff00;">'Mississippi'</span>) # <span style="color: #00ff00;">'Mississippi'</span>   <span style="color: #66f;">NB. not in docs, but should be. :)</span>
 Misp
 </pre>
 </div>
@@ -543,7 +543,7 @@ Well of course, it <i>isn't</i>. What I thought of s <i>Select</i> is just <i>Fr
 
 <div class="org-src-container">
 
-<pre class="src src-j">   0 2 4 { 'abcdefg'
+<pre class="src src-j">   0 2 4 { <span style="color: #00ff00;">'abcdefg'</span>
 ace
 </pre>
 </div>
@@ -555,16 +555,16 @@ dyadic <code>e.</code> (called <a href="http://www.jsoftware.com/help/dictionary
 
 <div class="org-src-container">
 
-<pre class="src src-j">   NB. Selecting values directly with 'Copy':
-   1 0 1 0 1 0 0 # 'abcdefg'
+<pre class="src src-j">   <span style="color: #66f;">NB. Selecting values directly with 'Copy':</span>
+   1 0 1 0 1 0 0 # <span style="color: #00ff00;">'abcdefg'</span>
 ace
 
-   NB. For each integer 0..6, is it an element of the array 0 2 4 ?
+   <span style="color: #66f;">NB. For each integer 0..6, is it an element of the array 0 2 4 ?</span>
    (i.7) e. 0 2 4
 1 0 1 0 1 0 0
 
-   NB. Combining those two ideas:
-   ((i.7) e. 0 2 4) # 'abcdefg'
+   <span style="color: #66f;">NB. Combining those two ideas:</span>
+   ((i.7) e. 0 2 4) # <span style="color: #00ff00;">'abcdefg'</span>
 ace
 </pre>
 </div>
@@ -579,7 +579,7 @@ But why on earth is it called <i>Copy</i>?!?
 
 <div class="org-src-container">
 
-<pre class="src src-j">   0 1 2 3 # 'abcd'
+<pre class="src src-j">   0 1 2 3 # <span style="color: #00ff00;">'abcd'</span>
 bccddd
 </pre>
 </div>
@@ -598,7 +598,7 @@ So there I was, looking at:
 
 <div class="org-src-container">
 
-<pre class="src src-j">   'a' i. a.
+<pre class="src src-j">   <span style="color: #00ff00;">'a'</span> i. <span style="color: #7fffd4;">a.</span>
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 ...
 </pre>
 </div>
@@ -617,9 +617,9 @@ So now I can do:
 
 <div class="org-src-container">
 
-<pre class="src src-j">   NB. Just using (8 32 $) here to reformat the results:
+<pre class="src src-j">   <span style="color: #66f;">NB. Just using (8 32 $) here to reformat the results:</span>
 
-   8 32 $        'a' i. a.      NB. My original data.
+   8 32 $        <span style="color: #00ff00;">'a'</span> i. <span style="color: #7fffd4;">a.</span>      <span style="color: #66f;">NB. My original data.</span>
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
@@ -629,7 +629,7 @@ So now I can do:
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 
-   8 32 $      -.'a' i. a.      NB. After applying not.
+   8 32 $      -.<span style="color: #00ff00;">'a'</span> i. <span style="color: #7fffd4;">a.</span>      <span style="color: #66f;">NB. After applying not.</span>
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -648,8 +648,8 @@ I didn't really know where I was going with this, yet, but I figured I could use
 
 <div class="org-src-container">
 
-<pre class="src src-j">   NB. ~ swaps the arguments of a verb so that  a. #~ x   becomes  x # a.
-   a. #~  -. 'a' i. a.
+<pre class="src src-j">   <span style="color: #66f;">NB. ~ swaps the arguments of a verb so that  a. #~ x   becomes  x # a.</span>
+   <span style="color: #7fffd4;">a.</span> #~  -. <span style="color: #00ff00;">'a'</span> i. <span style="color: #7fffd4;">a.</span>
 a
 </pre>
 </div>
@@ -673,13 +673,13 @@ First I tried just replacing the string, and I <i>got an error</i>. I tried the 
 
 <div class="org-src-container">
 
-<pre class="src src-j">   a.#~-.'apples'i.a.
+<pre class="src src-j">   <span style="color: #7fffd4;">a.</span>#~-.<span style="color: #00ff00;">'apples'</span>i.a.
 |domain error
-|   a.    #~-.'apples'i.a.
+|   <span style="color: #7fffd4;">a.</span>    #~-.<span style="color: #00ff00;">'apples'</span>i.a.
 
-   a.#~-.'apples'i.a.
+   <span style="color: #7fffd4;">a.</span>#~-.<span style="color: #00ff00;">'apples'</span>i.a.
 |domain error
-|   a.    #~-.'apples'i.a.
+|   <span style="color: #7fffd4;">a.</span>    #~-.<span style="color: #00ff00;">'apples'</span>i.a.
 </pre>
 </div>
 
@@ -689,27 +689,27 @@ Next I <i>tried some other stuff</i> and <i>some stuff happened</i>.
 
 <div class="org-src-container">
 
-<pre class="src src-j">   'apples'i.a       NB. I forgot the . in a. but failed to notice
-'apples' i. a        NB. J is giving me back a symbolic expression,
-                     NB. presumably because 'a' is not defined.
-                     NB. I wonder if maybe '' is for characters and
-                     NB. '"' is for strings, so try:
+<pre class="src src-j">   <span style="color: #00ff00;">'apples'</span>i.a       <span style="color: #66f;">NB. I forgot the . in a. but failed to notice</span>
+<span style="color: #00ff00;">'apples'</span> i. a        <span style="color: #66f;">NB. J is giving me back a symbolic expression,</span>
+                     <span style="color: #66f;">NB. presumably because 'a' is not defined.</span>
+                     <span style="color: #66f;">NB. I wonder if maybe '' is for characters and</span>
+                     <span style="color: #66f;">NB. '"' is for strings, so try:</span>
 
-   "apples"i.a       NB. but " is a verb in J, not part of a string.
-|syntax error        NB. 'a' is a string. there is no "character" type
+   "apples"i.a       <span style="color: #66f;">NB. but " is a verb in J, not part of a string.</span>
+|syntax error        <span style="color: #66f;">NB. 'a' is a string. there is no "character" type</span>
 |       "apples"i.a
 
-   'apples'i.a       NB. The J terminal makes it easy to duplicate input.
-'apples' i. a        NB. I cursored up and pressed enter to duplicate the
-                     NB. line, and probably just automatically ran it to
-                     NB. make sure it acted the same, in case I had
-                     NB. accidentally changed the history.
+   <span style="color: #00ff00;">'apples'</span>i.a       <span style="color: #66f;">NB. The J terminal makes it easy to duplicate input.</span>
+<span style="color: #00ff00;">'apples'</span> i. a        <span style="color: #66f;">NB. I cursored up and pressed enter to duplicate the</span>
+                     <span style="color: #66f;">NB. line, and probably just automatically ran it to</span>
+                     <span style="color: #66f;">NB. make sure it acted the same, in case I had</span>
+                     <span style="color: #66f;">NB. accidentally changed the history.</span>
 
-   'apples'i./a      NB. / inserts a function between each element of a
-'apples' i./ a       NB. an array (so +/1 2 3 -&gt; 1+2+3). I have no idea
-                     NB. what I was thinking about here that would have
-   'apples'i.~/a     NB. caused me to type it.
-'apples' i.~/ a
+   <span style="color: #00ff00;">'apples'</span>i./a      <span style="color: #66f;">NB. / inserts a function between each element of a</span>
+<span style="color: #00ff00;">'apples'</span> i./ a       <span style="color: #66f;">NB. an array (so +/1 2 3 -&gt; 1+2+3). I have no idea</span>
+                     <span style="color: #66f;">NB. what I was thinking about here that would have</span>
+   <span style="color: #00ff00;">'apples'</span>i.~/a     <span style="color: #66f;">NB. caused me to type it.</span>
+<span style="color: #00ff00;">'apples'</span> i.~/ a
 </pre>
 </div>
 
@@ -735,7 +735,7 @@ Eventually, my brain caught up to my fingers, I noticed the missing period in <c
 
 <div class="org-src-container">
 
-<pre class="src src-j">  'apples' i.a.
+<pre class="src src-j">  <span style="color: #00ff00;">'apples'</span> i.a.
 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6
 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6
 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 0 6 6 6 4 6 6 6 6 6 6 3 6 6 6 1 6
@@ -781,7 +781,7 @@ If you look closely, you can see that the numbers <code>0 1 3 4 5</code> all app
 
 <div class="org-src-container">
 
-<pre class="src src-j">   1 2 { 'apples'
+<pre class="src src-j">   1 2 { <span style="color: #00ff00;">'apples'</span>
 pp
 </pre>
 </div>
@@ -796,7 +796,7 @@ In other words, I had the parameters backwards, and what I should have typed was
 
 <div class="org-src-container">
 
-<pre class="src src-j">   a.i.'apples'
+<pre class="src src-j">   a.i.<span style="color: #00ff00;">'apples'</span>
 97 112 112 108 101 115
 </pre>
 </div>
@@ -807,12 +807,12 @@ And in fact, that is exactly the definition I eventually came up with for <code>
 
 <div class="org-src-container">
 
-<pre class="src src-j">ord =. a. &amp; i.    NB. The '&amp;' is an operator that transforms dyadic i. into
-                  NB. a new verb (which I assigned to the variable 'ord')
-                  NB. Now: (ord x) = ((a.&amp;i.) x) = (a. i. x)
-                  NB. This transformation is called "partial application".
+<pre class="src src-j"><span style="color: #eedd82;">ord</span> =. <span style="color: #7fffd4;">a.</span> &amp; i.    <span style="color: #66f;">NB. The '&amp;' is an operator that transforms dyadic i. into</span>
+                  <span style="color: #66f;">NB. a new verb (which I assigned to the variable 'ord')</span>
+                  <span style="color: #66f;">NB. Now: (ord x) = ((a.&amp;i.) x) = (a. i. x)</span>
+                  <span style="color: #66f;">NB. This transformation is called "partial application".</span>
 
-   ord 'apples'
+   ord <span style="color: #00ff00;">'apples'</span>
 97 112 112 108 101 115
 </pre>
 </div>
@@ -834,15 +834,14 @@ Instead, my failed attempt to use double quotes for a string reminded me of the 
 <div id="outline-container-sec-10" class="outline-2">
 <h2 id="sec-10"><a id="1czgqo30q9g0" name="1czgqo30q9g0"></a><span class="section-number-2">10</span> NOTE . epilogue : a built in function</h2>
 <div class="outline-text-2" id="text-10">
-
 <div class="org-src-container">
 
-<pre class="src src-j">   load 'convert'
+<pre class="src src-j">   <span style="color: #ff00ff; font-weight: bold;">load</span> <span style="color: #00ff00;">'convert'</span>
    toupper
 3 : 0
-x=. I. 26 &gt; n=. ((97+i.26){a.) i. t=. ,y
-($y) $ ((x{n) { (65+i.26){a.) x}t
-)
+<span style="color: #eedd82;">x</span>=. I. 26 &gt; <span style="color: #eedd82;">n</span>=. ((97+i.26){<span style="color: #7fffd4;">a.</span>) i. <span style="color: #eedd82;">t</span>=. ,y
+($y) $ ((x{n) { (65+i.26){<span style="color: #7fffd4;">a.</span>) x}t
+<span style="color: #00ffff;">)</span>
 </pre>
 </div>
 </div>
