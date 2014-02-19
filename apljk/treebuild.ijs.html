@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>parsing in j</title>
+<!-- 2014-02-19 Wed 11:23 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">parsing in j</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. basic tree building operations</a></li>
+<li><a href="#sec-2">2. a simple tree-builder implementation</a></li>
+<li><a href="#sec-3">3. queries</a></li>
+<li><a href="#sec-4">4. an example tree</a></li>
+<li><a href="#sec-5">5. maybe later</a></li>
+<li><a href="#sec-6">6. references</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> basic tree building operations</h2>
+<div class="outline-text-2" id="text-1">
+<dl class="org-dl">
+<dt> emit </dt><dd>splice some data into the current node
+</dd>
+<dt> node </dt><dd>start a new node
+</dd>
+<dt> done </dt><dd>finish a node (returning to the previous one)
+</dd>
+<dt> drop </dt><dd>remove the last item (and all its children)
+</dd>
+<dt> goto </dt><dd>go back to a node created earlier
+</dd>
+</dl>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> a simple tree-builder implementation</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+The tree is a rank 1 array of parent indices (where <code>__</code> indicates root/null)
+</p>
+
+<p>
+Here is a straightforward imperative definition of our primitives:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">tree</span> =: $0   <span style="color: #66f;">NB. stores the links to parents.</span>
+<span style="color: #ffffff; font-weight: bold;">data</span> =: $0   <span style="color: #66f;">NB. stores the actual data items.</span>
+<span style="color: #ffffff; font-weight: bold;">path</span> =: $0   <span style="color: #66f;">NB. the stack of parent nodes.</span>
+<span style="color: #ffffff; font-weight: bold;">here</span> =: _1   <span style="color: #66f;">NB. the current parent node.</span>
+
+<span style="color: #ffffff; font-weight: bold;">emit</span> =: <span style="color: #7fffd4;">monad</span> <span style="color: #ff00ff; font-weight: bold;">define</span> "0
+  <span style="color: #ffffff; font-weight: bold;">tree</span> =: tree, here
+  <span style="color: #ffffff; font-weight: bold;">data</span> =: data, y
+<span style="color: #00ffff;">)</span>
+
+<span style="color: #ffffff; font-weight: bold;">node</span> =: <span style="color: #7fffd4;">monad</span> <span style="color: #ff00ff; font-weight: bold;">define</span> "_
+  <span style="color: #ffffff; font-weight: bold;">path</span> =: path, here
+  <span style="color: #ffffff; font-weight: bold;">here</span> =: &lt;: # tree
+<span style="color: #00ffff;">)</span>
+
+<span style="color: #ffffff; font-weight: bold;">done</span> =: <span style="color: #7fffd4;">monad</span> <span style="color: #ff00ff; font-weight: bold;">define</span> "_
+  <span style="color: #ffffff; font-weight: bold;">here</span> =: {: path
+  <span style="color: #ffffff; font-weight: bold;">path</span> =: }: path
+<span style="color: #00ffff;">)</span>
+
+<span style="color: #ffffff; font-weight: bold;">drop</span> =: <span style="color: #7fffd4;">monad</span> <span style="color: #ff00ff; font-weight: bold;">define</span> "_
+  <span style="color: #ffffff; font-weight: bold;">data</span> =: }: data
+  <span style="color: #ffffff; font-weight: bold;">tree</span> =: }: tree
+<span style="color: #00ffff;">)</span>
+
+<span style="color: #ffffff; font-weight: bold;">goto</span> =: <span style="color: #7fffd4;">monad</span> <span style="color: #ff00ff; font-weight: bold;">define</span> "_
+  <span style="color: #ffffff; font-weight: bold;">path</span> =: path, here
+  <span style="color: #ffffff; font-weight: bold;">here</span> =: y
+<span style="color: #00ffff;">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> queries</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">upfrom</span> =: 3 : <span style="color: #00ff00;">'if. y=_1 do. _1 else. y{tree end.'</span>"0
+<span style="color: #ffffff; font-weight: bold;">dnfrom</span> =: 3 : <span style="color: #00ff00;">'if. 0=#y do. $0 else. I. +./"2 tree ="1 0 ;y end.'</span>"1
+<span style="color: #ffffff; font-weight: bold;">above</span> =: (_1 -.~ }.)&amp;(upfrom f.^:a:)"0
+<span style="color: #ffffff; font-weight: bold;">below</span> =: 13 : <span style="color: #00ff00;">'; }. dnfrom each ^:a: &lt; y'</span>
+<span style="color: #ffffff; font-weight: bold;">depth</span> =: #@above
+<span style="color: #ffffff; font-weight: bold;">treet</span> =: 3 : <span style="color: #00ff00;">'(i.#tree),.tree,.data'</span> <span style="color: #66f;">NB. tree table :)</span>
+<span style="color: #ffffff; font-weight: bold;">index</span> =: 3 : <span style="color: #00ff00;">'(i.#tree)'</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> an example tree</h2>
+<div class="outline-text-2" id="text-4">
+<div class="org-src-container">
+
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">reset</span> =: <span style="color: #7fffd4;">verb</span> <span style="color: #ff00ff; font-weight: bold;">define</span>
+  <span style="color: #ffffff; font-weight: bold;">tree</span> =: <span style="color: #ffffff; font-weight: bold;">path</span> =: <span style="color: #ffffff; font-weight: bold;">data</span> =: $ &gt;: <span style="color: #ffffff; font-weight: bold;">here</span> =: _1
+<span style="color: #00ffff;">)</span>
+<span style="color: #ffffff; font-weight: bold;">tree0</span> =: <span style="color: #7fffd4;">verb</span> <span style="color: #ff00ff; font-weight: bold;">define</span>
+  emit i. 5
+  node<span style="color: #00ff00;">''</span>
+  emit 44 45 46
+  done<span style="color: #00ff00;">''</span>
+  emit 5 6
+  node<span style="color: #00ff00;">''</span>
+  emit 60 61 62
+  done<span style="color: #00ff00;">''</span>
+  goto 4
+  emit 44
+  done<span style="color: #00ff00;">''</span>
+  goto data i. 61
+  emit 610 611
+  done<span style="color: #00ff00;">''</span>
+<span style="color: #00ffff;">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> maybe later</h2>
+<div class="outline-text-2" id="text-5">
+<div class="org-src-container">
+
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">type</span> =: $0   <span style="color: #66f;">NB. a type marker for each node in the tree.</span>
+<span style="color: #ffffff; font-weight: bold;">tags</span> =: $.$0 <span style="color: #66f;">NB. sparse array holding meta data about nodes.</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> references</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+Tree structure is based on:
+<a href="http://www.jsoftware.com/jwiki/DevonMcCormick/Trees">http://www.jsoftware.com/jwiki/DevonMcCormick/Trees</a>
+</p>
+
+<p>
+Other helpful links:
+<a href="http://www.jsoftware.com/jwiki/AlexMikhailov/Parsing">http://www.jsoftware.com/jwiki/AlexMikhailov/Parsing</a>
+<a href="http://www.jsoftware.com/jwiki/Scripts/Scheme">http://www.jsoftware.com/jwiki/Scripts/Scheme</a>
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>
