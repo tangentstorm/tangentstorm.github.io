@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>building trees in j</title>
-<!-- 2014-02-19 Wed 11:25 -->
+<!-- 2014-02-19 Wed 12:12 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -67,8 +67,11 @@ for the JavaScript code in this tag.
 <li><a href="#sec-2">2. a simple tree-builder implementation</a></li>
 <li><a href="#sec-3">3. queries</a></li>
 <li><a href="#sec-4">4. an example tree</a></li>
-<li><a href="#sec-5">5. maybe later</a></li>
-<li><a href="#sec-6">6. references</a></li>
+<li><a href="#sec-5">5. in action</a></li>
+<li><a href="#sec-6">6. <span class="todo TODO">TODO</span> s-expression parser</a></li>
+<li><a href="#sec-7">7. maybe later</a></li>
+<li><a href="#sec-8">8. outline</a></li>
+<li><a href="#sec-9">9. references</a></li>
 </ul>
 </div>
 </div>
@@ -77,13 +80,13 @@ for the JavaScript code in this tag.
 <h2 id="sec-1"><span class="section-number-2">1</span> basic tree building operations</h2>
 <div class="outline-text-2" id="text-1">
 <dl class="org-dl">
-<dt> emit </dt><dd>splice some data into the current node
+<dt> emit </dt><dd>splice some items into the current node
 </dd>
 <dt> node </dt><dd>start a new node
 </dd>
 <dt> done </dt><dd>finish a node (returning to the previous one)
 </dd>
-<dt> drop </dt><dd>remove the last item (and all its children)
+<dt> drop </dt><dd>remove the last item
 </dd>
 <dt> goto </dt><dd>go back to a node created earlier
 </dd>
@@ -103,7 +106,7 @@ Here is a straightforward imperative definition of our primitives:
 
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">tree</span> =: $0   <span style="color: #66f;">NB. stores the links to parents.</span>
+<pre class="src src-j" id="builder"><span style="color: #ffffff; font-weight: bold;">tree</span> =: $0   <span style="color: #66f;">NB. stores the links to parents.</span>
 <span style="color: #ffffff; font-weight: bold;">data</span> =: $0   <span style="color: #66f;">NB. stores the actual data items.</span>
 <span style="color: #ffffff; font-weight: bold;">path</span> =: $0   <span style="color: #66f;">NB. the stack of parent nodes.</span>
 <span style="color: #ffffff; font-weight: bold;">here</span> =: _1   <span style="color: #66f;">NB. the current parent node.</span>
@@ -142,7 +145,7 @@ Here is a straightforward imperative definition of our primitives:
 <div class="outline-text-2" id="text-3">
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">upfrom</span> =: 3 : <span style="color: #00ff00;">'if. y=_1 do. _1 else. y{tree end.'</span>"0
+<pre class="src src-j" id="queries"><span style="color: #ffffff; font-weight: bold;">upfrom</span> =: 3 : <span style="color: #00ff00;">'if. y=_1 do. _1 else. y{tree end.'</span>"0
 <span style="color: #ffffff; font-weight: bold;">dnfrom</span> =: 3 : <span style="color: #00ff00;">'if. 0=#y do. $0 else. I. +./"2 tree ="1 0 ;y end.'</span>"1
 <span style="color: #ffffff; font-weight: bold;">above</span> =: (_1 -.~ }.)&amp;(upfrom f.^:a:)"0
 <span style="color: #ffffff; font-weight: bold;">below</span> =: 13 : <span style="color: #00ff00;">'; }. dnfrom each ^:a: &lt; y'</span>
@@ -158,7 +161,7 @@ Here is a straightforward imperative definition of our primitives:
 <div class="outline-text-2" id="text-4">
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">reset</span> =: <span style="color: #7fffd4;">verb</span> <span style="color: #ff00ff; font-weight: bold;">define</span>
+<pre class="src src-j" id="example"><span style="color: #ffffff; font-weight: bold;">reset</span> =: <span style="color: #7fffd4;">verb</span> <span style="color: #ff00ff; font-weight: bold;">define</span>
   <span style="color: #ffffff; font-weight: bold;">tree</span> =: <span style="color: #ffffff; font-weight: bold;">path</span> =: <span style="color: #ffffff; font-weight: bold;">data</span> =: $ &gt;: <span style="color: #ffffff; font-weight: bold;">here</span> =: _1
 <span style="color: #00ffff;">)</span>
 <span style="color: #ffffff; font-weight: bold;">tree0</span> =: <span style="color: #7fffd4;">verb</span> <span style="color: #ff00ff; font-weight: bold;">define</span>
@@ -183,8 +186,77 @@ Here is a straightforward imperative definition of our primitives:
 </div>
 
 <div id="outline-container-sec-5" class="outline-2">
-<h2 id="sec-5"><span class="section-number-2">5</span> maybe later</h2>
+<h2 id="sec-5"><span class="section-number-2">5</span> in action</h2>
 <div class="outline-text-2" id="text-5">
+<div class="org-src-container">
+
+<pre class="src src-j">   reset<span style="color: #00ff00;">''</span>
+
+   tree0<span style="color: #00ff00;">''</span>
+
+   treet<span style="color: #00ff00;">''</span>
+ 0 _1   0
+ 1 _1   1
+ 2 _1   2
+ 3 _1   3
+ 4 _1   4
+ 5  4  44
+ 6  4  45
+ 7  4  46
+ 8 _1   5
+ 9 _1   6
+10  9  60
+11  9  61
+12  9  62
+13  4  44
+14 11 610
+15 11 611
+
+   upfrom data i. 610
+11
+   data {~ upfrom data i. 610
+61
+   data {~ upfrom data i. 610 61
+61 6
+   data {~ above data i. 610
+61 6
+   data {~ below 4
+44 45 46 44
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> <span class="todo TODO">TODO</span> s-expression parser</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+This works well, except it throws a domain error at the end. :/
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   reset<span style="color: #00ff00;">''</span>
+
+   (node`done`emit)@.(<span style="color: #00ff00;">'()'</span>&amp;i.)"0  <span style="color: #00ff00;">' (banana (creme) (pie))'</span>
+|domain error
+|       (node`done`emit)@.(<span style="color: #00ff00;">'()'</span>&amp;i.)"0<span style="color: #00ff00;">' (banana (creme) (pie))'</span>
+   tree
+_1 0 0 0 0 0 0 0 7 7 7 7 7 0 13 13 13
+   data
+ banana creme pie
+   tree &lt;/. data
+&#9484;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9488;
+&#9474; &#9474;banana  &#9474;creme&#9474;pie&#9474;
+&#9492;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9496;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> maybe later</h2>
+<div class="outline-text-2" id="text-7">
 <div class="org-src-container">
 
 <pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">type</span> =: $0   <span style="color: #66f;">NB. a type marker for each node in the tree.</span>
@@ -193,19 +265,43 @@ Here is a straightforward imperative definition of our primitives:
 </div>
 </div>
 </div>
-<div id="outline-container-sec-6" class="outline-2">
-<h2 id="sec-6"><span class="section-number-2">6</span> references</h2>
-<div class="outline-text-2" id="text-6">
+
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> outline</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+(nodedoneemit)@.'()'i.'(banana(creme)(pie))'
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">&lt;&lt;builder&gt;&gt;
+&lt;&lt;queries&gt;&gt;
+&lt;&lt;example&gt;&gt;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> references</h2>
+<div class="outline-text-2" id="text-9">
 <p>
 Tree structure is based on:
-<a href="http://www.jsoftware.com/jwiki/DevonMcCormick/Trees">http://www.jsoftware.com/jwiki/DevonMcCormick/Trees</a>
 </p>
+<ul class="org-ul">
+<li><a href="http://www.jsoftware.com/jwiki/DevonMcCormick/Trees">http://www.jsoftware.com/jwiki/DevonMcCormick/Trees</a>
+</li>
+</ul>
 
 <p>
 Other helpful links:
-<a href="http://www.jsoftware.com/jwiki/AlexMikhailov/Parsing">http://www.jsoftware.com/jwiki/AlexMikhailov/Parsing</a>
-<a href="http://www.jsoftware.com/jwiki/Scripts/Scheme">http://www.jsoftware.com/jwiki/Scripts/Scheme</a>
 </p>
+<ul class="org-ul">
+<li><a href="http://www.jsoftware.com/jwiki/AlexMikhailov/Parsing">http://www.jsoftware.com/jwiki/AlexMikhailov/Parsing</a>
+</li>
+<li><a href="http://www.jsoftware.com/jwiki/Scripts/Scheme">http://www.jsoftware.com/jwiki/Scripts/Scheme</a>
+</li>
+</ul>
 </div>
 </div>
 </div>
