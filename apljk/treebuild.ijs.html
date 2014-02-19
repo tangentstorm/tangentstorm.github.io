@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>building trees in j</title>
-<!-- 2014-02-19 Wed 12:14 -->
+<!-- 2014-02-19 Wed 12:39 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -241,14 +241,22 @@ This works well, except it throws a domain error at the end. :/
    (node`done`emit)@.(<span style="color: #00ff00;">'()'</span>&amp;i.)"0  <span style="color: #00ff00;">' (banana (creme) (pie))'</span>
 |domain error
 |       (node`done`emit)@.(<span style="color: #00ff00;">'()'</span>&amp;i.)"0<span style="color: #00ff00;">' (banana (creme) (pie))'</span>
+
    tree
 _1 0 0 0 0 0 0 0 7 7 7 7 7 0 13 13 13
+
    data
  banana creme pie
+
    tree &lt;/. data
 &#9484;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9488;
 &#9474; &#9474;banana  &#9474;creme&#9474;pie&#9474;
 &#9492;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9496;
+
+   |:(data ,~"0 1  <span style="color: #00ff00;">'_'</span> #~ "0 ]) depth index<span style="color: #00ff00;">''</span>
+ ________________
+        _____ ___
+ banana creme pie
 </pre>
 </div>
 </div>
