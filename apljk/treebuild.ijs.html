@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>building trees in j</title>
-<!-- 2014-02-19 Wed 12:39 -->
+<!-- 2014-02-19 Wed 23:54 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -70,7 +70,7 @@ for the JavaScript code in this tag.
 <li><a href="#sec-5">5. in action</a></li>
 <li><a href="#sec-6">6. <span class="todo TODO">TODO</span> s-expression parser</a></li>
 <li><a href="#sec-7">7. maybe later</a></li>
-<li><a href="#sec-8">8. outline</a></li>
+<li><a href="#sec-8">8. <code>treebuild.ijs</code></a></li>
 <li><a href="#sec-9">9. references</a></li>
 </ul>
 </div>
@@ -119,11 +119,13 @@ Here is a straightforward imperative definition of our primitives:
 <span style="color: #ffffff; font-weight: bold;">node</span> =: <span style="color: #7fffd4;">monad</span> <span style="color: #ff00ff; font-weight: bold;">define</span> "_
   <span style="color: #ffffff; font-weight: bold;">path</span> =: path, here
   <span style="color: #ffffff; font-weight: bold;">here</span> =: &lt;: # tree
+  tree
 <span style="color: #00ffff;">)</span>
 
 <span style="color: #ffffff; font-weight: bold;">done</span> =: <span style="color: #7fffd4;">monad</span> <span style="color: #ff00ff; font-weight: bold;">define</span> "_
   <span style="color: #ffffff; font-weight: bold;">here</span> =: {: path
   <span style="color: #ffffff; font-weight: bold;">path</span> =: }: path
+  tree
 <span style="color: #00ffff;">)</span>
 
 <span style="color: #ffffff; font-weight: bold;">drop</span> =: <span style="color: #7fffd4;">monad</span> <span style="color: #ff00ff; font-weight: bold;">define</span> "_
@@ -134,12 +136,22 @@ Here is a straightforward imperative definition of our primitives:
 <span style="color: #ffffff; font-weight: bold;">goto</span> =: <span style="color: #7fffd4;">monad</span> <span style="color: #ff00ff; font-weight: bold;">define</span> "_
   <span style="color: #ffffff; font-weight: bold;">path</span> =: path, here
   <span style="color: #ffffff; font-weight: bold;">here</span> =: y
+  tree
 <span style="color: #00ffff;">)</span>
 </pre>
 </div>
-</div>
-</div>
+<p>
+    here =: y
+    tree
+  )
+#+end<sub>src</sub>
+</p>
 
+<p>
+These verbs all return the tree as a convention, both to to make tracing simpler and to allow easy use in gerunds. (See <a href="#sec-6">s-expression parser</a>, below).
+</p>
+</div>
+</div>
 <div id="outline-container-sec-3" class="outline-2">
 <h2 id="sec-3"><span class="section-number-2">3</span> queries</h2>
 <div class="outline-text-2" id="text-3">
@@ -228,35 +240,43 @@ Here is a straightforward imperative definition of our primitives:
 </div>
 
 <div id="outline-container-sec-6" class="outline-2">
-<h2 id="sec-6"><span class="section-number-2">6</span> <span class="todo TODO">TODO</span> s-expression parser</h2>
+<h2 id="sec-6"><a id="uorjh9t0deg0" name="uorjh9t0deg0"></a><span class="section-number-2">6</span> <span class="todo TODO">TODO</span> s-expression parser</h2>
 <div class="outline-text-2" id="text-6">
+<p>
+Parsing lisp-style s-expressions is simply a matter of mapping each character to a corresponding tree builder routine:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j" id="rsx"><span style="color: #ffffff; font-weight: bold;">rsx</span> =: (node`done`emit)@.(<span style="color: #00ff00;">'()'</span> &amp; i.)"0  <span style="color: #66f;">NB. 'read s-expression'</span>
+</pre>
+</div>
+
 <p>
 This works well, except it throws a domain error at the end. :/
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-j">   reset<span style="color: #00ff00;">''</span>
-
-   (node`done`emit)@.(<span style="color: #00ff00;">'()'</span>&amp;i.)"0  <span style="color: #00ff00;">' (banana (creme) (pie))'</span>
-|domain error
-|       (node`done`emit)@.(<span style="color: #00ff00;">'()'</span>&amp;i.)"0<span style="color: #00ff00;">' (banana (creme) (pie))'</span>
+<pre class="src src-j">   rsx<span style="color: #00ff00;">'(banana (creme) pie)'</span> [ reset<span style="color: #00ff00;">''</span>
+|domain error: rsx
+|       rsx<span style="color: #00ff00;">'(banana (creme) pie)'</span>[reset<span style="color: #00ff00;">''</span>
 
    tree
-_1 0 0 0 0 0 0 0 7 7 7 7 7 0 13 13 13
+_1 _1 _1 _1 _1 _1 _1 6 6 6 6 6 _1 _1 _1 _1
 
    data
- banana creme pie
+banana creme pie
 
-   tree &lt;/. data
-&#9484;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9488;
-&#9474; &#9474;banana  &#9474;creme&#9474;pie&#9474;
-&#9492;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9496;
+   tree&lt;/.data  <span style="color: #66f;">NB. grouped by parent</span>
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;banana  pie&#9474;creme&#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
 
-   |:(data ,~"0 1  <span style="color: #00ff00;">'_'</span> #~ "0 ]) depth index<span style="color: #00ff00;">''</span>
- ________________
-        _____ ___
- banana creme pie
+ |:(data ,~"0 1  <span style="color: #00ff00;">'_'</span> #~ "0 &gt;:) depth index<span style="color: #00ff00;">''</span>
+________________
+       _____
+banana creme pie
 </pre>
 </div>
 </div>
@@ -275,13 +295,28 @@ _1 0 0 0 0 0 0 0 7 7 7 7 7 0 13 13 13
 </div>
 
 <div id="outline-container-sec-8" class="outline-2">
-<h2 id="sec-8"><span class="section-number-2">8</span> outline</h2>
+<h2 id="sec-8"><span class="section-number-2">8</span> <code>treebuild.ijs</code></h2>
 <div class="outline-text-2" id="text-8">
+<p>
+This code is maintained as a literate program with org-babel for emacs.
+You can retrieve it in any of three formats:
+</p>
+
+<ul class="org-ul">
+<li><a href="http://tangentstorm.github.io/apljk/treebuild.ijs.html">a readable html version</a>
+</li>
+<li><a href="https://github.com/sabren/b4/blob/master/web/apljk/treebuild.ijs.org">the literate <code>.org</code> file</a>
+</li>
+<li><a href="https://github.com/tangentstorm/b4/blob/master/j/treebuild.ijs">the generated j source code</a>
+</li>
+</ul>
+
 <div class="org-src-container">
 
 <pre class="src src-j">&lt;&lt;builder&gt;&gt;
 &lt;&lt;queries&gt;&gt;
 &lt;&lt;example&gt;&gt;
+&lt;&lt;rsx&gt;&gt;
 </pre>
 </div>
 </div>
