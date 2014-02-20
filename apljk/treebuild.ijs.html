@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>building trees in j</title>
-<!-- 2014-02-19 Wed 23:58 -->
+<!-- 2014-02-20 Thu 00:23 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -114,9 +114,11 @@ Here is a straightforward imperative definition of our primitives:
 <span style="color: #ffffff; font-weight: bold;">emit</span> =: <span style="color: #7fffd4;">monad</span> <span style="color: #ff00ff; font-weight: bold;">define</span> "0
   <span style="color: #ffffff; font-weight: bold;">tree</span> =: tree, here
   <span style="color: #ffffff; font-weight: bold;">data</span> =: data, y
+  tree
 <span style="color: #00ffff;">)</span>
 
 <span style="color: #ffffff; font-weight: bold;">node</span> =: <span style="color: #7fffd4;">monad</span> <span style="color: #ff00ff; font-weight: bold;">define</span> "_
+  emit y
   <span style="color: #ffffff; font-weight: bold;">path</span> =: path, here
   <span style="color: #ffffff; font-weight: bold;">here</span> =: &lt;: # tree
   tree
@@ -140,12 +142,6 @@ Here is a straightforward imperative definition of our primitives:
 <span style="color: #00ffff;">)</span>
 </pre>
 </div>
-<p>
-    here =: y
-    tree
-  )
-#+end<sub>src</sub>
-</p>
 
 <p>
 These verbs all return the tree as a convention, both to to make tracing simpler and to allow easy use in gerunds. (See <a href="#sec-6">s-expression parser</a>, below).
@@ -253,30 +249,34 @@ Parsing lisp-style s-expressions is simply a matter of mapping each character to
 </div>
 
 <p>
-This works well, except it throws a domain error at the end. :/
+In this version, every character is mapped to its own node, but it should be easy to update this to use j's sequential machine primitive to break the input into tokens first. (<b>TODO</b>)
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-j">   rsx<span style="color: #00ff00;">'(banana (creme) pie)'</span> [ reset<span style="color: #00ff00;">''</span>
-|domain error: rsx
-|       rsx<span style="color: #00ff00;">'(banana (creme) pie)'</span>[reset<span style="color: #00ff00;">''</span>
+<pre class="src src-j">   <span style="color: #66f;">NB. the trace is a large ugly matrix that shows the</span>
+   <span style="color: #66f;">NB. tree at each step of the parse.</span>
+   <span style="color: #eedd82;">trace</span> =. rsx<span style="color: #00ff00;">'(banana (creme (pie)))'</span> [ reset<span style="color: #00ff00;">''</span>
 
    tree
-_1 _1 _1 _1 _1 _1 _1 6 6 6 6 6 _1 _1 _1 _1
+_1 0 0 0 0 0 0 0 0 8 8 8 8 8 8 8 15 15 15 8 0 _1
 
    data
-banana creme pie
+(banana (creme (pie)))
 
-   tree&lt;/.data  <span style="color: #66f;">NB. grouped by parent</span>
-&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
-&#9474;banana  pie&#9474;creme&#9474;
-&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+   <span style="color: #66f;">NB. the characters grouped by parent:</span>
+   tree&lt;/.data
+&#9484;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9488;
+&#9474;()&#9474;banana ()&#9474;creme ()&#9474;pie&#9474;
+&#9492;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9496;
 
- |:(data ,~"0 1  <span style="color: #00ff00;">'_'</span> #~ "0 &gt;:) depth index<span style="color: #00ff00;">''</span>
-________________
-       _____
-banana creme pie
+   <span style="color: #66f;">NB. show depth of each character node graphically:</span>
+   |:(data ,~"0 1  <span style="color: #00ff00;">'_'</span> #~ "0 &gt;:) depth index<span style="color: #00ff00;">''</span>
+______________________
+ ____________________
+         ___________
+                ___
+(banana (creme (pie)))
 </pre>
 </div>
 </div>
