@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>parsers</title>
+<!-- 2014-03-05 Wed 18:42 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">parsers</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. overview of parsing</a></li>
+<li><a href="#sec-2">2. representing and building trees : </a></li>
+<li><a href="#sec-3">3. procedures for building trees</a></li>
+<li><a href="#sec-4">4. procedures for walking the trees</a></li>
+<li><a href="#sec-5">5. inspection</a></li>
+<li><a href="#sec-6">6. a simple classifier (to map input symbols to ints)</a></li>
+<li><a href="#sec-7">7. how exactly does the tree get built?</a></li>
+<li><a href="#sec-8">8. what happens when the input does not match?</a></li>
+<li><a href="#sec-9">9. one possible general approach</a></li>
+<li><a href="#sec-10">10. state machines</a></li>
+<li><a href="#sec-11">11. postfix tree modifiers (adverbs)</a></li>
+<li><a href="#sec-12">12. metagrammar with the grammar combinators</a></li>
+<li><a href="#sec-13">13. metagrammar (inspired by antlr)</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> overview of parsing</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+A parser recognizes text in a particular language, and (usually) does something with it. In our case, we will describe the language to parse by defining a grammar, and instruct the parser to build a tree.
+</p>
+
+<p>
+We will construct our parser as a simple virtual machine.
+</p>
+
+<ul class="org-ul">
+<li>Decide how to represent trees.
+</li>
+<li>Provide procedures for building the trees.
+</li>
+<li>Provide a way to walk the trees.
+</li>
+<li>Model the grammar as a tree.
+</li>
+<li>Walk the grammar tree to parse the code.
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> representing and building trees : <a href="../apljk/treebuild.ijs.html">../apljk/treebuild.ijs.html</a></h2>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> procedures for building trees</h2>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> procedures for walking the trees</h2>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> inspection</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+<i>how does walking the grammar tree work, in general?</i>
+</p>
+
+<p>
+walk each rule from left to right, just like forth words
+</p>
+
+<p>
+<i>what about optional / repeat keywords?</i>
+</p>
+
+<p>
+either use a prefix or a retro-style quotation.
+</p>
+
+<p>
+<i>what does the prefix / quotation do?</i>
+</p>
+
+<p>
+Sometimes we need to alow the pattern we're matching to fail locally. Like for <code>/a*b/</code> we want to match any number of <code>a</code> characters, including zero. So we might attempt to match <code>a</code> and fail, but the pattern as a whole can still pass.
+</p>
+
+<p>
+On the other hand, we could forget about this idea of 'attempting' to match something, and instead just say what happens when a particular character or token shows up.
+</p>
+
+<p>
+If we use that approach, then for this regexp, there are only three cases to consider: <code>a</code>, <code>b</code>, and anything else.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> a simple classifier (to map input symbols to ints)</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+suppose i have a handful of mutually exclusive predicates&#x2026; as in verbs that always return either 0 or 1&#x2026;
+</p>
+
+<p>
+how would i turn that into a classifier?
+</p>
+
+<p>
+here's an example with only one verb: suppose i'm matching a regular expression like  <i>a*b</i>
+</p>
+
+<p>
+so this matches 'b' and 'ab' and 'aaaab' but not 'c'. in short, any number (0.._) of 'a' characters, followed by a 'b'
+</p>
+
+<p>
+so if i'm looking at the next input character, there are 3 cases:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   i. ] <span style="color: #00ff00;">'a'</span>,<span style="color: #00ff00;">'b'</span>,<span style="color: #00ff00;">'c'</span>
+0 1 2
+   <span style="color: #00ff00;">'ab'</span> i. ] <span style="color: #00ff00;">'a'</span>,<span style="color: #00ff00;">'b'</span>,<span style="color: #00ff00;">'c'</span>,<span style="color: #00ff00;">'d'</span>
+0 1 2 2
+</pre>
+</div>
+
+<p>
+so this classifies the input character into one of 3 bins.
+</p>
+
+<p>
+but now maybe i want to add a fourth bin for numbers.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   (e.&amp;<span style="color: #00ff00;">'0123456789'</span>) <span style="color: #00ff00;">'abc012'</span>
+0 0 0 1 1 1
+   (e.&amp;<span style="color: #00ff00;">'0123456789'</span>)`(<span style="color: #00ff00;">'a'</span>=])`(<span style="color: #00ff00;">'b'</span>=])`:0"0 <span style="color: #00ff00;">'abc012'</span>
+0 1 0
+0 0 1
+0 0 0
+1 0 0
+1 0 0
+</pre>
+</div>
+
+<p>
+what i want it to return is: <code>1 2 3 0 0 0</code>  or maybe  <code>2 3 0 1 1 1</code>
+that is, either index of the rule that matched, with <code>(1+#m)</code> for no match, or <code>1+</code> the rule that matched, with <code>0</code> for no match.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   +/"1 [ 1 2 3 *"1 (e.&amp;<span style="color: #00ff00;">'0123456789'</span>)`(<span style="color: #00ff00;">'a'</span>=])`(<span style="color: #00ff00;">'b'</span>=])`:0"0<span style="color: #00ff00;">'abc012'</span>
+2 3 0 1 1 1
+</pre>
+</div>
+
+<p>
+That'll work. :)
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">  <span style="color: #ffffff; font-weight: bold;">classify</span> =: 4 :<span style="color: #00ff00;">'+/"1 (&gt;:i.#x) * x:`0 y'</span>"1 _1
+  (e.&amp;<span style="color: #00ff00;">'0123456789'</span>)`(<span style="color: #00ff00;">'a'</span>=])`(<span style="color: #00ff00;">'b'</span>=]) classify <span style="color: #00ff00;">'abc012'</span>
+2 3 0 1 1 1
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> how exactly does the tree get built?</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+We walk the input and return the next state.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> what happens when the input does not match?</h2>
+<div class="outline-text-2" id="text-8">
+<ul class="org-ul">
+<li></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> one possible general approach</h2>
+<div class="outline-text-2" id="text-9">
+<ul class="org-ul">
+<li>represent grammars as a set of instructions for a virtual machine
+</li>
+<li>basic instructions for:
+<ul class="org-ul">
+<li>matching strings
+</li>
+<li>building trees
+</li>
+<li>managing the parser state
+</li>
+<li>assigning variables
+</li>
+</ul>
+</li>
+</ul>
+
+<p>
+enter rule: 
+  create node if attributes are set.
+  allocate storage for data
+</p>
+
+<p>
+stack frames
+for each item in sequence:
+</p>
+<ul class="org-ul">
+<li>attempt to match
+</li>
+<li>if match fails, 
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><span class="section-number-2">10</span> state machines</h2>
+</div>
+<div id="outline-container-sec-11" class="outline-2">
+<h2 id="sec-11"><span class="section-number-2">11</span> postfix tree modifiers (adverbs)</h2>
+<div class="outline-text-2" id="text-11">
+<div class="org-src-container">
+
+<pre class="src src-j">] <span style="color: #eedd82;">meta</span> =. ;: (0 : 0)
+  <span style="color: #ffffff; font-weight: bold;">grammar</span> =: rule* ;
+  <span style="color: #ffffff; font-weight: bold;">rule</span>    =: iden  <span style="color: #00ff00;">'='</span> expr <span style="color: #00ff00;">'.'</span> ;
+  <span style="color: #ffffff; font-weight: bold;">iden</span>    =: alpha ( alpha | digit ) ;
+  <span style="color: #ffffff; font-weight: bold;">alpha</span>   =: [ <span style="color: #00ff00;">'a'</span> .. <span style="color: #00ff00;">'z'</span> , <span style="color: #00ff00;">'A'</span> .. <span style="color: #00ff00;">'Z'</span> ] ;
+  <span style="color: #ffffff; font-weight: bold;">digit</span>   =: [ <span style="color: #00ff00;">'0'</span> .. <span style="color: #00ff00;">'9'</span> ] ;
+  <span style="color: #ffffff; font-weight: bold;">expr</span>    =: term [{ <span style="color: #00ff00;">'|'</span> term }] ;
+  <span style="color: #ffffff; font-weight: bold;">term</span>    =: { factor } ;
+  <span style="color: #ffffff; font-weight: bold;">factor</span>  =: iden | str | rep | opt | grp ;
+  <span style="color: #ffffff; font-weight: bold;">rep</span>     =: <span style="color: #00ff00;">'{'</span> expr <span style="color: #00ff00;">'}'</span> ;
+  <span style="color: #ffffff; font-weight: bold;">opt</span>     =: <span style="color: #00ff00;">'['</span> expr <span style="color: #00ff00;">']'</span> ;
+  <span style="color: #ffffff; font-weight: bold;">grp</span>     =: <span style="color: #00ff00;">'('</span> expr <span style="color: #00ff00;">')'</span> ;
+  <span style="color: #ffffff; font-weight: bold;">str</span>     =: <span style="color: #00ff00;">''''</span> [{ alpha }] <span style="color: #00ff00;">''''</span> ;
+<span style="color: #00ffff;">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-12" class="outline-2">
+<h2 id="sec-12"><span class="section-number-2">12</span> metagrammar with the grammar combinators</h2>
+</div>
+
+
+
+
+<div id="outline-container-sec-13" class="outline-2">
+<h2 id="sec-13"><span class="section-number-2">13</span> metagrammar (inspired by antlr)</h2>
+<div class="outline-text-2" id="text-13">
+<div class="org-src-container">
+
+<pre class="src src-antlr"><span style="color: #ffffff; font-weight: bold;">grammar</span> <span style="color: #ff00ff;">meta</span><span style="color: #00ffff;">;</span>
+
+<span style="color: #00ffff;">tokens</span> <span style="color: #ff00ff;">OPT</span>, <span style="color: #ff00ff;">REP</span>, <span style="color: #ff00ff;">ORP</span>, <span style="color: #ff00ff;">SEP</span>, <span style="color: #ff00ff;">TAG</span> <span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">gram</span> [<span style="color: #00ffff;">$name</span>:tok; <span style="color: #00ffff;">$super</span>:tok?; <span style="color: #00ffff;">$rules</span>:def*]
+<span style="color: #00ffff;">:</span> <span style="color: #00ff00;">'grammar'</span>^ <span style="color: #00ffff;">$name</span>=<span style="color: #ff00ff;">IDEN</span> <span style="color: #00ffff;">$super</span>=<span style="color: #ff00ff;">super</span>? <span style="color: #00ff00;">';'</span>!
+  <span style="color: #00ffff;">$rules</span>=<span style="color: #ff00ff;">def</span>* <span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">def</span> [<span style="color: #00ffff;">$name</span>:tok; <span style="color: #00ffff;">$rule</span>:<span style="color: #00ffff;">$seq</span> ]
+<span style="color: #00ffff;">:</span> <span style="color: #00ffff;">$name</span>=<span style="color: #ff00ff;">IDEN</span> <span style="color: #ff00ff;">attrs</span>? <span style="color: #00ff00;">':'</span>! <span style="color: #00ffff;">$alts</span>=<span style="color: #ff00ff;">alt</span> <span style="color: #00ff00;">';'</span>! <span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">alt</span> <span style="color: #00ffff;">:</span> <span style="color: #ff00ff;">seq</span> / <span style="color: #00ff00;">'|'</span> &gt; <span style="color: #ff00ff;">ALT</span> ^ <span style="color: #00ffff;">;</span>
+<span style="color: #ffffff; font-weight: bold;">seq</span> <span style="color: #00ffff;">:</span> <span style="color: #00ffff;">(</span> <span style="color: #00ffff;">(</span> <span style="color: #ff00ff;">grp</span> <span style="color: #00ffff;">|</span> <span style="color: #ff00ff;">lit</span> <span style="color: #00ffff;">|</span> <span style="color: #ff00ff;">sub</span> <span style="color: #00ffff;">|</span> <span style="color: #ff00ff;">var</span> <span style="color: #00ffff;">)</span>
+        <span style="color: #00ffff;">(</span> <span style="color: #00ff00;">'?'</span> &gt; <span style="color: #ff00ff;">OPT</span>  ^
+        <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'*'</span> &gt; <span style="color: #ff00ff;">REP</span>  ^
+        <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'+'</span> &gt; <span style="color: #ff00ff;">ORP</span>  ^
+        <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'^'</span> &gt; <span style="color: #ff00ff;">LIFT</span> ^
+        <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'&gt;'</span> &gt; <span style="color: #ff00ff;">VIRT</span> ^
+        <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'!'</span> &gt; <span style="color: #ff00ff;">DROP</span> ^
+        <span style="color: #00ffff;">)</span>^*
+      <span style="color: #00ffff;">)*</span> <span style="color: #00ffff;">;</span>
+<span style="color: #ffffff; font-weight: bold;">grp</span> <span style="color: #00ffff;">:</span> &gt; <span style="color: #ff00ff;">GRP</span> ^ <span style="color: #00ff00;">'('</span>! <span style="color: #ff00ff;">alt</span> <span style="color: #00ff00;">')'</span>! <span style="color: #00ffff;">;</span>
+<span style="color: #ffffff; font-weight: bold;">var</span> <span style="color: #00ffff;">:</span> <span style="color: #00ffff;">(</span> <span style="color: #ff00ff;">grp</span> <span style="color: #00ffff;">|</span> <span style="color: #ff00ff;">lit</span> <span style="color: #00ffff;">|</span> <span style="color: #ff00ff;">sub</span> <span style="color: #00ffff;">)</span>
+
+<span style="color: #ffffff; font-weight: bold;">IDEN</span> <span style="color: #00ffff;">:</span> <span style="color: #00ffff;">(</span><span style="color: #ff00ff;">Under</span><span style="color: #00ffff;">|</span><span style="color: #ff00ff;">Alpha</span><span style="color: #00ffff;">)</span> <span style="color: #00ffff;">(</span><span style="color: #ff00ff;">Under</span><span style="color: #00ffff;">|</span><span style="color: #ff00ff;">Alpha</span><span style="color: #00ffff;">|</span><span style="color: #ff00ff;">Digit</span><span style="color: #00ffff;">)*</span> <span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">Alpha</span> <span style="color: #eedd82;">fragment</span> : <span style="color: #00ff00;">'a'</span>..<span style="color: #00ff00;">'z'</span> <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'A'</span> ..<span style="color: #00ff00;">'Z'</span> <span style="color: #00ffff;">;</span>
+<span style="color: #ffffff; font-weight: bold;">Digit</span> <span style="color: #eedd82;">fragment</span> : <span style="color: #00ff00;">'0'</span>..<span style="color: #00ff00;">'9'</span> <span style="color: #00ffff;">;</span>
+<span style="color: #ffffff; font-weight: bold;">Under</span> <span style="color: #eedd82;">fragment</span> : <span style="color: #00ff00;">'_'</span> <span style="color: #00ffff;">;</span>
+
+<span style="color: #ffffff; font-weight: bold;">todo</span><span style="color: #00ffff;">:</span> <span style="color: #ffc0cb; font-weight: bold;">'</span><span style="color: #00ff00;">super ^ [$name,name:type;] /sep</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
