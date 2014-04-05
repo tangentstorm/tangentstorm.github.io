@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>parsers</title>
-<!-- 2014-03-05 Wed 18:42 -->
+<!-- 2014-04-05 Sat 13:38 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -64,18 +64,15 @@ for the JavaScript code in this tag.
 <div id="text-table-of-contents">
 <ul>
 <li><a href="#sec-1">1. overview of parsing</a></li>
-<li><a href="#sec-2">2. representing and building trees : </a></li>
+<li><a href="#sec-2">2. how to represent trees</a></li>
 <li><a href="#sec-3">3. procedures for building trees</a></li>
 <li><a href="#sec-4">4. procedures for walking the trees</a></li>
 <li><a href="#sec-5">5. inspection</a></li>
-<li><a href="#sec-6">6. a simple classifier (to map input symbols to ints)</a></li>
+<li><a href="#sec-6">6. a simple classifier tool</a></li>
 <li><a href="#sec-7">7. how exactly does the tree get built?</a></li>
 <li><a href="#sec-8">8. what happens when the input does not match?</a></li>
 <li><a href="#sec-9">9. one possible general approach</a></li>
-<li><a href="#sec-10">10. state machines</a></li>
-<li><a href="#sec-11">11. postfix tree modifiers (adverbs)</a></li>
-<li><a href="#sec-12">12. metagrammar with the grammar combinators</a></li>
-<li><a href="#sec-13">13. metagrammar (inspired by antlr)</a></li>
+<li><a href="#sec-10">10. metagrammar (inspired by antlr)</a></li>
 </ul>
 </div>
 </div>
@@ -105,8 +102,9 @@ We will construct our parser as a simple virtual machine.
 </ul>
 </div>
 </div>
+
 <div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> representing and building trees : <a href="../apljk/treebuild.ijs.html">../apljk/treebuild.ijs.html</a></h2>
+<h2 id="sec-2"><span class="section-number-2">2</span> how to represent trees</h2>
 </div>
 <div id="outline-container-sec-3" class="outline-2">
 <h2 id="sec-3"><span class="section-number-2">3</span> procedures for building trees</h2>
@@ -152,7 +150,7 @@ If we use that approach, then for this regexp, there are only three cases to con
 </div>
 </div>
 <div id="outline-container-sec-6" class="outline-2">
-<h2 id="sec-6"><span class="section-number-2">6</span> a simple classifier (to map input symbols to ints)</h2>
+<h2 id="sec-6"><span class="section-number-2">6</span> a simple classifier tool</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 suppose i have a handful of mutually exclusive predicates&#x2026; as in verbs that always return either 0 or 1&#x2026;
@@ -286,44 +284,9 @@ for each item in sequence:
 </div>
 </div>
 
-
 <div id="outline-container-sec-10" class="outline-2">
-<h2 id="sec-10"><span class="section-number-2">10</span> state machines</h2>
-</div>
-<div id="outline-container-sec-11" class="outline-2">
-<h2 id="sec-11"><span class="section-number-2">11</span> postfix tree modifiers (adverbs)</h2>
-<div class="outline-text-2" id="text-11">
-<div class="org-src-container">
-
-<pre class="src src-j">] <span style="color: #eedd82;">meta</span> =. ;: (0 : 0)
-  <span style="color: #ffffff; font-weight: bold;">grammar</span> =: rule* ;
-  <span style="color: #ffffff; font-weight: bold;">rule</span>    =: iden  <span style="color: #00ff00;">'='</span> expr <span style="color: #00ff00;">'.'</span> ;
-  <span style="color: #ffffff; font-weight: bold;">iden</span>    =: alpha ( alpha | digit ) ;
-  <span style="color: #ffffff; font-weight: bold;">alpha</span>   =: [ <span style="color: #00ff00;">'a'</span> .. <span style="color: #00ff00;">'z'</span> , <span style="color: #00ff00;">'A'</span> .. <span style="color: #00ff00;">'Z'</span> ] ;
-  <span style="color: #ffffff; font-weight: bold;">digit</span>   =: [ <span style="color: #00ff00;">'0'</span> .. <span style="color: #00ff00;">'9'</span> ] ;
-  <span style="color: #ffffff; font-weight: bold;">expr</span>    =: term [{ <span style="color: #00ff00;">'|'</span> term }] ;
-  <span style="color: #ffffff; font-weight: bold;">term</span>    =: { factor } ;
-  <span style="color: #ffffff; font-weight: bold;">factor</span>  =: iden | str | rep | opt | grp ;
-  <span style="color: #ffffff; font-weight: bold;">rep</span>     =: <span style="color: #00ff00;">'{'</span> expr <span style="color: #00ff00;">'}'</span> ;
-  <span style="color: #ffffff; font-weight: bold;">opt</span>     =: <span style="color: #00ff00;">'['</span> expr <span style="color: #00ff00;">']'</span> ;
-  <span style="color: #ffffff; font-weight: bold;">grp</span>     =: <span style="color: #00ff00;">'('</span> expr <span style="color: #00ff00;">')'</span> ;
-  <span style="color: #ffffff; font-weight: bold;">str</span>     =: <span style="color: #00ff00;">''''</span> [{ alpha }] <span style="color: #00ff00;">''''</span> ;
-<span style="color: #00ffff;">)</span>
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-sec-12" class="outline-2">
-<h2 id="sec-12"><span class="section-number-2">12</span> metagrammar with the grammar combinators</h2>
-</div>
-
-
-
-
-<div id="outline-container-sec-13" class="outline-2">
-<h2 id="sec-13"><span class="section-number-2">13</span> metagrammar (inspired by antlr)</h2>
-<div class="outline-text-2" id="text-13">
+<h2 id="sec-10"><span class="section-number-2">10</span> metagrammar (inspired by antlr)</h2>
+<div class="outline-text-2" id="text-10">
 <div class="org-src-container">
 
 <pre class="src src-antlr"><span style="color: #ffffff; font-weight: bold;">grammar</span> <span style="color: #ff00ff;">meta</span><span style="color: #00ffff;">;</span>

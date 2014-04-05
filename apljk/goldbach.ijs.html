@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>goldbach.ijs</title>
+<!-- 2014-04-05 Sat 13:38 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">goldbach.ijs</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. &#x2013; video notes ---</a></li>
+<li><a href="#sec-2">2. goldbach's conjecture</a>
+<ul>
+<li><a href="#sec-2-1">2.1. <span class="todo TODO">TODO</span> remove the formal statement section</a></li>
+<li><a href="#sec-2-2">2.2. <span class="todo TODO">TODO</span> shrink the testing part</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. problem and history  -  01:33</a></li>
+<li><a href="#sec-4">4. creating the evens and prime numbers</a>
+<ul>
+<li><a href="#sec-4-1">4.1. step i.10</a></li>
+<li><a href="#sec-4-2">4.2. step evens .</a></li>
+<li><a href="#sec-4-3">4.3. <span class="todo TODO">TODO</span> 'first 10 prime numbers' repeated</a></li>
+<li><a href="#sec-4-4">4.4. <span class="todo TODO">TODO</span> 'addition table' sounds weird</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. <span class="todo TODO">TODO</span> 3:20 lots of right after showing the pretty table</a></li>
+<li><a href="#sec-6">6. dyad 'e.' performs the 'element of' check.</a></li>
+<li><a href="#sec-7">7. <span class="todo TODO">TODO</span> lots of stumbling (when i mistyped '8')</a></li>
+<li><a href="#sec-8">8. <span class="todo TODO">TODO</span> </a></li>
+<li><a href="#sec-9">9. NOTE .</a></li>
+<li><a href="#sec-10">10. introduce goldbach (in less than 15 seconds)</a></li>
+<li><a href="#sec-11">11. e.</a></li>
+<li><a href="#sec-12">12. define a verb to create goldbach numbers (evens =: : 2 * 2 + i. 2 * y)</a></li>
+<li><a href="#sec-13">13. create the table of prime sums</a></li>
+<li><a href="#sec-14">14. define psums : , +/~ p: i. y</a></li>
+<li><a href="#sec-15">15. introduce the verb 'all'</a></li>
+</ul>
+</div>
+</div>
+<div class="org-src-container">
+
+<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">evens</span> =: 2 * 2 + ]
+<span style="color: #ffffff; font-weight: bold;">psums</span> =: 3 : <span style="color: #00ff00;">', +/~ p: y'</span>
+*./ (evens e. psums) i.100
+
+<span style="color: #ffffff; font-weight: bold;">divmod</span> =: &lt;.@(%~) ,. |
++/"1 p: 10 divmod (psums i. evens) 10
+</pre>
+</div>
+
+
+
+<p>
+“Every even integer greater than 2 can be expressed as
+the sum of two primes.”
+</p>
+
+<p>
+“You should use the word you use when you have knitted something and you then undo the knitting — when you are removing the structure and are left with the thread.” — Gitte Christensen, Vector, 2006-08
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> &#x2013; video notes ---</h2>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><a id="dm0ks7e1gfg0" name="dm0ks7e1gfg0"></a><span class="section-number-2">2</span> goldbach's conjecture</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+remove the word 'even'
+</p>
+</div>
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><a id="c9x089e1gfg0" name="c9x089e1gfg0"></a><span class="section-number-3">2.1</span> <span class="todo TODO">TODO</span> remove the formal statement section</h3>
+<div class="outline-text-3" id="text-2-1">
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><a id="foi36ae1gfg0" name="foi36ae1gfg0"></a><span class="section-number-3">2.2</span> <span class="todo TODO">TODO</span> shrink the testing part</h3>
+<div class="outline-text-3" id="text-2-2">
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><a id="c8whsxd1gfg0" name="c8whsxd1gfg0"></a><span class="section-number-2">3</span> problem and history  -  01:33</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><a id="gamfg1e1gfg0" name="gamfg1e1gfg0"></a><span class="section-number-2">4</span> creating the evens and prime numbers</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><a id="poviwae1gfg0" name="poviwae1gfg0"></a><span class="section-number-3">4.1</span> step i.10</h3>
+<div class="outline-text-3" id="text-4-1">
+</div>
+</div>
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><a id="f4liobe1gfg0" name="f4liobe1gfg0"></a><span class="section-number-3">4.2</span> step evens .</h3>
+<div class="outline-text-3" id="text-4-2">
+</div>
+</div>
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><a id="5xx4abe1gfg0" name="5xx4abe1gfg0"></a><span class="section-number-3">4.3</span> <span class="todo TODO">TODO</span> 'first 10 prime numbers' repeated</h3>
+<div class="outline-text-3" id="text-4-3">
+<ul class="org-ul">
+<li>2:54 repeats
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-4-4" class="outline-3">
+<h3 id="sec-4-4"><a id="xloemce1gfg0" name="xloemce1gfg0"></a><span class="section-number-3">4.4</span> <span class="todo TODO">TODO</span> 'addition table' sounds weird</h3>
+<div class="outline-text-3" id="text-4-4">
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><a id="960hb4e1gfg0" name="960hb4e1gfg0"></a><span class="section-number-2">5</span> <span class="todo TODO">TODO</span> 3:20 lots of right after showing the pretty table</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><a id="7tp7f5e1gfg0" name="7tp7f5e1gfg0"></a><span class="section-number-2">6</span> dyad 'e.' performs the 'element of' check.</h2>
+<div class="outline-text-2" id="text-6">
+</div>
+</div>
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><a id="9t5esee1gfg0" name="9t5esee1gfg0"></a><span class="section-number-2">7</span> <span class="todo TODO">TODO</span> lots of stumbling (when i mistyped '8')</h2>
+<div class="outline-text-2" id="text-7">
+</div>
+</div>
+
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><a id="v1x27ge1gfg0" name="v1x27ge1gfg0"></a><span class="section-number-2">8</span> <span class="todo TODO">TODO</span> </h2>
+<div class="outline-text-2" id="text-8">
+</div>
+</div>
+
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><a id="1gwg67e1gfg0" name="1gwg67e1gfg0"></a><span class="section-number-2">9</span> NOTE .</h2>
+<div class="outline-text-2" id="text-9">
+<div class="org-src-container">
+
+<pre class="src src-j">   +/~ p: i. 10
+ 4  5  7  9 13 15 19 21 25 31
+ 5  6  8 10 14 16 20 22 26 32
+ 7  8 10 12 16 18 22 24 28 34
+ 9 10 12 14 18 20 24 26 30 36
+13 14 16 18 22 24 28 30 34 40
+15 16 18 20 24 26 30 32 36 42
+19 20 22 24 28 30 34 36 40 46
+21 22 24 26 30 32 36 38 42 48
+25 26 28 30 34 36 40 42 46 52
+31 32 34 36 40 42 46 48 52 58
+</pre>
+</div>
+
+
+<div class="org-src-container">
+
+<pre class="src src-j"></pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><a id="vrvfv900hfg0" name="vrvfv900hfg0"></a><span class="section-number-2">10</span> introduce goldbach (in less than 15 seconds)</h2>
+<div class="outline-text-2" id="text-10">
+</div>
+</div>
+<div id="outline-container-sec-11" class="outline-2">
+<h2 id="sec-11"><a id="ctwcq800hfg0" name="ctwcq800hfg0"></a><span class="section-number-2">11</span> e.</h2>
+<div class="outline-text-2" id="text-11">
+</div>
+</div>
+<div id="outline-container-sec-12" class="outline-2">
+<h2 id="sec-12"><a id="syg8b900hfg0" name="syg8b900hfg0"></a><span class="section-number-2">12</span> define a verb to create goldbach numbers (evens =: : 2 * 2 + i. 2 * y)</h2>
+<div class="outline-text-2" id="text-12">
+</div>
+</div>
+<div id="outline-container-sec-13" class="outline-2">
+<h2 id="sec-13"><a id="x2ge4f00hfg0" name="x2ge4f00hfg0"></a><span class="section-number-2">13</span> create the table of prime sums</h2>
+<div class="outline-text-2" id="text-13">
+</div>
+</div>
+<div id="outline-container-sec-14" class="outline-2">
+<h2 id="sec-14"><a id="0tp78c00hfg0" name="0tp78c00hfg0"></a><span class="section-number-2">14</span> define psums : , +/~ p: i. y</h2>
+<div class="outline-text-2" id="text-14">
+</div>
+</div>
+<div id="outline-container-sec-15" class="outline-2">
+<h2 id="sec-15"><a id="0okkxd00hfg0" name="0okkxd00hfg0"></a><span class="section-number-2">15</span> introduce the verb 'all'</h2>
+<div class="outline-text-2" id="text-15">
+</div>
+</div>
+</div>
+</body>
+</html>
