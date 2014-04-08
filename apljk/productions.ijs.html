@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>grammar production in j</title>
-<!-- 2014-04-07 Mon 23:01 -->
+<!-- 2014-04-07 Mon 23:06 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -108,7 +108,7 @@ Since there are two possibilities and we know the longest output will require <c
 </p>
 
 <p>
-To generate them, we can assign the numbers to the choices, so that (0='aa'; 1='b'), and then simply count in binary to enumerate all possibilities:
+To produce them, we can the choices, so that (0='aa'; 1='b'), and then simply count in binary to generate all expansions.
 </p>
 
 <div class="org-src-container">
@@ -191,7 +191,7 @@ Now can encode the productions like so:
 </div>
 
 <p>
-Now we can use <code>{</code> to produce the resulting strings:
+We can use <code>{</code> to produce the resulting strings:
 </p>
 
 <div class="org-src-container">
@@ -223,14 +223,14 @@ Now we can use <code>{</code> to produce the resulting strings:
 </div>
 
 <p>
-Now, we can filter this list by finding the items where the length is equal to 5.
+Finally, we can filter this list by finding the items where the length is equal to 5.
 </p>
 
 <div class="org-src-container">
 
 <pre class="src src-j">  <span style="color: #66f;">NB. #y      returns the length of y</span>
   <span style="color: #66f;">NB. (5=#)y  returns 1 if the length is 5, 0 otherwise.</span>
-  <span style="color: #66f;">NB. u S:0 y applies u to the boxed items of y rather than y as a whole</span>
+  <span style="color: #66f;">NB. u S:0 y applies u to boxed items of y, rather than y as a whole</span>
   <span style="color: #66f;">NB. x#y     makes x[i] copies of y[i], where x and y are same length</span>
   <span style="color: #66f;">NB. ]y      returns y</span>
 
