@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>grammar production in j</title>
+<!-- 2014-04-07 Mon 22:57 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">grammar production in j</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Grammar Productions in J</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Grammar Productions in J</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Consider the following grammar in ANTLR notation:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-antlr"><span style="color: #ffffff; font-weight: bold;">s</span> <span style="color: #00ffff;">:</span> <span style="color: #00ffff;">(</span><span style="color: #00ff00;">'aa'</span> <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'b'</span><span style="color: #00ffff;">)*</span> <span style="color: #00ffff;">;</span> <span style="color: #66f;">// </span><span style="color: #66f;">s expands to ('aa' or 'b'), repeated 0..n times.</span>
+</pre>
+</div>
+
+<p>
+How can we find the set of sentences produced by this grammar that are exactly 5 characters long?
+</p>
+
+<p>
+Since 'b' is the shortest alternative in the production (aside from the empty string), we know that we only need to consider applying the '*' operation a maximum of 5 times:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-antlr"><span style="color: #ffffff; font-weight: bold;">s</span> <span style="color: #00ffff;">:</span> <span style="color: #00ffff;">(</span><span style="color: #00ff00;">'a'</span><span style="color: #00ffff;">|</span><span style="color: #00ff00;">'b'</span><span style="color: #00ffff;">)*</span>   <span style="color: #00ffff;">;</span>             <span style="color: #66f;">// </span><span style="color: #66f;">antlr EBNF-style notation</span>
+<span style="color: #ffffff; font-weight: bold;">s</span> <span style="color: #00ffff;">:</span> <span style="color: #00ffff;">()</span> <span style="color: #00ffff;">|</span> <span style="color: #00ffff;">(</span><span style="color: #00ff00;">'a'</span> <span style="color: #ff00ff;">s</span><span style="color: #00ffff;">)</span> <span style="color: #00ffff;">|</span> <span style="color: #00ffff;">(</span><span style="color: #00ff00;">'b'</span> <span style="color: #ff00ff;">s</span><span style="color: #00ffff;">)</span> <span style="color: #00ffff;">;</span>   <span style="color: #66f;">// </span><span style="color: #66f;">rewritten in traditional BNF-style</span>
+
+<span style="color: #ffffff; font-weight: bold;">s</span>                 <span style="color: #66f;">// </span><span style="color: #66f;">0. &lt;s&gt; can expand to...</span>
+<span style="color: #00ff00;">'b'</span> <span style="color: #ff00ff;">s</span>             <span style="color: #66f;">// </span><span style="color: #66f;">1. which can expand to...</span>
+<span style="color: #00ff00;">'bb'</span> <span style="color: #ff00ff;">s</span>            <span style="color: #66f;">// </span><span style="color: #66f;">2. </span>
+<span style="color: #00ff00;">'bbb'</span> <span style="color: #ff00ff;">s</span>           <span style="color: #66f;">// </span><span style="color: #66f;">3.</span>
+<span style="color: #00ff00;">'bbbb'</span> <span style="color: #ff00ff;">s</span>          <span style="color: #66f;">// </span><span style="color: #66f;">4.</span>
+<span style="color: #00ff00;">'bbbbb'</span> <span style="color: #ff00ff;">s</span>         <span style="color: #66f;">// </span><span style="color: #66f;">5.</span>
+</pre>
+</div>
+
+<p>
+Since there are two possibilities and we know the longest output will require <code>5</code> applications, we have a maximum of <code>2^5=32</code> choices to explore.
+</p>
+
+<p>
+To generate them, we can assign the numbers to the choices, so that (0='aa'; 1='b'), and then simply count in binary to enumerate all possibilities:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   <span style="color: #66f;">NB. i.y    counts from 0..y</span>
+   <span style="color: #66f;">NB. #:y    converts y to binary</span>
+   <span style="color: #66f;">NB. &lt;y     boxes y</span>
+   <span style="color: #66f;">NB. u@v    composes verbs u and v</span>
+   <span style="color: #66f;">NB. u"0 y  applies u to the items of y, rather than y as a whole</span>
+   <span style="color: #66f;">NB. x $ y  reshapes y to shape x</span>
+
+   8 4 $    &lt;@#:"0 i.32
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;0        &#9474;1        &#9474;1 0      &#9474;1 1      &#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;1 0 0    &#9474;1 0 1    &#9474;1 1 0    &#9474;1 1 1    &#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;1 0 0 0  &#9474;1 0 0 1  &#9474;1 0 1 0  &#9474;1 0 1 1  &#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;1 1 0 0  &#9474;1 1 0 1  &#9474;1 1 1 0  &#9474;1 1 1 1  &#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;1 0 0 0 0&#9474;1 0 0 0 1&#9474;1 0 0 1 0&#9474;1 0 0 1 1&#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;1 0 1 0 0&#9474;1 0 1 0 1&#9474;1 0 1 1 0&#9474;1 0 1 1 1&#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;1 1 0 0 0&#9474;1 1 0 0 1&#9474;1 1 0 1 0&#9474;1 1 0 1 1&#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;1 1 1 0 0&#9474;1 1 1 0 1&#9474;1 1 1 1 0&#9474;1 1 1 1 1&#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+</pre>
+</div>
+
+<p>
+Unfortunately, if we don't box the results like this, J will pad the numbers with zeros so that they're all the same length.
+</p>
+
+<p>
+An alternative is to increment the binary digits by 1, so that when J pads the results with 0, it doesn't interfere with our generated strings.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   <span style="color: #66f;">NB. &gt;:y increments y by 1</span>
+   <span style="color: #66f;">NB. u"1 applies u to the rows of y, rather than y as a whole</span>
+
+   <span style="color: #66f;">NB. was: 8 4 $ &lt;       &lt;@#:"0 i.32</span>
+            8 4 $ &lt;"1    &gt;:@#:"0 i.32
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;1 0 0 0 0&#9474;2 0 0 0 0&#9474;2 1 0 0 0&#9474;2 2 0 0 0&#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;2 1 1 0 0&#9474;2 1 2 0 0&#9474;2 2 1 0 0&#9474;2 2 2 0 0&#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;2 1 1 1 0&#9474;2 1 1 2 0&#9474;2 1 2 1 0&#9474;2 1 2 2 0&#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;2 2 1 1 0&#9474;2 2 1 2 0&#9474;2 2 2 1 0&#9474;2 2 2 2 0&#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;2 1 1 1 1&#9474;2 1 1 1 2&#9474;2 1 1 2 1&#9474;2 1 1 2 2&#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;2 1 2 1 1&#9474;2 1 2 1 2&#9474;2 1 2 2 1&#9474;2 1 2 2 2&#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;2 2 1 1 1&#9474;2 2 1 1 2&#9474;2 2 1 2 1&#9474;2 2 1 2 2&#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;2 2 2 1 1&#9474;2 2 2 1 2&#9474;2 2 2 2 1&#9474;2 2 2 2 2&#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+</pre>
+</div>
+
+<p>
+Now can encode the productions like so:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">             <span style="color: #66f;">NB. 0   1     2</span>
+     ] <span style="color: #eedd82;">tokens</span> =. <span style="color: #00ff00;">''</span>; <span style="color: #00ff00;">'aa'</span>; <span style="color: #00ff00;">'b'</span>
+&#9484;&#9516;&#9472;&#9472;&#9516;&#9472;&#9488;
+&#9474;&#9474;aa&#9474;b&#9474;
+&#9492;&#9524;&#9472;&#9472;&#9524;&#9472;&#9496;
+</pre>
+</div>
+
+<p>
+Now we can use <code>{</code> to produce the resulting strings:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">   <span style="color: #66f;">NB. x{y     returns y[i] for i in x</span>
+   <span style="color: #66f;">NB. x u~ y  means y u x</span>
+   <span style="color: #66f;">NB. ;y      melds boxes together: (;(&lt;'aa'),(&lt;'b')) = (&lt;'aab')</span>
+
+   <span style="color: #66f;">NB. was:  &lt;  "1           &gt;:@#:"0 i.32</span>
+   8 4 $     &lt;@;"1 tokens {~ &gt;:@#:"0 i.32
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;aa       &#9474;b       &#9474;baa     &#9474;bb     &#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;baaaa    &#9474;baab    &#9474;bbaa    &#9474;bbb    &#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;baaaaaa  &#9474;baaaab  &#9474;baabaa  &#9474;baabb  &#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;bbaaaa   &#9474;bbaab   &#9474;bbbaa   &#9474;bbbb   &#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;baaaaaaaa&#9474;baaaaaab&#9474;baaaabaa&#9474;baaaabb&#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;baabaaaa &#9474;baabaab &#9474;baabbaa &#9474;baabbb &#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;bbaaaaaa &#9474;bbaaaab &#9474;bbaabaa &#9474;bbaabb &#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
+&#9474;bbbaaaa  &#9474;bbbaab  &#9474;bbbbaa  &#9474;bbbbb  &#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+</pre>
+</div>
+
+<p>
+Now, we can filter this list by finding the items where the length is equal to 5.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-j">  <span style="color: #66f;">NB. #y      returns the length of y</span>
+  <span style="color: #66f;">NB. (5=#)y  returns 1 if the length is 5, 0 otherwise.</span>
+  <span style="color: #66f;">NB. u S:0 y applies u to the boxed items of y rather than y as a whole</span>
+  <span style="color: #66f;">NB. x#y     makes x[i] copies of y[i], where x and y are same length</span>
+  <span style="color: #66f;">NB. ]y      returns y</span>
+
+  <span style="color: #66f;">NB.    (f        g h) y   means  (f        y) g (h y)</span>
+  <span style="color: #66f;">NB. so ((5=#)S:0 # ]) y   means  ((5=#)S:0 y) # (] y)</span>
+  <span style="color: #66f;">NB. which says: "make 1 copy of y[i] when length(unbox y[i]) = 5"</span>
+  <span style="color: #66f;">NB. (and 0 copies when the length is not 5)</span>
+
+  <span style="color: #66f;">NB. was:  8 4 $  &lt;@;"1 tokens {~ &gt;:@#:"0 i.32</span>
+  ((5=#)S:0 # ])  &lt;@;"1 tokens {~ &gt;:@#:"0 i.32
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;baaaa&#9474;baabb&#9474;bbaab&#9474;bbbaa&#9474;bbbbb&#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
