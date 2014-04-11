@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Implementing custom TView classes</title>
+<!-- 2014-04-11 Fri 06:10 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Implementing custom TView classes</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. The class hierarchy</a></li>
+<li><a href="#sec-2">2. Using TView instances</a></li>
+<li><a href="#sec-3">3. Implementing custom TView classes</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><a id="vnmbati01gg0" name="vnmbati01gg0"></a><span class="section-number-2">1</span> The class hierarchy</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+The units are as follows:
+</p>
+
+<p>
+<code>utv</code> : basic term view classes
+<code>udv</code> : database views
+<code>ui</code>  : older turbo pascal widgets being converted for modern use
+</p>
+
+<ul class="org-ul">
+<li>TComponent
+<dl class="org-dl">
+<dt> utv.TView </dt><dd>a drawble rectangle in space.
+<ul class="org-ul">
+<li>udv.TDBTreeGrid
+</li>
+<li id="utv.TTermView">maintains a persistent video ram buffer
+<ul class="org-ul">
+<li>udv.TDBMenu
+</li>
+</ul>
+</li>
+<li>ZObj
+<ul class="org-ul">
+<li>ZText
+<ul class="org-ul">
+<li>ZChoice
+</li>
+</ul>
+</li>
+<li>ZMenu
+<ul class="org-ul">
+<li>ZBounceMenu
+</li>
+<li>ZMenuBar
+</li>
+</ul>
+</li>
+<li id="ZInput">single line text input
+</li>
+<li>ZCounter
+<ul class="org-ul">
+<li>ZHexCounter
+</li>
+<li>ZColor
+</li>
+</ul>
+</li>
+<li>ZToggle
+<ul class="org-ul">
+<li>ZYesNo
+</li>
+</ul>
+</li>
+<li>ZConfirmBox
+<ul class="org-ul">
+<li>ZInputBox
+</li>
+</ul>
+</li>
+<li>ZVScroller
+</li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><a id="82f2iyj01gg0" name="82f2iyj01gg0"></a><span class="section-number-2">2</span> Using TView instances</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+They're meant to work pretty much like components in Lazarus: you create them as members of your <code>uapp.TCustomApp</code> object, and then just register your callbacks.
+</p>
+
+<p>
+For the time being, you have to explicitly call <code>ReDraw()</code> on each one.
+</p>
+
+<p>
+For <code>TTermView</code>, the system takes care of setting up the subwindows correctly, so you just override <code>Render()</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><a id="3v45soi01gg0" name="3v45soi01gg0"></a><span class="section-number-2">3</span> Implementing custom TView classes</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+</div>
+</div>
+</body>
+</html>

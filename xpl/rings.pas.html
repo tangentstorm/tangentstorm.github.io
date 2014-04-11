@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>rings</title>
-<!-- 2013-10-19 Sat 04:33 -->
+<!-- 2014-04-11 Fri 06:10 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012  Free Software Foundation, Inc.
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -63,7 +63,7 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. Introduction</a></li>
+<li><a href="#sec-1">1. <span class="todo TODO">TODO</span> Introduction</a></li>
 <li><a href="#sec-2">2. About the implementation</a></li>
 <li><a href="#sec-3">3. Types of Node</a>
 <ul>
@@ -635,8 +635,8 @@ The default implementation does a depth-first walk.
         <span style="color: #00ffff;">if</span> position &gt; 0 <span style="color: #00ffff;">then</span>
           <span style="color: #00ffff;">for</span> i := 1 <span style="color: #00ffff;">to</span> position <span style="color: #00ffff;">do</span> self.MoveNext
       <span style="color: #00ffff;">end</span>
-    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">raise</span> Exception.Create(<span style="color: #00ff00;">'out of bounds: '</span>
-                                + IntToStr(position))
+    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">raise</span> Exception.Create(Utf8Encode(<span style="color: #00ff00;">'out of bounds: '</span>)
+                + IntToStr(position))
   <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
@@ -807,9 +807,10 @@ Values are stored in cell nodes.
   <span style="color: #00ffff;">end</span>; <span style="color: #66f;">{ </span><span style="color: #66f;">Find </span><span style="color: #66f;">}</span>
 
 <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing</span>&lt;T&gt;.ForEach( action : GNodeAction );
-  <span style="color: #ff00ff;">var</span> item : T;
-  <span style="color: #00ffff;">begin</span>
-    <span style="color: #00ffff;">for</span> item <span style="color: #00ffff;">in</span> self <span style="color: #00ffff;">do</span> action( item );
+  <span style="color: #ff00ff;">var</span> item, ref : T;
+  <span style="color: #00ffff;">begin</span> <span style="color: #66f;">// </span><span style="color: #66f;">without ref, we get this error in recent 2.7.1 builds...</span>
+       <span style="color: #66f;">// </span><span style="color: #66f;">Error:Illegal assignment to for-loop variable "item"</span>
+    <span style="color: #00ffff;">for</span> item <span style="color: #00ffff;">in</span> self <span style="color: #00ffff;">do</span> <span style="color: #00ffff;">begin</span> ref := item; action( ref ) <span style="color: #00ffff;">end</span>;
   <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
@@ -895,7 +896,7 @@ Values are stored in cell nodes.
 <pre class="src src-pascal" id="GRing.methods"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing</span>&lt;T&gt;.Remove( val : T );
   <span style="color: #ff00ff;">var</span> c : IRingCursor&lt;T&gt;; found : <span style="color: #ff00ff;">boolean</span> = false;
   <span style="color: #00ffff;">begin</span>
-    <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">not</span> self.IsEmpty <span style="color: #00ffff;">then</span> pass
+    <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">not</span> self.IsEmpty <span style="color: #00ffff;">then</span> ok
     <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">begin</span>
       c := self.MakeCursor;
       <span style="color: #00ffff;">repeat</span>
@@ -912,7 +913,8 @@ Values are stored in cell nodes.
 <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GRing</span>&lt;T&gt;.Drop;
     <span style="color: #ff00ff;">var</span> temp : GNode&lt;T&gt;;
   <span style="color: #00ffff;">begin</span>
-    <span style="color: #00ffff;">if</span> IsEmpty <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">raise</span> Exception.Create(<span style="color: #00ff00;">'attempted to drop from empty list'</span>)
+    <span style="color: #00ffff;">if</span> IsEmpty <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">raise</span> 
+      Exception.Create(Utf8Encode(<span style="color: #00ff00;">'attempted to drop from empty list'</span>))
     <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">begin</span>
       temp := _clasp.PrevLink;
       _clasp.PrevLink := _clasp.PrevLink.PrevLink;
