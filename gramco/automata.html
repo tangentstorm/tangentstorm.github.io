@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>ufsm design</title>
+<!-- 2014-04-12 Sat 18:02 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">ufsm design</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. overview</a></li>
+<li><a href="#sec-2">2. finite state machines</a></li>
+<li><a href="#sec-3">3. Use case: tokenization</a></li>
+<li><a href="#sec-4">4. represeting a transition</a></li>
+<li><a href="#sec-5">5. transitions between states</a></li>
+<li><a href="#sec-6">6. Grouping symbols</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><a id="2v7cja119gg0" name="2v7cja119gg0"></a><span class="section-number-2">1</span> overview</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This document describes the design of a module for generic state machines.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><a id="t7p260p09gg0" name="t7p260p09gg0"></a><span class="section-number-2">2</span> finite state machines</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+A finite state machine is device that, at any given time, is in one<sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup> of <i>N</i> states (where <i>N</i> is a positive integer). The machine consumes symbols in some arbitrary input language, and transitions between states based on the input it receives.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #66f;">// </span><span style="color: #66f;">(i)nterface for (f)inite (s)tate (m)achines</span>
+<span style="color: #ff00ff;">type</span> IFSM&lt;T&gt; = <span style="color: #00ffff;">interface</span>
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">State</span> : cardinal;
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">MaxState</span> : cardinal;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Take</span>(symbol : T);
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Take</span>(sequence : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> T);
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Reset</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+In particular, we are interested in state machines that work with strings of characters, so we might as well specialize this interface for strings:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span> ICharFSM = <span style="color: #00ffff;">interface</span> (IFSM&lt;<span style="color: #ff00ff;">char</span>&gt;)
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Take</span>( s : <span style="color: #ff00ff;">string</span> );
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><a id="hgtic5x09gg0" name="hgtic5x09gg0"></a><span class="section-number-2">3</span> Use case: tokenization</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Although state machines on their own are interesting in a mathematical sense, we're interested in actually <i>using</i> them, which means attaching specific behaviors to certain transitions.
+</p>
+
+<p>
+For example, if our input is source code in some programming language, we may want to break the input stream down into tokens so that we can colorize them. In this case, we'd want to know:
+</p>
+
+<ul class="org-ul">
+<li>the actual <i>text</i> of the symbol
+</li>
+<li>what <i>kind</i> of symbol it is
+</li>
+</ul>
+
+<p>
+For example, we might want to assign different colors to numbers, strings, keywords, type names, comments, and miscelanious characters like punctuation.
+</p>
+
+<p>
+With a syntax highlighter, we'd want to keep whitespace intact, and so we'd probably want to have tokens like <code>spaces</code> for a string of spaces, and perhaps a <code>newline</code> token.
+</p>
+
+<p>
+The <i>kind</i> field can simply be another cardinal number.
+</p>
+
+<p>
+If we were writing a lexer that would feed tokens into a parser, on the other hand, we might want to ignore whitespace and comments, and only consider the tokens that affect the meaning of the program.
+</p>
+
+<p>
+One approach, used by the ANTLR parser generator, is to provide a second numeric tag called a channel.
+</p>
+
+<p>
+Adopting this approach, we might represent tokens like this:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span> TToken = <span style="color: #ff00ff;">record</span>
+  kind, channel : cardinal;
+  data : <span style="color: #ff00ff;">string</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+We would then want to provide an interface for applications to receive the tokens as they are identified. We can do this by defining a callback procedure (often called a <i>delegate</i> or <i>event handler type</i>):
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span> TTokenHandler = procedure (token : TToken) <span style="color: #00ffff;">of</span> <span style="color: #00ffff;">object</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><a id="3qqhtiy09gg0" name="3qqhtiy09gg0"></a><span class="section-number-2">4</span> represeting a transition</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+At a minimum, our data structure to represent state machine transitions needs to include the destination state.
+</p>
+
+<p>
+The "from" state and the symbol that triggers the transition probably shouldn't be stored as part of the transition, but rather as keys used to look up the transition in some mapping structure.
+</p>
+
+<p>
+Since we're modeling states as cardinals, the simplest model of a transition would just be a cardinal representing the next state.
+</p>
+
+<p>
+We know already, though, that we want to perform various actions as tokens come in, and it's likely that we'll want to expand the set of possible actions in the future.
+</p>
+
+<p>
+A generic type for <i>describing</i> state machines might look like this:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span> IFSMDescription&lt;TState, TSymbol, TAction&gt; = <span style="color: #00ffff;">interface</span>
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Transition</span>(
+              fromState : TState;
+              onSymbol  : TSymbol;
+              respondBy : TAction );
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+In practice, the <code>TAction</code> type might be <code>cardinal</code> (if we don't need those extra actions), or <code>array of byte</code>, or some more carefully defined type.
+</p>
+
+<p>
+Regardless of how we define <code>TAction</code>, the actual work would be carried out by some kind of simulator capable of interpreting the instructions:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span> IFSMSimulator&lt;TAction&gt; = <span style="color: #00ffff;">interface</span>
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Execute</span>(TAction);
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><a id="14v3dvr09gg0" name="14v3dvr09gg0"></a><span class="section-number-2">5</span> transitions between states</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+If there are <i>N</i> possible states and <i>M</i> symbols in the input language, then we could choose to represent the automaton as a 2-dimensional array containing <i>M</i> &times; <i>N</i> cells.
+</p>
+
+<p>
+Then, to decide what to do at any given point, the machine can simply inspect the cell at coordinates <code>[state][symbol]</code>, and adjust its state accordingly.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TFSM</span>&lt;TState, TSymbol, TAction&gt;.Take(sym : TSymbol);
+  <span style="color: #00ffff;">begin</span> execute(self[state, sym]);
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+Of course, much of the time, there will be a great deal of redundancy in the lookup table, so we may want to choose a more space-friendly representation such as a sparse array. Regardless of how it's represented internally, the <i>M</i> &times; <i>N</i> array metaphor is a sensible one, and we can provide it as an interface:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span> ITransitionTable&lt;TState, TSymbol, TAction&gt; = <span style="color: #00ffff;">interface</span>
+  <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">GetAction</span>(state : TState; sym : TSymbol) : TAction;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetAction</span>(state : TState; sym : TSymbol; action : TAction);
+  <span style="color: #00ffff;">property</span> actions[ state : TState; sym : TSymbol ] : TAction
+    <span style="color: #00ffff;">read</span> GetAction <span style="color: #00ffff;">write</span> SetAction; <span style="color: #00ffff;">default</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><a id="v2rd7a119gg0" name="v2rd7a119gg0"></a><span class="section-number-2">6</span> Grouping symbols</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+In addition to changing the representation of the lookup table to something more space efficient, we could modify the representation of symbols so that we can treat them in groups.
+</p>
+
+<p>
+This is similar to the idea of specifying the type of each output token, and the approach is the same: we would simply add a tag to the input symbols so that we could deal with them in groups.
+</p>
+
+<p>
+For example, for ascii input, we might provide something like this:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span>
+  TCharSet   = <span style="color: #ff00ff;">set</span> <span style="color: #00ffff;">of</span> <span style="color: #ff00ff;">char</span>;
+  TCharGroup = ( sgSpace, sgUpper, sgLower, sgNumber, sgSymbol, sgOther );
+  TGroupDefs = <span style="color: #ff00ff;">array</span> [ TCharGroup ] <span style="color: #00ffff;">of</span> TCharSet;
+<span style="color: #ff00ff;">var</span>
+  def : TGroupDefs; ch : <span style="color: #ff00ff;">char</span>; gr
+<span style="color: #00ffff;">begin</span>
+  def[sgSpace]  := [ <span style="color: #00ff00;">' '</span>, ^I <span style="color: #66f;">{</span><span style="color: #66f;">tab</span><span style="color: #66f;">}</span>, ^J <span style="color: #66f;">{</span><span style="color: #66f;">linefeed</span><span style="color: #66f;">}</span>, ^M <span style="color: #66f;">{</span><span style="color: #66f;">carriage return</span><span style="color: #66f;">}</span> ];
+  def[sgUpper]  := [ <span style="color: #00ff00;">'A'</span> .. <span style="color: #00ff00;">'Z'</span> ];
+  def[sgLower]  := [ <span style="color: #00ff00;">'a'</span> .. <span style="color: #00ff00;">'z'</span> ];
+  def[sgNumber] := [ <span style="color: #00ff00;">'0'</span> .. <span style="color: #00ff00;">'9'</span> ];
+  def[sgSymbol] := [ <span style="color: #00ff00;">'!'</span> .. <span style="color: #00ff00;">'~'</span> ] - def[sgUpper] - def[sgLower] - def[sgNumber];
+  def[sgOther] := ([ #0 .. <span style="color: #00ff00;">' '</span> ] - def[sgSpace]) + [ #128 .. #255 ];
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+
+<p>
+Then our language-specific <code>TSymbol</code> type might might look like this:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal"><span style="color: #ff00ff;">type</span> TSymbol = <span style="color: #ff00ff;">record</span>
+  group : TCharGroup;
+  ch : <span style="color: #ff00ff;">char</span>;
+<span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
+In automata theory, there is a distinction between deterministic and non-deterministic state machines. A "non-deterministic finite automaton" (NFA) is a state machine that can exist in multiple states at once, or transition between states without requiring input. It turns out that any NFA can be reduced to an equivalent DFA (deterministic finite automaton), and in this article, I'm referring only to the latter.
+</p></div>
+
+
+</div>
+</div></div>
+</body>
+</html>
