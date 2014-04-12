@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>kvm : keyboard/video/mouse support for virtual consoles</title>
-<!-- 2014-04-11 Fri 06:10 -->
+<!-- 2014-04-12 Sat 14:31 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Michal J Wallace" />
@@ -72,8 +72,7 @@ for the JavaScript code in this tag.
 <li><a href="#sec-4-2">4.2. TTermCell</a></li>
 <li><a href="#sec-4-3">4.3. TTermGrid</a></li>
 <li><a href="#sec-4-4">4.4. TPoint</a></li>
-<li><a href="#sec-4-5">4.5. TRect</a></li>
-<li><a href="#sec-4-6">4.6. Event Types</a></li>
+<li><a href="#sec-4-5">4.5. Event Types</a></li>
 </ul>
 </li>
 <li><a href="#sec-5">5. <code>TBaseTerm</code></a>
@@ -82,12 +81,14 @@ for the JavaScript code in this tag.
 <li><a href="#sec-5-2">5.2. implementation</a>
 <ul>
 <li><a href="#sec-5-2-1">5.2.1. constructor</a></li>
-<li><a href="#sec-5-2-2">5.2.2. display geometry</a></li>
-<li><a href="#sec-5-2-3">5.2.3. cursor position</a></li>
-<li><a href="#sec-5-2-4">5.2.4. cursor display</a></li>
-<li><a href="#sec-5-2-5">5.2.5. <span class="todo TODO">TODO</span> ins/delete lines</a></li>
-<li><a href="#sec-5-2-6">5.2.6. text atttributes</a></li>
-<li><a href="#sec-5-2-7">5.2.7. text emitter</a></li>
+<li><a href="#sec-5-2-2">5.2.2. memory management helpers</a></li>
+<li><a href="#sec-5-2-3">5.2.3. display geometry</a></li>
+<li><a href="#sec-5-2-4">5.2.4. cursor position</a></li>
+<li><a href="#sec-5-2-5">5.2.5. cursor display</a></li>
+<li><a href="#sec-5-2-6">5.2.6. <span class="todo TODO">TODO</span> ins/delete lines</a></li>
+<li><a href="#sec-5-2-7">5.2.7. text atttributes</a></li>
+<li><a href="#sec-5-2-8">5.2.8. text emitter</a></li>
+<li><a href="#sec-5-2-9">5.2.9. debug routines</a></li>
 </ul>
 </li>
 </ul>
@@ -105,25 +106,37 @@ for the JavaScript code in this tag.
 <li><a href="#sec-8-2">8.2. implementation</a></li>
 </ul>
 </li>
-<li><a href="#sec-9">9. <span class="todo TODO">TODO</span> <code>TVideoTerm</code> : uses free pascal's <code>video</code> unit</a></li>
-<li><a href="#sec-10">10. char mnemonics for ansi colors.</a></li>
-<li><a href="#sec-11">11. Text driver, for redirecting <code>write</code> and <code>writeln</code></a></li>
-<li><a href="#sec-12">12. Unit Life cycle</a></li>
-<li><a href="#sec-13">13. The Terminal Stack</a>
+<li><a href="#sec-9">9. <code>THookTerm</code> : wraps another term with callbacks for all routines</a>
 <ul>
-<li><a href="#sec-13-1">13.1. interface</a></li>
-<li><a href="#sec-13-2">13.2. implementation</a></li>
+<li><a href="#sec-9-1">9.1. interface</a></li>
+<li><a href="#sec-9-2">9.2. implementation</a>
+<ul>
+<li><a href="#sec-9-2-1">9.2.1. constructor and empty callback</a></li>
+<li><a href="#sec-9-2-2">9.2.2. passthrough queries (no callback)</a></li>
+<li><a href="#sec-9-2-3">9.2.3. callbacks</a></li>
 </ul>
 </li>
-<li><a href="#sec-14">14. APPENDIX Top-level convenience routines</a>
+</ul>
+</li>
+<li><a href="#sec-10">10. <span class="todo TODO">TODO</span> <code>TVideoTerm</code> : uses free pascal's <code>video</code> unit</a></li>
+<li><a href="#sec-11">11. char mnemonics for ansi colors.</a></li>
+<li><a href="#sec-12">12. Text driver, for redirecting <code>write</code> and <code>writeln</code></a></li>
+<li><a href="#sec-13">13. Unit Life cycle</a></li>
+<li><a href="#sec-14">14. The Terminal Stack</a>
 <ul>
 <li><a href="#sec-14-1">14.1. interface</a></li>
 <li><a href="#sec-14-2">14.2. implementation</a></li>
-<li><a href="#sec-14-3">14.3. conversions</a></li>
-<li><a href="#sec-14-4">14.4. convenience routines</a></li>
 </ul>
 </li>
-<li><a href="#sec-15">15. OUTPUT <code>kvm.pas</code></a></li>
+<li><a href="#sec-15">15. APPENDIX Top-level convenience routines</a>
+<ul>
+<li><a href="#sec-15-1">15.1. interface</a></li>
+<li><a href="#sec-15-2">15.2. implementation</a></li>
+<li><a href="#sec-15-3">15.3. conversions</a></li>
+<li><a href="#sec-15-4">15.4. convenience routines</a></li>
+</ul>
+</li>
+<li><a href="#sec-16">16. OUTPUT <code>kvm.pas</code></a></li>
 </ul>
 </div>
 </div>
@@ -169,6 +182,8 @@ This module implements an enhanced terminal device with support for unicode and 
 </dd>
 </dl>
 </dd>
+<dt> <code>THookTerm</code> </dt><dd>allows callbacks on emit, resize, etc
+</dd>
 </dl>
 </li>
 </ul>
@@ -183,13 +198,17 @@ A screen tracks a cursor position, bounds, color.
 
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="ITerm"><span style="color: #ff00ff;">type</span> ITerm = <span style="color: #00ffff;">interface</span>
+<pre class="src src-pascal" id="ITerm"><span style="color: #ff00ff;">type</span> ITerm = <span style="color: #00ffff;">interface</span> [<span style="color: #00ff00;">'{8309B694-C1C4-11E3-8461-00188B5936E2}'</span>]
+  <span style="color: #66f;">{ </span><span style="color: #66f;">queries </span><span style="color: #66f;">}</span>
   <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Width</span> : word;
   <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Height</span>: word;
   <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">XMax</span>  : word;
   <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">YMax</span>  : word;
   <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">WhereX</span>: word;
   <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">WhereY</span>: word;
+  <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">GetTextAttr</span> : word;
+  <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">asTerm</span> : ITerm;
+  <span style="color: #66f;">{ </span><span style="color: #66f;">commands </span><span style="color: #66f;">}</span>
   <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ClrScr</span>;
   <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ClrEol</span>;
   <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">NewLine</span>;
@@ -201,11 +220,12 @@ A screen tracks a cursor position, bounds, color.
   <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">InsLine</span>;
   <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">DelLine</span>;
   <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetTextAttr</span>( value : word );
-  <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">GetTextAttr</span> : word;
-  <span style="color: #00ffff;">property</span>  TextAttr : word <span style="color: #00ffff;">read</span> GetTextAttr <span style="color: #00ffff;">write</span> SetTextAttr;
   <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ShowCursor</span>;
   <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">HideCursor</span>;
   <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Resize</span>( NewW, NewH : word );
+  <span style="color: #66f;">{ </span><span style="color: #66f;">properties </span><span style="color: #66f;">}</span>
+  <span style="color: #00ffff;">property</span>  TextAttr : word <span style="color: #00ffff;">read</span> GetTextAttr <span style="color: #00ffff;">write</span> SetTextAttr;
+  <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">dump</span>;
 <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
@@ -307,7 +327,7 @@ A terminal's display buffer is essentially a grid of such cells. I'm using my <a
 <div class="outline-text-3" id="text-4-4">
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="TPoint"><span style="color: #ff00ff;">type</span> TPoint = <span style="color: #ff00ff;">class</span>
+<pre class="src src-pascal" id="TPoint"><span style="color: #ff00ff;">type</span> TPoint = <span style="color: #ff00ff;">record</span>
   x, y : cardinal;
 <span style="color: #00ffff;">end</span>;
 </pre>
@@ -315,21 +335,8 @@ A terminal's display buffer is essentially a grid of such cells. I'm using my <a
 </div>
 </div>
 <div id="outline-container-sec-4-5" class="outline-3">
-<h3 id="sec-4-5"><span class="section-number-3">4.5</span> TRect</h3>
+<h3 id="sec-4-5"><span class="section-number-3">4.5</span> Event Types</h3>
 <div class="outline-text-3" id="text-4-5">
-<div class="org-src-container">
-
-<pre class="src src-pascal" id="TRect"><span style="color: #ff00ff;">type</span> TRect = <span style="color: #ff00ff;">class</span>
-  x, y : cardinal;
-  w, h : cardinal;
-<span style="color: #00ffff;">end</span>;
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-sec-4-6" class="outline-3">
-<h3 id="sec-4-6"><span class="section-number-3">4.6</span> Event Types</h3>
-<div class="outline-text-3" id="text-4-6">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="event-types"><span style="color: #ff00ff;">type</span>
@@ -358,6 +365,7 @@ A terminal's display buffer is essentially a grid of such cells. I'm using my <a
     _w, _h : word;
   <span style="color: #00ffff;">public</span>
     <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>( NewW, NewH : word ); <span style="color: #00ffff;">virtual</span>;
+    <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">asTerm</span> : ITerm; <span style="color: #66f;">// </span><span style="color: #66f;">weak reference</span>
     <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">Width</span> : word; <span style="color: #00ffff;">virtual</span>; function Height : word; <span style="color: #00ffff;">virtual</span>;
     <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">xMax</span> : word; <span style="color: #00ffff;">virtual</span>; function yMax : word; <span style="color: #00ffff;">virtual</span>;
     <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">WhereX</span> : word; <span style="color: #00ffff;">virtual</span>; function WhereY : word; <span style="color: #00ffff;">virtual</span>;
@@ -372,6 +380,7 @@ A terminal's display buffer is essentially a grid of such cells. I'm using my <a
     <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">InsLine</span>; <span style="color: #00ffff;">virtual</span>; procedure DelLine; <span style="color: #00ffff;">virtual</span>;
     <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ShowCursor</span>; <span style="color: #00ffff;">virtual</span>; procedure HideCursor; <span style="color: #00ffff;">virtual</span>;
     <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Resize</span>( NewW, NewH : word ); <span style="color: #00ffff;">virtual</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">dump</span>; <span style="color: #00ffff;">virtual</span>;
   <span style="color: #00ffff;">protected</span>
     _OnEmit : TOnEmit; _OnGotoXY : TOnGotoXY;
     _OnSetTextAttr : TOnSetTextAttr; _OnSetFg, _OnSetBg : TOnSetColor;
@@ -384,6 +393,7 @@ A terminal's display buffer is essentially a grid of such cells. I'm using my <a
       <span style="color: #00ffff;">read</span> _OnSetTextAttr <span style="color: #00ffff;">write</span> _OnSetTextAttr;
     <span style="color: #00ffff;">property</span> OnSetFg : TOnSetColor <span style="color: #00ffff;">read</span> _OnSetFg <span style="color: #00ffff;">write</span> _OnSetFg;
     <span style="color: #00ffff;">property</span> OnSetBg : TOnSetColor <span style="color: #00ffff;">read</span> _OnSetBg <span style="color: #00ffff;">write</span> _OnSetBg;
+    <span style="color: #00ffff;">property</span>  TextAttr : word <span style="color: #00ffff;">read</span> GetTextAttr <span style="color: #00ffff;">write</span> SetTextAttr;
   <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
@@ -401,16 +411,33 @@ A terminal's display buffer is essentially a grid of such cells. I'm using my <a
 <pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">TBaseTerm.Create</span>( NewW, NewH : word );
   <span style="color: #00ffff;">begin</span>
     _w := NewW; _h := NewH;
-    _curs := TPoint.Create; _curs.x := 0; _curs.y := 0;
+    _curs.x := 0; _curs.y := 0;
     _attr.fg := $07; _attr.bg := $00; <span style="color: #66f;">// </span><span style="color: #66f;">light gray on black</span>
   <span style="color: #00ffff;">end</span>;
 </pre>
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-5-2-2" class="outline-4">
-<h4 id="sec-5-2-2"><span class="section-number-4">5.2.2</span> display geometry</h4>
+<h4 id="sec-5-2-2"><span class="section-number-4">5.2.2</span> memory management helpers</h4>
 <div class="outline-text-4" id="text-5-2-2">
+<p>
+This is so you can treat the instance as an ITerm without accidentally freeing the thing.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TBaseTerm.asTerm</span> : ITerm;
+  <span style="color: #00ffff;">begin</span> result := self; result._AddRef
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-5-2-3" class="outline-4">
+<h4 id="sec-5-2-3"><span class="section-number-4">5.2.3</span> display geometry</h4>
+<div class="outline-text-4" id="text-5-2-3">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TBaseTerm.Width</span> : word; <span style="color: #00ffff;">begin</span> result := _w <span style="color: #00ffff;">end</span>;
@@ -425,9 +452,9 @@ A terminal's display buffer is essentially a grid of such cells. I'm using my <a
 </div>
 </div>
 </div>
-<div id="outline-container-sec-5-2-3" class="outline-4">
-<h4 id="sec-5-2-3"><span class="section-number-4">5.2.3</span> cursor position</h4>
-<div class="outline-text-4" id="text-5-2-3">
+<div id="outline-container-sec-5-2-4" class="outline-4">
+<h4 id="sec-5-2-4"><span class="section-number-4">5.2.4</span> cursor position</h4>
+<div class="outline-text-4" id="text-5-2-4">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">TBaseTerm.WhereX</span> : word; <span style="color: #00ffff;">begin</span> result := _curs.x <span style="color: #00ffff;">end</span>;
@@ -488,9 +515,9 @@ A terminal's display buffer is essentially a grid of such cells. I'm using my <a
 </div>
 </div>
 </div>
-<div id="outline-container-sec-5-2-4" class="outline-4">
-<h4 id="sec-5-2-4"><span class="section-number-4">5.2.4</span> cursor display</h4>
-<div class="outline-text-4" id="text-5-2-4">
+<div id="outline-container-sec-5-2-5" class="outline-4">
+<h4 id="sec-5-2-5"><span class="section-number-4">5.2.5</span> cursor display</h4>
+<div class="outline-text-4" id="text-5-2-5">
 <p>
 It may not always be possible to change the shape of the cursor, so by default, these do nothing.
 </p>
@@ -503,9 +530,9 @@ It may not always be possible to change the shape of the cursor, so by default, 
 </div>
 </div>
 </div>
-<div id="outline-container-sec-5-2-5" class="outline-4">
-<h4 id="sec-5-2-5"><span class="section-number-4">5.2.5</span> <span class="todo TODO">TODO</span> ins/delete lines</h4>
-<div class="outline-text-4" id="text-5-2-5">
+<div id="outline-container-sec-5-2-6" class="outline-4">
+<h4 id="sec-5-2-6"><span class="section-number-4">5.2.6</span> <span class="todo TODO">TODO</span> ins/delete lines</h4>
+<div class="outline-text-4" id="text-5-2-6">
 <p>
 These may have to be pushed down into gridterm, or else everything needs to have a grid.
 </p>
@@ -518,9 +545,9 @@ These may have to be pushed down into gridterm, or else everything needs to have
 </div>
 </div>
 </div>
-<div id="outline-container-sec-5-2-6" class="outline-4">
-<h4 id="sec-5-2-6"><span class="section-number-4">5.2.6</span> text atttributes</h4>
-<div class="outline-text-4" id="text-5-2-6">
+<div id="outline-container-sec-5-2-7" class="outline-4">
+<h4 id="sec-5-2-7"><span class="section-number-4">5.2.7</span> text atttributes</h4>
+<div class="outline-text-4" id="text-5-2-7">
 <p>
 These control the foreground and background colors of the characters generated with (emit).
 </p>
@@ -529,7 +556,7 @@ These control the foreground and background colors of the characters generated w
 
 <pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">TBaseTerm.GetTextAttr</span> : word;
   <span style="color: #00ffff;">begin</span>
-    result := _attr.bg <span style="color: #00ffff;">shl</span> 16 + _attr.fg
+    result := _attr.bg <span style="color: #00ffff;">shl</span> 8 + _attr.fg
   <span style="color: #00ffff;">end</span>;
 
 <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TBaseTerm.SetTextAttr</span>( value : word );
@@ -555,9 +582,9 @@ These control the foreground and background colors of the characters generated w
 </div>
 </div>
 </div>
-<div id="outline-container-sec-5-2-7" class="outline-4">
-<h4 id="sec-5-2-7"><span class="section-number-4">5.2.7</span> text emitter</h4>
-<div class="outline-text-4" id="text-5-2-7">
+<div id="outline-container-sec-5-2-8" class="outline-4">
+<h4 id="sec-5-2-8"><span class="section-number-4">5.2.8</span> text emitter</h4>
+<div class="outline-text-4" id="text-5-2-8">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">TBaseTerm.EmitChar</span>( ch : TChr );
@@ -583,8 +610,28 @@ These control the foreground and background colors of the characters generated w
 </div>
 </div>
 </div>
+<div id="outline-container-sec-5-2-9" class="outline-4">
+<h4 id="sec-5-2-9"><span class="section-number-4">5.2.9</span> debug routines</h4>
+<div class="outline-text-4" id="text-5-2-9">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">tbaseterm.dump</span>;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> self = nil <span style="color: #00ffff;">then</span> trace(<span style="color: #00ff00;">'[NIL]'</span>)
+    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">begin</span>
+      trace([<span style="color: #00ff00;">'TERM['</span>, self.classname, <span style="color: #00ff00;">']'</span>]);
+      indent; <span style="color: #00ffff;">begin</span>
+        trace([<span style="color: #00ff00;">'w:'</span>, _w, <span style="color: #00ff00;">' h:'</span>, _h]);
+      <span style="color: #00ffff;">end</span>; dedent;
+    <span style="color: #00ffff;">end</span>;
+  <span style="color: #00ffff;">end</span>;
+</pre>
 </div>
 </div>
+</div>
+</div>
+</div>
+
 <div id="outline-container-sec-6" class="outline-2">
 <h2 id="sec-6"><span class="section-number-2">6</span> <code>TGridTerm</code></h2>
 <div class="outline-text-2" id="text-6">
@@ -762,7 +809,7 @@ These control the foreground and background colors of the characters generated w
     <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">begin</span>
       x := _curs.x;
       gotoxy(0,ymax);
-      <span style="color: #00ffff;">write</span>(stdout, lineEnding);
+      writeln(stdout);
       gotoxy(x,y);
     <span style="color: #00ffff;">end</span>;
   <span style="color: #00ffff;">end</span>;
@@ -860,8 +907,209 @@ We start with a handful of member variables to track the bounds:
 </div>
 </div>
 <div id="outline-container-sec-9" class="outline-2">
-<h2 id="sec-9"><span class="section-number-2">9</span> <span class="todo TODO">TODO</span> <code>TVideoTerm</code> : uses free pascal's <code>video</code> unit</h2>
+<h2 id="sec-9"><span class="section-number-2">9</span> <code>THookTerm</code> : wraps another term with callbacks for all routines</h2>
 <div class="outline-text-2" id="text-9">
+</div><div id="outline-container-sec-9-1" class="outline-3">
+<h3 id="sec-9-1"><span class="section-number-3">9.1</span> interface</h3>
+<div class="outline-text-3" id="text-9-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="THookTerm"><span style="color: #ff00ff;">type</span> TTermMessage = (hkClrScr, hkClrEol, hkNewLine, hkScrollUp,
+         hkFg, hkBg, hkEmit, hkGoXY, hkInsLine, hkDelLine,
+         hkAttr, hkShowCursor, hkHideCursor, hkResize );
+     TTermCallback =
+         <span style="color: #00ffff;">procedure</span>( msg : TTermMessage; args : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> variant )
+            <span style="color: #00ffff;">of</span> <span style="color: #00ffff;">object</span>;
+<span style="color: #ff00ff;">type</span> THookTerm = <span style="color: #ff00ff;">class</span> (TInterfacedObject, ITerm)
+  <span style="color: #00ffff;">protected</span>
+    _self : ITerm;
+    _Subject : ITerm; <span style="color: #66f;">// </span><span style="color: #66f;">the term to which we will relay events</span>
+    _OnChange : TTermCallback;
+  <span style="color: #00ffff;">published</span>
+    <span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">Create</span>;
+    <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">asTerm</span> : ITerm;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">DoNothing</span>( msg : TTermMessage; args : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> variant );
+    <span style="color: #00ffff;">property</span> OnChange : TTermCallback <span style="color: #00ffff;">read</span> _OnChange <span style="color: #00ffff;">write</span> _OnChange;
+    <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Width</span> : word;
+    <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Height</span>: word;
+    <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">XMax</span>  : word;
+    <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">YMax</span>  : word;
+    <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">WhereX</span>: word;
+    <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">WhereY</span>: word;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ClrScr</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ClrEol</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">NewLine</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ScrollUp</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Fg</span>( color : byte );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Bg</span>( color : byte );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Emit</span>( s : TStr );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">GotoXY</span>( x, y : word );
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">InsLine</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">DelLine</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">SetTextAttr</span>( value : word );
+    <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">GetTextAttr</span> : word;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">ShowCursor</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">HideCursor</span>;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">Resize</span>( NewW, NewH : word );
+    <span style="color: #00ffff;">property</span>  TextAttr : word <span style="color: #00ffff;">read</span> GetTextAttr <span style="color: #00ffff;">write</span> SetTextAttr;
+  <span style="color: #00ffff;">public</span> <span style="color: #66f;">{ </span><span style="color: #66f;">debug stuff </span><span style="color: #66f;">}</span>
+    <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">GetSubject</span> : ITerm;
+    <span style="color: #00ffff;">property</span> subject : ITerm <span style="color: #00ffff;">read</span> GetSubject <span style="color: #00ffff;">write</span> _subject;
+    <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">dump</span>;
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-9-2" class="outline-3">
+<h3 id="sec-9-2"><span class="section-number-3">9.2</span> implementation</h3>
+<div class="outline-text-3" id="text-9-2">
+</div><div id="outline-container-sec-9-2-1" class="outline-4">
+<h4 id="sec-9-2-1"><span class="section-number-4">9.2.1</span> constructor and empty callback</h4>
+<div class="outline-text-4" id="text-9-2-1">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="hook:impl"><span style="color: #00ffff;">constructor</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.Create</span>;
+  <span style="color: #00ffff;">begin</span> <span style="color: #00ffff;">inherited</span>;
+    _self := ITerm(self);
+    _OnChange := @self.DoNothing;
+    _Subject := kvm.asTerm;
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.Dump</span>;
+  <span style="color: #ff00ff;">var</span> indent : TStr;
+  <span style="color: #00ffff;">begin</span>
+    <span style="color: #00ffff;">if</span> self = nil <span style="color: #00ffff;">then</span> trace(<span style="color: #00ff00;">'[NIL]'</span>)
+    <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">begin</span>
+      trace(<span style="color: #00ff00;">'THookTerm'</span>);
+      trace(<span style="color: #00ff00;">' _subject: '</span>); _subject.dump;
+    <span style="color: #00ffff;">end</span>
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #66f;">// </span><span style="color: #66f;">HookTerms don't descend from baseterm ( for now, anyway )</span>
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.asTerm</span> : ITerm;
+  <span style="color: #00ffff;">begin</span> result := _self; result._addref;
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.GetSubject</span> : ITerm;
+  <span style="color: #00ffff;">begin</span> result := _subject.asTerm
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.DoNothing</span>( msg : TTermMessage;
+                               args : <span style="color: #ff00ff;">array</span> <span style="color: #00ffff;">of</span> variant );
+  <span style="color: #00ffff;">begin</span> <span style="color: #66f;">// </span><span style="color: #66f;">empty method as default callback</span>
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-9-2-2" class="outline-4">
+<h4 id="sec-9-2-2"><span class="section-number-4">9.2.2</span> passthrough queries (no callback)</h4>
+<div class="outline-text-4" id="text-9-2-2">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="hook:impl"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.Width</span> : word;
+  <span style="color: #00ffff;">begin</span> result := _subject.width
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.Height</span>: word;
+  <span style="color: #00ffff;">begin</span> result := _subject.height
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.XMax</span>  : word;
+  <span style="color: #00ffff;">begin</span> result := _subject.xmax
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.YMax</span>  : word;
+  <span style="color: #00ffff;">begin</span> result := _subject.ymax
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.WhereX</span>: word;
+  <span style="color: #00ffff;">begin</span> result := _subject.wherex
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.WhereY</span>: word;
+  <span style="color: #00ffff;">begin</span> result := _subject.wherex
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.GetTextAttr</span> : word;
+  <span style="color: #00ffff;">begin</span> result := _subject.textattr
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-9-2-3" class="outline-4">
+<h4 id="sec-9-2-3"><span class="section-number-4">9.2.3</span> callbacks</h4>
+<div class="outline-text-4" id="text-9-2-3">
+<div class="org-src-container">
+
+<pre class="src src-pascal" id="hook:impl"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.ClrScr</span>;
+  <span style="color: #00ffff;">begin</span> _subject.ClrScr; OnChange( hkClrScr, [ ]);
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.ClrEol</span>;
+  <span style="color: #00ffff;">begin</span> _subject.ClrScr; OnChange( hkClrEol, [ ]);
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.NewLine</span>;
+  <span style="color: #00ffff;">begin</span> _subject.ClrScr; OnChange( hkNewLine, [ ]);
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.ScrollUp</span>;
+  <span style="color: #00ffff;">begin</span> _subject.ScrollUp; OnChange( hkScrollUp, [ ]);
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.Fg</span>( color : byte );
+  <span style="color: #00ffff;">begin</span> _subject.Fg(color); OnChange( hkFg, [ color ]);
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.Bg</span>( color : byte );
+  <span style="color: #00ffff;">begin</span> _subject.Bg(color); OnChange( hkBg, [ color ]);
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.Emit</span>( s : TStr );
+  <span style="color: #00ffff;">begin</span> _subject.Emit( s ); OnChange( hkEmit, [ s ]);
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.GotoXY</span>( x, y : word );
+  <span style="color: #00ffff;">begin</span> _subject.GotoXY( x, y ); OnChange( hkGoXY, [ x, y ]);
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.InsLine</span>;
+  <span style="color: #00ffff;">begin</span> _subject.InsLine; OnChange( hkInsLine, [ ]);
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.DelLine</span>;
+  <span style="color: #00ffff;">begin</span> _subject.DelLine; OnChange( hkDelLine, [ ]);
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.SetTextAttr</span>( value : word );
+  <span style="color: #00ffff;">begin</span> _subject.SetTexTAttr(value); OnChange( hkAttr, [ value ]);
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.ShowCursor</span>;
+  <span style="color: #00ffff;">begin</span> _subject.ShowCursor; OnChange( hkShowCursor, [ ]);
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.HideCursor</span>;
+  <span style="color: #00ffff;">begin</span> _subject.HideCursor; OnChange( hkHideCursor, [ ]);
+  <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">THookTerm.Resize</span>( NewW, NewH : word );
+  <span style="color: #00ffff;">begin</span> _subject.Resize( newW, newH ); OnChange( hkResize, [ NewW, NewH ]);
+  <span style="color: #00ffff;">end</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><span class="section-number-2">10</span> <span class="todo TODO">TODO</span> <code>TVideoTerm</code> : uses free pascal's <code>video</code> unit</h2>
+<div class="outline-text-2" id="text-10">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="TVideoTerm"><span style="color: #ff00ff;">type</span> TVideoTerm = <span style="color: #ff00ff;">class</span> (TANSITerm)
@@ -870,9 +1118,9 @@ We start with a handful of member variables to track the bounds:
 </div>
 </div>
 </div>
-<div id="outline-container-sec-10" class="outline-2">
-<h2 id="sec-10"><span class="section-number-2">10</span> char mnemonics for ansi colors.</h2>
-<div class="outline-text-2" id="text-10">
+<div id="outline-container-sec-11" class="outline-2">
+<h2 id="sec-11"><span class="section-number-2">11</span> char mnemonics for ansi colors.</h2>
+<div class="outline-text-2" id="text-11">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">bg</span>( ch :  <span style="color: #ff00ff;">char</span> );
@@ -1001,9 +1249,9 @@ See also the <a href="https://github.com/tangentstorm/xpl/blob/master/code/cw.pa
 </p>
 </div>
 </div>
-<div id="outline-container-sec-11" class="outline-2">
-<h2 id="sec-11"><span class="section-number-2">11</span> Text driver, for redirecting <code>write</code> and <code>writeln</code></h2>
-<div class="outline-text-2" id="text-11">
+<div id="outline-container-sec-12" class="outline-2">
+<h2 id="sec-12"><span class="section-number-2">12</span> Text driver, for redirecting <code>write</code> and <code>writeln</code></h2>
+<div class="outline-text-2" id="text-12">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="textdriver"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">KvmWrite</span>(<span style="color: #ff00ff;">var</span> f: textrec): <span style="color: #ff00ff;">integer</span>;
@@ -1052,9 +1300,9 @@ See also the <a href="https://github.com/tangentstorm/xpl/blob/master/code/cw.pa
 </div>
 </div>
 </div>
-<div id="outline-container-sec-12" class="outline-2">
-<h2 id="sec-12"><span class="section-number-2">12</span> Unit Life cycle</h2>
-<div class="outline-text-2" id="text-12">
+<div id="outline-container-sec-13" class="outline-2">
+<h2 id="sec-13"><span class="section-number-2">13</span> Unit Life cycle</h2>
+<div class="outline-text-2" id="text-13">
 <p>
 There are basically three steps to deal with:
 </p>
@@ -1124,12 +1372,12 @@ The third step is just to initialize an empty stack:
 </div>
 </div>
 </div>
-<div id="outline-container-sec-13" class="outline-2">
-<h2 id="sec-13"><span class="section-number-2">13</span> The Terminal Stack</h2>
-<div class="outline-text-2" id="text-13">
-</div><div id="outline-container-sec-13-1" class="outline-3">
-<h3 id="sec-13-1"><span class="section-number-3">13.1</span> interface</h3>
-<div class="outline-text-3" id="text-13-1">
+<div id="outline-container-sec-14" class="outline-2">
+<h2 id="sec-14"><span class="section-number-2">14</span> The Terminal Stack</h2>
+<div class="outline-text-2" id="text-14">
+</div><div id="outline-container-sec-14-1" class="outline-3">
+<h3 id="sec-14-1"><span class="section-number-3">14.1</span> interface</h3>
+<div class="outline-text-3" id="text-14-1">
 <p>
 We maintain a stack of ITerm instances so that <code>kvm.work</code> can be assigned and later restored.
 </p>
@@ -1161,19 +1409,16 @@ We maintain a stack of ITerm instances so that <code>kvm.work</code> can be assi
 </p>
 </div>
 </div>
-<div id="outline-container-sec-13-2" class="outline-3">
-<h3 id="sec-13-2"><span class="section-number-3">13.2</span> implementation</h3>
-<div class="outline-text-3" id="text-13-2">
+<div id="outline-container-sec-14-2" class="outline-3">
+<h3 id="sec-14-2"><span class="section-number-3">14.2</span> implementation</h3>
+<div class="outline-text-3" id="text-14-2">
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="kvm:interface"><span style="color: #ff00ff;">type</span> TTermStack = specialize GStack&lt;ITerm&gt;;
+<pre class="src src-pascal" id="kvm:impl"><span style="color: #ff00ff;">type</span> TTermStack = specialize GStack&lt;ITerm&gt;;
 <span style="color: #ff00ff;">var</span> termStack : TTermStack;
-</pre>
-</div>
+<span style="color: #ff00ff;">var</span> work : ITerm;
 
-<div class="org-src-container">
-
-<pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">PushTerm</span>( term : ITerm );
+<span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">PushTerm</span>( term : ITerm );
   <span style="color: #00ffff;">begin</span>
     termStack.push( work );
     work := term;
@@ -1200,17 +1445,17 @@ We maintain a stack of ITerm instances so that <code>kvm.work</code> can be assi
 </div>
 </div>
 
-<div id="outline-container-sec-14" class="outline-2">
-<h2 id="sec-14"><span class="section-number-2">14</span> APPENDIX Top-level convenience routines</h2>
-<div class="outline-text-2" id="text-14">
+<div id="outline-container-sec-15" class="outline-2">
+<h2 id="sec-15"><span class="section-number-2">15</span> APPENDIX Top-level convenience routines</h2>
+<div class="outline-text-2" id="text-15">
 <p>
 In general, you're only going to work with one screen at a time, so it's convenient to have a set of routines that deal with whatever the current screen happens to be at the moment.
 </p>
 </div>
 
-<div id="outline-container-sec-14-1" class="outline-3">
-<h3 id="sec-14-1"><span class="section-number-3">14.1</span> interface</h3>
-<div class="outline-text-3" id="text-14-1">
+<div id="outline-container-sec-15-1" class="outline-3">
+<h3 id="sec-15-1"><span class="section-number-3">15.1</span> interface</h3>
+<div class="outline-text-3" id="text-15-1">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="toplevel"><span style="color: #66f;">{ </span><span style="color: #66f;">conversion helpers </span><span style="color: #66f;">}</span>
@@ -1218,8 +1463,7 @@ In general, you're only going to work with one screen at a time, so it's conveni
 <span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">AttrToWord</span>(a : TTextAttr) : word;
 
 <span style="color: #66f;">{ </span><span style="color: #66f;">convenience routines for global instance </span><span style="color: #66f;">}</span>
-<span style="color: #ff00ff;">var</span> work : ITerm;
-
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">asTerm</span> : ITerm; <span style="color: #66f;">// </span><span style="color: #66f;">always a weak reference</span>
 <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Width</span> : word;
 <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Height</span>: word;
 <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">XMax</span>  : word;
@@ -1244,12 +1488,12 @@ In general, you're only going to work with one screen at a time, so it's conveni
 </div>
 </div>
 </div>
-<div id="outline-container-sec-14-2" class="outline-3">
-<h3 id="sec-14-2"><span class="section-number-3">14.2</span> implementation</h3>
+<div id="outline-container-sec-15-2" class="outline-3">
+<h3 id="sec-15-2"><span class="section-number-3">15.2</span> implementation</h3>
 </div>
-<div id="outline-container-sec-14-3" class="outline-3">
-<h3 id="sec-14-3"><span class="section-number-3">14.3</span> conversions</h3>
-<div class="outline-text-3" id="text-14-3">
+<div id="outline-container-sec-15-3" class="outline-3">
+<h3 id="sec-15-3"><span class="section-number-3">15.3</span> conversions</h3>
+<div class="outline-text-3" id="text-15-3">
 <div class="org-src-container">
 
 <pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">function</span> <span style="color: #ffffff; font-weight: bold;">WordToAttr</span>(w : word): TTextAttr; <span style="color: #00ffff;">inline</span>;
@@ -1266,16 +1510,18 @@ In general, you're only going to work with one screen at a time, so it's conveni
 </div>
 </div>
 </div>
-<div id="outline-container-sec-14-4" class="outline-3">
-<h3 id="sec-14-4"><span class="section-number-3">14.4</span> convenience routines</h3>
-<div class="outline-text-3" id="text-14-4">
+<div id="outline-container-sec-15-4" class="outline-3">
+<h3 id="sec-15-4"><span class="section-number-3">15.4</span> convenience routines</h3>
+<div class="outline-text-3" id="text-15-4">
 <p>
 The others just delegate to the <code>work</code> term.
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Width</span>  : word; <span style="color: #00ffff;">begin</span> result := work.Width <span style="color: #00ffff;">end</span>;
+<pre class="src src-pascal" id="kvm:impl"><span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">asTerm</span> : ITerm; <span style="color: #00ffff;">begin</span> result := work.asTerm <span style="color: #00ffff;">end</span>;
+
+<span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Width</span>  : word; <span style="color: #00ffff;">begin</span> result := work.Width <span style="color: #00ffff;">end</span>;
 <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">Height</span> : word; <span style="color: #00ffff;">begin</span> result := work.Height <span style="color: #00ffff;">end</span>;
 <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">XMax</span>   : word; <span style="color: #00ffff;">begin</span> result := work.xMax <span style="color: #00ffff;">end</span>;
 <span style="color: #00ffff;">function</span>  <span style="color: #ffffff; font-weight: bold;">YMax</span>   : word; <span style="color: #00ffff;">begin</span> result := work.yMax <span style="color: #00ffff;">end</span>;
@@ -1310,15 +1556,15 @@ The others just delegate to the <code>work</code> term.
 </div>
 
 
-<div id="outline-container-sec-15" class="outline-2">
-<h2 id="sec-15"><span class="section-number-2">15</span> OUTPUT <code>kvm.pas</code></h2>
-<div class="outline-text-2" id="text-15">
+<div id="outline-container-sec-16" class="outline-2">
+<h2 id="sec-16"><span class="section-number-2">16</span> OUTPUT <code>kvm.pas</code></h2>
+<div class="outline-text-2" id="text-16">
 <div class="org-src-container">
 
-<pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">!! WARNING!! GENERATED FILE. edit ../text/kvm.pas.org instead!! !!</span><span style="color: #66f;">}</span>
+<pre class="src src-pascal"><span style="color: #66f;">{</span><span style="color: #66f;">!! WARNING!! GENERATED FILE. edit ../org/kvm.pas.org instead!! !!</span><span style="color: #66f;">}</span>
 
 
-<span style="color: #66f;">{</span><span style="color: #66f;">$mode objfpc</span><span style="color: #66f;">}{</span><span style="color: #66f;">$i xpc.inc</span><span style="color: #66f;">}</span>
+<span style="color: #66f;">{</span><span style="color: #66f;">$mode objfpc</span><span style="color: #66f;">}{</span><span style="color: #66f;">$i xpc.inc</span><span style="color: #66f;">}{</span><span style="color: #66f;">$m+</span><span style="color: #66f;">}</span>
 <span style="color: #00ffff;">unit</span> <span style="color: #ffffff; font-weight: bold;">kvm</span>;
 <span style="color: #00ffff;">interface</span> <span style="color: #00ffff;">uses</span> xpc, ugrid2d, sysutils, strutils, chk, stacks,
   <span style="color: #66f;">{</span><span style="color: #66f;">$ifdef VIDEOKVM</span><span style="color: #66f;">}</span>video
@@ -1336,7 +1582,6 @@ The others just delegate to the <code>work</code> term.
 &lt;&lt;TTermCell&gt;&gt;
 &lt;&lt;TTermGrid&gt;&gt;
 &lt;&lt;TPoint&gt;&gt;
-&lt;&lt;TRect&gt;&gt;
 &lt;&lt;event-types&gt;&gt;
 
 &lt;&lt;TBaseTerm&gt;&gt;
@@ -1344,6 +1589,7 @@ The others just delegate to the <code>work</code> term.
 &lt;&lt;TAnsiTerm&gt;&gt;
 &lt;&lt;TVideoTerm&gt;&gt;
 &lt;&lt;TSubTerm&gt;&gt;
+&lt;&lt;THookTerm&gt;&gt;
 
 <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">fg</span>( ch : <span style="color: #ff00ff;">char</span> );
 <span style="color: #00ffff;">procedure</span> <span style="color: #ffffff; font-weight: bold;">bg</span>( ch : <span style="color: #ff00ff;">char</span> );
@@ -1353,6 +1599,7 @@ The others just delegate to the <code>work</code> term.
 
 <span style="color: #00ffff;">implementation</span>
   &lt;&lt;@kvm:impl&gt;&gt;
+  &lt;&lt;@hook:impl&gt;&gt;
   &lt;&lt;textdriver&gt;&gt;
 &lt;&lt;lifecycle&gt;&gt;
 <span style="color: #00ffff;">end</span>.
