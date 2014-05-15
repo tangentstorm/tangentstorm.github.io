@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>bintree : binary trees</title>
-<!-- 2014-05-15 Thu 01:39 -->
+<!-- 2014-05-15 Thu 04:34 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -84,8 +84,8 @@ We'll cap the depth at 32:
 
 <div class="org-src-container">
 
-<pre class="src src-J"><span style="color: #eedd82;">u16</span> <span style="color: #666;">=:</span> ((2<span style="color: #ff0000;">^</span>16) <span style="color: color-202;">&amp;</span> <span style="color: #ff0000;">&gt;</span>) <span style="color: #ff0000;">*.</span> (<span style="color: #ff0000;">&gt;:</span> <span style="color: color-202;">&amp;</span> 0)     <span style="color: #66f;">NB. </span><span style="color: #66f;">y in range 0 .. 2^16 - 1 ?</span>
-<span style="color: #eedd82;">u16cap</span> <span style="color: #666;">=:</span> <span style="color: #ff0000;">_:</span><span style="color: color-202;">^:</span>(<span style="color: #ff0000;">[:</span> <span style="color: #ff0000;">-.</span> u16)<span style="color: color-202;">"</span>0         <span style="color: #66f;">NB. </span><span style="color: #66f;">replace non-u32 values with _</span>
+<pre class="src src-J"><span style="color: #eedd82;">u16</span> <span style="color: #666;">=:</span> ((2<span style="color: #ff0000;">^</span>16) <span style="color: #ff5f00;">&amp;</span> <span style="color: #ff0000;">&gt;</span>) <span style="color: #ff0000;">*.</span> (<span style="color: #ff0000;">&gt;:</span> <span style="color: #ff5f00;">&amp;</span> 0)     <span style="color: #66f;">NB. </span><span style="color: #66f;">y in range 0 .. 2^16 - 1 ?</span>
+<span style="color: #eedd82;">u16cap</span> <span style="color: #666;">=:</span> <span style="color: #ff0000;">_:</span><span style="color: #ff5f00;">^:</span>(<span style="color: #ff0000;">[:</span> <span style="color: #ff0000;">-.</span> u16)<span style="color: #ff5f00;">"</span>0         <span style="color: #66f;">NB. </span><span style="color: #66f;">replace non-u32 values with _</span>
 assert 0 1 1 0 <span style="color: #ff0000;">=</span> u16 _1 0<span style="color: #ff0000;">,</span> _1 0 <span style="color: #ff0000;">+</span> 2 <span style="color: #ff0000;">^</span> 16
 </pre>
 </div>
