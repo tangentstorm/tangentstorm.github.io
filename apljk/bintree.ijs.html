@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>bintree : binary trees</title>
-<!-- 2014-04-05 Sat 13:38 -->
+<!-- 2014-05-15 Thu 01:38 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -73,6 +73,7 @@ for the JavaScript code in this tag.
 <div id="outline-container-sec-1" class="outline-2">
 <h2 id="sec-1"><a id="9umevoc1ueg0" name="9umevoc1ueg0"></a><span class="section-number-2">1</span> binary trees</h2>
 <div class="outline-text-2" id="text-1">
+
 <p>
 We will model a binary tree of depth <code>n</code> as an array of <code>2^n</code>.
 </p>
@@ -83,35 +84,38 @@ We'll cap the depth at 32:
 
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">u16</span> =: ((2^16) &amp; &gt;) *. (&gt;: &amp; 0)     <span style="color: #66f;">NB. y in range 0 .. 2^16 - 1 ?</span>
-<span style="color: #ffffff; font-weight: bold;">u16cap</span> =: _:^:([: -. u16)"0         <span style="color: #66f;">NB. replace non-u32 values with _</span>
-<span style="color: #ff00ff; font-weight: bold;">assert</span> 0 1 1 0 = u16 _1 0, _1 0 + 2 ^ 16
+<pre class="src src-j"><span style="color: #eedd82;">u16</span> <span style="color: #666;">=:</span> ((2<span style="color: #ff0000;">^</span>16) <span style="color: color-202;">&amp;</span> <span style="color: #ff0000;">&gt;</span>) <span style="color: #ff0000;">*.</span> (<span style="color: #ff0000;">&gt;:</span> <span style="color: color-202;">&amp;</span> 0)     <span style="color: #66f;">NB. </span><span style="color: #66f;">y in range 0 .. 2^16 - 1 ?</span>
+<span style="color: #eedd82;">u16cap</span> <span style="color: #666;">=:</span> <span style="color: #ff0000;">_:</span><span style="color: color-202;">^:</span>(<span style="color: #ff0000;">[:</span> <span style="color: #ff0000;">-.</span> u16)<span style="color: color-202;">"</span>0         <span style="color: #66f;">NB. </span><span style="color: #66f;">replace non-u32 values with _</span>
+assert 0 1 1 0 <span style="color: #ff0000;">=</span> u16 _1 0<span style="color: #ff0000;">,</span> _1 0 <span style="color: #ff0000;">+</span> 2 <span style="color: #ff0000;">^</span> 16
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #ffffff; font-weight: bold;">lf</span> =: [: u16cap [: &gt;: +:            <span style="color: #66f;">NB. left child index  (1 + 2 * y)</span>
-<span style="color: #ffffff; font-weight: bold;">rt</span> =: [: u16cap [: +: &gt;:            <span style="color: #66f;">NB. right child index (2 * 1 + y)</span>
-<span style="color: #ffffff; font-weight: bold;">up</span> =: [: u16cap [: &lt;. [: -: &lt;:      <span style="color: #66f;">NB. parent index (floor of half y-1)</span>
+<pre class="src src-j"><span style="color: #eedd82;">lf</span> <span style="color: #666;">=:</span> <span style="color: #ff0000;">[:</span> u16cap <span style="color: #ff0000;">[:</span> <span style="color: #ff0000;">&gt;:</span> <span style="color: #ff0000;">+:</span>            <span style="color: #66f;">NB. </span><span style="color: #66f;">left child index  (1 + 2 * y)</span>
+<span style="color: #eedd82;">rt</span> <span style="color: #666;">=:</span> <span style="color: #ff0000;">[:</span> u16cap <span style="color: #ff0000;">[:</span> <span style="color: #ff0000;">+:</span> <span style="color: #ff0000;">&gt;:</span>            <span style="color: #66f;">NB. </span><span style="color: #66f;">right child index (2 * 1 + y)</span>
+<span style="color: #eedd82;">up</span> <span style="color: #666;">=:</span> <span style="color: #ff0000;">[:</span> u16cap <span style="color: #ff0000;">[:</span> <span style="color: #ff0000;">&lt;.</span> <span style="color: #ff0000;">[:</span> <span style="color: #ff0000;">-:</span> <span style="color: #ff0000;">&lt;:</span>      <span style="color: #66f;">NB. </span><span style="color: #66f;">parent index (floor of half y-1)</span>
 </pre>
 </div>
 </div>
 </div>
 
+
 <div id="outline-container-sec-2" class="outline-2">
 <h2 id="sec-2"><a id="gvk6pe60veg0" name="gvk6pe60veg0"></a><span class="section-number-2">2</span> a sparse array</h2>
 <div class="outline-text-2" id="text-2">
+
 <p>
 This gives us a 16 bit address space to work with:
 </p>
 <div class="org-src-container">
 
-<pre class="src src-j">(&lt;:2^16) 0} (2^16) $ $. 0 0
+<pre class="src src-j">(<span style="color: #ff0000;">&lt;:</span>2<span style="color: #ff0000;">^</span>16) 0<span style="color: #00ff00;">}</span> (2<span style="color: #ff0000;">^</span>16) <span style="color: #ff0000;">$</span> <span style="color: #ff0000;">$.</span> 0 0
 </pre>
 </div>
 </div>
 </div>
+
 
 
 <div id="outline-container-sec-3" class="outline-2">
