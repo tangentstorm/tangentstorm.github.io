@@ -1,0 +1,830 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>mrcode</title>
+<!-- 2014-05-20 Tue 02:41 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">mrcode</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. OUTPUT <code>mr.cf</code> : minrel in coffeescript</a></li>
+<li><a href="#sec-2">2. OUTPUT <code>mr.py</code> : minrel in python</a></li>
+<li><a href="#sec-3">3. <code>[0/5]</code> test suite for relational algebra</a>
+<ul>
+<li><a href="#sec-3-1">3.1. <span class="todo TODO">TODO</span> defining and populating a relation</a></li>
+<li><a href="#sec-3-2">3.2. <span class="todo TODO">TODO</span> <code>[0/4]</code> set operations</a>
+<ul>
+<li><a href="#sec-3-2-1">3.2.1. <span class="todo TODO">TODO</span> <code>∪</code> (union)</a></li>
+<li><a href="#sec-3-2-2">3.2.2. <span class="todo TODO">TODO</span> <code>∩</code> intersection</a></li>
+<li><a href="#sec-3-2-3">3.2.3. <span class="todo TODO">TODO</span> <code>⊂</code> (subset predicate)</a></li>
+<li><a href="#sec-3-2-4">3.2.4. <span class="todo TODO">TODO</span> <code>⊃</code> (superset predicate)</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-3">3.3. <span class="todo TODO">TODO</span> <code>[0/4]</code> relational operators</a>
+<ul>
+<li><a href="#sec-3-3-1">3.3.1. <span class="todo TODO">TODO</span> <code>π</code> projection (permute and delete columns)</a></li>
+<li><a href="#sec-3-3-2">3.3.2. <span class="todo TODO">TODO</span> <code>σ</code> selection (restrictions on rows)</a></li>
+<li><a href="#sec-3-3-3">3.3.3. <span class="todo TODO">TODO</span> <code>ρ</code> rename</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-4">3.4. <span class="todo TODO">TODO</span> joins</a>
+<ul>
+<li><a href="#sec-3-4-1">3.4.1. <span class="todo TODO">TODO</span> natural join (composition)</a></li>
+<li><a href="#sec-3-4-2">3.4.2. <span class="todo TODO">TODO</span> cross join (cartesian product)</a></li>
+<li><a href="#sec-3-4-3">3.4.3. <span class="todo TODO">TODO</span> theta join (restricted join)</a></li>
+<li><a href="#sec-3-4-4">3.4.4. <span class="todo TODO">TODO</span> semijoin ('left' or 'right' joins in sql)</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-5">3.5. <span class="todo TODO">TODO</span> extended operations</a>
+<ul>
+<li><a href="#sec-3-5-1">3.5.1. <span class="todo TODO">TODO</span> left outer join</a></li>
+<li><a href="#sec-3-5-2">3.5.2. <span class="todo TODO">TODO</span> right outer join</a></li>
+<li><a href="#sec-3-5-3">3.5.3. <span class="todo TODO">TODO</span> full outer join</a></li>
+<li><a href="#sec-3-5-4">3.5.4. <span class="todo TODO">TODO</span> aggregation</a></li>
+<li><a href="#sec-3-5-5">3.5.5. <span class="todo TODO">TODO</span> transitive closure</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-4">4. <span class="todo TODO">TODO</span> ascii-encoded file format</a>
+<ul>
+<li><a href="#sec-4-1">4.1. <span class="todo TODO">TODO</span> <code>sym</code> (special characters)&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-4-2">4.2. <span class="todo TODO">TODO</span> <code>dump</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-4-3">4.3. <span class="todo TODO">TODO</span> <code>load</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-4-4">4.4. <span class="todo TODO">TODO</span> <code>nil</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. <span class="todo TODO">TODO</span> type system&#xa0;&#xa0;&#xa0;<span class="tag"><span class="py">py</span></span></a>
+<ul>
+<li><a href="#sec-5-1">5.1. <span class="todo TODO">TODO</span> basic types&#xa0;&#xa0;&#xa0;<span class="tag"><span class="py">py</span></span></a></li>
+<li><a href="#sec-5-2">5.2. <span class="todo TODO">TODO</span> identity elements&#xa0;&#xa0;&#xa0;<span class="tag"><span class="py">py</span></span></a></li>
+</ul>
+</li>
+<li><a href="#sec-6">6. <span class="todo TODO">TODO</span> the <code>Rec</code> class (<code>Tup</code>?)</a></li>
+<li><a href="#sec-7">7. <span class="todo TODO">TODO</span> the <code>Rel</code> class</a>
+<ul>
+<li><a href="#sec-7-1">7.1. <span class="todo TODO">TODO</span> template&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span>&#xa0;<span class="py">py</span></span></a></li>
+<li><a href="#sec-7-2">7.2. <span class="todo TODO">TODO</span> <code>constructor</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-7-3">7.3. <span class="todo TODO">TODO</span> iterator</a></li>
+<li><a href="#sec-7-4">7.4. <span class="todo TODO">TODO</span> (convert to string)</a></li>
+<li><a href="#sec-7-5">7.5. <span class="todo TODO">TODO</span> <code>build_tree</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-7-6">7.6. <span class="todo TODO">TODO</span> <code>get_cursor</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-7-7">7.7. <span class="todo TODO">TODO</span> <code>push_key</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-7-8">7.8. <span class="todo TODO">TODO</span> <code>calc</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-7-9">7.9. <span class="todo TODO">TODO</span> <code>as</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-7-10">7.10. <span class="todo TODO">TODO</span> <code>show</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-7-11">7.11. <span class="todo TODO">TODO</span> <code>keep</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-7-12">7.12. <span class="todo TODO">TODO</span> <code>sort</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-7-13">7.13. <span class="todo TODO">TODO</span> <code>reverse</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-7-14">7.14. <span class="todo TODO">TODO</span> <code>to_org</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-7-15">7.15. <span class="todo TODO">TODO</span> <code>records</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-7-16">7.16. <span class="todo TODO">TODO</span> <code>clone</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+<li><a href="#sec-7-17">7.17. <span class="todo TODO">TODO</span> <code>update</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><a id="h2za1uw0mhg0" name="h2za1uw0mhg0"></a><span class="section-number-2">1</span> OUTPUT <code>mr.cf</code> : minrel in coffeescript</h2>
+<div class="outline-text-2" id="text-1">
+<div class="org-src-container">
+
+<pre class="src src-coffee">module <span style="color: #00ff00;">'mr'</span>
+imports [ <span style="color: #00ff00;">'cur'</span>, <span style="color: #00ff00;">'seq'</span> ], <span style="color: #ffffff; font-weight: bold;">-&gt;</span>
+  &lt;&lt;cf.dump&gt;&gt;
+  &lt;&lt;cf.load&gt;&gt;
+  &lt;&lt;cf.sym&gt;&gt;
+  &lt;&lt;cf.nil&gt;&gt;
+  &lt;&lt;cf.Rel&gt;&gt;
+  <span style="color: #66f;"># {{ cf.MinRelParser }}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><a id="dqm3vuw0mhg0" name="dqm3vuw0mhg0"></a><span class="section-number-2">2</span> OUTPUT <code>mr.py</code> : minrel in python</h2>
+<div class="outline-text-2" id="text-2">
+
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #00ffff;">import</span> check
+<span style="color: #00ffff;">import</span> unittest
+<span style="color: #00ffff;">from</span> functools <span style="color: #00ffff;">import</span> <span style="color: #ff00ff; font-weight: bold;">reduce</span>
+</pre>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><a id="27ai3sc1mhg0" name="27ai3sc1mhg0"></a><span class="section-number-2">3</span> <code>[0/5]</code> test suite for relational algebra</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><a id="buj6mvc1mhg0" name="buj6mvc1mhg0"></a><span class="section-number-3">3.1</span> <span class="todo TODO">TODO</span> defining and populating a relation</h3>
+<div class="outline-text-3" id="text-3-1">
+
+<div class="org-src-container">
+
+<pre class="src src-mr">langs lang:Str who:Str example:Str
+
+pythonGvRprint("hello, world")
+pascalNWprogram hw; begin writeln(''hello, world'') end.
+oberonNWMODULE hi; IMPORT Out; BEGIN Out.String("hi"); Out.Ln END hi.
+haskellSPJmain = print "hello world"
+JKEIecho 'hello world'
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><a id="75dbf4d1mhg0" name="75dbf4d1mhg0"></a><span class="section-number-3">3.2</span> <span class="todo TODO">TODO</span> <code>[0/4]</code> set operations</h3>
+<div class="outline-text-3" id="text-3-2">
+</div>
+<div id="outline-container-sec-3-2-1" class="outline-4">
+<h4 id="sec-3-2-1"><a id="zgb3ywc1mhg0" name="zgb3ywc1mhg0"></a><span class="section-number-4">3.2.1</span> <span class="todo TODO">TODO</span> <code>∪</code> (union)</h4>
+<div class="outline-text-4" id="text-3-2-1">
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">test_union</span>(<span style="color: #00ffff;">self</span>):
+    <span style="color: #00ff00;">"""</span>
+<span style="color: #00ff00;">    The union of two relations a and b is just the set of tuples</span>
+<span style="color: #00ff00;">    that appear either in a or b or both.</span>
+
+<span style="color: #00ff00;">    The union is a relation if and only if a and b have the same columns.</span>
+<span style="color: #00ff00;">    Otherwise, it's just a set of rows.</span>
+
+<span style="color: #00ff00;">    Therefore, the union operation is not closed under composition</span>
+<span style="color: #00ff00;">    for relations, unless we put restrictions on its use.</span>
+<span style="color: #00ff00;">    """</span>
+    <span style="color: #eedd82;">hello</span> = <span style="color: #00ffff;">lambda</span> **kw : Rel(<span style="color: #ff00ff; font-weight: bold;">dict</span>(lang=Type.Str, who=Type.Str, src=Type.Str)).iden().append(kw)
+    <span style="color: #eedd82;">py</span>  = hello(lang=<span style="color: #00ff00;">'python'</span>, who=<span style="color: #00ff00;">'GvR'</span>, src=<span style="color: #00ff00;">'print "hello, world"'</span>)
+    <span style="color: #eedd82;">pas</span> = hello(lang=<span style="color: #00ff00;">'pascal'</span>, who=<span style="color: #00ff00;">'NW'</span>, src=<span style="color: #00ff00;">"program hw; begin writeln('hello, world') end."</span>)
+    <span style="color: #eedd82;">ob</span>  = hello(lang=<span style="color: #00ff00;">'oberon'</span>, who=<span style="color: #00ff00;">'NW'</span>, src=<span style="color: #00ff00;">"Out.String('hello, world'); Out.Ln;"</span>)
+    <span style="color: #eedd82;">has</span> = hello(lang=<span style="color: #00ff00;">'haskell'</span>, who=<span style="color: #00ff00;">'SPJ'</span>, src=<span style="color: #00ff00;">'main = print "hello, world"'</span>)
+
+    <span style="color: #00ffff;">self</span>.assertIsInstance(py, Rel)
+    <span style="color: #00ffff;">assert</span> py.count() == 1, py
+
+    <span style="color: #eedd82;">pypas</span> = py.union(pas)
+    check.<span style="color: #ff00ff; font-weight: bold;">type</span>(pas, Rel)
+    <span style="color: #00ffff;">assert</span> pypas.count() == 2, py.union(pas)
+
+    <span style="color: #00ffff;">assert</span> pypas.union(ob).count() == 3, py.union(pas).union(ob)
+    <span style="color: #00ffff;">assert</span> pypas.union(ob).union(has).count() == 4, py.union(pas).union(ob).union(has)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2-2" class="outline-4">
+<h4 id="sec-3-2-2"><a id="goe2u5d1mhg0" name="goe2u5d1mhg0"></a><span class="section-number-4">3.2.2</span> <span class="todo TODO">TODO</span> <code>∩</code> intersection</h4>
+<div class="outline-text-4" id="text-3-2-2">
+</div>
+</div>
+
+<div id="outline-container-sec-3-2-3" class="outline-4">
+<h4 id="sec-3-2-3"><a id="9vvefad1mhg0" name="9vvefad1mhg0"></a><span class="section-number-4">3.2.3</span> <span class="todo TODO">TODO</span> <code>⊂</code> (subset predicate)</h4>
+<div class="outline-text-4" id="text-3-2-3">
+</div>
+</div>
+
+<div id="outline-container-sec-3-2-4" class="outline-4">
+<h4 id="sec-3-2-4"><a id="rvdjkbd1mhg0" name="rvdjkbd1mhg0"></a><span class="section-number-4">3.2.4</span> <span class="todo TODO">TODO</span> <code>⊃</code> (superset predicate)</h4>
+<div class="outline-text-4" id="text-3-2-4">
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3-3" class="outline-3">
+<h3 id="sec-3-3"><a id="6fn4kwc1mhg0" name="6fn4kwc1mhg0"></a><span class="section-number-3">3.3</span> <span class="todo TODO">TODO</span> <code>[0/4]</code> relational operators</h3>
+<div class="outline-text-3" id="text-3-3">
+</div>
+
+<div id="outline-container-sec-3-3-1" class="outline-4">
+<h4 id="sec-3-3-1"><a id="6lf9dyc1mhg0" name="6lf9dyc1mhg0"></a><span class="section-number-4">3.3.1</span> <span class="todo TODO">TODO</span> <code>π</code> projection (permute and delete columns)</h4>
+<div class="outline-text-4" id="text-3-3-1">
+</div>
+</div>
+
+<div id="outline-container-sec-3-3-2" class="outline-4">
+<h4 id="sec-3-3-2"><a id="v9z4kyc1mhg0" name="v9z4kyc1mhg0"></a><span class="section-number-4">3.3.2</span> <span class="todo TODO">TODO</span> <code>σ</code> selection (restrictions on rows)</h4>
+<div class="outline-text-4" id="text-3-3-2">
+</div>
+</div>
+
+<div id="outline-container-sec-3-3-3" class="outline-4">
+<h4 id="sec-3-3-3"><a id="4mo32ed1mhg0" name="4mo32ed1mhg0"></a><span class="section-number-4">3.3.3</span> <span class="todo TODO">TODO</span> <code>ρ</code> rename</h4>
+<div class="outline-text-4" id="text-3-3-3">
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3-4" class="outline-3">
+<h3 id="sec-3-4"><a id="s3t2h1d1mhg0" name="s3t2h1d1mhg0"></a><span class="section-number-3">3.4</span> <span class="todo TODO">TODO</span> joins</h3>
+<div class="outline-text-3" id="text-3-4">
+</div>
+
+<div id="outline-container-sec-3-4-1" class="outline-4">
+<h4 id="sec-3-4-1"><a id="p53gnid1mhg0" name="p53gnid1mhg0"></a><span class="section-number-4">3.4.1</span> <span class="todo TODO">TODO</span> natural join (composition)</h4>
+<div class="outline-text-4" id="text-3-4-1">
+</div>
+</div>
+
+<div id="outline-container-sec-3-4-2" class="outline-4">
+<h4 id="sec-3-4-2"><a id="etqcphd1mhg0" name="etqcphd1mhg0"></a><span class="section-number-4">3.4.2</span> <span class="todo TODO">TODO</span> cross join (cartesian product)</h4>
+<div class="outline-text-4" id="text-3-4-2">
+</div>
+</div>
+
+<div id="outline-container-sec-3-4-3" class="outline-4">
+<h4 id="sec-3-4-3"><a id="0swjtid1mhg0" name="0swjtid1mhg0"></a><span class="section-number-4">3.4.3</span> <span class="todo TODO">TODO</span> theta join (restricted join)</h4>
+<div class="outline-text-4" id="text-3-4-3">
+</div>
+</div>
+
+<div id="outline-container-sec-3-4-4" class="outline-4">
+<h4 id="sec-3-4-4"><a id="xsigxld1mhg0" name="xsigxld1mhg0"></a><span class="section-number-4">3.4.4</span> <span class="todo TODO">TODO</span> semijoin ('left' or 'right' joins in sql)</h4>
+<div class="outline-text-4" id="text-3-4-4">
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3-5" class="outline-3">
+<h3 id="sec-3-5"><a id="yzg5cxc1mhg0" name="yzg5cxc1mhg0"></a><span class="section-number-3">3.5</span> <span class="todo TODO">TODO</span> extended operations</h3>
+<div class="outline-text-3" id="text-3-5">
+</div>
+
+<div id="outline-container-sec-3-5-1" class="outline-4">
+<h4 id="sec-3-5-1"><a id="zudbppd1mhg0" name="zudbppd1mhg0"></a><span class="section-number-4">3.5.1</span> <span class="todo TODO">TODO</span> left outer join</h4>
+<div class="outline-text-4" id="text-3-5-1">
+</div>
+</div>
+
+<div id="outline-container-sec-3-5-2" class="outline-4">
+<h4 id="sec-3-5-2"><a id="8lz3fqd1mhg0" name="8lz3fqd1mhg0"></a><span class="section-number-4">3.5.2</span> <span class="todo TODO">TODO</span> right outer join</h4>
+<div class="outline-text-4" id="text-3-5-2">
+</div>
+</div>
+
+<div id="outline-container-sec-3-5-3" class="outline-4">
+<h4 id="sec-3-5-3"><a id="fgdavpd1mhg0" name="fgdavpd1mhg0"></a><span class="section-number-4">3.5.3</span> <span class="todo TODO">TODO</span> full outer join</h4>
+<div class="outline-text-4" id="text-3-5-3">
+</div>
+</div>
+
+<div id="outline-container-sec-3-5-4" class="outline-4">
+<h4 id="sec-3-5-4"><a id="guw7tqd1mhg0" name="guw7tqd1mhg0"></a><span class="section-number-4">3.5.4</span> <span class="todo TODO">TODO</span> aggregation</h4>
+<div class="outline-text-4" id="text-3-5-4">
+</div>
+</div>
+
+<div id="outline-container-sec-3-5-5" class="outline-4">
+<h4 id="sec-3-5-5"><a id="ee760rd1mhg0" name="ee760rd1mhg0"></a><span class="section-number-4">3.5.5</span> <span class="todo TODO">TODO</span> transitive closure</h4>
+<div class="outline-text-4" id="text-3-5-5">
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><a id="mar033x0mhg0" name="mar033x0mhg0"></a><span class="section-number-2">4</span> <span class="todo TODO">TODO</span> ascii-encoded file format</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><a id="u37bn4x0mhg0" name="u37bn4x0mhg0"></a><span class="section-number-3">4.1</span> <span class="todo TODO">TODO</span> <code>sym</code> (special characters)&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-4-1">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.sym"><span style="color: #eedd82;">sym</span> =
+  <span style="color: #ff00ff;">tbl_sep:</span><span style="color: #00ff00;">'\x1c'</span>
+  <span style="color: #ff00ff;">grp_sep:</span><span style="color: #00ff00;">'\x1d'</span>
+  <span style="color: #ff00ff;">rec_sep:</span><span style="color: #00ff00;">'\x1e'</span>
+  <span style="color: #ff00ff;">val_sep:</span><span style="color: #00ff00;">'\x1f'</span>
+  <span style="color: #ff00ff;">eot    :</span><span style="color: #00ff00;">'\x03'</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><a id="24p8u3x0mhg0" name="24p8u3x0mhg0"></a><span class="section-number-3">4.2</span> <span class="todo TODO">TODO</span> <code>dump</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-4-2">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.dump"><span style="color: #eedd82;">dump</span> =
+  <span style="color: #ff00ff;">row:</span>(vals)<span style="color: #ffffff; font-weight: bold;">-&gt;</span> vals.join <span style="color: #00ff00;">'\x1f'</span>
+  <span style="color: #ff00ff;">grp:</span>(rows)<span style="color: #ffffff; font-weight: bold;">-&gt;</span> rows.map(dump.row).join <span style="color: #00ff00;">'\x1e'</span>
+  <span style="color: #ff00ff;">tbl:</span>(grps)<span style="color: #ffffff; font-weight: bold;">-&gt;</span> grps.map(dump.grp).join <span style="color: #00ff00;">'\x1d'</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><a id="u7ecwvw0mhg0" name="u7ecwvw0mhg0"></a><span class="section-number-3">4.3</span> <span class="todo TODO">TODO</span> <code>load</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-4-3">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.load"><span style="color: #eedd82;">load</span> =  <span style="color: #66f;"># exposed as loadB</span>
+  <span style="color: #66f;"># This is a super-simple, but naive parser implementation.</span>
+  <span style="color: #66f;"># The benefit is that string.split() is native code.</span>
+  <span style="color: #66f;"># But: with a large database, it's going to create a lot</span>
+  <span style="color: #66f;"># of large intermediate strings just so it can split them.</span>
+  <span style="color: #ff00ff;">row:</span>(text)<span style="color: #ffffff; font-weight: bold;">-&gt;</span> text.split( <span style="color: #00ff00;">'\x1f'</span> )
+  <span style="color: #ff00ff;">grp:</span>(text)<span style="color: #ffffff; font-weight: bold;">-&gt;</span> text.split( <span style="color: #00ff00;">'\x1e'</span> ).map load.row
+  <span style="color: #ff00ff;">tbl:</span>(text)<span style="color: #ffffff; font-weight: bold;">-&gt;</span>
+    [ head, rows ] = text.split( <span style="color: #00ff00;">'\x1d'</span> ).map load.grp
+    <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">new</span> Rel( head, rows )
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-4" class="outline-3">
+<h3 id="sec-4-4"><a id="fyo7a9x0mhg0" name="fyo7a9x0mhg0"></a><span class="section-number-3">4.4</span> <span class="todo TODO">TODO</span> <code>nil</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-4-4">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.nil"><span style="color: #eedd82;">nil</span>     = <span style="color: #00ff00;">'None'</span>  <span style="color: #66f;">#TODO: true nulls for $mr fields</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><a id="cxka61z0mhg0" name="cxka61z0mhg0"></a><span class="section-number-2">5</span> <span class="todo TODO">TODO</span> type system&#xa0;&#xa0;&#xa0;<span class="tag"><span class="py">py</span></span></h2>
+<div class="outline-text-2" id="text-5">
+</div>
+
+<div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><a id="d3x963z0mhg0" name="d3x963z0mhg0"></a><span class="section-number-3">5.1</span> <span class="todo TODO">TODO</span> basic types&#xa0;&#xa0;&#xa0;<span class="tag"><span class="py">py</span></span></h3>
+<div class="outline-text-3" id="text-5-1">
+<div class="org-src-container">
+
+<pre class="src src-python" id="py.Type"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Type</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+    <span style="color: #eedd82;">Int</span> = <span style="color: #ff00ff; font-weight: bold;">int</span>
+    <span style="color: #eedd82;">Str</span> = <span style="color: #ff00ff; font-weight: bold;">str</span>
+    <span style="color: #eedd82;">Bit</span> = <span style="color: #ff00ff; font-weight: bold;">bool</span>
+    <span style="color: #eedd82;">Num</span> = <span style="color: #ff00ff; font-weight: bold;">float</span>
+    <span style="color: #eedd82;">Nil</span> = <span style="color: #ff00ff; font-weight: bold;">type</span>(<span style="color: #7fffd4;">None</span>)
+    <span style="color: #eedd82;">Any</span> = <span style="color: #ff00ff; font-weight: bold;">object</span>
+    <span style="color: #eedd82;">Row</span> = <span style="color: #ff00ff; font-weight: bold;">dict</span>
+    <span style="color: #eedd82;">Lam</span> = <span style="color: #ff00ff; font-weight: bold;">type</span>(<span style="color: #00ffff;">lambda</span> x:x)
+    <span style="color: #eedd82;">Val</span> = <span style="color: #ff00ff; font-weight: bold;">list</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><a id="0flgi3z0mhg0" name="0flgi3z0mhg0"></a><span class="section-number-3">5.2</span> <span class="todo TODO">TODO</span> identity elements&#xa0;&#xa0;&#xa0;<span class="tag"><span class="py">py</span></span></h3>
+<div class="outline-text-3" id="text-5-2">
+<div class="org-src-container">
+
+<pre class="src src-python" id="py.identity_el"><span style="color: #eedd82;">identity_el</span> ={ <span style="color: #66f;"># </span><span style="color: #66f;">identity element</span>
+    Type.Int     : <span style="color: #00ffff;">lambda</span> : 0,
+    Type.Str     : <span style="color: #00ffff;">lambda</span> : <span style="color: #00ff00;">''</span>,
+    Type.Bit     : <span style="color: #00ffff;">lambda</span> : <span style="color: #7fffd4;">False</span>,
+    Type.Num     : <span style="color: #00ffff;">lambda</span> : 0.0,
+    Type.Nil     : <span style="color: #00ffff;">lambda</span> : <span style="color: #7fffd4;">None</span>,
+    Type.Any     : <span style="color: #00ffff;">lambda</span> : <span style="color: #ff00ff; font-weight: bold;">object</span>(),
+    Type.Row     : <span style="color: #00ffff;">lambda</span> : {},
+    Type.Lam     : <span style="color: #00ffff;">lambda</span> : <span style="color: #00ffff;">lambda</span> x : x,
+    Type.Val     : <span style="color: #00ffff;">lambda</span> : [],
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><a id="ha1996z0mhg0" name="ha1996z0mhg0"></a><span class="section-number-2">6</span> <span class="todo TODO">TODO</span> the <code>Rec</code> class (<code>Tup</code>?)</h2>
+<div class="outline-text-2" id="text-6">
+<div class="org-src-container">
+
+<pre class="src src-python" id="py.Rec"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Rec</span>(<span style="color: #ff00ff; font-weight: bold;">dict</span>):
+    <span style="color: #00ff00;">"""</span>
+<span style="color: #00ff00;">    This is a bit like javascript or lua, where getattr and </span>
+<span style="color: #00ff00;">    getitem behave the same. (it doesn't use javascript's </span>
+<span style="color: #00ff00;">    prototyping features, though)</span>
+<span style="color: #00ff00;">    """</span>
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__getattr__</span>(<span style="color: #00ffff;">self</span>, item): <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>[item]
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__setattr__</span>(<span style="color: #00ffff;">self</span>, item, value): <span style="color: #00ffff;">self</span>[item] = value
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><a id="lrc54cx0mhg0" name="lrc54cx0mhg0"></a><span class="section-number-2">7</span> <span class="todo TODO">TODO</span> the <code>Rel</code> class</h2>
+<div class="outline-text-2" id="text-7">
+</div>
+<div id="outline-container-sec-7-1" class="outline-3">
+<h3 id="sec-7-1"><a id="owc0puy0mhg0" name="owc0puy0mhg0"></a><span class="section-number-3">7.1</span> <span class="todo TODO">TODO</span> template&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span>&#xa0;<span class="py">py</span></span></h3>
+<div class="outline-text-3" id="text-7-1">
+
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.Rel"><span style="color: #00ffff;">class</span> Rel
+  &lt;&lt;cf.Rel.constructor&gt;&gt;
+  &lt;&lt;cf.Rel.build_tree&gt;&gt;
+  &lt;&lt;cf.Rel.get_cursor&gt;&gt;
+  &lt;&lt;cf.Rel.push_key&gt;&gt;
+  &lt;&lt;cf.Rel.calc&gt;&gt;
+  &lt;&lt;cf.Rel.as&gt;&gt;
+  &lt;&lt;cf.Rel.show&gt;&gt;
+  &lt;&lt;cf.Rel.keep&gt;&gt;
+  &lt;&lt;cf.Rel.sort&gt;&gt;
+  &lt;&lt;cf.Rel.reverse&gt;&gt;
+  &lt;&lt;cf.Rel.to_org&gt;&gt;
+  &lt;&lt;cf.Rel.records&gt;&gt;
+  &lt;&lt;cf.Rel.clone&gt;&gt;
+  &lt;&lt;cf.Rel.update&gt;&gt;
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="py.Rel"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Rel</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+    <span style="color: #00ff00;">"""</span>
+<span style="color: #00ff00;">    The class of relvars.</span>
+<span style="color: #00ff00;">    """</span>
+    &lt;&lt;py.Rel.__init__&gt;&gt;
+    &lt;&lt;py.Rel.__iter__&gt;&gt;
+    &lt;&lt;py.Rel.__str__&gt;&gt;
+    &lt;&lt;py.Rel.__repr__&gt;&gt;
+    &lt;&lt;py.Rel.iden&gt;&gt;
+    &lt;&lt;py.Rel.newrel&gt;&gt;
+    &lt;&lt;py.Rel.<span style="color: #ff00ff; font-weight: bold;">sorted</span>&gt;&gt;
+    &lt;&lt;py.Rel.identity_row&gt;&gt;
+    &lt;&lt;py.Rel.projected&gt;&gt;
+    &lt;&lt;py.Rel.union&gt;&gt;
+    &lt;&lt;py.Rel.count&gt;&gt;
+    &lt;&lt;py.Rel.append&gt;&gt;
+    &lt;&lt;py.Rel.append_all&gt;&gt;
+    &lt;&lt;py.Rel.restricted&gt;&gt;
+    &lt;&lt;py.Rel.matching&gt;&gt;
+    &lt;&lt;py.Rel.extend&gt;&gt;
+    &lt;&lt;py.Rel.recurse&gt;&gt;
+    &lt;&lt;py.Rel.as_rels&gt;&gt;
+    &lt;&lt;py.Rel.first_row&gt;&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-2" class="outline-3">
+<h3 id="sec-7-2"><a id="0sxkrdx0mhg0" name="0sxkrdx0mhg0"></a><span class="section-number-3">7.2</span> <span class="todo TODO">TODO</span> <code>constructor</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-7-2">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.Rel.constructor"><span style="color: #ff00ff;">constructor:</span>( head, <span style="color: #eedd82;">@rows</span> )<span style="color: #ffffff; font-weight: bold;">-&gt;</span>
+  <span style="color: #eedd82;">@keys</span> = head[ 0 ]
+  <span style="color: #eedd82;">@typs</span> = <span style="color: #00ffff;">if</span> head.length &gt; 1 <span style="color: #00ffff;">then</span> head[ 1 ] <span style="color: #00ffff;">else</span> (<span style="color: #00ff00;">'Any'</span> <span style="color: #00ffff;">for</span> each <span style="color: #00ffff;">in</span> keys)
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="py.Rel.__init__"><span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, columns):
+    <span style="color: #00ff00;">"""</span>
+<span style="color: #00ff00;">    :: { Str : Typ } -&gt; Rel</span>
+<span style="color: #00ff00;">    """</span>
+    <span style="color: #00ffff;">self</span>.cols = columns
+    <span style="color: #00ffff;">self</span>.rows = []
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-3" class="outline-3">
+<h3 id="sec-7-3"><a id="jljiumz0mhg0" name="jljiumz0mhg0"></a><span class="section-number-3">7.3</span> <span class="todo TODO">TODO</span> iterator</h3>
+<div class="outline-text-3" id="text-7-3">
+<div class="org-src-container">
+
+<pre class="src src-python" id="py.Rel.__iter__"><span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__iter__</span>(<span style="color: #00ffff;">self</span>):
+    <span style="color: #00ff00;">"""</span>
+<span style="color: #00ff00;">    :: Rel -&gt; [Row] |%| .rows</span>
+<span style="color: #00ff00;">    """</span>
+    <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">iter</span>(<span style="color: #00ffff;">self</span>.rows)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-4" class="outline-3">
+<h3 id="sec-7-4"><a id="jljiumz0mhg0" name="jljiumz0mhg0"></a><span class="section-number-3">7.4</span> <span class="todo TODO">TODO</span> (convert to string)</h3>
+<div class="outline-text-3" id="text-7-4">
+<div class="org-src-container">
+
+<pre class="src src-python" id="py.Rel.__str__"><span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__str__</span>(<span style="color: #00ffff;">self</span>):
+    <span style="color: #00ff00;">"""</span>
+<span style="color: #00ff00;">    :: Rel -&gt; Str |%| .__iter__</span>
+<span style="color: #00ff00;">    """</span>
+    <span style="color: #00ffff;">return</span> <span style="color: #00ff00;">'\n'</span>.join(<span style="color: #ff00ff; font-weight: bold;">map</span>(<span style="color: #ff00ff; font-weight: bold;">str</span>, <span style="color: #00ffff;">self</span>))
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="py.Rel.__repr__"><span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__repr__</span>(<span style="color: #00ffff;">self</span>):
+    <span style="color: #00ff00;">"""</span>
+<span style="color: #00ff00;">    :: Rel -&gt; Str</span>
+<span style="color: #00ff00;">    """</span>
+    <span style="color: #00ffff;">return</span> <span style="color: #00ff00;">'Rel {0} with {1} {2}'</span>.<span style="color: #ff00ff; font-weight: bold;">format</span>(
+        <span style="color: #00ffff;">self</span>.cols, <span style="color: #00ffff;">self</span>.count(),
+        <span style="color: #00ff00;">'row'</span> <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">self</span>.count() == 1 <span style="color: #00ffff;">else</span> <span style="color: #00ff00;">'rows'</span>)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-5" class="outline-3">
+<h3 id="sec-7-5"><a id="xm85ody0mhg0" name="xm85ody0mhg0"></a><span class="section-number-3">7.5</span> <span class="todo TODO">TODO</span> <code>build_tree</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-7-5">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.Rel.build_tree"><span style="color: #ff00ff;">build_tree:</span>( node_key, parent_key, sort_key )<span style="color: #ffffff; font-weight: bold;">=&gt;</span>
+  <span style="color: #66f;">###</span>
+<span style="color: #66f;">  This annotates the rows of the relation with hierarchy information,</span>
+<span style="color: #66f;">  by adding a .children attribute to each row array.</span>
+
+<span style="color: #66f;">  Return value is @root, a fake row whose .children</span>
+<span style="color: #66f;">  contains all the root nodes.</span>
+<span style="color: #66f;">  ###</span>
+
+  <span style="color: #eedd82;">nid_col</span> = <span style="color: #eedd82;">@keys</span>.indexOf( node_key )
+  <span style="color: #eedd82;">par_col</span> = <span style="color: #eedd82;">@keys</span>.indexOf( parent_key )
+  <span style="color: #eedd82;">ord_col</span> = <span style="color: #00ffff;">if</span> sort_key? <span style="color: #00ffff;">then</span> <span style="color: #eedd82;">@keys</span>.indexOf( sort_key )
+
+  <span style="color: #66f;"># On the first pass first, we collect the children of each row</span>
+  <span style="color: #66f;"># and identify the root nodes.</span>
+  <span style="color: #eedd82;">roots</span> = []
+  <span style="color: #eedd82;">children</span> = {}
+  <span style="color: #00ffff;">for</span> row <span style="color: #00ffff;">in</span> <span style="color: #eedd82;">@rows</span>
+    <span style="color: #eedd82;">parent</span> = row[par_col]
+    children[ parent ] ?= []
+    children[ parent ].push( row )
+    <span style="color: #00ffff;">if</span> parent <span style="color: #00ffff;">is</span> nil
+      roots.push row
+
+  <span style="color: #66f;"># On the second pass, we bind the children to the parents.</span>
+  <span style="color: #66f;"># The .children won't conflict with a field name because</span>
+  <span style="color: #66f;"># the row objects are arrays, not objects.</span>
+  <span style="color: #00ffff;">for</span> row <span style="color: #00ffff;">in</span> <span style="color: #eedd82;">@rows</span>
+    <span style="color: #eedd82;">row.children</span> = children[row[nid_col]] <span style="color: #00ffff;">or</span> []
+
+  <span style="color: #00ffff;">return</span> <span style="color: #eedd82;">@root</span> = { <span style="color: #ff00ff;">children:</span> roots }
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-6" class="outline-3">
+<h3 id="sec-7-6"><a id="b4o3mpy0mhg0" name="b4o3mpy0mhg0"></a><span class="section-number-3">7.6</span> <span class="todo TODO">TODO</span> <code>get_cursor</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-7-6">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.Rel.get_cursor"><span style="color: #ff00ff;">get_cursor:</span>()<span style="color: #ffffff; font-weight: bold;">=&gt;</span>
+  <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">new</span> $cur.Cursor(<span style="color: #00ffff;">new</span> $seq.IterSeq <span style="color: #eedd82;">@rows</span>)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-7" class="outline-3">
+<h3 id="sec-7-7"><a id="n2s72qy0mhg0" name="n2s72qy0mhg0"></a><span class="section-number-3">7.7</span> <span class="todo TODO">TODO</span> <code>push_key</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-7-7">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.Rel.push_key"><span style="color: #ff00ff;">push_key:</span>( )<span style="color: #ffffff; font-weight: bold;">=&gt;</span>
+  <span style="color: #eedd82;">@keys</span>.push( <span style="color: #00ff00;">"$</span><span style="color: #eedd82;">#{@keys.length}</span><span style="color: #00ff00;">"</span> )
+  <span style="color: #eedd82;">@typs</span>.push( <span style="color: #00ff00;">'Dyn'</span> )
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-8" class="outline-3">
+<h3 id="sec-7-8"><a id="czvf7qy0mhg0" name="czvf7qy0mhg0"></a><span class="section-number-3">7.8</span> <span class="todo TODO">TODO</span> <code>calc</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-7-8">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.Rel.calc"><span style="color: #ff00ff;">calc:</span>( f )<span style="color: #ffffff; font-weight: bold;">=&gt;</span>
+  <span style="color: #eedd82;">@push_key</span>()
+  <span style="color: #00ffff;">for</span> row <span style="color: #00ffff;">in</span> <span style="color: #eedd82;">@rows</span>
+    <span style="color: #eedd82;">obj</span> = dict zip <span style="color: #eedd82;">@keys</span>, row
+    <span style="color: #eedd82;">last</span> = f.call( obj, last)
+    row.push last
+  @
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-9" class="outline-3">
+<h3 id="sec-7-9"><a id="5564dqy0mhg0" name="5564dqy0mhg0"></a><span class="section-number-3">7.9</span> <span class="todo TODO">TODO</span> <code>as</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-7-9">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.Rel.as"><span style="color: #ff00ff;">as:</span>( name )<span style="color: #ffffff; font-weight: bold;">=&gt;</span>
+  <span style="color: #eedd82;">@keys</span>[ <span style="color: #eedd82;">@keys</span>.length - 1 ] = name
+  @
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-10" class="outline-3">
+<h3 id="sec-7-10"><a id="ko0hhqy0mhg0" name="ko0hhqy0mhg0"></a><span class="section-number-3">7.10</span> <span class="todo TODO">TODO</span> <code>show</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-7-10">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.Rel.show"><span style="color: #ff00ff;">show:</span>(cols)<span style="color: #ffffff; font-weight: bold;">=&gt;</span>
+  <span style="color: #00ffff;">new</span> $tbl.RelVue <span style="color: #00ff00;">'#rhs'</span>, @, cols
+  @
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-11" class="outline-3">
+<h3 id="sec-7-11"><a id="pxj5oqy0mhg0" name="pxj5oqy0mhg0"></a><span class="section-number-3">7.11</span> <span class="todo TODO">TODO</span> <code>keep</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-7-11">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.Rel.keep"><span style="color: #ff00ff;">keep:</span>(cond)<span style="color: #ffffff; font-weight: bold;">=&gt;</span>
+  <span style="color: #eedd82;">@rows</span> = (row <span style="color: #00ffff;">for</span> row <span style="color: #00ffff;">in</span> <span style="color: #eedd82;">@rows</span> <span style="color: #00ffff;">when</span> cond.call((dict zip <span style="color: #eedd82;">@keys</span>, row)))
+  @
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-12" class="outline-3">
+<h3 id="sec-7-12"><a id="g65dtqy0mhg0" name="g65dtqy0mhg0"></a><span class="section-number-3">7.12</span> <span class="todo TODO">TODO</span> <code>sort</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-7-12">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.Rel.sort"><span style="color: #ff00ff;">sort:</span>(key_or_func)<span style="color: #ffffff; font-weight: bold;">=&gt;</span>
+  <span style="color: #66f;"># if function, it should be (row , row )-&gt; { -1, 0, 1 }</span>
+  <span style="color: #eedd82;">func</span> =
+    <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">typeof</span> key_or_func <span style="color: #00ffff;">is</span> <span style="color: #00ff00;">'function'</span>
+    <span style="color: #00ffff;">then</span> key_or_func
+    <span style="color: #00ffff;">else</span> (a, b)<span style="color: #ffffff; font-weight: bold;">=&gt;</span>
+      <span style="color: #eedd82;">idx</span> = <span style="color: #eedd82;">@keys</span>.indexOf key_or_func
+      <span style="color: #00ffff;">if</span> a[idx] <span style="color: #00ffff;">is</span> b[idx] <span style="color: #00ffff;">then</span> 0
+      <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> (a[idx] &lt; b[idx] <span style="color: #00ffff;">or</span> b[idx] <span style="color: #00ffff;">is</span><span style="color: #7fffd4;"> null</span>) <span style="color: #00ffff;">then</span> +1
+      <span style="color: #00ffff;">else</span> -1
+
+  <span style="color: #eedd82;">@rows</span> = <span style="color: #eedd82;">@rows</span>.sort(func)
+  @
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-13" class="outline-3">
+<h3 id="sec-7-13"><a id="6q5hzqy0mhg0" name="6q5hzqy0mhg0"></a><span class="section-number-3">7.13</span> <span class="todo TODO">TODO</span> <code>reverse</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-7-13">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.Rel.reverse"><span style="color: #ff00ff;">reverse:</span><span style="color: #ffffff; font-weight: bold;">=&gt;</span>
+  <span style="color: #eedd82;">@rows</span> = <span style="color: #eedd82;">@rows</span>.reverse()
+  @
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-14" class="outline-3">
+<h3 id="sec-7-14"><a id="kyld3ry0mhg0" name="kyld3ry0mhg0"></a><span class="section-number-3">7.14</span> <span class="todo TODO">TODO</span> <code>to_org</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-7-14">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.Rel.to_org"><span style="color: #ff00ff;">to_org:</span><span style="color: #ffffff; font-weight: bold;">=&gt;</span>
+  <span style="color: #eedd82;">orgline</span> = (row)<span style="color: #ffffff; font-weight: bold;">-&gt;</span> <span style="color: #00ff00;">"|</span><span style="color: #eedd82;">#{ row.join('|')  }</span><span style="color: #00ff00;">|"</span>
+  <span style="color: #eedd82;">head</span> = orgline(<span style="color: #eedd82;">@keys</span>)
+  <span style="color: #eedd82;">body</span> = (orgline row <span style="color: #00ffff;">for</span> row <span style="color: #00ffff;">in</span> <span style="color: #eedd82;">@rows</span>).join(<span style="color: #00ff00;">'\n'</span>)
+  <span style="color: #00ffff;">return</span> <span style="color: #00ff00;">"</span><span style="color: #eedd82;">#{ head }</span><span style="color: #00ff00;">\n|-\n</span><span style="color: #eedd82;">#{ body }</span><span style="color: #00ff00;">"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-15" class="outline-3">
+<h3 id="sec-7-15"><a id="6jlf8ry0mhg0" name="6jlf8ry0mhg0"></a><span class="section-number-3">7.15</span> <span class="todo TODO">TODO</span> <code>records</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-7-15">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.Rel.records"><span style="color: #ff00ff;">records:</span><span style="color: #ffffff; font-weight: bold;">=&gt;</span>
+  <span style="color: #00ffff;">return</span> (dict zip <span style="color: #eedd82;">@keys</span>, row <span style="color: #00ffff;">for</span> row <span style="color: #00ffff;">in</span> <span style="color: #eedd82;">@rows</span>)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-16" class="outline-3">
+<h3 id="sec-7-16"><a id="x5l2ery0mhg0" name="x5l2ery0mhg0"></a><span class="section-number-3">7.16</span> <span class="todo TODO">TODO</span> <code>clone</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-7-16">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.Rel.clone"><span style="color: #ff00ff;">clone:</span><span style="color: #ffffff; font-weight: bold;">=&gt;</span>
+  deepcopy(@)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-7-17" class="outline-3">
+<h3 id="sec-7-17"><a id="vdjkiry0mhg0" name="vdjkiry0mhg0"></a><span class="section-number-3">7.17</span> <span class="todo TODO">TODO</span> <code>update</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cf">cf</span></span></h3>
+<div class="outline-text-3" id="text-7-17">
+<div class="org-src-container">
+
+<pre class="src src-coffee" id="cf.Rel.update"><span style="color: #ff00ff;">update:</span>(key, func)<span style="color: #ffffff; font-weight: bold;">=&gt;</span>
+  <span style="color: #eedd82;">idx</span> = <span style="color: #eedd82;">@keys</span>.indexOf key
+  <span style="color: #00ffff;">for</span> row <span style="color: #00ffff;">in</span> <span style="color: #eedd82;">@rows</span>
+    <span style="color: #eedd82;">obj</span> = dict zip <span style="color: #eedd82;">@keys</span>, row
+    row[idx] = func.call(obj)
+  @
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
