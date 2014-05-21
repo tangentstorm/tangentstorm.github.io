@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>literate-sexpr.ijs</title>
+<!-- 2014-05-21 Wed 02:34 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">literate-sexpr.ijs</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. <span class="todo TODO">TODO</span> urgh&#x2026; so close. :)</a></li>
+</ul>
+</div>
+</div>
+<p>
+Dyad <code>x E. y</code> (<a href="http://www.jsoftware.com/help/dictionary/decapdot.htm">Member of Interval)</a> returns an array marking the location of pattern <code>x</code> in <code>y</code>.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #00ff00;">'x'</span> <span style="color: #ffaf00;">E.</span> <span style="color: #00ff00;">'.x..x...x'</span>
+</pre>
+</div>
+<p>
+By default, it applies to the outermost rank of each argument:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #ffaf00;">E.</span> <span style="color: brightred;">b.</span> 0
+</pre>
+</div>
+<p>
+So, we can use it to mark occurrences of a substring:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #00ff00;">'()'</span> <span style="color: #ffaf00;">E.</span> <span style="color: #00ff00;">'(( () () ))'</span>
+</pre>
+</div>
+<p>
+If we want to mark each character of <code>x</code> individually, we can use the rank conjunction:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #00ff00;">'()'</span> <span style="color: #ffaf00;">E.</span><span style="color: #ff5f00;">"</span>0 1 <span style="color: #00ff00;">'(( () () ))'</span>
+</pre>
+</div>
+<p>
+Suppose we multiply the first row by <code>1</code> and the second row by <code>_1</code>&#x2026;
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J">1 _1 <span style="color: #ffaf00;">*</span> <span style="color: #00ff00;">'()'</span> <span style="color: #ffaf00;">E.</span><span style="color: #ff5f00;">"</span>0 1 <span style="color: #00ff00;">'(( () () ))'</span>
+</pre>
+</div>
+<p>
+If we add these rows together&#x2026;
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #ffaf00;">+</span><span style="color: brightred;">/</span> 1 _1 <span style="color: #ffaf00;">*</span> <span style="color: #00ff00;">'()'</span> <span style="color: #ffaf00;">E.</span><span style="color: #ff5f00;">"</span>0 1 <span style="color: #00ff00;">'(( () () ))'</span>
+</pre>
+</div>
+<p>
+And then take a running total&#x2026;
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #ffaf00;">+</span><span style="color: brightred;">/\</span> <span style="color: #ffaf00;">+</span><span style="color: brightred;">/</span> 1 _1 <span style="color: #ffaf00;">*</span> <span style="color: #00ff00;">'()'</span> <span style="color: #ffaf00;">E.</span><span style="color: #ff5f00;">"</span>0 1 <span style="color: #00ff00;">'(( () () ))'</span>
+</pre>
+</div>
+<p>
+&#x2026; then the result is the depth of each character within the nested parentheses.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #eedd82;">depth</span> <span style="color: #666;">=:</span> monad define
+  <span style="color: #ffaf00;">+</span><span style="color: brightred;">/\</span> <span style="color: #ffaf00;">+</span><span style="color: brightred;">/</span> 1 _1 <span style="color: #ffaf00;">*</span> <span style="color: #00ff00;">'()'</span> <span style="color: #ffaf00;">E.</span><span style="color: #ff5f00;">"</span>0 1 y
+)
+depth <span style="color: #00ff00;">'(( () () ))'</span>
+</pre>
+</div>
+<p>
+If the last item in this array is 0, we know the parentheses balance.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #eedd82;">parensOk</span> <span style="color: #666;">=:</span> 0 <span style="color: #ffaf00;">=</span> <span style="color: #ffaf00;">{:</span> <span style="color: #ff5f00;">@</span> depth
+parensOk <span style="color: #00ff00;">'('</span>
+parensOk <span style="color: #00ff00;">'()'</span>
+parensOk <span style="color: #ff5f00;">S:</span>0 <span style="color: #00ff00;">' '</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">')'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'('</span><span style="color: #ffaf00;">;</span>  <span style="color: #00ff00;">'())'</span><span style="color: #ffaf00;">;</span>  <span style="color: #00ff00;">'()()'</span><span style="color: #ffaf00;">;</span>  <span style="color: #00ff00;">'(()'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'ok'</span><span style="color: #ffaf00;">;</span>  <span style="color: #00ff00;">'(ok)'</span>
+</pre>
+</div>
+<p>
+We can combine this new function with the <a href="http://www.jsoftware.com/help/dictionary/d430.htm">prefix adverb</a> ( <code>\</code> ) and the <a href="http://www.jsoftware.com/help/dictionary/d331.htm">cut dyad</a> ( <code>;.</code> ) to isolate parenthesized s-expressions in an input string:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J">parensOk<span style="color: brightred;">\</span> <span style="color: #eedd82;">s</span> <span style="color: #666;">=:</span> <span style="color: #00ff00;">'a (lisp-s(t(y)l)e) (reader) ... or not.'</span>
+(parensOk<span style="color: brightred;">\</span> <span style="color: #ffaf00;">&lt;</span><span style="color: #ff5f00;">;.</span>2 <span style="color: #ffaf00;">]</span>) s
+</pre>
+</div>
+<p>
+To work around the bug at the outermost layer, we could just wrap the whole thing in an extra layer of parentheses:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #eedd82;">around</span> <span style="color: #666;">=:</span> (0<span style="color: #ffaf00;">{[</span>)<span style="color: #ffaf00;">,</span> <span style="color: #ffaf00;">],</span> (1<span style="color: #ffaf00;">{[</span>)
+<span style="color: #00ff00;">'()'</span> around <span style="color: #00ff00;">'test'</span>
+</pre>
+</div>
+<p>
+But now we only get one box:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J">(parensOk<span style="color: brightred;">\</span> <span style="color: #ffaf00;">&lt;</span><span style="color: #ff5f00;">;.</span>2 <span style="color: #ffaf00;">]</span>) <span style="color: #00ff00;">'()'</span> around s
+</pre>
+</div>
+<p>
+Better would be to use dyadic <code>i.</code> and <code>i:</code> to find the first <code>(</code> and last <code>)</code>:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J">(<span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">'('</span> <span style="color: #ffaf00;">,</span> <span style="color: #ffaf00;">i:</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">')'</span>) s
+</pre>
+</div>
+<p>
+We can use those numbers to make a new cut, but it will need some adjusting:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"> (<span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">#</span> <span style="color: #ffaf00;">e.</span> <span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">'('</span> <span style="color: #ffaf00;">,</span> <span style="color: #ffaf00;">i:</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">')'</span>) s
+((<span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">#</span> <span style="color: #ffaf00;">e.</span> <span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">'('</span> <span style="color: #ffaf00;">,</span> <span style="color: #ffaf00;">i:</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">')'</span>) <span style="color: #ffaf00;">&lt;</span><span style="color: #ff5f00;">;.</span>1 <span style="color: #ffaf00;">]</span>) s
+</pre>
+</div>
+<p>
+There are two problems here.
+</p>
+
+<p>
+First, it cut off the first part of the string. We can fix that by toggling the first bit:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"> (1(0)<span style="color: brightred;">}</span> <span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">#</span> <span style="color: #ffaf00;">e.</span> <span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">'('</span> <span style="color: #ffaf00;">,</span> <span style="color: #ffaf00;">i:</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">')'</span>) s
+((1(0)<span style="color: brightred;">}</span> <span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">#</span> <span style="color: #ffaf00;">e.</span> <span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">'('</span> <span style="color: #ffaf00;">,</span> <span style="color: #ffaf00;">i:</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">')'</span>) <span style="color: #ffaf00;">&lt;</span><span style="color: #ff5f00;">;.</span>1 <span style="color: #ffaf00;">]</span>) s
+</pre>
+</div>
+<p>
+Second, the <code>)</code> is on the wrong side of the cut.
+</p>
+
+<p>
+To fix this, we just add 1 to the index:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"> (1(0)<span style="color: brightred;">}</span> <span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">#</span> <span style="color: #ffaf00;">e.</span> <span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">'('</span> <span style="color: #ffaf00;">,</span> 1 <span style="color: #ffaf00;">+</span> <span style="color: #ffaf00;">i:</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">')'</span>) s
+((1(0)<span style="color: brightred;">}</span> <span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">#</span> <span style="color: #ffaf00;">e.</span> <span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">'('</span> <span style="color: #ffaf00;">,</span> 1 <span style="color: #ffaf00;">+</span> <span style="color: #ffaf00;">i:</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">')'</span>) <span style="color: #ffaf00;">&lt;</span><span style="color: #ff5f00;">;.</span> 1 <span style="color: #ffaf00;">]</span>) s
+</pre>
+</div>
+<p>
+We'll call this verb <code>segments</code>.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #eedd82;">segments</span> <span style="color: #666;">=:</span> ((1(0)<span style="color: brightred;">}</span> <span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">#</span> <span style="color: #ffaf00;">e.</span> <span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">'('</span> <span style="color: #ffaf00;">,</span> 1 <span style="color: #ffaf00;">+</span> <span style="color: #ffaf00;">i:</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">')'</span>) <span style="color: #ffaf00;">&lt;</span><span style="color: #ff5f00;">;.</span> 1 <span style="color: #ffaf00;">]</span>)
+segments s
+</pre>
+</div>
+<p>
+Since this verb only looks at the first and last parentheses, the resulting array could have between 1 and 3 segments.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J">segments each <span style="color: #00ff00;">'x'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'x(o)'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'(o)x'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'(o)'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'x(o)x'</span>
+</pre>
+</div>
+<p>
+We don't necessarily know the positions of the items, but it's easy to check by testing the first character for <code>(</code>.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #eedd82;">nested</span> <span style="color: #666;">=:</span> <span style="color: #00ff00;">'('</span> <span style="color: #ffaf00;">=</span> <span style="color: #ffaf00;">{.</span>
+nested <span style="color: #ff5f00;">L:</span>0 segments each <span style="color: #00ff00;">'x'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'x(o)'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'(o)x'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'(o)'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'x(o)x'</span>
+</pre>
+</div>
+
+<p>
+Using this information, we can select whether to recurse or not:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J">((<span style="color: #ffaf00;">$:</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">}.</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">}:</span>)<span style="color: #ff5f00;">^:</span>nested <span style="color: #ff5f00;">L:</span>0)<span style="color: #ff5f00;">@</span>segments s
+</pre>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><a id="e78if1h0ohg0" name="e78if1h0ohg0"></a><span class="section-number-2">1</span> <span class="todo TODO">TODO</span> urgh&#x2026; so close. :)</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+</div>
+</div>
+</body>
+</html>
