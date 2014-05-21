@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>literate-sexpr.ijs</title>
-<!-- 2014-05-21 Wed 02:35 -->
+<!-- 2014-05-21 Wed 02:37 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -73,9 +73,13 @@ Dyad <code>x E. y</code> (<a href="http://www.jsoftware.com/help/dictionary/deca
 
 <div class="org-src-container">
 
-<pre class="src src-J"><span style="color: #00ff00;">'x'</span> <span style="color: #ffaf00;">E.</span> <span style="color: #00ff00;">'.x..x...x'</span>
+<pre class="src src-J"><span style="color: #00ff00;">'X'</span> <span style="color: #ffaf00;">E.</span> <span style="color: #00ff00;">'.x..x...x'</span>
 </pre>
 </div>
+<pre class="example">
+0 0 0 0 0 0 0 0 0
+</pre>
+
 <p>
 By default, it applies to the outermost rank of each argument:
 </p>
@@ -85,6 +89,10 @@ By default, it applies to the outermost rank of each argument:
 <pre class="src src-J"><span style="color: #ffaf00;">E.</span> <span style="color: brightred;">b.</span> 0
 </pre>
 </div>
+<pre class="example">
+0 _ _
+</pre>
+
 <p>
 So, we can use it to mark occurrences of a substring:
 </p>
@@ -94,6 +102,10 @@ So, we can use it to mark occurrences of a substring:
 <pre class="src src-J"><span style="color: #00ff00;">'()'</span> <span style="color: #ffaf00;">E.</span> <span style="color: #00ff00;">'(( () () ))'</span>
 </pre>
 </div>
+<pre class="example">
+0 0 0 1 0 0 1 0 0 0 0
+</pre>
+
 <p>
 If we want to mark each character of <code>x</code> individually, we can use the rank conjunction:
 </p>
@@ -103,6 +115,11 @@ If we want to mark each character of <code>x</code> individually, we can use the
 <pre class="src src-J"><span style="color: #00ff00;">'()'</span> <span style="color: #ffaf00;">E.</span><span style="color: #ff5f00;">"</span>0 1 <span style="color: #00ff00;">'(( () () ))'</span>
 </pre>
 </div>
+<pre class="example">
+1 1 0 1 0 0 1 0 0 0 0
+0 0 0 0 1 0 0 1 0 1 1
+</pre>
+
 <p>
 Suppose we multiply the first row by <code>1</code> and the second row by <code>_1</code>&#x2026;
 </p>
@@ -112,6 +129,11 @@ Suppose we multiply the first row by <code>1</code> and the second row by <code>
 <pre class="src src-J">1 _1 <span style="color: #ffaf00;">*</span> <span style="color: #00ff00;">'()'</span> <span style="color: #ffaf00;">E.</span><span style="color: #ff5f00;">"</span>0 1 <span style="color: #00ff00;">'(( () () ))'</span>
 </pre>
 </div>
+<pre class="example">
+1 1 0 1  0 0 1  0 0  0  0
+0 0 0 0 _1 0 0 _1 0 _1 _1
+</pre>
+
 <p>
 If we add these rows together&#x2026;
 </p>
@@ -121,6 +143,10 @@ If we add these rows together&#x2026;
 <pre class="src src-J"><span style="color: #ffaf00;">+</span><span style="color: brightred;">/</span> 1 _1 <span style="color: #ffaf00;">*</span> <span style="color: #00ff00;">'()'</span> <span style="color: #ffaf00;">E.</span><span style="color: #ff5f00;">"</span>0 1 <span style="color: #00ff00;">'(( () () ))'</span>
 </pre>
 </div>
+<pre class="example">
+1 1 0 1 _1 0 1 _1 0 _1 _1
+</pre>
+
 <p>
 And then take a running total&#x2026;
 </p>
@@ -130,6 +156,10 @@ And then take a running total&#x2026;
 <pre class="src src-J"><span style="color: #ffaf00;">+</span><span style="color: brightred;">/\</span> <span style="color: #ffaf00;">+</span><span style="color: brightred;">/</span> 1 _1 <span style="color: #ffaf00;">*</span> <span style="color: #00ff00;">'()'</span> <span style="color: #ffaf00;">E.</span><span style="color: #ff5f00;">"</span>0 1 <span style="color: #00ff00;">'(( () () ))'</span>
 </pre>
 </div>
+<pre class="example">
+1 2 2 3 2 2 3 2 2 1 0
+</pre>
+
 <p>
 &#x2026; then the result is the depth of each character within the nested parentheses.
 </p>
@@ -142,6 +172,10 @@ And then take a running total&#x2026;
 depth <span style="color: #00ff00;">'(( () () ))'</span>
 </pre>
 </div>
+<pre class="example">
+1 2 2 3 2 2 3 2 2 1 0
+</pre>
+
 <p>
 If the last item in this array is 0, we know the parentheses balance.
 </p>
@@ -154,6 +188,14 @@ parensOk <span style="color: #00ff00;">'()'</span>
 parensOk <span style="color: #ff5f00;">S:</span>0 <span style="color: #00ff00;">' '</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">')'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'('</span><span style="color: #ffaf00;">;</span>  <span style="color: #00ff00;">'())'</span><span style="color: #ffaf00;">;</span>  <span style="color: #00ff00;">'()()'</span><span style="color: #ffaf00;">;</span>  <span style="color: #00ff00;">'(()'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'ok'</span><span style="color: #ffaf00;">;</span>  <span style="color: #00ff00;">'(ok)'</span>
 </pre>
 </div>
+<pre class="example">
+0
+
+1
+
+1 0 0 0 1 0 1 1
+</pre>
+
 <p>
 We can combine this new function with the <a href="http://www.jsoftware.com/help/dictionary/d430.htm">prefix adverb</a> ( <code>\</code> ) and the <a href="http://www.jsoftware.com/help/dictionary/d331.htm">cut dyad</a> ( <code>;.</code> ) to isolate parenthesized s-expressions in an input string:
 </p>
@@ -164,6 +206,14 @@ We can combine this new function with the <a href="http://www.jsoftware.com/help
 (parensOk<span style="color: brightred;">\</span> <span style="color: #ffaf00;">&lt;</span><span style="color: #ff5f00;">;.</span>2 <span style="color: #ffaf00;">]</span>) s
 </pre>
 </div>
+<pre class="example">
+1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1
+
+┌─┬─┬────────────────┬─┬────────┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
+│a│ │(lisp-s(t(y)l)e)│ │(reader)│ │.│.│.│ │o│r│ │n│o│t│.│
+└─┴─┴────────────────┴─┴────────┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
+</pre>
+
 <p>
 To work around the bug at the outermost layer, we could just wrap the whole thing in an extra layer of parentheses:
 </p>
@@ -174,6 +224,10 @@ To work around the bug at the outermost layer, we could just wrap the whole thin
 <span style="color: #00ff00;">'()'</span> around <span style="color: #00ff00;">'test'</span>
 </pre>
 </div>
+<pre class="example">
+(test)
+</pre>
+
 <p>
 But now we only get one box:
 </p>
@@ -183,6 +237,12 @@ But now we only get one box:
 <pre class="src src-J">(parensOk<span style="color: brightred;">\</span> <span style="color: #ffaf00;">&lt;</span><span style="color: #ff5f00;">;.</span>2 <span style="color: #ffaf00;">]</span>) <span style="color: #00ff00;">'()'</span> around s
 </pre>
 </div>
+<pre class="example">
+┌─────────────────────────────────────────┐
+│(a (lisp-s(t(y)l)e) (reader) ... or not.)│
+└─────────────────────────────────────────┘
+</pre>
+
 <p>
 Better would be to use dyadic <code>i.</code> and <code>i:</code> to find the first <code>(</code> and last <code>)</code>:
 </p>
@@ -192,6 +252,10 @@ Better would be to use dyadic <code>i.</code> and <code>i:</code> to find the fi
 <pre class="src src-J">(<span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">'('</span> <span style="color: #ffaf00;">,</span> <span style="color: #ffaf00;">i:</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">')'</span>) s
 </pre>
 </div>
+<pre class="example">
+2 26
+</pre>
+
 <p>
 We can use those numbers to make a new cut, but it will need some adjusting:
 </p>
@@ -202,6 +266,14 @@ We can use those numbers to make a new cut, but it will need some adjusting:
 ((<span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">#</span> <span style="color: #ffaf00;">e.</span> <span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">'('</span> <span style="color: #ffaf00;">,</span> <span style="color: #ffaf00;">i:</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">')'</span>) <span style="color: #ffaf00;">&lt;</span><span style="color: #ff5f00;">;.</span>1 <span style="color: #ffaf00;">]</span>) s
 </pre>
 </div>
+<pre class="example">
+0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0
+
+┌────────────────────────┬─────────────┐
+│(lisp-s(t(y)l)e) (reader│) ... or not.│
+└────────────────────────┴─────────────┘
+</pre>
+
 <p>
 There are two problems here.
 </p>
@@ -230,6 +302,14 @@ To fix this, we just add 1 to the index:
 ((1(0)<span style="color: brightred;">}</span> <span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">#</span> <span style="color: #ffaf00;">e.</span> <span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">'('</span> <span style="color: #ffaf00;">,</span> 1 <span style="color: #ffaf00;">+</span> <span style="color: #ffaf00;">i:</span><span style="color: #ff5f00;">&amp;</span><span style="color: #00ff00;">')'</span>) <span style="color: #ffaf00;">&lt;</span><span style="color: #ff5f00;">;.</span> 1 <span style="color: #ffaf00;">]</span>) s
 </pre>
 </div>
+<pre class="example">
+1 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0
+
+┌──┬─────────────────────────┬────────────┐
+│a │(lisp-s(t(y)l)e) (reader)│ ... or not.│
+└──┴─────────────────────────┴────────────┘
+</pre>
+
 <p>
 We'll call this verb <code>segments</code>.
 </p>
@@ -249,6 +329,14 @@ Since this verb only looks at the first and last parentheses, the resulting arra
 <pre class="src src-J">segments each <span style="color: #00ff00;">'x'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'x(o)'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'(o)x'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'(o)'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'x(o)x'</span>
 </pre>
 </div>
+<pre class="example">
+┌───┬───────┬───────┬─────┬─────────┐
+│┌─┐│┌─┬───┐│┌───┬─┐│┌───┐│┌─┬───┬─┐│
+││x│││x│(o)│││(o)│x│││(o)│││x│(o)│x││
+│└─┘│└─┴───┘│└───┴─┘│└───┘│└─┴───┴─┘│
+└───┴───────┴───────┴─────┴─────────┘
+</pre>
+
 <p>
 We don't necessarily know the positions of the items, but it's easy to check by testing the first character for <code>(</code>.
 </p>
@@ -259,6 +347,14 @@ We don't necessarily know the positions of the items, but it's easy to check by 
 nested <span style="color: #ff5f00;">L:</span>0 segments each <span style="color: #00ff00;">'x'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'x(o)'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'(o)x'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'(o)'</span><span style="color: #ffaf00;">;</span> <span style="color: #00ff00;">'x(o)x'</span>
 </pre>
 </div>
+<pre class="example">
+┌───┬─────┬─────┬───┬───────┐
+│┌─┐│┌─┬─┐│┌─┬─┐│┌─┐│┌─┬─┬─┐│
+││0│││0│1│││1│0│││1│││0│1│0││
+│└─┘│└─┴─┘│└─┴─┘│└─┘│└─┴─┴─┘│
+└───┴─────┴─────┴───┴───────┘
+</pre>
+
 
 <p>
 Using this information, we can select whether to recurse or not:
@@ -269,6 +365,18 @@ Using this information, we can select whether to recurse or not:
 <pre class="src src-J">((<span style="color: #ffaf00;">$:</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">}.</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">}:</span>)<span style="color: #ff5f00;">^:</span>nested <span style="color: #ff5f00;">L:</span>0)<span style="color: #ff5f00;">@</span>segments s
 </pre>
 </div>
+<pre class="example">
+┌──┬──────────────────────────────┬────────────┐
+│a │┌──────┬────────────┬────────┐│ ... or not.│
+│  ││lisp-s│┌─┬──────┬─┐│ (reader││            │
+│  ││      ││t│┌──┬─┐│e││        ││            │
+│  ││      ││ ││y)│l││ ││        ││            │
+│  ││      ││ │└──┴─┘│ ││        ││            │
+│  ││      │└─┴──────┴─┘│        ││            │
+│  │└──────┴────────────┴────────┘│            │
+└──┴──────────────────────────────┴────────────┘
+</pre>
+
 
 <div id="outline-container-sec-1" class="outline-2">
 <h2 id="sec-1"><a id="e78if1h0ohg0" name="e78if1h0ohg0"></a><span class="section-number-2">1</span> <span class="todo TODO">TODO</span> urgh&#x2026; so close. :)</h2>
