@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>a quick intro to nial</title>
-<!-- 2014-05-28 Wed 13:43 -->
+<!-- 2014-05-28 Wed 13:52 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -119,7 +119,7 @@ Of course, you can use parentheses to change the evaluation order:
 </pre>
 
 <p>
-Nial's core data structure is the nestable array. Items in the array needn't be the same type:
+Nial's core data structure is the array. Individual items like strings and integers are treated as 0-dimensional arrays. Arrays can be nested, and individual items in the array needn't be the same type:
 </p>
 
 <div class="org-src-container">
@@ -137,7 +137,7 @@ Nial's core data structure is the nestable array. Items in the array needn't be 
 </pre>
 
 <p>
-Arrays can be assign to variables:
+Arrays can be assigned to variables:
 </p>
 
 <div class="org-src-container">
@@ -193,7 +193,7 @@ You can even create arrays of functions:
 
 
 <p>
-Arrays can be reshaped.
+The <code>reshape</code> operator can turn a list of numbers into a table (or even a higher dimensional array):
 </p>
 
 <div class="org-src-container">
@@ -359,22 +359,24 @@ The code is fairly clean and well documented, though, so I'm hoping to change th
 </p>
 
 <p>
-My fork of the Q'Nial codebase is here:
+This little page barely scratches the surface, obviously. I mostly just wrote it to test out my emacs mode:
 </p>
 
-<ul class="org-ul">
-<li><a href="https://github.com/tangentstorm/qnial">https://github.com/tangentstorm/qnial</a>
-</li>
-</ul>
+<dl class="org-dl">
+<dt> emacs mode </dt><dd><a href="https://github.com/tangentstorm/nial-mode">https://github.com/tangentstorm/nial-mode</a>
+</dd>
+<dt> q'nial source </dt><dd><a href="https://github.com/tangentstorm/qnial">https://github.com/tangentstorm/qnial</a>
+</dd>
+<dt> (no term) </dt><dd>old but official q'nial website: <a href="http://www.nial.com/AboutNial.html">http://www.nial.com/AboutNial.html</a>
+</dd>
+</dl>
 
 <p>
-The emacs and org-mode integration I used to make this page is here:
+Stay tuned to <a href="http://www.reddit.com/r/apljk/">http://www.reddit.com/r/apljk/</a> if you want to hear more!
 </p>
 
-<ul class="org-ul">
-<li><a href="https://github.com/tangentstorm/nial-mode">https://github.com/tangentstorm/nial-mode</a>
-</li>
-</ul>
+<pre class="example">
+</pre>
 </div>
 </div>
 </div>
