@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>a quick intro to nial</title>
+<!-- 2014-05-28 Wed 13:36 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">a quick intro to nial</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. nial overview</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> nial overview</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Nial is an array language, like APL, J, or K, but with a more english-like syntax:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nial"><span style="color: #66f;">% first 10 non-negative integers;</span>
+ <span style="color: #ffffff; font-weight: bold;">tell</span> 10
+</pre>
+</div>
+
+<p>
+Unlike conventional languages (or even other array languages), nial has a strict left-to right evaluation order:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nial"><span style="color: #ffffff; font-weight: bold;">tell</span> 10 <span style="color: #ff00ff; font-weight: bold;">*</span> 2 <span style="color: #ff00ff; font-weight: bold;">+</span> 1
+</pre>
+</div>
+
+<p>
+Of course, you can use parentheses to change the evaluation order:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nial"><span style="color: #ffffff; font-weight: bold;">sum</span> <span style="color: #ffffff; font-weight: bold;">tell</span> 10
+<span style="color: #ffffff; font-weight: bold;">sum</span> <span style="color: #ffffff; font-weight: bold;">tell</span> 10 <span style="color: #ff00ff; font-weight: bold;">+</span> 1
+<span style="color: #ffffff; font-weight: bold;">sum</span> (<span style="color: #ffffff; font-weight: bold;">tell</span> 10 <span style="color: #ff00ff; font-weight: bold;">+</span> 1)
+</pre>
+</div>
+
+<p>
+Nial's core data structure is the nestable array. Items in the array needn't be the same type:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nial">1 2 3 <span style="color: #00ff00;">'a string'</span> <span style="color: #ffaf00;">"a-symbol</span> [<span style="color: #00ff00;">'sub'</span>,<span style="color: #00ff00;">'array'</span>] (<span style="color: #ffffff; font-weight: bold;">tell</span> 5)
+</pre>
+</div>
+
+<p>
+Arrays can be assign to variables:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nial">a <span style="color: #ff00ff;">:=</span> <span style="color: #ffaf00;">"a</span> <span style="color: #ffaf00;">"cute</span> <span style="color: #ffaf00;">"little</span> <span style="color: #ffaf00;">"symbol</span> <span style="color: #ffaf00;">"array</span>
+</pre>
+</div>
+
+<p>
+And manipulated in various ways:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nial">[<span style="color: #ffffff; font-weight: bold;">tally</span> a, <span style="color: #ffffff; font-weight: bold;">min</span> a, <span style="color: #ffffff; font-weight: bold;">max</span> a, <span style="color: #ffffff; font-weight: bold;">first</span> a, <span style="color: #ffffff; font-weight: bold;">post</span> a, <span style="color: #ffffff; font-weight: bold;">post</span> <span style="color: #ffffff; font-weight: bold;">reverse</span> a, <span style="color: #ffffff; font-weight: bold;">last</span> a]
+</pre>
+</div>
+
+<p>
+You can even create arrays of functions:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nial"><span style="color: #66f;">% previous line again, but using an atlas;</span>
+[<span style="color: #ffffff; font-weight: bold;">tally</span>, <span style="color: #ffffff; font-weight: bold;">min</span>, <span style="color: #ffffff; font-weight: bold;">max</span>, <span style="color: #ffffff; font-weight: bold;">first</span>, <span style="color: #ffffff; font-weight: bold;">post</span>, <span style="color: #ffffff; font-weight: bold;">post</span> <span style="color: #ffffff; font-weight: bold;">reverse</span>, <span style="color: #ffffff; font-weight: bold;">last</span>] a
+</pre>
+</div>
+
+
+<p>
+Arrays can be reshaped.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nial">i <span style="color: #ff00ff;">:=</span> 8 8 <span style="color: #ffffff; font-weight: bold;">reshape</span> <span style="color: #ffffff; font-weight: bold;">tell</span> 64
+</pre>
+</div>
+
+
+<p>
+Comparisons on arrays return arrays of bits, shown as <code>o</code> and <code>l</code> in nial:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nial">j <span style="color: #ff00ff;">:=</span> i <span style="color: #ffff00;">eachleft</span> <span style="color: #ffffff; font-weight: bold;">in</span> 26 21 29 41 49 50 51 52 53
+</pre>
+</div>
+
+<p>
+With a little work, this can be an array of symbols&#x2026;
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nial">f <span style="color: #ff00ff;">:=</span> <span style="color: #ffff00;">each</span> (<span style="color: #00ffff;">op</span> bit { <span style="color: #00ffff;">if</span> bit <span style="color: #00ffff;">then</span> <span style="color: #ffffff; font-weight: bold;">phrase</span> <span style="color: #00ff00;">'&#9619;'</span> <span style="color: #00ffff;">else</span> <span style="color: #ffffff; font-weight: bold;">phrase</span> <span style="color: #00ff00;">'&#9617;'</span> <span style="color: #00ffff;">endif</span> }) j
+</pre>
+</div>
+
+
+<p>
+Reversing a 2d array works on the outermost axis:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nial"><span style="color: #ffffff; font-weight: bold;">reverse</span> f
+</pre>
+</div>
+
+
+<p>
+We can chose the x-axis instead with the help of the <code>byrows</code> transformer.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nial"><span style="color: #ffff00;">byrows</span> <span style="color: #ffffff; font-weight: bold;">reverse</span> f
+</pre>
+</div>
+
+
+<p>
+We can also transpose an array:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nial"><span style="color: #ffffff; font-weight: bold;">transpose</span> f
+</pre>
+</div>
+
+
+<p>
+Which of course means they can be rotated:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nial">[<span style="color: #ffff00;">bycols</span> <span style="color: #ffffff; font-weight: bold;">reverse</span> <span style="color: #ffffff; font-weight: bold;">transpose</span>, <span style="color: #ffffff; font-weight: bold;">transpose</span> (<span style="color: #ffff00;">bycols</span> <span style="color: #ffffff; font-weight: bold;">reverse</span>) ] f
+</pre>
+</div>
+
+<p>
+The misshapen boxes above reveal a lack of support for utf-8 in the Q'Nial interpreter.
+</p>
+
+<p>
+Q'Nial was developed at Queen's University in Kingston, Canada. It was marketed as a commercial product during the 1980's and 90's. It was released under an open source license in 2006, but doesn't appear to be actively maintained.
+</p>
+
+<p>
+The code is fairly clean and well documented, though, so I'm hoping to change that.
+</p>
+
+<p>
+My fork of the Q'Nial codebase is here:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://github.com/tangentstorm/qnial">https://github.com/tangentstorm/qnial</a>
+</li>
+</ul>
+
+<p>
+The emacs and org-mode integration I used to make this page is here:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://github.com/tangentstorm/nial-mode">https://github.com/tangentstorm/nial-mode</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</body>
+</html>
