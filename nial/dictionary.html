@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>q'nial dictionary version 6.3</title>
-<!-- 2014-05-29 Thu 23:10 -->
+<!-- 2014-05-30 Fri 09:30 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="nial systems, limited" />
@@ -105,7 +105,7 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. <code>abs</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="table">table</span></span></a>
+<li><a href="#sec-1">1. <code>abs</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="op">op</span>&#xa0;<span class="math">math</span></span></a>
 <ul>
 <li><a href="#sec-1-1">1.1. Equations</a></li>
 </ul>
@@ -643,6 +643,7 @@ for the JavaScript code in this tag.
 <li><a href="#sec-148">148. <code>INNER</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="tr">tr</span></span></a>
 <ul>
 <li><a href="#sec-148-1">148.1. Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></a></li>
+<li><a href="#sec-148-2">148.2. Equation</a></li>
 </ul>
 </li>
 <li><a href="#sec-149">149. <code>innerproduct</code></a></li>
@@ -1348,7 +1349,7 @@ for the JavaScript code in this tag.
 </div>
 
 <div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> <code>abs</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="table">table</span></span></h2>
+<h2 id="sec-1"><span class="section-number-2">1</span> <code>abs</code>&#xa0;&#xa0;&#xa0;<span class="tag"><span class="op">op</span>&#xa0;<span class="math">math</span></span></h2>
 <div class="outline-text-2" id="text-1">
 
 <p>
@@ -1438,7 +1439,7 @@ The operation <a href="#sec-1">1</a> can be used to convert a boolean value to a
 <div class="outline-text-2" id="text-2">
 
 <p>
-The transformer <i>=ACCUMULATE=</i> is similar to the concept of scan in APL.  It computes the partial reductions of the initial lists of the items of A, using reduce f (a right-to-left reduction) to compute each partial result.  (A reductive operation is one which when applied to an array having a number of items returns a single result.)
+The transformer <i>=ACCUMULATE=</i> is similar to the concept of scan in APL.  It computes the partial reductions of the initial lists of the items of A, using <i>=REDUCE=</i> f (a right-to-left reduction) to compute each partial result.  (A reductive operation is one which when applied to an array having a number of items returns a single result.)
 </p>
 
 <p>
@@ -1695,6 +1696,7 @@ A remark is an input to the Q'Nial interpreter that is not processed.  It begins
 <p>
 An address is an integer or a list of integers describing the location of an item in an array. An address uses 0-origin counting, i.e. the first position in a list is at address 0. All the addresses of an array can be stored in an array of the same rectangular structure as the array itself.  Such an array is called the grid of an array.  Consider the following example:
 </p>
+
 <pre class="example">
             GRID OF THE ARRAY                 ARRAY
 +-----+-----+-----+-----+-----+-----+ +---+---+---+---+---+---+
@@ -1735,7 +1737,7 @@ The address of a single is the empty list Null.
 <div class="outline-text-2" id="text-6">
 
 <p>
-The operation allbools tests whether or not A is a nonempty array of boolean items.  It returns true if A is not empty and all the items of A are boolean atoms, false otherwise.
+The operation allbools tests whether or not A is a nonempty array of boolean items.  It returns <code>true</code> if A is not empty and all the items of A are boolean atoms, <code>false</code> otherwise.
 </p>
 
 <div class="org-src-container">
@@ -1978,7 +1980,6 @@ o
 </pre>
 </div>
 
-
 <div id="outline-container-sec-10-1" class="outline-3">
 <h3 id="sec-10-1"><span class="section-number-3">10.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
 <div class="outline-text-3" id="text-10-1">
@@ -2027,7 +2028,6 @@ l
 o
 </pre>
 </div>
-
 
 <div id="outline-container-sec-11-1" class="outline-3">
 <h3 id="sec-11-1"><span class="section-number-3">11.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
@@ -2284,7 +2284,7 @@ The operation arccos is the inverse of cos in the numeric domain.  It produces t
 
 <tr>
 <td class="left">real</td>
-<td class="left">the angle B in radians such that cos B = A, if A is in the range -1 to 1; otherwise the fault ?arccos</td>
+<td class="left">the angle B in radians such that cos B = A<sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup></td>
 </tr>
 
 <tr>
@@ -2303,24 +2303,6 @@ The operation arccos is the inverse of cos in the numeric domain.  It produces t
 </tr>
 </tbody>
 </table>
-
-<div class="org-src-container">
-
-<pre class="src src-nial"><span style="color: #ffffff; font-weight: bold;">arccos</span> l -2 0.35
-</pre>
-</div>
-<pre class="example">
-0. ?arccos 1.21323
-</pre>
-
-<div class="org-src-container">
-
-<pre class="src src-nial"><span style="color: #ffffff; font-weight: bold;">arccos</span> `a <span style="color: #ffaf00;">"abc</span> ?<span style="color: brightred;">?error</span>
-</pre>
-</div>
-<pre class="example">
-?arccos ?arccos ?error
-</pre>
 </div>
 
 <div id="outline-container-sec-16-1" class="outline-3">
@@ -2381,7 +2363,7 @@ The operation arcsin is the inverse of sin in the numeric domain.  It produces t
 
 <tr>
 <td class="left">real</td>
-<td class="left">the angle B in radians such that sin B = A, if A is in the range -1 to 1; otherwise, the fault ?arcsin</td>
+<td class="left">the angle B in radians such that sin B = A<sup><a id="fnr.1.100" name="fnr.1.100" class="footref" href="#fn.1">1</a></sup></td>
 </tr>
 
 <tr>
@@ -2401,18 +2383,6 @@ The operation arcsin is the inverse of sin in the numeric domain.  It produces t
 </tbody>
 </table>
 
-
-<div class="org-src-container">
-
-<pre class="src src-nial"><span style="color: #ffffff; font-weight: bold;">arcsin</span> l -2 0.35
-</pre>
-</div>
-<pre class="example">
-1.5708 ?arcsin 0.357571
-</pre>
-
-
-
 <div class="org-src-container">
 
 <pre class="src src-nial"><span style="color: #ffffff; font-weight: bold;">arcsin</span> `a <span style="color: #ffaf00;">"abc</span> ?<span style="color: brightred;">?error</span>
@@ -2421,7 +2391,6 @@ The operation arcsin is the inverse of sin in the numeric domain.  It produces t
 <pre class="example">
 ?arcsin ?arcsin ?error
 </pre>
-
 
 
 <div class="org-src-container">
@@ -2433,7 +2402,6 @@ The operation arcsin is the inverse of sin in the numeric domain.  It produces t
 1.5708 1.5708 0.523599
 </pre>
 </div>
-
 
 <div id="outline-container-sec-17-1" class="outline-3">
 <h3 id="sec-17-1"><span class="section-number-3">17.1</span> Equation</h3>
@@ -2783,7 +2751,6 @@ The operation axes generates a list of axis numbers for the array A counting fro
 0 1 2
 </pre>
 </div>
-
 
 <div id="outline-container-sec-25-1" class="outline-3">
 <h3 id="sec-25-1"><span class="section-number-3">25.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
@@ -4061,7 +4028,6 @@ Examples
 </pre>
 </div>
 
-
 <div id="outline-container-sec-47-1" class="outline-3">
 <h3 id="sec-47-1"><span class="section-number-3">47.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
 <div class="outline-text-3" id="text-47-1">
@@ -5022,7 +4988,6 @@ The operation <a href="#sec-65">65</a> implements the cosine function of mathema
 </pre>
 </div>
 
-
 <div id="outline-container-sec-65-1" class="outline-3">
 <h3 id="sec-65-1"><span class="section-number-3">65.1</span> Equation</h3>
 <div class="outline-text-3" id="text-65-1">
@@ -5113,7 +5078,6 @@ The operation cosh implements the hyperbolic cosine function of mathematics.  It
 ?cosh ?cosh ?error
 </pre>
 </div>
-
 
 <div id="outline-container-sec-66-1" class="outline-3">
 <h3 id="sec-66-1"><span class="section-number-3">66.1</span> Equation</h3>
@@ -6195,7 +6159,6 @@ The expression Dlllist provides a list of the current routines that have been re
 3
 </pre>
 </div>
-
 
 <div id="outline-container-sec-85-1" class="outline-3">
 <h3 id="sec-85-1"><span class="section-number-3">85.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
@@ -7486,7 +7449,6 @@ The operation exp implements the exponential function of mathematics.  It produc
 </pre>
 </div>
 
-
 <div id="outline-container-sec-102-1" class="outline-3">
 <h3 id="sec-102-1"><span class="section-number-3">102.1</span> Equations</h3>
 <div class="outline-text-3" id="text-102-1">
@@ -7630,7 +7592,6 @@ The constant expression False denotes the boolean atom for false, which Nial als
 ol
 </pre>
 </div>
-
 
 <div id="outline-container-sec-108-1" class="outline-3">
 <h3 id="sec-108-1"><span class="section-number-3">108.1</span> Equations</h3>
@@ -7982,7 +7943,6 @@ The transformer <i>=FILTER=</i> is given a predicate operation f that is used to
 37 4.5
 </pre>
 </div>
-
 
 <div id="outline-container-sec-116-1" class="outline-3">
 <h3 id="sec-116-1"><span class="section-number-3">116.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
@@ -8342,7 +8302,6 @@ The operation floor produces the following results when applied to atoms of the 
 </pre>
 </div>
 
-
 <div id="outline-container-sec-121-1" class="outline-3">
 <h3 id="sec-121-1"><span class="section-number-3">121.1</span> Equation</h3>
 <div class="outline-text-3" id="text-121-1">
@@ -8392,7 +8351,6 @@ The transformer <i>=FOLD=</i> modifies an operation f to one that takes a pair o
 27
 </pre>
 </div>
-
 
 <div id="outline-container-sec-122-1" class="outline-3">
 <h3 id="sec-122-1"><span class="section-number-3">122.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
@@ -8545,7 +8503,6 @@ The operation <a href="#sec-125">125</a> converts the boolean array A to a simpl
 lollo
 </pre>
 </div>
-
 
 <div id="outline-container-sec-125-1" class="outline-3">
 <h3 id="sec-125-1"><span class="section-number-3">125.1</span> Equations</h3>
@@ -9013,7 +8970,6 @@ The operation
 3 2 4 0 1
 </pre>
 </div>
-
 
 <div id="outline-container-sec-136-1" class="outline-3">
 <h3 id="sec-136-1"><span class="section-number-3">136.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
@@ -9851,50 +9807,61 @@ The transformer <i>=INNER=</i> generalizes the inner product operation of linear
 <p>
 Thus, INNER [+,*]  is equivalent to matrix multiplication in linear algebra and INNER [or,and]  is boolean matrix product.  For higher dimensional arrays, the lists are formed by "pushing down" the last axis of A and the first axis of B.
 </p>
-<pre class="example">
-2 3 4 INNER [+,*] 4 5 6
+
+<div class="org-src-container">
+
+<pre class="src src-nial">2 3 4 <span style="color: #ffff00;">INNER</span> [<span style="color: #ff00ff; font-weight: bold;">+</span>,<span style="color: #ff00ff; font-weight: bold;">*</span>] 4 5 6
 </pre>
-<p>
-47
-</p>
-<pre class="example">
-loll INNER [or,and] olol
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-nial">loll <span style="color: #ffff00;">INNER</span> [<span style="color: #ffffff; font-weight: bold;">or</span>,<span style="color: #ffffff; font-weight: bold;">and</span>] olol
 </pre>
-<p>
-l
-</p>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-nial">A <span style="color: #ff00ff;">:=</span> 2 4 <span style="color: #ffffff; font-weight: bold;">reshape</span> <span style="color: #ffffff; font-weight: bold;">count</span> 8;
+B <span style="color: #ff00ff;">:=</span> 4 3 <span style="color: #ffffff; font-weight: bold;">reshape</span> <span style="color: #ffffff; font-weight: bold;">tell</span> 8;
+A B
+</pre>
+</div>
 <pre class="example">
-    A := 2 4 reshape count 8;
-    B := 4 3 reshape tell 8;
-    A B
 +-------+-----+
 |1 2 3 4|0 1 2|
 |5 6 7 8|3 4 5|
 |       |6 7 0|
 |       |1 2 3|
 +-------+-----+
-    A INNER [sum,times] B
 </pre>
-<p>
-28 38 24
-68 94 64
-</p>
-</div>
 
+<div class="org-src-container">
+
+<pre class="src src-nial">A <span style="color: #ffff00;">INNER</span> [<span style="color: #ffffff; font-weight: bold;">sum</span>,<span style="color: #ffffff; font-weight: bold;">times</span>] B
+</pre>
+</div>
+</div>
 <div id="outline-container-sec-148-1" class="outline-3">
 <h3 id="sec-148-1"><span class="section-number-3">148.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
 <div class="outline-text-3" id="text-148-1">
 <div class="org-src-container">
 
-<pre class="src src-nial">:     <span style="color: #ffff00;">INNER</span> <span style="color: #00ffff;">IS</span> <span style="color: #ffffff; font-weight: bold;">TRANSFORMER</span> f g (<span style="color: #ffffff; font-weight: bold;">OPERATION</span> A B) {
-:        <span style="color: #ffffff; font-weight: bold;">rows</span> A <span style="color: #ffff00;">OUTER</span> (f g) (0 <span style="color: #ffffff; font-weight: bold;">split</span> B) }
+<pre class="src src-nial"><span style="color: #ffff00;">INNER</span> <span style="color: #00ffff;">IS</span> <span style="color: #ffffff; font-weight: bold;">TRANSFORMER</span> f g (<span style="color: #ffffff; font-weight: bold;">OPERATION</span> A B) {
+  <span style="color: #ffffff; font-weight: bold;">rows</span> A <span style="color: #ffff00;">OUTER</span> (f g) (0 <span style="color: #ffffff; font-weight: bold;">split</span> B) }
 </pre>
 </div>
+</div>
+</div>
 
-<p>
-Equation
-   shape (A INNER [f,g] B) = (front shape A) link (rest shape B)
-</p>
+<div id="outline-container-sec-148-2" class="outline-3">
+<h3 id="sec-148-2"><span class="section-number-3">148.2</span> Equation</h3>
+<div class="outline-text-3" id="text-148-2">
+<div class="org-src-container">
+
+<pre class="src src-nial"><span style="color: #ffffff; font-weight: bold;">shape</span> (A <span style="color: #ffff00;">INNER</span> [f,g] B) <span style="color: #ff00ff; font-weight: bold;">=</span> (<span style="color: #ffffff; font-weight: bold;">front</span> <span style="color: #ffffff; font-weight: bold;">shape</span> A) <span style="color: #ffffff; font-weight: bold;">link</span> (<span style="color: #ffffff; font-weight: bold;">rest</span> <span style="color: #ffffff; font-weight: bold;">shape</span> B)
+</pre>
+</div>
 </div>
 </div>
 </div>
@@ -9907,10 +9874,14 @@ Equation
 The operation innerproduct computes the mathematical inner product of real vectors and matrices using special code for efficiency.  For real matrices, it produces the same result as A INNER [+,*] B, but computes the result more rapidly for large arguments.  It coerces boolean and integer arrays to reals.  The name ip is provided as an abbreviation.
 </p>
 
+<div class="org-src-container">
+
+<pre class="src src-nial">A <span style="color: #ff00ff;">:=</span> 2 4 <span style="color: #ffffff; font-weight: bold;">reshape</span> <span style="color: #ffffff; font-weight: bold;">count</span> 8;
+B <span style="color: #ff00ff;">:=</span> 4 3 <span style="color: #ffffff; font-weight: bold;">reshape</span> <span style="color: #ffffff; font-weight: bold;">tell</span> 8;
+A B
+</pre>
+</div>
 <pre class="example">
-    A := 2 4 reshape count 8;
-    B := 4 3 reshape tell 8;
-    A B
 +-------+-----+
 |1 2 3 4|0 1 2|
 |5 6 7 8|3 4 5|
@@ -9919,28 +9890,28 @@ The operation innerproduct computes the mathematical inner product of real vecto
 +-------+-----+
 </pre>
 
-<pre class="example">
-A innerproduct B
+<div class="org-src-container">
+
+<pre class="src src-nial">A <span style="color: #ffffff; font-weight: bold;">innerproduct</span> B
 </pre>
-<ol class="org-ol">
-<li>38. 24.
-</li>
-<li>94. 64.
-</li>
-</ol>
+</div>
+<pre class="example">
+28. 38. 24.
+68. 94. 64.
+</pre>
+
 
 <p>
 The number of columns of A must match the number of rows in B.
 </p>
-<pre class="example">
-B ip A
-</pre>
-<p>
-?conform in ip
-</p>
-</div>
-</div>
 
+<div class="org-src-container">
+
+<pre class="src src-nial">B <span style="color: #ffffff; font-weight: bold;">ip</span> A
+</pre>
+</div>
+</div>
+</div>
 <div id="outline-container-sec-150" class="outline-2">
 <h2 id="sec-150"><span class="section-number-2">150</span> interrupt</h2>
 <div class="outline-text-2" id="text-150">
@@ -9964,7 +9935,7 @@ The user can interrupt execution by pressing &lt;Ctrl-c&gt; &lt;Return&gt; at th
 <div class="outline-text-2" id="text-151">
 
 <p>
-The operation inverse computes the mathematical inverse of a square matrix A returning a square matrix of the same shape.  If A is singular within numerical limits, the result is the fault ?singular.  The name inv is provided as an abbreviation.
+The operation inverse computes the mathematical inverse of a square matrix A returning a square matrix of the same shape.  If A is singular within numerical limits, the result is the fault ?singular.  The name <code>inv</code> is provided as an abbreviation.
 </p>
 
 <div class="org-src-container">
@@ -10122,7 +10093,6 @@ lo
 </pre>
 </div>
 
-
 <div id="outline-container-sec-154-1" class="outline-3">
 <h3 id="sec-154-1"><span class="section-number-3">154.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
 <div class="outline-text-3" id="text-154-1">
@@ -10219,7 +10189,6 @@ o
 </pre>
 </div>
 
-
 <div id="outline-container-sec-156-1" class="outline-3">
 <h3 id="sec-156-1"><span class="section-number-3">156.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
 <div class="outline-text-3" id="text-156-1">
@@ -10258,7 +10227,6 @@ l
 o
 </pre>
 </div>
-
 
 <div id="outline-container-sec-157-1" class="outline-3">
 <h3 id="sec-157-1"><span class="section-number-3">157.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
@@ -10441,7 +10409,7 @@ An empty array is one that has no items.
 <div class="outline-text-2" id="text-160">
 
 <p>
-The transformer <i>=ITERATE=</i> is used to apply the operation f sequentially to the items of A in row major order.  (Row major order means across the rows moving left to right, starting at the top row and then going down the rows.  An example is given under list.) The result is the result of applying f to the final item.  If A has no items, the result is the fault ?noexpr.
+The transformer <i>=ITERATE=</i> is used to apply the operation f sequentially to the items of A in row major order.  (Row major order means across the rows moving left to right, starting at the top row and then going down the rows.  An example is given under <a href="#sec-171">171</a>.) The result is the result of applying f to the final item.  If A has no items, the result is the fault ?noexpr.
 </p>
 
 
@@ -10997,7 +10965,7 @@ Link is similar to a set-union operation, although it does not remove duplicates
 <div class="outline-text-2" id="text-171">
 
 <p>
-The operation list returns the list of the items of A in row major order.
+The operation <a href="#sec-171">171</a> returns the list of the items of A in row major order.
 </p>
 
 
@@ -12394,7 +12362,6 @@ olool
 </pre>
 </div>
 
-
 <div id="outline-container-sec-197-1" class="outline-3">
 <h3 id="sec-197-1"><span class="section-number-3">197.1</span> Equations</h3>
 <div class="outline-text-3" id="text-197-1">
@@ -12454,7 +12421,6 @@ l
 l
 </pre>
 </div>
-
 
 <div id="outline-container-sec-198-1" class="outline-3">
 <h3 id="sec-198-1"><span class="section-number-3">198.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
@@ -13112,7 +13078,7 @@ The items of the result are the arrays of items of A from corresponding position
 </pre>
 
 <p>
-The first example shows that pack of a pair of triples is a triple of pairs.  The second shows that pack of a quadruple of pairs is a pair of quadruples.  The third shows that pack of a pair of 2 by 3 tables is a 2 by 3 table of pairs.  The final example shows a case where replication occurs.  The first and last items have shape <sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup>.  The second and third items are an atom and a solitary and hence can be replicated.
+The first example shows that pack of a pair of triples is a triple of pairs.  The second shows that pack of a quadruple of pairs is a pair of quadruples.  The third shows that pack of a pair of 2 by 3 tables is a 2 by 3 table of pairs.  The final example shows a case where replication occurs.  The first and last items have shape <sup><a id="fnr.2" name="fnr.2" class="footref" href="#fn.2">2</a></sup>.  The second and third items are an atom and a solitary and hence can be replicated.
 </p>
 </div>
 
@@ -13443,7 +13409,6 @@ hello world
 </pre>
 </div>
 
-
 <div id="outline-container-sec-214-1" class="outline-3">
 <h3 id="sec-214-1"><span class="section-number-3">214.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
 <div class="outline-text-3" id="text-214-1">
@@ -13553,7 +13518,6 @@ The operation phrase converts a string into a phrase with the same content.  It 
 </pre>
 </div>
 
-
 <div id="outline-container-sec-217-1" class="outline-3">
 <h3 id="sec-217-1"><span class="section-number-3">217.1</span> Equations</h3>
 <div class="outline-text-3" id="text-217-1">
@@ -13660,7 +13624,7 @@ of
 </pre>
 
 <p>
-In the first example, pick selects the fourth item because of 0-origin indexing.  In the second example, <sup><a id="fnr.1.100" name="fnr.1.100" class="footref" href="#fn.1">1</a></sup> is not an address of the list (its addresses are integers) but it is converted to integer 3.  Thus, a solitary integer can be used as an address of a list for pick.  The third example shows that an address for a table is a pair of integers.  The last example shows that picking out of range returns a fault.
+In the first example, pick selects the fourth item because of 0-origin indexing.  In the second example, <sup><a id="fnr.2.100" name="fnr.2.100" class="footref" href="#fn.2">2</a></sup> is not an address of the list (its addresses are integers) but it is converted to integer 3.  Thus, a solitary integer can be used as an address of a list for pick.  The third example shows that an address for a table is a pair of integers.  The last example shows that picking out of range returns a fault.
 </p>
 
 <p>
@@ -15925,7 +15889,6 @@ If the response is text that begins with y or Y, the expression Restart is execu
 12
 </pre>
 </div>
-
 
 <div id="outline-container-sec-253-1" class="outline-3">
 <h3 id="sec-253-1"><span class="section-number-3">253.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
@@ -19028,7 +18991,6 @@ in not order some words
 </pre>
 </div>
 
-
 <div id="outline-container-sec-302-1" class="outline-3">
 <h3 id="sec-302-1"><span class="section-number-3">302.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
 <div class="outline-text-3" id="text-302-1">
@@ -19085,7 +19047,6 @@ The operation sortup returns the list of items of array A ordered according to t
 in not order some words
 </pre>
 </div>
-
 
 <div id="outline-container-sec-303-1" class="outline-3">
 <h3 id="sec-303-1"><span class="section-number-3">303.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
@@ -19324,7 +19285,6 @@ The operation sqrt implements the square root function of mathematics.  It produ
 </pre>
 </div>
 </div>
-
 
 <div id="outline-container-sec-305-2" class="outline-3">
 <h3 id="sec-305-2"><span class="section-number-3">305.2</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
@@ -20245,7 +20205,6 @@ The operation tally returns an integer indicating the number of items of the arr
 </pre>
 </div>
 
-
 <div id="outline-container-sec-321-1" class="outline-3">
 <h3 id="sec-321-1"><span class="section-number-3">321.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
 <div class="outline-text-3" id="text-321-1">
@@ -20337,7 +20296,6 @@ The operation tan implements the tangent function of mathematics.  It produces t
 </pre>
 </div>
 
-
 <div id="outline-container-sec-322-1" class="outline-3">
 <h3 id="sec-322-1"><span class="section-number-3">322.1</span> Definition Equation</h3>
 <div class="outline-text-3" id="text-322-1">
@@ -20417,7 +20375,6 @@ The operation tanh implements the hyperbolic tangent function of mathematics.  I
 </pre>
 </div>
 
-
 <div id="outline-container-sec-323-1" class="outline-3">
 <h3 id="sec-323-1"><span class="section-number-3">323.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
 <div class="outline-text-3" id="text-323-1">
@@ -20428,7 +20385,6 @@ The operation tanh implements the hyperbolic tangent function of mathematics.  I
 </div>
 </div>
 </div>
-
 
 <div id="outline-container-sec-323-2" class="outline-3">
 <h3 id="sec-323-2"><span class="section-number-3">323.2</span> Equations</h3>
@@ -20578,7 +20534,6 @@ The operation third returns the third of the items of A.  Third is defined in te
 0
 </pre>
 </div>
-
 
 <div id="outline-container-sec-326-1" class="outline-3">
 <h3 id="sec-326-1"><span class="section-number-3">326.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
@@ -20857,7 +20812,6 @@ The major purpose for Toplevel is to handle an exception condition within a defi
 The operation toraw converts the simple array A of real number, integers, or characters to a boolean array corresponding to the internal bit pattern for the data.
 </p>
 
-
 <div class="org-src-container">
 
 <pre class="src src-nial"><span style="color: #ffffff; font-weight: bold;">toraw</span> <span style="color: #00ff00;">'345'</span>
@@ -20866,8 +20820,6 @@ The operation toraw converts the simple array A of real number, integers, or cha
 <pre class="example">
 oooooooooollololoolloloo
 </pre>
-
-
 
 <div class="org-src-container">
 
@@ -20878,8 +20830,6 @@ oooooooooollololoolloloo
 ooooooooooooooooooooooololollool
 </pre>
 
-
-
 <div class="org-src-container">
 
 <pre class="src src-nial"><span style="color: #ffffff; font-weight: bold;">toraw</span> 34.5
@@ -20888,8 +20838,6 @@ ooooooooooooooooooooooololollool
 <pre class="example">
 ooooooooooooooooooooooooooooooooolooooooolooooololoooooooooooooo
 </pre>
-
-
 
 <div class="org-src-container">
 
@@ -20900,7 +20848,6 @@ ooooooooooooooooooooooooooooooooolooooooolooooololoooooooooooooo
 lollo
 </pre>
 </div>
-
 
 <div id="outline-container-sec-337-1" class="outline-3">
 <h3 id="sec-337-1"><span class="section-number-3">337.1</span> Equation</h3>
@@ -20930,8 +20877,6 @@ The operation toupper is used to ensure that a string has all its letters in upp
 <pre class="example">
 ABCDE*?12XYZ
 </pre>
-
-
 
 <div class="org-src-container">
 
@@ -21124,7 +21069,6 @@ The constant expression True denotes the boolean atom for true, which Nial also 
 </div>
 </div>
 </div>
-
 
 <div id="outline-container-sec-343-2" class="outline-3">
 <h3 id="sec-343-2"><span class="section-number-3">343.2</span> Equations</h3>
@@ -21715,7 +21659,6 @@ l
 </pre>
 </div>
 
-
 <div id="outline-container-sec-352-1" class="outline-3">
 <h3 id="sec-352-1"><span class="section-number-3">352.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
 <div class="outline-text-3" id="text-352-1">
@@ -21791,7 +21734,6 @@ The operation valence returns an integer indicating the number of axes of A.  If
 8
 </pre>
 </div>
-
 
 <div id="outline-container-sec-353-1" class="outline-3">
 <h3 id="sec-353-1"><span class="section-number-3">353.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
@@ -21953,7 +21895,6 @@ The operation void is an obsolete operation that has the same effect as the oper
 l
 </pre>
 </div>
-
 
 <div id="outline-container-sec-358-1" class="outline-3">
 <h3 id="sec-358-1"><span class="section-number-3">358.1</span> Definition&#xa0;&#xa0;&#xa0;<span class="tag"><span class="def">def</span></span></h3>
@@ -22247,7 +22188,7 @@ The expression Window returns the parameters of the current window, Position, Si
 <div class="outline-text-2" id="text-363">
 
 <p>
-The operation write displays the picture of an array on the display screen.  The result is the no-expression fault ?noexpr.  The picture displayed depends on the settings of the diagram/sketch and decor/nodecor switches.  The effect of write is the same as applying writescreen to the picture of the array.
+The operation write displays the picture of an array on the display screen.  The result is the no-expression fault <code>?noexpr</code>.  The picture displayed depends on the settings of the diagram/sketch and decor/nodecor switches.  The effect of write is the same as applying <a href="#sec-369">369</a> to the picture of the array.
 </p>
 
 <div class="org-src-container">
@@ -22405,7 +22346,7 @@ After the text is displayed, the cursor is placed on the line following the last
 
 <div class="org-src-container">
 
-<pre class="src src-nial"><span style="color: #ffffff; font-weight: bold;">writescreen</span>  <span style="color: #00ff00;">'End of Manual'</span> ;
+<pre class="src src-nial"><span style="color: #ffffff; font-weight: bold;">writescreen</span>  <span style="color: #00ff00;">'End of Manual'</span>;
 </pre>
 </div>
 
@@ -22418,7 +22359,20 @@ The operation <a href="#sec-369">369</a> is similar to the operation <a href="#s
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
 
-<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p>DEFINITION NOT FOUND.</p></div>
+<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
+if A is in the range -1 to 1; otherwise, the fault ?arcsin
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-nial"><span style="color: #ffffff; font-weight: bold;">arcsin</span> l -2 0.35
+</pre>
+</div>
+<pre class="example">
+1.5708 ?arcsin 0.357571
+</pre></div>
+
+<div class="footdef"><sup><a id="fn.2" name="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p>DEFINITION NOT FOUND.</p></div>
 
 
 </div>
