@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>mini-rosetta</title>
-<!-- 2014-05-29 Thu 23:15 -->
+<!-- 2014-05-31 Sat 13:14 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -107,9 +107,6 @@ These are all comparisons of J, haskell, and nial for now.
 <span style="color: #66f;">-- </span><span style="color: #66f;">monadic hook and fork</span>
 <span style="color: #ffffff; font-weight: bold;">mfk</span> f g h y <span style="color: #eedd82;">=</span> (f y) <span style="color: #eedd82;">`g`</span> (h y)
 <span style="color: #ffffff; font-weight: bold;">mhk</span> <span style="color: #eedd82;">=</span> mfk id
-
-<span style="color: #66f;">-- </span><span style="color: #66f;">test that all items in list are true</span>
-<span style="color: #ffffff; font-weight: bold;">allTrue</span> <span style="color: #eedd82;">=</span> all (<span style="color: #eedd82;">==</span> <span style="color: #ff00ff;">True</span>)
 </pre>
 </div>
 </div>
@@ -320,7 +317,7 @@ l
 
 <div class="org-src-container">
 
-<pre class="src src-haskell"><span style="color: #ff00ff;">Prelude</span><span style="color: #ffffff; font-weight: bold;">&gt;</span> allTrue <span style="color: #eedd82;">$</span> (mfk tail (zipWith (<span style="color: #eedd82;">&lt;</span>)) init) [0<span style="color: #eedd82;">..</span>9]
+<pre class="src src-haskell"><span style="color: #ff00ff;">Prelude</span><span style="color: #ffffff; font-weight: bold;">&gt;</span> and <span style="color: #eedd82;">$</span> (mfk tail (zipWith (<span style="color: #eedd82;">&lt;</span>)) init) [0<span style="color: #eedd82;">..</span>9]
 <span style="color: #ff00ff;">True</span>
 </pre>
 </div>
@@ -381,7 +378,7 @@ Yet another way to double a number:
 
 <div class="org-src-container">
 
-<pre class="src src-J">5 (+ &amp; *:) 6   <span style="color: #66f;">NB. '&amp;' is 'atop' ... '+:' is square</span>
+<pre class="src src-J">5 (+ &amp; *:) 6   <span style="color: #66f;">NB. '&amp;' is 'atop' ... '*:' is square</span>
 </pre>
 </div>
 <pre class="example">
