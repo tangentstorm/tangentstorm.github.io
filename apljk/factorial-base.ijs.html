@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>factorial-base.ijs</title>
-<!-- 2014-10-11 Sat 17:38 -->
+<!-- 2014-10-11 Sat 17:45 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -87,6 +87,7 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
+
 <div id="outline-container-sec-2" class="outline-2">
 <h2 id="sec-2"><span class="section-number-2">2</span> how many ways are there to chose 7 playing cards from a 52-card deck?</h2>
 <div class="outline-text-2" id="text-2">
@@ -105,6 +106,10 @@ Here are a few ways to express (52 choose 7) in J:
 </pre>
 </div>
 
+<pre class="example">
+133784560
+</pre>
+
 
 <div class="org-src-container">
 
@@ -113,12 +118,20 @@ Here are a few ways to express (52 choose 7) in J:
 </pre>
 </div>
 
+<pre class="example">
+133784560
+</pre>
+
 <div class="org-src-container">
 
 <pre class="src src-J"><span style="color: #66f;">NB. factor out the '52 -'</span>
 (*/ 52 - 0 1 2 3 4 5 6) % (*/ 1 2 3 4 5 6 7)
 </pre>
 </div>
+
+<pre class="example">
+133784560
+</pre>
 
 <div class="org-src-container">
 
@@ -127,12 +140,20 @@ Here are a few ways to express (52 choose 7) in J:
 </pre>
 </div>
 
+<pre class="example">
+133784560
+</pre>
+
 <div class="org-src-container">
 
 <pre class="src src-J"><span style="color: #66f;">NB. factor out the */</span>
 */ (52 - i.7) % (1 + i.7)
 </pre>
 </div>
+
+<pre class="example">
+133784560
+</pre>
 
 <div class="org-src-container">
 
@@ -141,12 +162,20 @@ Here are a few ways to express (52 choose 7) in J:
 </pre>
 </div>
 
+<pre class="example">
+133784560
+</pre>
+
 <div class="org-src-container">
 
 <pre class="src src-J"><span style="color: #66f;">NB. factor out the arguments</span>
 */ x (- % 1+]) i. y [ <span style="color: #00ff00;">'x y'</span> =. 52 7
 </pre>
 </div>
+
+<pre class="example">
+133784560
+</pre>
 
 <div class="org-src-container">
 
@@ -155,12 +184,20 @@ Here are a few ways to express (52 choose 7) in J:
 </pre>
 </div>
 
+<pre class="example">
+[: */ [ (- % 1 + ]) [: i. ]
+</pre>
+
 <div class="org-src-container">
 
 <pre class="src src-J"><span style="color: #ffffff; font-weight: bold;">choose</span> =: [: */ [ (- % 1 + ]) [: i. ]
 52 choose 7
 </pre>
 </div>
+
+<pre class="example">
+133784560
+</pre>
 
 <p>
 But the simplest of all is to just use the primitive:
@@ -171,6 +208,10 @@ But the simplest of all is to just use the primitive:
 <pre class="src src-J">7!52
 </pre>
 </div>
+
+<pre class="example">
+133784560
+</pre>
 </div>
 </div>
 
@@ -218,6 +259,10 @@ How many combinations of 2 cards are there?
 </pre>
 </div>
 
+<pre class="example">
+1326
+</pre>
+
 <p>
 How many possible values would we have if we used base-51 for the second digit?
 </p>
@@ -227,6 +272,10 @@ How many possible values would we have if we used base-51 for the second digit?
 <pre class="src src-J">52 * 51
 </pre>
 </div>
+
+<pre class="example">
+2652
+</pre>
 
 <p>
 This is twice the number of values that we need. It's a perfectly fine coding scheme, but it leaves gaps.
@@ -242,6 +291,10 @@ Is there an alternative?
 </pre>
 </div>
 
+<pre class="example">
+1326
+</pre>
+
 <p>
 J is perfectly happy to work with fractional bases.
 </p>
@@ -252,11 +305,19 @@ J is perfectly happy to work with fractional bases.
 </pre>
 </div>
 
+<pre class="example">
+0
+</pre>
+
 <div class="org-src-container">
 
 <pre class="src src-J">51r2 52 #. (51r2-1),51  <span style="color: #66f;">NB. highest 2-digit number in this base</span>
 </pre>
 </div>
+
+<pre class="example">
+1325
+</pre>
 
 <p>
 We can convert any pair of cards back and forth to our fractional base:
@@ -269,12 +330,24 @@ We can convert any pair of cards back and forth to our fractional base:
 </pre>
 </div>
 
+<pre class="example">
+23 38
+
+13 2
+</pre>
+
 <div class="org-src-container">
 
 <pre class="src src-J">51r2 52 #. 23 38
 51r2 52 #. 13 2
 </pre>
 </div>
+
+<pre class="example">
+1234
+
+678
+</pre>
 </div>
 </div>
 
@@ -293,6 +366,12 @@ The following verb calculates the bases for each digit for (x choose y) combinat
 </pre>
 </div>
 
+<pre class="example">
+46r7 47r6 48r5 49r4 50r3 51r2 52
+
+133784560
+</pre>
+
 
 <p>
 We can subtract 1 from each digit to get the highest well-formed number in our base:
@@ -304,6 +383,10 @@ We can subtract 1 from each digit to get the highest well-formed number in our b
 (52 chbas 7) - 1
 </pre>
 </div>
+
+<pre class="example">
+39r7 41r6 43r5 45r4 47r3 49r2 51
+</pre>
 
 <p>
 Converting these "digits" back to a decimal number (with #.) and then adding 1 should give us the total number of combinations.
@@ -317,6 +400,12 @@ Converting these "digits" back to a decimal number (with #.) and then adding 1 s
 </pre>
 </div>
 
+<pre class="example">
+133784560
+
+133784560
+</pre>
+
 <p>
 Here's a base 10 analogy to make it clearer:
 </p>
@@ -327,6 +416,12 @@ Here's a base 10 analogy to make it clearer:
 1 + 10 10 10 10 #. 0 9 9 9
 </pre>
 </div>
+
+<pre class="example">
+0 9 9 9
+
+1000
+</pre>
 </div>
 </div>
 </div>
