@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>vorunati-device</title>
+<!-- 2014-05-28 Wed 01:10 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">vorunati-device</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 1. any function can be reduced to the form <code>bit^x \rarr bit^y</code>.</a></li>
+<li><a href="#sec-2">2. 2. Number of functions from <code>bit^x \rarr bit^y</code>?</a></li>
+<li><a href="#sec-3">3. 3. Number of bits required to represent <code>n</code> distinct functions.</a></li>
+<li><a href="#sec-4">4. 4. number of bits required to identify a function in <code>bit^x \rarr bit^y</code>.</a></li>
+<li><a href="#sec-5">5. NOTE . given a lookup table of the codomain, we can constrain these functions so that <code>y≤x</code>.</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><a id="ipf4bz60shg0" name="ipf4bz60shg0"></a><span class="section-number-2">1</span> 1. any function can be reduced to the form <code>bit^x \rarr bit^y</code>.</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+</div>
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><a id="vwgh1270shg0" name="vwgh1270shg0"></a><span class="section-number-2">2</span> 2. Number of functions from <code>bit^x \rarr bit^y</code>?</h2>
+<div class="outline-text-2" id="text-2">
+
+<p>
+To find the answer, we need to construct a truth table.
+</p>
+
+<p>
+A function with no input is a constant, so its truth table contains one item.
+</p>
+
+<p>
+There are 2 functions of (0 bit -&gt; 1 bit). (Niladic 0 and 1).
+</p>
+
+<p>
+There are 4 functions of (1 bit -&gt; 1 bit). (Monadic 0: and 1:, -. (inversion/not), and ] (identity).
+</p>
+
+<p>
+There are 16 functions of (2 bit -&gt; 1 bit). (The 16 boolean connectives.)
+</p>
+
+<p>
+The way to construct the table is to start with 2 cells to hold the outputs, and just keep doubling as you add each new input bit.
+</p>
+
+<p>
+So that's <code>2^x</code> cells in the table, and the input simply selects the cell.
+</p>
+
+<p>
+Likewise, the output bits selects between <code>2^y</code> possible outputs, and we have a choice of <code>2^y</code> outputs for <i>each</i> of the <code>2^x</code> inputs.
+</p>
+
+<p>
+Thus, there are <code>(2^y)^(2^x)</code> possible functions of type <code>(bit^x \rarr bit^y)</code>.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><a id="kvwdeb90shg0" name="kvwdeb90shg0"></a><span class="section-number-2">3</span> 3. Number of bits required to represent <code>n</code> distinct functions.</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+This is easy. It's just <code>log₂(n)</code>.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><a id="1y8gmh90shg0" name="1y8gmh90shg0"></a><span class="section-number-2">4</span> 4. number of bits required to identify a function in <code>bit^x \rarr bit^y</code>.</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+We just combine the answers from steps 3 and 4:  <code>log₂(=(2^y)^(2^x))</code>.
+</p>
+
+<p>
+There is a law about logarithms: <code>log[n](a^b) \rarr b × log[n](a)</code>
+</p>
+
+<p>
+Therefore, our answer reduces to:   <code>(2^x) × log₂(2^y)</code>
+</p>
+
+<p>
+This reduces to <code>((2^x)×y)</code>.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><a id="bc19y390shg0" name="bc19y390shg0"></a><span class="section-number-2">5</span> NOTE . given a lookup table of the codomain, we can constrain these functions so that <code>y≤x</code>.</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+We know (<code>x ≤ y</code>) because we can just enumerate the results for all (<code>2^x</code>) inputs. Since we're talking about functions, there can't be more distinct outputs than there are inputs. The only trick is mapping the outputs to the inputs.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>

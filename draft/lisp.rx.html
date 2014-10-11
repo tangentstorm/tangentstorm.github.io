@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>lisp.rx : a tiny lisp in retro</title>
+<!-- 2014-05-15 Thu 00:06 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">lisp.rx : a tiny lisp in retro</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. a universal evaluator</a></li>
+<li><a href="#sec-2">2. <span class="todo TODO">TODO</span> <code>[0/2]</code> &laquo;defs&raquo; = words to define</a>
+<ul>
+<li><a href="#sec-2-1">2.1. <span class="todo TODO">TODO</span> <code>[0/11]</code> other meta functions</a></li>
+<li><a href="#sec-2-2">2.2. <span class="todo TODO">TODO</span> <code>[0/8]</code> symbols</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><a id="p3cifs60ygg0" name="p3cifs60ygg0"></a><span class="section-number-2">1</span> a universal evaluator</h2>
+<div class="outline-text-2" id="text-1">
+
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #66f;">( sx -&gt; s-expression: either an atom or a cons cell (list). )</span>
+<span style="color: #66f;">( al -&gt; a-list: an sx consisting of (key . value) pairs. )</span>
+<span style="color: #66f;">( ctx -&gt; environ: a-list holding variables defined in current scope )</span>
+
+&lt;&lt;defs&gt;&gt;
+
+<span style="color: #c63; font-weight: bold;">:</span> mEVAL <span style="color: #66f;">( revectored because mutually recursive with other functions )</span>
+<span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( c:al e:sx - sx ) evaluate expression e in context c"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> mAPPLY mAPPQ mCONS mEVAL
+<span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( c:ctx f:sx args:sx - sx ) apply function f to quoted arguments"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> mEVAL2
+   2over <span style="color: #66f;">( -&gt; a pq a pq )</span>
+   mCDR mEVAL <span style="color: #00ffff;">push</span>
+   mCAR mEVAL <span style="color: #00ffff;">pop</span>
+<span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( a:sx pq:sx -&gt; p:sx q:sx ) eval sx pair (x . y) in context of alist a"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> mEVLIS mNULL? <span style="color: #00ffff;">[</span> sNULL <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> mCAR mEVAL mCDR mEVLIS mCONS <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span>
+<span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( a:sx l:sx ) eval each sx in l in context of alist a"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> mSPLIT <span style="color: #00ffff;">dup</span> mCDR <span style="color: #00ffff;">[</span> mCAR <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">dip</span>
+<span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( pq:sx - p:sx q:sx ) split cons cell into its parts"</span>
+
+<span style="color: #c63; font-weight: bold;">:</span> mEV.form <span style="color: #66f;">( c:ctx pq:sx - sx )</span>
+  mSPLIT <span style="color: #00ffff;">swap</span> <span style="color: #66f;">( -&gt; c q p )</span>
+  <span style="color: #00ffff;">[</span> sQUOTE mEQ? <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> mCADR <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+  <span style="color: #00ffff;">[</span> sATOM? mEQ? <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> mCADR mEVAL mATOM? <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+  <span style="color: #00ffff;">[</span> sCOND  mEQ? <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> mCDR mEVCOND <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+  <span style="color: #00ffff;">[</span> sCAR   mEQ? <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> mCADR mEVAL mCAR <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+  <span style="color: #00ffff;">[</span> sCDR   mEQ? <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> mCADR mEVAL mCDR <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+  <span style="color: #00ffff;">[</span> sCONS  mEQ? <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> mEVAL2 mCONS <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+  <span style="color: #00ffff;">[</span> sDEF   mEQ? <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> <span style="color: #00ffff;">dup</span> mCADR mCADDR bindFn <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+  <span style="color: #00ffff;">[</span> sCTX   mEQ? <span style="color: #00ffff;">]</span> [] <span style="color: #66f;">( do nothing; leaving c )</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+  <span style="color: #66f;">( otherwise: try to treat as function application )</span>
+    <span style="color: #00ffff;">rot</span> <span style="color: #00ffff;">2dup</span> 2push 2rot    <span style="color: #66f;">( -&gt; c q p | c c )</span>
+    <span style="color: #00ffff;">pop</span> <span style="color: #00ffff;">swap</span> mASSOC <span style="color: #00ffff;">push</span>   <span style="color: #66f;">( -&gt; c q   | P c )</span> <span style="color: #66f;">( P is mEVAL[ctx; p] )</span>
+    mEVLIS <span style="color: #00ffff;">pop</span> <span style="color: #00ffff;">swap</span>        <span style="color: #66f;">( -&gt; P Q   | c   )</span>
+    mCONS <span style="color: #00ffff;">pop</span> <span style="color: #00ffff;">swap</span> mEVAL   <span style="color: #66f;">( -&gt; v     |     )</span>
+<span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( c:sx p:sx q:sx - v:sx ) eval form (p . q) in context c"</span> :doc
+
+<span style="color: #c63; font-weight: bold;">:</span> mEV.lambda            <span style="color: #66f;">(    c l a )</span>
+  <span style="color: #00ffff;">rot</span> <span style="color: #00ffff;">swap</span> <span style="color: #00ffff;">over</span> <span style="color: #00ffff;">swap</span>    <span style="color: #66f;">( -&gt; l c c a )</span>
+  mEVLIS <span style="color: #00ffff;">push</span> <span style="color: #00ffff;">swap</span>      <span style="color: #66f;">( -&gt; c l | A )</span>
+  mSPLIT <span style="color: #00ffff;">nip</span> mSPLIT     <span style="color: #66f;">( -&gt; c p q | A  // p is arg names, q is body )</span>
+  <span style="color: #00ffff;">swap</span> <span style="color: #00ffff;">push</span> <span style="color: #00ffff;">swap</span> <span style="color: #00ffff;">pop</span>    <span style="color: #66f;">( -&gt; q c p | A )</span>
+  <span style="color: #00ffff;">pop</span> mZIP <span style="color: #00ffff;">swap</span> mAPPEND <span style="color: #66f;">( -&gt; q pAc  // pAc=new ctx with bound args )</span>
+  <span style="color: #00ffff;">swap</span> mEVAL
+<span style="color: #c63; font-weight: bold;">;</span> <span style="color: #00ff00;">"( ctx:sx lam:sx@(&#955; . pq) args:sx -&gt; sx )"</span> :doc
+
+<span style="color: #66f;">( : mEVAL - now we can define it for real. )</span>
+<span style="color: #00ffff;">[</span> <span style="color: #66f;">( c:ctx e:sx -&gt; sx )</span>
+  <span style="color: #00ffff;">dup</span> mATOM?
+  <span style="color: #00ffff;">[</span> <span style="color: #66f;">( if e is an atom, just look it up )</span> mASSOC <span style="color: #00ffff;">]</span>
+  <span style="color: #00ffff;">[</span> <span style="color: #66f;">( elif mCAR[e] is an atom... )</span> <span style="color: #00ffff;">dup</span> mCAR <span style="color: #00ffff;">dup</span> mATOM?
+    <span style="color: #00ffff;">[</span> <span style="color: #66f;">( then evaluate as a form: )</span> mEV.form <span style="color: #00ffff;">]</span>
+    <span style="color: #00ffff;">[</span> <span style="color: #66f;">( else try to treat it as a lambda )</span>
+      mSPLIT <span style="color: #00ffff;">over</span> mCAR <span style="color: #66f;">( c ((p . q) . args) -&gt; c (p q) (args) p )</span>
+      <span style="color: #00ffff;">[</span> sLAMBDA mEQ? <span style="color: #00ffff;">]</span> <span style="color: #00ffff;">[</span> mEV.lambda <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">whend</span>
+      <span style="color: #00ff00;">"can't apply "</span> puts mPRINT <span style="color: #00ff00;">" to arguments. "</span> puts cr
+      <span style="color: #00ffff;">2drop</span> <span style="color: #00ffff;">drop</span>
+    <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span>
+  <span style="color: #00ffff;">]</span> <span style="color: #ffd700; font-weight: bold;">if</span>
+<span style="color: #00ffff;">]</span> <span style="color: #c63; font-weight: bold;">is</span> mEVAL
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><a id="di1h2wi0ygg0" name="di1h2wi0ygg0"></a><span class="section-number-2">2</span> <span class="todo TODO">TODO</span> <code>[0/2]</code> &laquo;defs&raquo; = words to define</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><a id="2l545yi0ygg0" name="2l545yi0ygg0"></a><span class="section-number-3">2.1</span> <span class="todo TODO">TODO</span> <code>[0/11]</code> other meta functions</h3>
+<div class="outline-text-3" id="text-2-1">
+<dl class="org-dl">
+<dt> <code>[&#xa0;]</code> mASSOC </dt><dd>c:al s:sx &rarr; sx ; <i>lookup symbol s in context c</i>
+</dd>
+<dt> <code>[&#xa0;]</code> mAPPQ </dt><dd>s:sx &rarr; sx ; <i>basically (map quote s)</i>
+</dd>
+<dt> <code>[&#xa0;]</code> mCONS </dt><dd>p q &rarr; (p . q)
+</dd>
+<dt> <code>[&#xa0;]</code> mCDR  </dt><dd>(p . q) &rarr; q
+</dd>
+<dt> <code>[&#xa0;]</code> mEVLIS </dt><dd>s:sx &rarr; sx ; <i>basically (map eval s)</i>
+</dd>
+<dt> <code>[&#xa0;]</code> mNULL? </dt><dd>s &rarr; bit
+</dd>
+<dt> <code>[&#xa0;]</code> mCAR </dt><dd>(p . q) -&gt; p
+</dd>
+<dt> <code>[&#xa0;]</code> mEQ? </dt><dd>p q &rarr; bit
+</dd>
+<dt> <code>[&#xa0;]</code> mATOM? </dt><dd>p &rarr; bit
+</dd>
+<dt> <code>[&#xa0;]</code> mEVCOND </dt><dd>opts:sx &rarr; sx ; <i>special branching/conditional statement</i>
+</dd>
+<dt> <code>[&#xa0;]</code> bindFn </dt><dd>key val -&gt; key ; <i>associate key with value in current ctx</i>
+</dd>
+<dt> <code>[&#xa0;]</code> mZIP </dt><dd>[a] [b] -&gt; [(a . b)]
+</dd>
+</dl>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><a id="ngggw0j0ygg0" name="ngggw0j0ygg0"></a><span class="section-number-3">2.2</span> <span class="todo TODO">TODO</span> <code>[0/8]</code> symbols</h3>
+<div class="outline-text-3" id="text-2-2">
+
+<ul class="org-ul">
+<li><code>[&#xa0;]</code> sQUOTE
+</li>
+<li><code>[&#xa0;]</code> sATOM?
+</li>
+<li><code>[&#xa0;]</code> sCOND
+</li>
+<li><code>[&#xa0;]</code> sCAR
+</li>
+<li><code>[&#xa0;]</code> sCDR
+</li>
+<li><code>[&#xa0;]</code> sCONS
+</li>
+<li><code>[&#xa0;]</code> sDEF
+</li>
+<li><code>[&#xa0;]</code> sCTX
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

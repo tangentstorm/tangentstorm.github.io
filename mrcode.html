@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>mrcode</title>
-<!-- 2014-05-20 Tue 02:41 -->
+<!-- 2014-05-28 Wed 01:10 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -141,6 +141,43 @@ for the JavaScript code in this tag.
 </ul>
 </div>
 </div>
+<p>
+&ne;
+( most of these are from proofwiki.org )
+</p>
+<dl class="org-dl">
+<dt> power set </dt><dd>X &times; Y = { (x, y) : x &isin; X &and; y &isin; Y }.
+</dd>
+<dt> extensionality </dt><dd>&forall;A ∀B (∀X, (X &isin; A ⇔ X &isin; B) &rArr; A = B).
+</dd>
+<dt> pairing </dt><dd>∀A ∀B ∃x ∀y (y∈x ⇔ y=A ∨ y=B).
+</dd>
+<dt> infinity </dt><dd>∃x ((∃y y∈x ∧ ∀z ¬ (z∈y)) ∧ ∀u u∈x ⇒ u⁺∈x)
+</dd>
+<dt> union </dt><dd>∀A.∃x.∀y.(y∈x ⇔ ∃z. (z∈A ∧ y∈z))
+</dd>
+<dt> foundation </dt><dd>∀S.((∃x.x∈S) ⇒ ∃y∈S. ∀z∈S. ¬(z∈y))
+</dd>
+<dt> existence </dt><dd>∃x.∀y.(¬(y∈x))
+</dd>
+<dt> choice </dt><dd>∀s.((∅∉s ∧ ∀t,u∈s.t=u ∨ t∩u=∅) ⇒ ∃c.∀t∈s.∃x.t∩c={x})
+</dd>
+<dt> specification </dt><dd>∀P:a → Bit. ∀z.∃x.∀y.(y∈x ⇒ (y∈z ∧ P(y)))
+</dd>
+<dt> replacement </dt><dd>(∀y.∃x.∀z.(P(y,z)⇒x=z))⇒∀w.∃x.∀y.(y∈w⇒∀z.(P(y,z)⇒z∈x))
+</dd>
+</dl>
+
+<dl class="org-dl">
+<dt> tarski </dt><dd>⊢ ∃y(x∈y ∧ ∀z∈y (∀w(w ⊆ z → w ∈ y) ∧ ∃w∈y ∀v(v ⊆ z → v ∈ w)) ∧ ∀z(z ⊆ y → (z ≈ y ∨ z ∈ y)))
+</dd>
+</dl>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #ffaf00;">,.</span>a<span style="color: brightred;">.</span> <span style="color: #ffaf00;">i.</span> <span style="color: #ff5f00;">L:</span> 0 <span style="color: #00ff00;">'&#8704;'</span><span style="color: #ffaf00;">;</span><span style="color: #00ff00;">'&#8712;'</span><span style="color: #ffaf00;">;</span><span style="color: #00ff00;">'&#8660;'</span><span style="color: #ffaf00;">;</span><span style="color: #00ff00;">'&#8743;'</span><span style="color: #ffaf00;">;</span><span style="color: #00ff00;">'&#8746;'</span><span style="color: #ffaf00;">;</span><span style="color: #00ff00;">'&#8745;'</span><span style="color: #ffaf00;">;</span><span style="color: #00ff00;">'&#8835;'</span><span style="color: #ffaf00;">;</span><span style="color: #00ff00;">'&#8834;'</span>
+</pre>
+</div>
 <div id="outline-container-sec-1" class="outline-2">
 <h2 id="sec-1"><a id="h2za1uw0mhg0" name="h2za1uw0mhg0"></a><span class="section-number-2">1</span> OUTPUT <code>mr.cf</code> : minrel in coffeescript</h2>
 <div class="outline-text-2" id="text-1">
@@ -187,13 +224,7 @@ imports [ <span style="color: #00ff00;">'cur'</span>, <span style="color: #00ff0
 
 <div class="org-src-container">
 
-<pre class="src src-mr">langs lang:Str who:Str example:Str
-
-pythonGvRprint("hello, world")
-pascalNWprogram hw; begin writeln(''hello, world'') end.
-oberonNWMODULE hi; IMPORT Out; BEGIN Out.String("hi"); Out.Ln END hi.
-haskellSPJmain = print "hello world"
-JKEIecho 'hello world'
+<pre class="src src-mr">langslangStrwhoStrexampleStrpythonGvRprint("hello, world")pascalNWprogram hw; begin writeln('hello, world') end.oberonNWMODULE hi; IMPORT Out; BEGIN Out.String("hi"); Out.Ln END hi.haskellSPJmain = print "hello world"JKEIecho 'hello world'
 </pre>
 </div>
 </div>
@@ -438,7 +469,7 @@ JKEIecho 'hello world'
     <span style="color: #eedd82;">Str</span> = <span style="color: #ff00ff; font-weight: bold;">str</span>
     <span style="color: #eedd82;">Bit</span> = <span style="color: #ff00ff; font-weight: bold;">bool</span>
     <span style="color: #eedd82;">Num</span> = <span style="color: #ff00ff; font-weight: bold;">float</span>
-    <span style="color: #eedd82;">Nil</span> = <span style="color: #ff00ff; font-weight: bold;">type</span>(<span style="color: #7fffd4;">None</span>)
+    <span style="color: #eedd82;">Nil</span> = <span style="color: #ff00ff; font-weight: bold;">type</span>(<span style="color: #ffaf00;">None</span>)
     <span style="color: #eedd82;">Any</span> = <span style="color: #ff00ff; font-weight: bold;">object</span>
     <span style="color: #eedd82;">Row</span> = <span style="color: #ff00ff; font-weight: bold;">dict</span>
     <span style="color: #eedd82;">Lam</span> = <span style="color: #ff00ff; font-weight: bold;">type</span>(<span style="color: #00ffff;">lambda</span> x:x)
@@ -456,9 +487,9 @@ JKEIecho 'hello world'
 <pre class="src src-python" id="py.identity_el"><span style="color: #eedd82;">identity_el</span> ={ <span style="color: #66f;"># </span><span style="color: #66f;">identity element</span>
     Type.Int     : <span style="color: #00ffff;">lambda</span> : 0,
     Type.Str     : <span style="color: #00ffff;">lambda</span> : <span style="color: #00ff00;">''</span>,
-    Type.Bit     : <span style="color: #00ffff;">lambda</span> : <span style="color: #7fffd4;">False</span>,
+    Type.Bit     : <span style="color: #00ffff;">lambda</span> : <span style="color: #ffaf00;">False</span>,
     Type.Num     : <span style="color: #00ffff;">lambda</span> : 0.0,
-    Type.Nil     : <span style="color: #00ffff;">lambda</span> : <span style="color: #7fffd4;">None</span>,
+    Type.Nil     : <span style="color: #00ffff;">lambda</span> : <span style="color: #ffaf00;">None</span>,
     Type.Any     : <span style="color: #00ffff;">lambda</span> : <span style="color: #ff00ff; font-weight: bold;">object</span>(),
     Type.Row     : <span style="color: #00ffff;">lambda</span> : {},
     Type.Lam     : <span style="color: #00ffff;">lambda</span> : <span style="color: #00ffff;">lambda</span> x : x,
@@ -747,7 +778,7 @@ JKEIecho 'hello world'
     <span style="color: #00ffff;">else</span> (a, b)<span style="color: #ffffff; font-weight: bold;">=&gt;</span>
       <span style="color: #eedd82;">idx</span> = <span style="color: #eedd82;">@keys</span>.indexOf key_or_func
       <span style="color: #00ffff;">if</span> a[idx] <span style="color: #00ffff;">is</span> b[idx] <span style="color: #00ffff;">then</span> 0
-      <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> (a[idx] &lt; b[idx] <span style="color: #00ffff;">or</span> b[idx] <span style="color: #00ffff;">is</span><span style="color: #7fffd4;"> null</span>) <span style="color: #00ffff;">then</span> +1
+      <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">if</span> (a[idx] &lt; b[idx] <span style="color: #00ffff;">or</span> b[idx] <span style="color: #00ffff;">is</span><span style="color: #ffaf00;"> null</span>) <span style="color: #00ffff;">then</span> +1
       <span style="color: #00ffff;">else</span> -1
 
   <span style="color: #eedd82;">@rows</span> = <span style="color: #eedd82;">@rows</span>.sort(func)

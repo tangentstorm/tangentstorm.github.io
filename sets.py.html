@@ -3,8 +3,8 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title>index</title>
-<!-- 2014-10-11 Sat 17:38 -->
+<title>sets.py</title>
+<!-- 2014-05-28 Wed 01:09 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -58,47 +58,23 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">index</h1>
-<p>
-misc j articles (mostly unorganized drafts)
-</p>
+<h1 class="title">sets.py</h1>
+<div class="org-src-container">
 
-<ul class="org-ul">
-<li><a href="amend.ijs.html">amend.ijs.html</a>
-</li>
-<li><a href="treebuild.ijs.html">treebuild.ijs.html</a>
-</li>
-
-<li><a href="bjonas-scheme.ijs.html">bjonas-scheme.ijs.html</a>
-</li>
-<li><a href="factoring-verbs-j.html">factoring-verbs-j.html</a>
-</li>
-<li><a href="perfect-numbers.html">perfect-numbers.html</a>
-</li>
-<li><a href="rpn-in-j.html">rpn-in-j.html</a>
-</li>
-<li><a href="strip-ws.html">strip-ws.html</a>
-</li>
-<li><a href="upcase-saga-1.html">upcase-saga-1.html</a>
-</li>
-<li><a href="verbarrays.html">verbarrays.html</a>
-</li>
-<li><a href="z.ijs.html">z.ijs.html</a>
-</li>
-<li><a href="factorial-base.ijs.html">factorial-base.ijs.html</a>
-</li>
-</ul>
+<pre class="src src-python"><span style="color: #eedd82;">car</span> = (<span style="color: #00ffff;">lambda</span> aset: <span style="color: #ff00ff; font-weight: bold;">set</span>([e - {()} <span style="color: #00ffff;">for</span> e <span style="color: #00ffff;">in</span> aset <span style="color: #00ffff;">if</span> () <span style="color: #00ffff;">in</span> e]))
+car( {<span style="color: #ff00ff; font-weight: bold;">frozenset</span>([<span style="color: #00ff00;">'the-cdr'</span>]), <span style="color: #ff00ff; font-weight: bold;">frozenset</span>([<span style="color: #00ff00;">'the-car'</span>, ()])} )
+</pre>
+</div>
 
 
-<p>
-drafts:
-</p>
-<ul class="org-ul">
-<li><a href="bintree.ijs.html">bintree.ijs.html</a>
-</li>
-<li><a href="adder.ijs.html">adder.ijs.html</a>
-</li>
-</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #eedd82;">balanced</span> <span style="color: #666;">=:</span> (0 <span style="color: #ffaf00;">=</span> <span style="color: #ffaf00;">[:</span> <span style="color: #ffaf00;">+</span><span style="color: brightred;">/</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">,</span> 1 _1 <span style="color: #ffaf00;">*</span> <span style="color: #ffaf00;">E.</span><span style="color: #ff5f00;">"</span>0 1)
+assert <span style="color: #ffaf00;">-.</span> <span style="color: #00ff00;">'()'</span> balanced <span style="color: #00ff00;">'(()'</span>
+assert    <span style="color: #00ff00;">'()'</span> balanced <span style="color: #00ff00;">'(())'</span>
+</pre>
+</div>
 </div>
 </body>
 </html>

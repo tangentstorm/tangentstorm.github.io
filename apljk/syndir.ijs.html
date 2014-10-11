@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>relational programming in j</title>
+<!-- 2014-05-15 Thu 03:12 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">relational programming in j</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. introduction</a></li>
+<li><a href="#sec-2">2. implementation</a></li>
+<li><a href="#sec-3">3. REFERENCES</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><a id="kmhghel0ghg0" name="kmhghel0ghg0"></a><span class="section-number-2">1</span> introduction</h2>
+<div class="outline-text-2" id="text-1">
+
+<p>
+I've been reading through a series of old papers, written by a fellow named Bruce MacLennan during the 1980's
+</p>
+
+<p>
+MacLennan's work deals with binary relations, where a relation is something like a verb/function that may produce more than one result for a given input, and whose inverse is also a relation.
+</p>
+
+<p>
+For example, whereas <code>\ast:</code> represents the "square function" in J, <code>(\ast: :. ((+,-)@%:))</code> might represent the "square relation".
+</p>
+
+<p>
+In addition, a binary relation can be defined by creating an array of shape <code>(n, 2)</code>.
+</p>
+
+<p>
+MacLennan's language is untyped, but allows restricting either side of a relation by a predicate (which is just a relation mapping objects to boolean values), so a relational array might actually contain any number of boxed columns.
+</p>
+
+<p>
+In my code, I've started to implement relations as objects, thinking I could use them as a common interface for both the formulaic and tabular varieties.
+</p>
+
+<p>
+I've also created some words that allow you to define relations as a normal table of values (like you might find in a relational database), plus an index at which to "split" the table vertically so it can function as a mapping.
+</p>
+
+<p>
+For example:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J">require <span style="color: #00ff00;">'~/d/syndir.ijs'</span>
+require <span style="color: #00ff00;">'~/l/j/rel.ijs'</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #ff0000;">]</span> <span style="color: #eedd82;">doubles</span> <span style="color: #666;">=:</span> (<span style="color: #ff0000;">,.</span> <span style="color: #ff0000;">+:</span>) <span style="color: #ff0000;">i:</span> 3 <span style="color: #66f;">NB. </span><span style="color: #66f;">dyadic relation y=2*x, restricted to i:3</span>
+</pre>
+</div>
+
+<pre class="example">
+_3 _6
+_2 _4
+_1 _2
+ 0  0
+ 1  2
+ 2  4
+ 3  6
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #ff0000;">]</span> <span style="color: #eedd82;">squares</span> <span style="color: #666;">=:</span> (<span style="color: #ff0000;">,.</span> <span style="color: #ff0000;">*:</span>) <span style="color: #ff0000;">i:</span> 3 <span style="color: #66f;">NB. </span><span style="color: #66f;">dyadic relation y=x^2, restricted to i:3</span>
+</pre>
+</div>
+
+<pre class="example">
+_3 9
+_2 4
+_1 1
+ 0 0
+ 1 1
+ 2 4
+ 3 9
+</pre>
+
+
+<p>
+Monad <code>ar</code> [a]pplies a (tabular) [r]elation to an input:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J">squares ar <span style="color: color-202;">"</span>0 <span style="color: #ff0000;">]</span> 1 2 3
+</pre>
+</div>
+
+<pre class="example">
+1
+
+4
+
+9
+</pre>
+
+
+<p>
+The inverse of a tabular relation is formed by swapping the columns.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J">iv squares
+</pre>
+</div>
+
+<pre class="example">
+9 _3
+4 _2
+1 _1
+0  0
+1  1
+4  2
+9  3
+</pre>
+
+<p>
+The monad <code>ai</code> [a]pplies the [i]nverse of a tabular relation.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J">squares ai 9
+</pre>
+</div>
+
+<pre class="example">
+_3
+ 3
+</pre>
+
+<p>
+Now we can join the two tables on column 0 from each:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J">squares 0 0 J doubles
+</pre>
+</div>
+
+<pre class="example">
+_3 9 _6
+_2 4 _4
+_1 1 _2
+ 0 0  0
+ 1 1  2
+ 2 4  4
+ 3 9  6
+</pre>
+
+<p>
+Applying the inverse of this result is something like solving the following algebra problem:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #66f;">NB. </span><span style="color: #66f;">Solve for x, given ( 9 = x ^ 2 ) and ( _6 = 2 * x ).</span>
+2 (squares 0 0 J doubles) ai 9 _6
+</pre>
+</div>
+
+<pre class="example">
+_3
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><a id="x6rifxk0ghg0" name="x6rifxk0ghg0"></a><span class="section-number-2">2</span> implementation</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><a id="10rancl0ghg0" name="10rancl0ghg0"></a><span class="section-number-2">3</span> REFERENCES</h2>
+<div class="outline-text-2" id="text-3">
+
+<p>
+All of these are written by Bruce J MacLennan:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://archive.org/details/introductiontore00macl">Introduction to Relational Programming</a> (Jun 1981)
+</li>
+<li><a href="https://archive.org/details/overviewofrelati00macl">Overview of relational programming</a> (Nov 1981)
+</li>
+<li><a href="https://archive.org/details/relationalprogra00macl">A Relational Program for a Syntax Directed Editor</a> (Apr 1982)
+</li>
+<li><a href="https://archive.org/details/relationalprogra83012macl">Relational Programming</a> (Sep 1983)
+</li>
+<li><a href="https://archive.org/details/fourrelationalpr00macl">Four Relational Programs</a> (Nov 1986)
+</li>
+</ul>
+</div>
+</div>
+</div>
+</body>
+</html>
