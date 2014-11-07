@@ -3,8 +3,8 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title>euler.j</title>
-<!-- 2014-05-28 Wed 01:14 -->
+<title>project euler problems</title>
+<!-- 2014-11-07 Fri 10:53 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -58,113 +58,152 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">euler.j</h1>
+<h1 class="title">project euler problems</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. 2. even fibonacci</a></li>
-<li><a href="#sec-2">2. 3. largest prime factor of 600851475143</a></li>
-<li><a href="#sec-3">3. 4. largest palindrome product of two 3 digit numbers</a></li>
-<li><a href="#sec-4">4. 5. Smallest positive number that is evenly divisible by all of the numbers from 1 to 20?</a></li>
-<li><a href="#sec-5">5. 6. sum square difference</a></li>
-<li><a href="#sec-6">6. 7. 10001st prime</a></li>
-<li><a href="#sec-7">7. 8. largest product in a series</a></li>
-<li><a href="#sec-8">8. 9. special pythagorean triplet</a></li>
-<li><a href="#sec-9">9. <span class="todo TODO">TODO</span> 11. largest product in a grid</a></li>
+<li><a href="#sec-1">1. <span class="done DONE">DONE</span> 1. multiples of 3 and 5</a></li>
+<li><a href="#sec-2">2. <span class="done DONE">DONE</span> 2. even fibonacci numbers</a></li>
+<li><a href="#sec-3">3. <span class="done DONE">DONE</span> 3. largest prime factor of 600851475143</a></li>
+<li><a href="#sec-4">4. <span class="done DONE">DONE</span> 4. largest palindrome product of two 3 digit numbers</a>
+<ul>
+<li><a href="#sec-4-1">4.1. second implementation, almost a year later</a></li>
+</ul>
+</li>
+<li><a href="#sec-5">5. <span class="done DONE">DONE</span> 5. smallest multiple</a></li>
+<li><a href="#sec-6">6. <span class="done DONE">DONE</span> 6. sum square difference</a></li>
+<li><a href="#sec-7">7. <span class="done DONE">DONE</span> 7. 10001st prime</a></li>
+<li><a href="#sec-8">8. <span class="done DONE">DONE</span> 8. largest product in a series</a></li>
+<li><a href="#sec-9">9. <span class="done DONE">DONE</span> 9. special pythagorean triplet</a></li>
+<li><a href="#sec-10">10. <span class="todo TODO">TODO</span> 11. largest product in a grid</a></li>
+<li><a href="#sec-11">11. <span class="done DONE">DONE</span> 74. Digit factorial chains</a></li>
 </ul>
 </div>
 </div>
+
 <div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><a id="gindt020lbg0" name="gindt020lbg0"></a><span class="section-number-2">1</span> 2. even fibonacci</h2>
+<h2 id="sec-1"><a id="k0di44q0fng0" name="k0di44q0fng0"></a><span class="section-number-2">1</span> <span class="done DONE">DONE</span> 1. multiples of 3 and 5</h2>
 <div class="outline-text-2" id="text-1">
+
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #66f;">NB. </span><span style="color: #66f;">sum of the even unique values of fibonacci pairs less than 4 million</span>
-<span style="color: #ffaf00;">+</span><span style="color: brightred;">/</span> (<span style="color: #ffaf00;">]</span> <span style="color: #ffaf00;">#</span><span style="color: brightred;">~</span> 2<span style="color: #ffaf00;">:</span> <span style="color: #ffaf00;">-.</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">|</span> <span style="color: #ffaf00;">]</span>) <span style="color: #ffaf00;">~.,</span> ((<span style="color: #ffaf00;">{:,+</span><span style="color: brightred;">/</span>)<span style="color: #ff5f00;">^:</span>(4000000 <span style="color: #ffaf00;">&gt;</span> <span style="color: #ffaf00;">+</span><span style="color: brightred;">/</span>)<span style="color: #ff5f00;">^:</span>(<span style="color: #ffaf00;">&lt;</span>_))1 2
+<pre class="src src-J">+/ I. +./ 0 = 3 5 |/ i.1000
 </pre>
 </div>
 </div>
 </div>
 
 <div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><a id="s94jd120lbg0" name="s94jd120lbg0"></a><span class="section-number-2">2</span> 3. largest prime factor of 600851475143</h2>
+<h2 id="sec-2"><a id="gindt020lbg0" name="gindt020lbg0"></a><span class="section-number-2">2</span> <span class="done DONE">DONE</span> 2. even fibonacci numbers</h2>
 <div class="outline-text-2" id="text-2">
+
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #ffaf00;">&gt;.</span><span style="color: brightred;">/</span> <span style="color: #ffaf00;">q:</span> 600851475143
+<pre class="src src-j"><span style="color: #66f;">NB. sum of the even unique values of fibonacci pairs less than 4 million</span>
++/ (] #~ 2: -.@| ]) ~., (({:,+/)^:(4000000 &gt; +/)^:(&lt;_))1 2
 </pre>
 </div>
 </div>
 </div>
 
 <div id="outline-container-sec-3" class="outline-2">
-<h2 id="sec-3"><a id="oqo68620lbg0" name="oqo68620lbg0"></a><span class="section-number-2">3</span> 4. largest palindrome product of two 3 digit numbers</h2>
+<h2 id="sec-3"><a id="s94jd120lbg0" name="s94jd120lbg0"></a><span class="section-number-2">3</span> <span class="done DONE">DONE</span> 3. largest prime factor of 600851475143</h2>
 <div class="outline-text-2" id="text-3">
 
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #66f;">NB. </span><span style="color: #66f;">number of digits needed to represent y in base x</span>
-<span style="color: #eedd82;">ndig</span> <span style="color: #666;">=.</span> 13 <span style="color: #ffaf00;">:</span> <span style="color: #00ff00;">'&gt;. x ^. &gt;: y'</span>
-
-<span style="color: #66f;">NB. </span><span style="color: #66f;">the actual digits of y in base x</span>
-<span style="color: #eedd82;">basex</span> <span style="color: #666;">=.</span> 13 <span style="color: #ffaf00;">:</span> <span style="color: #00ff00;">'((x ndig f. y) # x) #: y'</span>       
-<span style="color: #eedd82;">digits</span> <span style="color: #666;">=.</span> 10 <span style="color: #ff5f00;">&amp;</span> basex
-
-<span style="color: #eedd82;">ispal</span> <span style="color: #666;">=.</span> <span style="color: #ffaf00;">*.</span><span style="color: brightred;">/</span> <span style="color: #ff5f00;">@</span> (<span style="color: #ffaf00;">|.</span> <span style="color: #ffaf00;">=</span> <span style="color: #ffaf00;">]</span>) <span style="color: #ff5f00;">&amp;</span> digits
-
-<span style="color: #ffaf00;">&gt;.</span><span style="color: brightred;">/</span> (ispal<span style="color: #ff5f00;">"</span>0 <span style="color: #ffaf00;">#</span> <span style="color: #ffaf00;">]</span>) <span style="color: #ffaf00;">,</span> <span style="color: #ffaf00;">*</span><span style="color: brightred;">/~</span> 100 <span style="color: #ffaf00;">+</span> <span style="color: #ffaf00;">i.</span> 899
+<pre class="src src-j">&gt;./ q: 600851475143
 </pre>
 </div>
 </div>
 </div>
 
-
 <div id="outline-container-sec-4" class="outline-2">
-<h2 id="sec-4"><a id="kbr7vmb0lbg0" name="kbr7vmb0lbg0"></a><span class="section-number-2">4</span> 5. Smallest positive number that is evenly divisible by all of the numbers from 1 to 20?</h2>
+<h2 id="sec-4"><a id="oqo68620lbg0" name="oqo68620lbg0"></a><span class="section-number-2">4</span> <span class="done DONE">DONE</span> 4. largest palindrome product of two 3 digit numbers</h2>
 <div class="outline-text-2" id="text-4">
 
 <div class="org-src-container">
 
-<pre class="src src-j">9 <span style="color: #ffaf00;">":</span> <span style="color: #ffaf00;">*</span><span style="color: brightred;">/</span>(<span style="color: #ffaf00;">]</span> <span style="color: #ffaf00;">^</span><span style="color: brightred;">~</span> <span style="color: #ffaf00;">p:</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">i.</span><span style="color: #ff5f00;">@</span><span style="color: #ffaf00;">#</span>)<span style="color: #ffaf00;">&gt;.</span><span style="color: brightred;">/</span>_ <span style="color: #ffaf00;">q:&gt;:i.</span>20
+<pre class="src src-J"><span style="color: #66f;">NB. number of digits needed to represent y in base x</span>
+<span style="color: #eedd82;">ndig</span> =. 13 : <span style="color: #00ff00;">'&gt;. x ^. &gt;: y'</span>
 
-<span style="color: #66f;">NB. </span><span style="color: #66f;">this takes the prime exponents (_ q:) of each number between-one-and (&gt;:i.) 20</span>
-<span style="color: #66f;">NB. </span><span style="color: #66f;">then finds the product (*/) of the actual primes needed (p:@i.@#) raised to those powers. (]^~)</span>
+<span style="color: #66f;">NB. the actual digits of y in base x</span>
+<span style="color: #eedd82;">basex</span> =. 13 : <span style="color: #00ff00;">'((x ndig f. y) # x) #: y'</span>
+<span style="color: #eedd82;">digits</span> =. 10 &amp; basex
+
+<span style="color: #eedd82;">ispal</span> =. *./ @ (|. = ]) &amp; digits
+
+&gt;./ (ispal"0 # ]) , */~ 100 + i. 899
 </pre>
+</div>
+</div>
+
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><a id="ump94qf0wng0" name="ump94qf0wng0"></a><span class="section-number-3">4.1</span> second implementation, almost a year later</h3>
+<div class="outline-text-3" id="text-4-1">
+
+<div class="org-src-container">
+
+<pre class="src src-J">&gt;./ (#~|.=":) ~. */~ 100+i.899x
+</pre>
+</div>
 </div>
 </div>
 </div>
 
 
 <div id="outline-container-sec-5" class="outline-2">
-<h2 id="sec-5"><a id="g40f7cf0lbg0" name="g40f7cf0lbg0"></a><span class="section-number-2">5</span> 6. sum square difference</h2>
+<h2 id="sec-5"><a id="kbr7vmb0lbg0" name="kbr7vmb0lbg0"></a><span class="section-number-2">5</span> <span class="done DONE">DONE</span> 5. smallest multiple</h2>
 <div class="outline-text-2" id="text-5">
+
+<p>
+Smallest positive number that is evenly divisible by all integers from 1 to 20?
+</p>
+
 <div class="org-src-container">
 
-<pre class="src src-j">(<span style="color: #ffaf00;">*:</span><span style="color: #ff5f00;">@</span>(<span style="color: #ffaf00;">+</span><span style="color: brightred;">/</span>) <span style="color: #ffaf00;">-</span> <span style="color: #ffaf00;">+</span><span style="color: brightred;">/</span><span style="color: #ff5f00;">@:</span><span style="color: #ffaf00;">*:</span>) <span style="color: #ffaf00;">&gt;:i.</span>100
+<pre class="src src-J">9 ": */(] ^~ p:@i.@#)&gt;./_ q:&gt;:i.20
+
+<span style="color: #66f;">NB. this takes the prime exponents (_ q:) of the numbers (&gt;:i.) 20</span>
+<span style="color: #66f;">NB. then finds the product (*/) of the actual primes needed (p:@i.@#)</span>
+<span style="color: #66f;">NB. raised to those powers. (]^~)</span>
 </pre>
 </div>
 </div>
 </div>
-
 
 <div id="outline-container-sec-6" class="outline-2">
-<h2 id="sec-6"><a id="k5v4off0lbg0" name="k5v4off0lbg0"></a><span class="section-number-2">6</span> 7. 10001st prime</h2>
+<h2 id="sec-6"><a id="g40f7cf0lbg0" name="g40f7cf0lbg0"></a><span class="section-number-2">6</span> <span class="done DONE">DONE</span> 6. sum square difference</h2>
 <div class="outline-text-2" id="text-6">
-<pre class="example">
-p: 10000oh
+
+<div class="org-src-container">
+
+<pre class="src src-J">(*:@(+/) - +/@:*:) &gt;:i.100
 </pre>
 </div>
 </div>
-
+</div>
 
 <div id="outline-container-sec-7" class="outline-2">
-<h2 id="sec-7"><a id="wk08igf0lbg0" name="wk08igf0lbg0"></a><span class="section-number-2">7</span> 8. largest product in a series</h2>
+<h2 id="sec-7"><a id="k5v4off0lbg0" name="k5v4off0lbg0"></a><span class="section-number-2">7</span> <span class="done DONE">DONE</span> 7. 10001st prime</h2>
 <div class="outline-text-2" id="text-7">
 
 <div class="org-src-container">
 
-<pre class="src src-J"><span style="color: #eedd82;">series</span> <span style="color: #666;">=.</span> 0 <span style="color: #ffaf00;">:</span> 0
+<pre class="src src-J">p: 10000
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><a id="wk08igf0lbg0" name="wk08igf0lbg0"></a><span class="section-number-2">8</span> <span class="done DONE">DONE</span> 8. largest product in a series</h2>
+<div class="outline-text-2" id="text-8">
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #eedd82;">series</span> =. 0 : 0
 73167176531330624919225119674426574742355349194934
 96983520312774506326239578318016984801869478851843
 85861560789112949495459501737958331952853208805511
@@ -185,74 +224,68 @@ p: 10000oh
 84580156166097919133875499200524063689912560717606
 05886116467109405077541002256983155200055935729725
 71636269561882670428252483600823257530420752963450
-)
+<span style="color: #00ffff;">)</span>
 
-<span style="color: #66f;">NB. </span><span style="color: #66f;">find the greatest (&gt;./) row-product (*/"1) where the rows </span>
-<span style="color: #66f;">NB. </span><span style="color: #66f;">are every 5-item sequence in an array.</span>
-<span style="color: #eedd82;">v</span> <span style="color: #666;">=.</span> 13 <span style="color: #ffaf00;">:</span> <span style="color: #00ff00;">'&gt;./ */"1 |: (,.i.13) |.!.0 x: y'</span>
+<span style="color: #66f;">NB. find the greatest (&gt;./) row-product (*/"1) where the rows</span>
+<span style="color: #66f;">NB. are every 5-item sequence in an array.</span>
+<span style="color: #eedd82;">v</span> =. 13 : <span style="color: #00ff00;">'&gt;./ */"1 |: (,.i.13) |.!.0 x: y'</span>
 
-<span style="color: #66f;">NB. </span><span style="color: #66f;">This comes out to: [: &gt;./ [: */"1 [: |: (i.5 1) |.!.0 ] </span>
-<span style="color: #66f;">NB. </span><span style="color: #66f;">I hadn't thought of using (i.5 1) before. Cool. :)</span>
+<span style="color: #66f;">NB. This comes out to: [: &gt;./ [: */"1 [: |: (i.5 1) |.!.0 ]</span>
+<span style="color: #66f;">NB. I hadn't thought of using (i.5 1) before. Cool. :)</span>
 
-<span style="color: #66f;">NB. </span><span style="color: #66f;">strip out the newlines and convert to an array digits</span>
-<span style="color: #eedd82;">series</span> <span style="color: #666;">=.</span> <span style="color: #ffaf00;">".</span><span style="color: #ff5f00;">"</span>0 ((10<span style="color: #ffaf00;">{</span>a<span style="color: brightred;">.</span>)<span style="color: #ff5f00;">&amp;</span><span style="color: #ffaf00;">~:</span> <span style="color: #ffaf00;">#</span> <span style="color: #ffaf00;">]</span>) series
+<span style="color: #66f;">NB. strip out the newlines and convert to an array digits</span>
+<span style="color: #00ff00;">series =. "."0 ((10{a.)&amp;~: # ]) series</span>
 
-v series
+<span style="color: #00ff00;">v series</span>
 </pre>
 </div>
 </div>
 </div>
 
-
-<div id="outline-container-sec-8" class="outline-2">
-<h2 id="sec-8"><a id="0s84a0h0lbg0" name="0s84a0h0lbg0"></a><span class="section-number-2">8</span> 9. special pythagorean triplet</h2>
-<div class="outline-text-2" id="text-8">
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><a id="0s84a0h0lbg0" name="0s84a0h0lbg0"></a><span class="section-number-2">9</span> <span class="done DONE">DONE</span> 9. special pythagorean triplet</h2>
+<div class="outline-text-2" id="text-9">
 
 <div class="org-src-container">
 
-<pre class="src src-j"><span style="color: #66f;">NB. </span><span style="color: #66f;">my thought was to use 'antibase' to enumerate </span>
-<span style="color: #66f;">NB. </span><span style="color: #66f;">this found the answer, but there were other rows mixed in that contained zeros:</span>
-(<span style="color: #ffaf00;">]#</span><span style="color: brightred;">~</span>(1000 <span style="color: #ffaf00;">=</span> <span style="color: #ffaf00;">+</span><span style="color: brightred;">/</span><span style="color: #ff5f00;">"</span>1 <span style="color: #ff5f00;">@:</span> <span style="color: #ffaf00;">*:</span>))<span style="color: #ff5f00;">"</span>2 <span style="color: #ffaf00;">[</span> 500 500 500 <span style="color: #ffaf00;">#:</span> (500 <span style="color: #ffaf00;">*</span> 500) <span style="color: #ffaf00;">+</span> <span style="color: #ffaf00;">i.</span> 10000000
+<pre class="src src-j"><span style="color: #66f;">NB. my thought was to use 'antibase' to enumerate. this found the answer,</span>
+<span style="color: #66f;">NB. but there were other rows mixed in that contained zeros:</span>
+(]#~(1000 = +/"1 @: *:))"2 [ 500 500 500 #: (500 * 500) + i. 10000000
 
-<span style="color: #66f;">NB. </span><span style="color: #66f;">this version is significantly faster because of starting at 500^3 and skipping low numbers.</span>
-<span style="color: #66f;">NB. </span><span style="color: #66f;">if i hadn't found the answer, i would have changed the (5 5 5) to (1 1 1) just to eliminate</span>
-<span style="color: #66f;">NB. </span><span style="color: #66f;">the zeros.</span>
-(<span style="color: #ffaf00;">]</span> <span style="color: #ffaf00;">#</span><span style="color: brightred;">~</span> (1000 <span style="color: #ffaf00;">=</span> <span style="color: #ffaf00;">+</span><span style="color: brightred;">/</span><span style="color: #ff5f00;">"</span>1 <span style="color: #ff5f00;">@:</span> <span style="color: #ffaf00;">*:</span>) <span style="color: #ffaf00;">*.</span> <span style="color: #ffaf00;">-.</span><span style="color: #ff5f00;">@</span>(0<span style="color: #ff5f00;">&amp;</span><span style="color: #ffaf00;">e.</span><span style="color: #ff5f00;">"</span>1))<span style="color: #ff5f00;">"</span>2 <span style="color: #ffaf00;">[</span> (5 5 5)<span style="color: #ffaf00;">+</span><span style="color: #ff5f00;">"</span>1 (500 500 500) <span style="color: #ffaf00;">#:</span> (500 <span style="color: #ffaf00;">^</span>3) <span style="color: #ffaf00;">+</span> <span style="color: #ffaf00;">i.</span> 1000000
+<span style="color: #66f;">NB. this version is significantly faster because of starting at 500^3</span>
+<span style="color: #66f;">NB. and skipping low numbers. if i hadn''t found the answer, i would have</span>
+<span style="color: #66f;">NB. changed the (5 5 5) to (1 1 1) just to eliminate  the zeros.</span>
+(] #~ (1000 = +/"1 @: *:) *. -.@(0&amp;e."1))"2 [ (5 5 5)+"1 (500 500 500) #: (500 ^3) + i. 1000000
 
-<span style="color: #66f;">NB. </span><span style="color: #66f;">and in fact, once i added this, the   -. @ 0&amp;e. is un-necessary</span>
+<span style="color: #66f;">NB. and in fact, once i added this, the   -. @ 0&amp;e. is un-necessary</span>
 
-<span style="color: #66f;">NB. </span><span style="color: #66f;">this version is almost instantaneous, and avoids searching such a large</span>
-<span style="color: #66f;">NB. </span><span style="color: #66f;">number of (low,low,high) triples.</span>
-(<span style="color: #ffaf00;">]</span> <span style="color: #ffaf00;">#</span><span style="color: brightred;">~</span> (1000 <span style="color: #ffaf00;">=</span> <span style="color: #ffaf00;">+</span><span style="color: brightred;">/</span><span style="color: #ff5f00;">"</span>1 <span style="color: #ff5f00;">@:</span> <span style="color: #ffaf00;">*:</span>))<span style="color: #ff5f00;">"</span>2 <span style="color: #ffaf00;">[</span> (3<span style="color: #ffaf00;">$</span> 1)<span style="color: #ffaf00;">+</span><span style="color: #ff5f00;">"</span>1 (3 <span style="color: #ffaf00;">$</span> 50) <span style="color: #ffaf00;">#:</span> (50 <span style="color: #ffaf00;">^</span>3) <span style="color: #ffaf00;">+</span> <span style="color: #ffaf00;">i.</span>50<span style="color: #ffaf00;">^</span>3
+<span style="color: #66f;">NB. this version is almost instantaneous, and avoids searching such a large</span>
+<span style="color: #66f;">NB. number of (low,low,high) triples.</span>
+(] #~ (1000 = +/"1 @: *:))"2 [ (3$ 1)+"1 (3 $ 50) #: (50 ^3) + i.50^3
 
-<span style="color: #66f;">NB. </span><span style="color: #66f;">all of these find several duplicates caused by multiples and re-arrangements.</span>
-<span style="color: #66f;">NB. </span><span style="color: #66f;">if I couldn't, i'd try to figure out how to filter permutations, or avoid them</span>
-<span style="color: #66f;">NB. </span><span style="color: #66f;">in the first place.</span>
+<span style="color: #66f;">NB. all of these find several duplicates caused by multiples and</span>
+<span style="color: #66f;">NB. re-arrangements. if I couldn't, i'd try to figure out how to filter</span>
+<span style="color: #66f;">NB. permutations, or avoid them in the first place.</span>
 
-<span style="color: #66f;">NB. </span><span style="color: #66f;">--------------------------------------------</span>
-<span style="color: #66f;">NB. </span><span style="color: #66f;">whoops! we only want the +/a b c,  not +/@*: a b c</span>
-<span style="color: #66f;">NB. </span><span style="color: #66f;">--------------------------------------------</span>
+<span style="color: #66f;">NB. --------------------------------------------</span>
+<span style="color: #66f;">NB. whoops! we only want the +/a b c,  not +/@*: a b c</span>
+<span style="color: #66f;">NB. --------------------------------------------</span>
 
-<span style="color: #66f;">NB. </span><span style="color: #66f;">test for triples a^2+b^2=c^2</span>
-<span style="color: #66f;">NB. </span><span style="color: #66f;">except we'll write it  c^2 = b^2 + a^2</span>
-<span style="color: #eedd82;">istriple</span> <span style="color: #666;">=:</span> ( <span style="color: #ffaf00;">=</span><span style="color: #ff5f00;">`</span><span style="color: #ffaf00;">+</span> <span style="color: brightred;">/</span> )<span style="color: #ff5f00;">@:</span><span style="color: #ffaf00;">*:</span>
+<span style="color: #66f;">NB. test for triples a^2+b^2=c^2</span>
+<span style="color: #66f;">NB. except we''ll write it  c^2 = b^2 + a^2</span>
+<span style="color: #ffffff; font-weight: bold;">istriple</span> =: ( =`+ / )@:*:
 
-<span style="color: #66f;">NB. </span><span style="color: #66f;">generate a bunch of triples by using base n:  (i did these in problem 4)</span>
-<span style="color: #eedd82;">ndigs</span> <span style="color: #666;">=.</span> 13 <span style="color: #ffaf00;">:</span> <span style="color: #00ff00;">'&gt;. x ^. &gt;: y'</span>
-<span style="color: #eedd82;">basex</span> <span style="color: #666;">=.</span> 13 <span style="color: #ffaf00;">:</span> <span style="color: #00ff00;">'((x ndigs f. y) # x) #: y'</span>
+<span style="color: #66f;">NB. generate a bunch of triples by using base n:  (i did these in problem 4)</span>
+<span style="color: #eedd82;">ndigs</span> =. 13 : <span style="color: #00ff00;">'&gt;. x ^. &gt;: y'</span>
+<span style="color: #eedd82;">basex</span> =. 13 : <span style="color: #00ff00;">'((x ndigs f. y) # x) #: y'</span>
 </pre>
 </div>
 </div>
 </div>
 
-
-
-
-
-
-<div id="outline-container-sec-9" class="outline-2">
-<h2 id="sec-9"><a id="qe99t1b1ueg0" name="qe99t1b1ueg0"></a><span class="section-number-2">9</span> <span class="todo TODO">TODO</span> 11. largest product in a grid</h2>
-<div class="outline-text-2" id="text-9">
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><a id="qe99t1b1ueg0" name="qe99t1b1ueg0"></a><span class="section-number-2">10</span> <span class="todo TODO">TODO</span> 11. largest product in a grid</h2>
+<div class="outline-text-2" id="text-10">
 
 <p>
 08 02 22 97 38 15 00 40 00 75 04 05 07 78 52 12 50 77 91 08
@@ -278,20 +311,37 @@ v series
 </p>
 
 <p>
-fftw was trying to figure out how to do it in APL (which either lacks an oblique verb or he didn't know where to find it), and I remembered the game of life video from dyalog, where he used the vertical and horizontal rotate verbs. So i suggested this:
+fftw was trying to figure out how to do it in APL (which either lacks
+an oblique verb or he didn't know where to find it), and I remembered
+the game of life video from dyalog, where he used the vertical and
+horizontal rotate verbs. So i suggested this:
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-j">   <span style="color: #ffaf00;">]</span> <span style="color: #eedd82;">y</span><span style="color: #666;">=.</span> _ <span style="color: #ffaf00;">*</span> <span style="color: #ffaf00;">-.</span> 5 4 7 <span style="color: #ffaf00;">e.</span><span style="color: brightred;">~</span> <span style="color: #ffaf00;">i.</span> 3 3
+<pre class="src src-j">   ] <span style="color: #eedd82;">y</span>=. _ * -. 5 4 7 e.~ i. 3 3
 _ _ _
 _ 0 0
 _ 0 _
 
-   1<span style="color: #ffaf00;">|.</span>(<span style="color: #ff5f00;">"</span>1) 1<span style="color: #ffaf00;">|.</span> y
+   1|.("1) 1|. y
 0 0 _
 0 _ _
 _ _ _
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-11" class="outline-2">
+<h2 id="sec-11"><a id="gzwgiwp0fng0" name="gzwgiwp0fng0"></a><span class="section-number-2">11</span> <span class="done DONE">DONE</span> 74. Digit factorial chains</h2>
+<div class="outline-text-2" id="text-11">
+
+<div class="org-src-container">
+
+<pre class="src src-J">  <span style="color: #66f;">NB. Quite slow.</span>
+  +/60=&lt;:@#@((,~ [: +/"1 @: ! (10 #.^:_1 {.))M.^:({.-.@e.}.)^:_)"0 i.1000000
+402
 </pre>
 </div>
 </div>

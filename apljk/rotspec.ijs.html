@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>rotspec.ijs</title>
+<!-- 2014-11-07 Fri 10:53 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">rotspec.ijs</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. specification</a></li>
+<li><a href="#sec-2">2. accesor words</a></li>
+<li><a href="#sec-3">3. functional specification</a></li>
+<li><a href="#sec-4">4. NOTE . refinement</a></li>
+<li><a href="#sec-5">5. NOTE . implementation</a></li>
+<li><a href="#sec-6">6. forth style primitives</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><a id="lfzabjb1wng0" name="lfzabjb1wng0"></a><span class="section-number-2">1</span> specification</h2>
+<div class="outline-text-2" id="text-1">
+
+<p>
+I'm working with a forth-like language, that uses a stack to store data.
+i want to implement the operation <code>rot</code> which would rotate the top three items on the stack.
+</p>
+
+<p>
+if <code>s0</code> is the stack at the start of the program, and <code>s1</code> is the stack at the end of the program. The input and output might look like this: 
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J">[ 0 1 2 { <span style="color: #ffffff; font-weight: bold;">s0</span>=:<span style="color: #00ff00;">'abcd'</span>
+[ 1 2 0 { <span style="color: #ffffff; font-weight: bold;">s1</span>=:<span style="color: #00ff00;">'cabd'</span>
+</pre>
+</div>
+
+<pre class="example">
+abc
+
+abc
+</pre>
+
+
+<p>
+The precondition is that <code>s0</code> at least 3 items <code>(3&lt;:#s0)</code> and the specification is that <code>s1</code> has the same number of items, and that the above pattern holds:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J">[ (3 &lt;: # s0) &lt;: (s0 =&amp;# s1) *. ((0 1 2 { s0) -: (1 2 0 { s1))
+</pre>
+</div>
+
+<pre class="example">
+1
+</pre>
+
+<p>
+What I've done here so far is provide a spec (a boolean expression) and some example input and output for which the spec evaluates to true. This provides a quick sanity check on the spec itself.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><a id="u0idvkb1wng0" name="u0idvkb1wng0"></a><span class="section-number-2">2</span> accesor words</h2>
+<div class="outline-text-2" id="text-2">
+
+
+<p>
+The next step will be to convert the spec into functions, but first I need to define some helpers:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #66f;">NB. x set y : verb. set variable with name x to value y</span>
+<span style="color: #66f;">NB. python:   exec x+"=y"</span>
+<span style="color: #ffffff; font-weight: bold;">set</span> =: 4 :<span style="color: #00ff00;">'1[ ". x,''=: y'''</span>
+
+<span style="color: #66f;">NB. x m put y : adverb. put val(s) x at key(s) m in var y</span>
+<span style="color: #66f;">NB. python:   for xi,mi in zip(x,m): y[mi] = xi</span>
+<span style="color: #ffffff; font-weight: bold;">put</span> =: 1 :(<span style="color: #00ff00;">'[:'</span>;<span style="color: #00ff00;">':'</span>; <span style="color: #00ff00;">'1[ y ] ". ''x y } m'''</span>)
+
+<span style="color: #66f;">NB. get m   : make new verb that evals m at call time.</span>
+<span style="color: #66f;">NB. python: get = lambda m: lambda y: eval m</span>
+<span style="color: #66f;">NB. I use it to create accessor verbs.</span>
+<span style="color: #ffffff; font-weight: bold;">get</span> =: 1 :<span style="color: #00ff00;">'y ] ".m'</span>
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><a id="30ibrlb1wng0" name="30ibrlb1wng0"></a><span class="section-number-2">3</span> functional specification</h2>
+<div class="outline-text-2" id="text-3">
+
+
+<p>
+Now we can breaking the spec down into two specifications and a precondition.
+</p>
+
+
+<p>
+The capitalized names <code>S</code> and <code>S1</code> are the accessor functions for the lower-case variables, defined above.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #66f;">NB. accessor verbs. see above.</span>
+<span style="color: #00ff00;">'`S S1'</span> =: (<span style="color: #00ff00;">'s'</span>get)`(<span style="color: #00ff00;">'s1'</span>get)
+
+<span style="color: #ffffff; font-weight: bold;">C0</span> =: 3 &lt;: [: # S                  <span style="color: #66f;">NB. precondition: a least 3 items</span>
+<span style="color: #ffffff; font-weight: bold;">R0</span> =: S =&amp;# S1                     <span style="color: #66f;">NB. end length must be same</span>
+<span style="color: #ffffff; font-weight: bold;">R1</span> =: (0 1 2 { S) -: (1 2 0 { S1)  <span style="color: #66f;">NB. rotation pattern abcd... &#8594; cabd...</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #ffffff; font-weight: bold;">spec</span> =: C0 &lt;: R0 *. R1
+spec<span style="color: #00ff00;">''</span>
+</pre>
+</div>
+
+<pre class="example">
+1
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><a id="iq3lgrb1wng0" name="iq3lgrb1wng0"></a><span class="section-number-2">4</span> NOTE . refinement</h2>
+<div class="outline-text-2" id="text-4">
+
+
+<p>
+So now we can try to refine the specification:
+</p>
+
+<p>
+<code>R0</code>, which says that the lengths of the two lists are equal can be refined just by assignment:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J">R0 &gt;: <span style="color: #00ff00;">'s1'</span>set s
+</pre>
+</div>
+
+<pre class="example">
+1
+</pre>
+
+<p>
+In a boolean context, the <code>&gt;:</code> symbol (less than or equal to) can also be interpreted to mean <i>is implied by</i>, or <i>refines</i>. So the above section says that setting <code>s1</code> to <code>s0</code> refines <code>R0</code>. We use <code>set</code> rather than normal assignment simply because of the side effect that it always returns <code>1</code>.
+</p>
+
+<p>
+Since <code>R0</code> and all of the other specifications ignore their arguments and return a boolean, we can chain them together.
+</p>
+
+<p>
+<code>R1</code> specifies that the appropriate permutation took place:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J">R1 &gt;: <span style="color: #00ff00;">'s1'</span>set (0 1 2 { s) 1 2 0 } s
+</pre>
+</div>
+
+<pre class="example">
+1
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><a id="cxsk8rb1wng0" name="cxsk8rb1wng0"></a><span class="section-number-2">5</span> NOTE . implementation</h2>
+<div class="outline-text-2" id="text-5">
+
+
+
+<p>
+We can now actually execute the program and test that the conditions hold.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #ffffff; font-weight: bold;">s1</span>=: (0 1 2 { s) 1 2 0 } <span style="color: #ffffff; font-weight: bold;">s</span>=: <span style="color: #00ff00;">'abcd'</span>
+<span style="color: #ff00ff; font-weight: bold;">assert</span> <span style="color: #ffffff; font-weight: bold;">r</span>=: C0 *. (R0 *. R1)<span style="color: #00ff00;">''</span>
+
+(":;".) S:0 ;:<span style="color: #00ff00;">'s s1 r'</span>
+</pre>
+</div>
+
+<pre class="example">
+┌──┬────┐
+│s │abcd│
+├──┼────┤
+│s1│cabd│
+├──┼────┤
+│r │1   │
+└──┴────┘
+</pre>
+
+
+<p>
+Actually there's an even simpler implementation of <code>rot</code> in J:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #ffffff; font-weight: bold;">s1</span>=: 3 A.&amp;.|. <span style="color: #00ff00;">'abcd'</span>
+<span style="color: #ff00ff; font-weight: bold;">assert</span> <span style="color: #ffffff; font-weight: bold;">r</span>=: C0 *. (R0 *. R1)<span style="color: #00ff00;">''</span>
+(":;".) S:0 ;:<span style="color: #00ff00;">'s s1 r'</span>
+</pre>
+</div>
+
+<pre class="example">
+┌──┬────┐
+│s │abcd│
+├──┼────┤
+│s1│cabd│
+├──┼────┤
+│r │1   │
+└──┴────┘
+</pre>
+
+<p>
+However, my goal here isn't just to implement <code>rot</code> and show off feaures of j, but rather to implement it on my forth-style virtual machine, treating the primitive forth operations as axioms in a logical system.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><a id="k2mcghb1wng0" name="k2mcghb1wng0"></a><span class="section-number-2">6</span> forth style primitives</h2>
+<div class="outline-text-2" id="text-6">
+
+<p>
+Here is a working forth-style implementation of <code>rot</code>, extracted from retroforth:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-retro"><span style="color: #c63; font-weight: bold;">:</span> <span style="color: #00ffff;">rot</span> <span style="color: #66f;">( xyz -- yzx )</span> <span style="color: #00ffff;">push</span> <span style="color: #00ffff;">swap</span> <span style="color: #00ffff;">pop</span> <span style="color: #00ffff;">swap</span> <span style="color: #c63; font-weight: bold;">;</span>
+</pre>
+</div>
+
+<p>
+The words <code>push</code>, <code>pop</code>, and <code>swap</code> are three of the 'axioms' of a forth system (ANSI forth uses the names <code>&gt;R</code> and <code>R&gt;</code> for <code>push</code> and <code>pop</code>, respectively). They're generally implemented in assembly language, and often correspond to a single machine code instruction. Since J isn't a stack-oriented language, none of these words are available, but they're not hard to implement.
+</p>
+
+<p>
+In retro, <code>push</code> and <code>pop</code> use a secondary stack, but since it's only using it for one value, we can just use a variable in J. We'll call it <code>a</code>. For the others, we'll continue to use our stack variables <code>s</code> and <code>s1</code>
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-J"><span style="color: #ffffff; font-weight: bold;">push</span> =: (<span style="color: #00ff00;">'a'</span>;<span style="color: #00ff00;">'s1'</span>) set L:0 ({. ; }.)@S0
+<span style="color: #ffffff; font-weight: bold;">swap</span> =: <span style="color: #00ff00;">'s1'</span>set 1 A.&amp;.|. S1
+<span style="color: #ffffff; font-weight: bold;">pop</span>  =: <span style="color: #00ff00;">'s1'</span>set a, S1
+<span style="color: #ffffff; font-weight: bold;">joy</span>  =: 1 : <span style="color: #00ff00;">'(|. (1j1 $~ #m) #!.({.[:`a:) m)`]`:6 y'</span>
+<span style="color: #ffffff; font-weight: bold;">rot</span>=: (push`swap`pop`swap) joy
+rot <span style="color: #ffffff; font-weight: bold;">s</span>=: <span style="color: #00ff00;">'abcd'</span>
+echo <span style="color: #00ff00;">'rot acbd &#8594; '</span>,s1
+<span style="color: #ff00ff; font-weight: bold;">assert</span> <span style="color: #ffffff; font-weight: bold;">r</span>=: C0 *. (R0 *. R1)<span style="color: #00ff00;">''</span>
+(":;".) S:0 ;:<span style="color: #00ff00;">'s s1 r'</span>
+</pre>
+</div>
+
+<pre class="example">
+1
+
+rot acbd → cabd
+
+┌──┬────┐
+│s │abcd│
+├──┼────┤
+│s1│cabd│
+├──┼────┤
+│r │1   │
+└──┴────┘
+</pre>
+
+<p>
+So.. Great, now I have an implementation (<code>run</code>) that seems to work for this particular input value (since I don't get an assertion failure when I evaluate the spec), but this just shows that it works for that one input.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>
