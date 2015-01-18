@@ -327,13 +327,15 @@ Here's an grammar for EBNF written in EBNF, so we can test the parser.
 This text is adapted from <a href="http://www.inf.ethz.ch/personal/wirth/CompilerConstruction/index.html">Compiler Construction</a> by Niklaus Wirth (who invented EBNF, as well as Pascal, Modula, Oberon, and a variety of other languages).
 </p>
 
-<pre class="example">
-main = { rule } .
-rule = IDENT "=" expr "." .
-expr = term { "|" term } .
-term = factor { factor } .
-factor = IDENT | STRING | "{" expr "}" | "[" expr "]" | "(" expr ")" .
+<div class="org-src-container">
+
+<pre class="src src-prolog" id="ebnf">main = <span style="color: #00ffff;">{</span> rule <span style="color: #00ffff;">}</span> .
+rule = <span style="color: #eedd82;">IDENT</span> <span style="color: #00ff00;">"="</span> expr <span style="color: #00ff00;">"."</span> .
+expr = term <span style="color: #00ffff;">{</span> <span style="color: #00ff00;">"|"</span> term <span style="color: #00ffff;">}</span> .
+term = factor <span style="color: #00ffff;">{</span> factor <span style="color: #00ffff;">}</span> .
+factor = <span style="color: #eedd82;">IDENT</span> <span style="color: #00ffff;">|</span> <span style="color: #eedd82;">STRING</span> <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">"{"</span> expr <span style="color: #00ff00;">"}"</span> <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">"["</span> expr <span style="color: #00ff00;">"]"</span> <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">"("</span> expr <span style="color: #00ff00;">")"</span> .
 </pre>
+</div>
 
 <p>
 I placed that code in a block of its own so it would be syntax highlighted, but for python it should be inside a string.
