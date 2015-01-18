@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>wejal bootstrap</title>
-<!-- 2015-01-18 Sun 10:47 -->
+<!-- 2015-01-18 Sun 14:33 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -67,6 +67,12 @@ for the JavaScript code in this tag.
 <li><a href="#sec-2">2. Some data types for modeling grammar definitions.</a></li>
 <li><a href="#sec-3">3. Manually build a base grammar to provide generic tokenization.</a></li>
 <li><a href="#sec-4">4. Now define the bootstrap grammar to parse EBNF grammar definitions.</a></li>
+<li><a href="#sec-5">5. Generic dispatch:</a></li>
+<li><a href="#sec-6">6. Worlds for backtracking.</a></li>
+<li><a href="#sec-7">7. Grammar Interpreter</a></li>
+<li><a href="#sec-8">8. ebnf in ebnf</a></li>
+<li><a href="#sec-9">9. OUTPUT wejalboot.py</a></li>
+<li><a href="#sec-10">10. Handler Methods for the Grammar Interpreter</a></li>
 </ul>
 </div>
 </div>
@@ -99,17 +105,20 @@ Our first step is to define some types that we can use to tag the different part
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
 
-<pre class="src src-python"><span style="color: #00ffff;">from</span> collections <span style="color: #00ffff;">import</span> namedtuple
+<pre class="src src-python" id="imports"><span style="color: #00ffff;">from</span> collections <span style="color: #00ffff;">import</span> namedtuple
+</pre>
+</div>
+<div class="org-src-container">
 
-<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">T</span>(tag, doc=<span style="color: #00ff00;">''</span>, args=[<span style="color: #00ff00;">'data'</span>]):
+<pre class="src src-python" id="code"><span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">T</span>(tag, doc=<span style="color: #00ff00;">''</span>, args=[<span style="color: #00ff00;">'body'</span>]):
     <span style="color: #00ff00;">"""Creates a new tuple type."""</span>
     <span style="color: #eedd82;">res</span> = namedtuple(tag, args)
     <span style="color: #00ffff;">if</span> doc: res.<span style="color: #ff00ff; font-weight: bold;">__doc__</span>+=<span style="color: #00ff00;">' : '</span>+doc
     <span style="color: #00ffff;">return</span> res
 
 <span style="color: #eedd82;">Gram</span> = T(<span style="color: #00ff00;">'Gram'</span>, <span style="color: #00ff00;">'contains grammar rules (may inherit from `base`).'</span>,
-         [<span style="color: #00ff00;">'name'</span>, <span style="color: #00ff00;">'base'</span>, <span style="color: #00ff00;">'doc'</span>, <span style="color: #00ff00;">'defs'</span>])
-<span style="color: #eedd82;">Def</span> = T(<span style="color: #00ff00;">'Def'</span>, <span style="color: #00ff00;">'define a named rule.'</span>, [<span style="color: #00ff00;">'name'</span>,<span style="color: #00ff00;">'data'</span>])
+         [<span style="color: #00ff00;">'name'</span>, <span style="color: #00ff00;">'base'</span>, <span style="color: #00ff00;">'doc'</span>, <span style="color: #00ff00;">'body'</span>])
+<span style="color: #eedd82;">Def</span> = T(<span style="color: #00ff00;">'Def'</span>, <span style="color: #00ff00;">'define a named rule.'</span>, [<span style="color: #00ff00;">'name'</span>,<span style="color: #00ff00;">'body'</span>])
 <span style="color: #eedd82;">Ref</span> = T(<span style="color: #00ff00;">'Ref'</span>, <span style="color: #00ff00;">'refer to (invoke) a named rule'</span>)
 
 <span style="color: #eedd82;">Any</span> = T(<span style="color: #00ff00;">'Any'</span>, <span style="color: #00ff00;">'match anything'</span>, [])
@@ -124,9 +133,9 @@ Our first step is to define some types that we can use to tag the different part
 <span style="color: #eedd82;">Opt</span> = T(<span style="color: #00ff00;">'Opt'</span>, <span style="color: #00ff00;">'match 0 or 1 repetitions.'</span>)
 <span style="color: #eedd82;">Orp</span> = T(<span style="color: #00ff00;">'Orp'</span>, <span style="color: #00ff00;">'match 0 or more repetitions.'</span>)
 
-<span style="color: #eedd82;">Var</span> = T(<span style="color: #00ff00;">'Var'</span>, <span style="color: #00ff00;">'save matched string in a variable.'</span>, [<span style="color: #00ff00;">'name'</span>,<span style="color: #00ff00;">'data'</span>])
+<span style="color: #eedd82;">Var</span> = T(<span style="color: #00ff00;">'Var'</span>, <span style="color: #00ff00;">'save matched string in a variable.'</span>, [<span style="color: #00ff00;">'name'</span>,<span style="color: #00ff00;">'body'</span>])
 <span style="color: #eedd82;">Val</span> = T(<span style="color: #00ff00;">'Val'</span>, <span style="color: #00ff00;">'match against the saved value.'</span>, [<span style="color: #00ff00;">'name'</span>])
-<span style="color: #eedd82;">New</span> = T(<span style="color: #00ff00;">'New'</span>, <span style="color: #00ff00;">'build a new class/tuple instance'</span>, [<span style="color: #00ff00;">'Class'</span>, <span style="color: #00ff00;">'data'</span>])
+<span style="color: #eedd82;">New</span> = T(<span style="color: #00ff00;">'New'</span>, <span style="color: #00ff00;">'build a new class/tuple instance'</span>, [<span style="color: #00ff00;">'Class'</span>, <span style="color: #00ff00;">'body'</span>])
 <span style="color: #eedd82;">Arg</span> = T(<span style="color: #00ff00;">'Arg'</span>, <span style="color: #00ff00;">'pass matched data as arg to containing "New"'</span>)
 </pre>
 </div>
@@ -138,12 +147,12 @@ Our first step is to define some types that we can use to tag the different part
 <div class="outline-text-2" id="text-3">
 <div class="org-src-container">
 
-<pre class="src src-python"><span style="color: #00ffff;">import</span> string
+<pre class="src src-python" id="imports"><span style="color: #00ffff;">import</span> string
 </pre>
 </div>
 <div class="org-src-container">
 
-<pre class="src src-python"><span style="color: #eedd82;">ECHR</span>, <span style="color: #eedd82;">SQ</span>, <span style="color: #eedd82;">DQ</span> = [<span style="color: #00ff00;">'\\'</span>, <span style="color: #00ff00;">"'"</span>, <span style="color: #00ff00;">'"'</span>]
+<pre class="src src-python" id="code"><span style="color: #eedd82;">ECHR</span>, <span style="color: #eedd82;">SQ</span>, <span style="color: #eedd82;">DQ</span> = [<span style="color: #00ff00;">'\\'</span>, <span style="color: #00ff00;">"'"</span>, <span style="color: #00ff00;">'"'</span>]
 <span style="color: #eedd82;">base</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [], <span style="color: #00ff00;">"rules common to all grammars"</span>, [
     Def(<span style="color: #00ff00;">'main'</span>, Orp(<span style="color: #00ff00;">'token'</span>)),
     Def(<span style="color: #00ff00;">'token'</span>, [Skip(Orp(Ref(<span style="color: #00ff00;">'space'</span>))),
@@ -182,18 +191,203 @@ Our first step is to define some types that we can use to tag the different part
 
 <div class="org-src-container">
 
-<pre class="src src-python"><span style="color: #eedd82;">ebnf</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [base], <span style="color: #00ff00;">"ebnf meta-grammar (for parsing grammars)"</span>, [
+<pre class="src src-python" id="code"><span style="color: #eedd82;">ebnf</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [base], <span style="color: #00ff00;">"ebnf meta-grammar (for parsing grammars)"</span>, [
     Def(<span style="color: #00ff00;">'main'</span>, Orp(Ref(<span style="color: #00ff00;">'rule'</span>))),
     Def(<span style="color: #00ff00;">'rule'</span>, Seq([Var(<span style="color: #00ff00;">'name'</span>, Ref(<span style="color: #00ff00;">'IDENT'</span>)),
                      Lit(<span style="color: #00ff00;">'='</span>), Ref(<span style="color: #00ff00;">'expr'</span>), Lit(<span style="color: #00ff00;">'.'</span>) ])),
     Def(<span style="color: #00ff00;">'expr'</span>, [ Ref(<span style="color: #00ff00;">'term'</span>), Orp([Lit(<span style="color: #00ff00;">'|'</span>), Ref(<span style="color: #00ff00;">'term'</span>) ]) ]),
-    Def(<span style="color: #00ff00;">'term'</span>, Rep(Ref(<span style="color: #00ff00;">'factor'</span>))),
+    Def(<span style="color: #00ff00;">'term'</span>, [ Ref(<span style="color: #00ff00;">'factor'</span>), Rep(Ref(<span style="color: #00ff00;">'factor'</span>)) ]),
     Def(<span style="color: #00ff00;">'factor'</span>, Alt([Ref(<span style="color: #00ff00;">'IDENT'</span>), Ref(<span style="color: #00ff00;">'STRING'</span>),
                        Ref(<span style="color: #00ff00;">'rep'</span>), Ref(<span style="color: #00ff00;">'opt'</span>), Ref(<span style="color: #00ff00;">'grp'</span>)])),
     Def(<span style="color: #00ff00;">'rep'</span>, [<span style="color: #00ff00;">'{'</span>, New(Rep, Ref(<span style="color: #00ff00;">'expr'</span>)), <span style="color: #00ff00;">'}'</span>]),  <span style="color: #66f;"># </span><span style="color: #66f;">'x*'</span>
     Def(<span style="color: #00ff00;">'opt'</span>, [<span style="color: #00ff00;">'['</span>, New(Opt, Ref(<span style="color: #00ff00;">'expr'</span>)), <span style="color: #00ff00;">']'</span>]),  <span style="color: #66f;"># </span><span style="color: #66f;">'x?'</span>
     Def(<span style="color: #00ff00;">'grp'</span>, [<span style="color: #00ff00;">'('</span>, New(Grp, Ref(<span style="color: #00ff00;">'expr'</span>)), <span style="color: #00ff00;">')'</span>]),  <span style="color: #66f;"># </span><span style="color: #66f;">'(x)'</span>
 ])
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><a id="w0bhd8b1jqg0" name="w0bhd8b1jqg0"></a><span class="section-number-2">5</span> Generic dispatch:</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+We need a way walk these trees and dispatch to an appropriate method for each type of node in our AST.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="imports"><span style="color: #00ffff;">from</span> warnings <span style="color: #00ffff;">import</span> warn
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="code"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Dispatcher</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, tree):
+        <span style="color: #00ffff;">self</span>.root = tree
+        <span style="color: #00ffff;">self</span>.done = <span style="color: #ffaf00;">False</span>
+        <span style="color: #00ffff;">self</span>.node = <span style="color: #ffaf00;">None</span>
+        <span style="color: #00ffff;">self</span>.path = [] <span style="color: #66f;"># </span><span style="color: #66f;">stack of breadcrumbs from the root</span>
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">unhandled</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">yield</span> warn(<span style="color: #00ff00;">'no handler for tag: %s'</span> % node.__class__.<span style="color: #ff00ff; font-weight: bold;">__name__</span>)
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">walk</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #eedd82;">tag</span> = node.__class__.<span style="color: #ff00ff; font-weight: bold;">__name__</span>
+        <span style="color: #eedd82;">meth</span> = <span style="color: #ff00ff; font-weight: bold;">getattr</span>(<span style="color: #00ffff;">self</span>, <span style="color: #00ff00;">'on'</span>+tag, <span style="color: #00ffff;">self</span>.unhandled)
+        <span style="color: #00ffff;">self</span>.path.append(<span style="color: #00ffff;">self</span>.node); <span style="color: #00ffff;">self</span>.node = node
+        <span style="color: #00ffff;">yield</span> <span style="color: #00ffff;">from</span> meth(node)
+        <span style="color: #00ffff;">self</span>.node = <span style="color: #00ffff;">self</span>.path.pop()
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><a id="u8s6vh00kqg0" name="u8s6vh00kqg0"></a><span class="section-number-2">6</span> Worlds for backtracking.</h2>
+<div class="outline-text-2" id="text-6">
+
+<p>
+A world is a context for holding changes, similar to a working copy in a version control system. The idea is that any time we might need to backtrack (any time an <code>Alt</code> node is encountered), we'll fork a new world, and changes we make are done to the world object. This way, if the match ultimately fails, we can rewind the side effects.
+</p>
+
+<p>
+This ability is common in prototype-based langugaes like Self and JavaScript (though it isn't necessarily commonly <i>used</i>). The name 'World' and the idea of applying it to parsing comes from Alex Warth's <a href="http://www.tinlizzie.org/ometa/">OMeta</a> dissertation.
+</p>
+
+<p>
+It's easy to make a python class that works this way: we just override
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="code"><span style="color: #eedd82;">HOME</span> = {} <span style="color: #66f;"># </span><span style="color: #66f;">arbitrary dictionary object</span>
+
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">World</span>(<span style="color: #ff00ff; font-weight: bold;">dict</span>):
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, proto=HOME):
+        <span style="color: #ff00ff; font-weight: bold;">super</span>(World, <span style="color: #00ffff;">self</span>).__init__()
+        <span style="color: #00ffff;">self</span>.proto = proto
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__getattr__</span>(<span style="color: #00ffff;">self</span>, name):
+        <span style="color: #66f;"># </span><span style="color: #66f;">called when attribute has no local definition.</span>
+        <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">getattr</span>(<span style="color: #00ffff;">self</span>.proto, name)
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__getitem__</span>(<span style="color: #00ffff;">self</span>, key):
+        <span style="color: #00ffff;">if</span> key <span style="color: #00ffff;">in</span> <span style="color: #00ffff;">self</span>.keys(): <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">super</span>(World, <span style="color: #00ffff;">self</span>)[key]
+        <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.proto[key]
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><a id="n0pcnnd1jqg0" name="n0pcnnd1jqg0"></a><span class="section-number-2">7</span> Grammar Interpreter</h2>
+<div class="outline-text-2" id="text-7">
+
+<p>
+We will assume for now that we have the entire string in memory.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="code"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Grin</span>(Dispatcher):
+    <span style="color: #00ff00;">"""Grammar Interpreter"""</span>
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match</span>(<span style="color: #00ffff;">self</span>, src):
+        <span style="color: #00ffff;">self</span>.src, <span style="color: #00ffff;">self</span>.pos, <span style="color: #00ffff;">self</span>.ch = src, 0, <span style="color: #00ff00;">''</span>
+        <span style="color: #00ffff;">self</span>.page, <span style="color: #00ffff;">self</span>.line, <span style="color: #00ffff;">self</span>.col = 0, 0, 0
+        <span style="color: #00ffff;">self</span>.wo = World(); <span style="color: #00ffff;">self</span>.worlds = []
+        <span style="color: #00ffff;">for</span> step <span style="color: #00ffff;">in</span> <span style="color: #00ffff;">self</span>.walk(<span style="color: #00ffff;">self</span>.root): <span style="color: #00ffff;">pass</span>
+
+    &lt;&lt;@methods&gt;&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><a id="bd6hv400kqg0" name="bd6hv400kqg0"></a><span class="section-number-2">8</span> ebnf in ebnf</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+Here's an grammar for EBNF written in EBNF, so we can test the parser.
+</p>
+
+<p>
+This text is adapted from <a href="http://www.inf.ethz.ch/personal/wirth/CompilerConstruction/index.html">Compiler Construction</a> by Niklaus Wirth (who invented EBNF, as well as Pascal, Modula, Oberon, and a variety of other languages).
+</p>
+
+<pre class="example">
+main = { rule } .
+rule = IDENT "=" expr "." .
+expr = term { "|" term } .
+term = factor { factor } .
+factor = IDENT | STRING | "{" expr "}" | "[" expr "]" | "(" expr ")" .
+</pre>
+
+<p>
+I placed that code in a block of its own so it would be syntax highlighted, but for python it should be inside a string.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="code"><span style="color: #eedd82;">ebnf_src</span> = (
+ <span style="color: #00ff00;">'&lt;&lt;ebnf&gt;&gt;'</span>
+)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><a id="npdbb4e1jqg0" name="npdbb4e1jqg0"></a><span class="section-number-2">9</span> OUTPUT wejalboot.py</h2>
+<div class="outline-text-2" id="text-9">
+
+<p>
+And now we can put the whole thing together:
+</p>
+
+<pre class="example">
+&lt;&lt;@imports&gt;&gt;
+&lt;&lt;@code&gt;&gt;
+if __name__=="__main__":
+    print(Grin(ebnf).match(ebnf_src))
+</pre>
+
+<p>
+If we try to run this now, here's what we'll get:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-org"><span style="color: color-208;">wejalboot.py:82:</span> <span style="font-weight: bold;">UserWarning: no handler for tag: Gram</span>
+  <span style="color: #00ff00;">yield warn('no handler for tag: %s' % node.__class__.__name__)</span>
+<span style="color: #ffd700; font-style: italic;">None</span>
+</pre>
+</div>
+
+<p>
+So now our job is to go back and fill in a handler method for each node until it's able to walk the whole tree.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><a id="ks01bt30kqg0" name="ks01bt30kqg0"></a><span class="section-number-2">10</span> Handler Methods for the Grammar Interpreter</h2>
+<div class="outline-text-2" id="text-10">
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="methods"><span style="color: #66f;"># </span><span style="color: #66f;">(still inside  `class Grin`...)</span>
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">onGram</span>(<span style="color: #00ffff;">self</span>, node):
+    <span style="color: #00ffff;">self</span>.defs = {}
+    <span style="color: #00ffff;">for</span> child <span style="color: #00ffff;">in</span> node.body: <span style="color: #00ffff;">yield</span> <span style="color: #00ffff;">from</span> <span style="color: #00ffff;">self</span>.walk(child)
+
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">onDef</span>(<span style="color: #00ffff;">self</span>, node):
+    <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">NotImplementedError</span>(<span style="color: #00ff00;">'TODO: onDef (and others)...'</span>)
 </pre>
 </div>
 </div>
