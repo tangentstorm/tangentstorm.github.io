@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>wejal bootstrap</title>
-<!-- 2015-01-18 Sun 14:33 -->
+<!-- 2015-01-18 Sun 14:48 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -257,7 +257,15 @@ This ability is common in prototype-based langugaes like Self and JavaScript (th
 </p>
 
 <p>
-It's easy to make a python class that works this way: we just override
+It's easy to make a python class that works this way: we just override <code>__getattr__</code> (for the <code>x.a</code> syntax), and <code>__getitem__</code> (for the <code>x[a]</code> syntax) so that they delegate to a prototype object when there's no local value defined.
+</p>
+
+<p>
+Since we do <i>not</i> override the corresponding <code>__setitem__</code> and <code>__setattr__</code> methods, any assignment made to an attribute or item of the world will affect the local object, leaving the prototype's value unchanged.
+</p>
+
+<p>
+It's very much like what happens when overriding methods in a subclass, except it happens for individual objects rather than classes, and it happens dynamically at runtime.
 </p>
 
 <div class="org-src-container">
