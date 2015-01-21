@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>ometa-rules</title>
+<!-- 2015-01-21 Wed 11:12 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="michal wallace" />
+<link rel="stylesheet" type="text/css" href="/etc/style.css">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">ometa-rules</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. pegs, from the ometa paper</a></li>
+<li><a href="#sec-2">2. inference rules</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><a id="x28cp6y0nqg0" name="x28cp6y0nqg0"></a><span class="section-number-2">1</span> pegs, from the ometa paper</h2>
+<div class="outline-text-2" id="text-1">
+
+<div class="org-src-container">
+
+<pre class="src src-antlr"><span style="color: #66f;">// </span><span style="color: #66f;">language of parsing expressions</span>
+<span style="color: #ffffff; font-weight: bold;">e</span> <span style="color: #00ffff;">:</span> <span style="color: #ff00ff;">&#949;</span>           <span style="color: #66f;">// </span><span style="color: #66f;">empty</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #ff00ff;">a</span>           <span style="color: #66f;">// </span><span style="color: #66f;">atom</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #ff00ff;">n</span>           <span style="color: #66f;">// </span><span style="color: #66f;">nonterm</span>
+  <span style="color: #00ffff;">|</span> e0=<span style="color: #ff00ff;">e</span> e1=<span style="color: #ff00ff;">e</span>   <span style="color: #66f;">// </span><span style="color: #66f;">sequence</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #ff00ff;">e</span> <span style="color: #00ff00;">'*'</span>^      <span style="color: #66f;">// </span><span style="color: #66f;">iteration</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'!'</span> <span style="color: #ff00ff;">e</span>       <span style="color: #66f;">// </span><span style="color: #66f;">negation</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #ff00ff;">e</span> <span style="color: #00ff00;">':'</span> <span style="color: #ff00ff;">x</span>     <span style="color: #66f;">// </span><span style="color: #66f;">binding</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'-&gt;'</span> <span style="color: #ff00ff;">t</span>      <span style="color: #66f;">// </span><span style="color: #66f;">semantic action</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'['</span> <span style="color: #ff00ff;">e</span> <span style="color: #00ff00;">']'</span>   <span style="color: #66f;">// </span><span style="color: #66f;">list pattern</span>
+  <span style="color: #00ffff;">;</span>
+
+<span style="color: #66f;">// </span><span style="color: #66f;">language of values</span>
+<span style="color: #ffffff; font-weight: bold;">v</span> <span style="color: #00ffff;">:</span> <span style="color: #ff00ff;">a</span>           <span style="color: #66f;">// </span><span style="color: #66f;">atomic value (e.g., a character)</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'['</span> <span style="color: #ff00ff;">v</span>* <span style="color: #00ff00;">']'</span>  <span style="color: #66f;">// </span><span style="color: #66f;">list of values</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'none'</span>      <span style="color: #66f;">// </span><span style="color: #66f;">no value</span>
+  <span style="color: #00ffff;">;</span>
+
+<span style="color: #66f;">// </span><span style="color: #66f;">term language (for semantic actions)</span>
+<span style="color: #ffffff; font-weight: bold;">t</span> <span style="color: #00ffff;">:</span> <span style="color: #ff00ff;">a</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'['</span> <span style="color: #ff00ff;">t</span>* <span style="color: #00ff00;">']'</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">'none'</span>
+  <span style="color: #00ffff;">|</span> <span style="color: #ff00ff;">x</span>           <span style="color: #66f;">// </span><span style="color: #66f;">a variable</span>
+  <span style="color: #00ffff;">;</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><a id="h78eejy0nqg0" name="h78eejy0nqg0"></a><span class="section-number-2">2</span> inference rules</h2>
+<div class="outline-text-2" id="text-2">
+
+<div class="org-src-container">
+
+<pre class="src src-logic">empty:
+  ⊢ (ε, x, μ) ⇒ (NONE, x, μ).
+
+atom-success:
+  ⊢ (a, a x, μ) ⇒ (a, x, μ).
+atom-failure-1:
+  ⊢ a≠b ⊢ (a, b x, μ) ⇒ (FAIL, μ).
+atom-failure-2:
+  ⊢ (a, [x] y, μ) ⇒ (FAIL, μ).
+atom-failure-3:
+  ⊢ (a, none x, μ) ⇒  (FAIL, μ).
+atom-failure-4:
+  ⊢ |x|=0 ⊢ (a,x,μ) ⇒ (FAIL, μ).
+
+nonterminal-success:
+  A ← e ∈ G, (e, x y, ∅) ⇒ (v, y, μ′₁) ⊢ (A, x y, μ₀) ⇒ (v, y, μ₀).
+nonterminal-failure:
+  A ← e ∈ G, (e, x y, ∅) ⇒ (FAIL, μ′₁) ⊢ (A, x y, μ₀) ⇒ (FAIL, μ₀).
+
+sequence-next:
+  (e₀, x y, μ) ⇒ (v₀, y, μ′), (e₁, y, μ′) ⇒ ans ⊢ (e₀ e₁, x y, μ) ⇒ ans.
+sequence-failure:
+  (e₀, x y, μ) ⇒ (FAIL, μ′) ⊢ (e₀ e₁, x, μ) ⇒ (FAIL, μ′).
+
+alternation-success:
+  (e₀, x y, μ) ⇒ (v₀, y, μ′) ⊢ (e₀ / e₁, x y, μ) ⇒ (v₀₁, y, μ′).
+alternation-next:
+  (e₀, x, μ) ⇒ (FAIL, μ′), (e₁, x, μ′) ⇒ ans ⊢ (e₀ / e₁, x y, μ) ⇒ ans.
+
+iteration-repetition:
+  (e, x y z, μ)⇒(v, y z, μ′), (e*, y z, μ)⇒(v̅, z, μ″), v[ans]=append([v],v̅)
+  ⊢ (e*, x y z, μ) ⇒ (v[ans], z, μ″).
+iteration-termination:
+  (e, x, μ) ⇒ (FAIL, μ′) ⊢ (e*, x, μ) ⇒ ([], x, μ′).
+
+negation-success:
+  (e, x, μ) ⇒ (FAIL, μ′) ⊢ (!e, x, μ) ⇒ (NONE, x, μ′).
+negation-failure:
+  (e, x y, μ) ⇒ (v, y, μ′) ⊢ (!e, x y, μ) ⇒ (FAIL, μ′).
+
+binding-success:
+  (e, x y, μ) ⇒ (v, y, μ′) ⊢ (e:X, x y, μ) ⇒ (v, y, [x → v] μ′).
+binding-failure:
+  (e, x, μ) ⇒ (FAIL, μ′) ⊢ (e:X, x, μ) ⇒ (FAIL, μ′).
+
+eval-atom:
+  ⊢ eval(a, μ)=a.
+eval-none:
+  ⊢ eval(NONE,μ)=NONE.
+eval-var:
+  x → v ∈ μ ⊢ eval(X,μ)=v.
+eval-list:
+  eval(t₀, μ ,v₀) … eval(tₙ, μ ,vₙ)  ⊢ eval([t₀…tₙ],μ) = [v₀…vₙ].
+semantic-action:
+  eval(t, μ) = v ⊢ (→ t, x,  μ) ⇒ (v, x, μ).
+
+list-success:
+  (e, x y, μ) ⇒ (v, y, μ′), |y|=0 ⊢ ([e],[x y] z, μ) ⇒ ([x],z, μ′).
+list-failure-1:
+  (e, x y, μ) ⇒ (v, y, μ′), |y|&gt;0 ⊢ ([e],[x y] z, μ) ⇒ (FAIL, μ′).
+list-failure-2:
+  (e, x, μ) ⇒ (FAIL, μ′) ⊢ ([e], [x]y, μ) ⇒ (FAIL, μ′).
+list-failure-3:
+  ⊢ ([e], a x, μ) ⇒ (FAIL, μ).
+list-failure-4:
+  ⊢ ([e], NONE x, μ) ⇒ (FAIL, μ).
+list-failure-5:
+  (|x|=0) ⊢ ([e], x, μ) ⇒ (FAIL, μ).
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
