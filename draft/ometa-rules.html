@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>ometa-rules</title>
-<!-- 2015-01-21 Wed 11:12 -->
+<!-- 2015-01-22 Thu 08:17 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -115,18 +115,20 @@ for the JavaScript code in this tag.
 atom-success:
   ⊢ (a, a x, μ) ⇒ (a, x, μ).
 atom-failure-1:
-  ⊢ a≠b ⊢ (a, b x, μ) ⇒ (FAIL, μ).
+  ⊢ a≠b, (a, b x, μ) ⇒ (FAIL, μ).
 atom-failure-2:
   ⊢ (a, [x] y, μ) ⇒ (FAIL, μ).
 atom-failure-3:
   ⊢ (a, none x, μ) ⇒  (FAIL, μ).
 atom-failure-4:
-  ⊢ |x|=0 ⊢ (a,x,μ) ⇒ (FAIL, μ).
+  ⊢ |x|=0, (a,x,μ) ⇒ (FAIL, μ).
 
 nonterminal-success:
-  A ← e ∈ G, (e, x y, ∅) ⇒ (v, y, μ′₁) ⊢ (A, x y, μ₀) ⇒ (v, y, μ₀).
+  A ← e ∈ G, (e, x y, ∅) ⇒ (v, y, μ′₁)
+  ⊢ (A, x y, μ₀) ⇒ (v, y, μ₀).
 nonterminal-failure:
-  A ← e ∈ G, (e, x y, ∅) ⇒ (FAIL, μ′₁) ⊢ (A, x y, μ₀) ⇒ (FAIL, μ₀).
+  A ← e ∈ G, (e, x y, ∅) ⇒ (FAIL, μ′₁)
+  ⊢ (A, x y, μ₀) ⇒ (FAIL, μ₀).
 
 sequence-next:
   (e₀, x y, μ) ⇒ (v₀, y, μ′), (e₁, y, μ′) ⇒ ans ⊢ (e₀ e₁, x y, μ) ⇒ ans.
@@ -134,7 +136,7 @@ sequence-failure:
   (e₀, x y, μ) ⇒ (FAIL, μ′) ⊢ (e₀ e₁, x, μ) ⇒ (FAIL, μ′).
 
 alternation-success:
-  (e₀, x y, μ) ⇒ (v₀, y, μ′) ⊢ (e₀ / e₁, x y, μ) ⇒ (v₀₁, y, μ′).
+  (e₀, x y, μ) ⇒ (v₀, y, μ′) ⊢ (e₀ / e₁, x y, μ) ⇒ (v₀, y, μ′).
 alternation-next:
   (e₀, x, μ) ⇒ (FAIL, μ′), (e₁, x, μ′) ⇒ ans ⊢ (e₀ / e₁, x y, μ) ⇒ ans.
 
