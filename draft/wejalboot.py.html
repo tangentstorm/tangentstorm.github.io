@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>wejal bootstrap</title>
-<!-- 2015-01-22 Thu 08:17 -->
+<!-- 2015-01-22 Thu 12:48 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="michal wallace" />
@@ -114,7 +114,7 @@ Our first step is to define some types that we can use to tag the different part
 </div>
 <div class="org-src-container">
 
-<pre class="src src-python" id="code"><span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">T</span>(tag, doc=<span style="color: #00ff00;">''</span>, args)
+<pre class="src src-python" id="code"><span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">T</span>(tag, doc, args):
     <span style="color: #00ff00;">"""Creates a new tuple type."""</span>
     <span style="color: #eedd82;">res</span> = namedtuple(tag, args)
     <span style="color: #00ffff;">if</span> doc: res.<span style="color: #ff00ff; font-weight: bold;">__doc__</span>+=<span style="color: #00ff00;">' : '</span>+doc
@@ -239,15 +239,11 @@ We need a way walk these trees and dispatch to an appropriate method for each ty
         <span style="color: #00ffff;">self</span>.node = <span style="color: #ffaf00;">None</span>
         <span style="color: #00ffff;">self</span>.path = [] <span style="color: #66f;"># </span><span style="color: #66f;">stack of breadcrumbs from the root</span>
 
-    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">unhandled</span>(<span style="color: #00ffff;">self</span>, node):
-        <span style="color: #00ffff;">yield</span> warn(<span style="color: #00ff00;">'no handler for tag: %s'</span> % node.__class__.<span style="color: #ff00ff; font-weight: bold;">__name__</span>)
-
-    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">walk</span>(<span style="color: #00ffff;">self</span>, node):
-        <span style="color: #eedd82;">tag</span> = node.__class__.<span style="color: #ff00ff; font-weight: bold;">__name__</span>
-        <span style="color: #eedd82;">meth</span> = <span style="color: #ff00ff; font-weight: bold;">getattr</span>(<span style="color: #00ffff;">self</span>, <span style="color: #00ff00;">'on'</span>+tag, <span style="color: #00ffff;">self</span>.unhandled)
-        <span style="color: #00ffff;">self</span>.path.append(<span style="color: #00ffff;">self</span>.node); <span style="color: #00ffff;">self</span>.node = node
-        <span style="color: #00ffff;">yield</span> <span style="color: #00ffff;">from</span> meth(node)
-        <span style="color: #00ffff;">self</span>.node = <span style="color: #00ffff;">self</span>.path.pop()
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">walk</span>(<span style="color: #00ffff;">self</span>, prefix, node):
+        <span style="color: #eedd82;">meth_name</span> = <span style="color: #00ff00;">"%s_%s"</span> % (prefix, node.__class__.<span style="color: #ff00ff; font-weight: bold;">__name__</span>)
+        <span style="color: #00ffff;">if</span> <span style="color: #ff00ff; font-weight: bold;">hasattr</span>(<span style="color: #00ffff;">self</span>, meth_name):
+            <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">getattr</span>(<span style="color: #00ffff;">self</span>, meth_name)(node)
+        <span style="color: #00ffff;">else</span>: warn(<span style="color: #00ff00;">'no handler for %s'</span> % (meth_name))
 </pre>
 </div>
 </div>
@@ -305,7 +301,6 @@ It's very much like what happens when overriding methods in a subclass, except i
 </div>
 </div>
 
-
 <div id="outline-container-sec-7" class="outline-2">
 <h2 id="sec-7"><a id="n0pcnnd1jqg0" name="n0pcnnd1jqg0"></a><span class="section-number-2">7</span> Grammar Interpreter</h2>
 <div class="outline-text-2" id="text-7">
@@ -319,11 +314,14 @@ We will assume for now that we have the entire string in memory.
 <pre class="src src-python" id="code"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Grin</span>(Dispatcher):
     <span style="color: #00ff00;">"""Grammar Interpreter"""</span>
 
-    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match</span>(<span style="color: #00ffff;">self</span>, src):
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, root):
+        <span style="color: #ff00ff; font-weight: bold;">super</span>(Grin,<span style="color: #00ffff;">self</span>).__init__(root)
+        <span style="color: #00ffff;">self</span>.init(root)
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">parse</span>(<span style="color: #00ffff;">self</span>, src):
         <span style="color: #00ffff;">self</span>.env = World()
         <span style="color: #00ffff;">self</span>.src, <span style="color: #00ffff;">self</span>.pos, <span style="color: #00ffff;">self</span>.ch = src, 0, <span style="color: #00ff00;">''</span>
         <span style="color: #00ffff;">self</span>.page, <span style="color: #00ffff;">self</span>.line, <span style="color: #00ffff;">self</span>.col = 0, 0, 0
-        <span style="color: #00ffff;">for</span> step <span style="color: #00ffff;">in</span> <span style="color: #00ffff;">self</span>.walk(<span style="color: #00ffff;">self</span>.root): <span style="color: #00ffff;">pass</span>
 
     &lt;&lt;@methods&gt;&gt;
 </pre>
@@ -358,9 +356,9 @@ I placed that code in a block of its own so it would be syntax highlighted, but 
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="code"><span style="color: #eedd82;">ebnf_src</span> = (
- <span style="color: #00ff00;">'&lt;&lt;ebnf&gt;&gt;'</span>
-)
+<pre class="src src-python" id="code"><span style="color: #eedd82;">ebnf_src</span> = <span style="color: #00ff00;">'''\</span>
+<span style="color: #00ff00;">&lt;&lt;ebnf&gt;&gt;</span>
+<span style="color: #00ff00;">'''</span>
 </pre>
 </div>
 </div>
@@ -374,12 +372,227 @@ I placed that code in a block of its own so it would be syntax highlighted, but 
 And now we can put the whole thing together:
 </p>
 
-<pre class="example">
-&lt;&lt;@imports&gt;&gt;
-&lt;&lt;@code&gt;&gt;
-if __name__=="__main__":
-    print(Grin(ebnf).match(ebnf_src))
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #00ffff;">from</span> collections <span style="color: #00ffff;">import</span> namedtuple
+<span style="color: #00ffff;">import</span> string
+<span style="color: #00ffff;">from</span> warnings <span style="color: #00ffff;">import</span> warn
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">T</span>(tag, doc, args):
+    <span style="color: #00ff00;">"""Creates a new tuple type."""</span>
+    <span style="color: #eedd82;">res</span> = namedtuple(tag, args)
+    <span style="color: #00ffff;">if</span> doc: res.<span style="color: #ff00ff; font-weight: bold;">__doc__</span>+=<span style="color: #00ff00;">' : '</span>+doc
+    <span style="color: #00ffff;">return</span> res
+
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">TB</span>(tag, doc, args=[<span style="color: #00ff00;">'body'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">TI</span>(tag, doc, args=[<span style="color: #00ff00;">'item'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">TN</span>(tag, doc, args=[<span style="color: #00ff00;">'name'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">T2</span>(tag, doc, args=[<span style="color: #00ff00;">'name'</span>,<span style="color: #00ff00;">'body'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
+
+<span style="color: #eedd82;">Gram</span> = T(<span style="color: #00ff00;">'Gram'</span>, <span style="color: #00ff00;">'contains grammar rules (may inherit from `base`).'</span>,
+         [<span style="color: #00ff00;">'name'</span>, <span style="color: #00ff00;">'base'</span>, <span style="color: #00ff00;">'doc'</span>, <span style="color: #00ff00;">'body'</span>])
+<span style="color: #eedd82;">Def</span> = T(<span style="color: #00ff00;">'Def'</span>, <span style="color: #00ff00;">'define a named rule.'</span>, [<span style="color: #00ff00;">'name'</span>,<span style="color: #00ff00;">'body'</span>])
+<span style="color: #eedd82;">Ref</span> = TN(<span style="color: #00ff00;">'Ref'</span>, <span style="color: #00ff00;">'refer to (invoke) a named rule'</span>)
+
+<span style="color: #eedd82;">Any</span> = T(<span style="color: #00ff00;">'Any'</span>, <span style="color: #00ff00;">'match anything'</span>, [])
+<span style="color: #eedd82;">Not</span> = TI(<span style="color: #00ff00;">'Not'</span>, <span style="color: #00ff00;">'fail if the pattern would match, but do not consume'</span>)
+<span style="color: #eedd82;">Skip</span> = TI(<span style="color: #00ff00;">'Skip'</span>, <span style="color: #00ff00;">'match the pattern, but hide it from other rules'</span>)
+
+<span style="color: #eedd82;">Lit</span> = TI(<span style="color: #00ff00;">'Lit'</span>, <span style="color: #00ff00;">'match literal item (using ==)'</span>)
+<span style="color: #eedd82;">Seq</span> = TB(<span style="color: #00ff00;">'Seq'</span>, <span style="color: #00ff00;">'match a sequence of patterns'</span>)
+<span style="color: #eedd82;">Grp</span> = TB(<span style="color: #00ff00;">'Grp'</span>, <span style="color: #00ff00;">'same as Seq, but renders in parentheses'</span>)
+<span style="color: #eedd82;">Alt</span> = TB(<span style="color: #00ff00;">'Alt'</span>, <span style="color: #00ff00;">'match any of the alternatives'</span>)
+<span style="color: #eedd82;">Rep</span> = TI(<span style="color: #00ff00;">'Rep'</span>, <span style="color: #00ff00;">'match 1 or more repetitions.'</span>)
+<span style="color: #eedd82;">Opt</span> = TI(<span style="color: #00ff00;">'Opt'</span>, <span style="color: #00ff00;">'match 0 or 1 repetitions.'</span>)
+<span style="color: #eedd82;">Orp</span> = TI(<span style="color: #00ff00;">'Orp'</span>, <span style="color: #00ff00;">'match 0 or more repetitions.'</span>)
+
+<span style="color: #eedd82;">Var</span> = T2(<span style="color: #00ff00;">'Var'</span>, <span style="color: #00ff00;">'save matched string in a variable.'</span>)
+<span style="color: #eedd82;">Val</span> = TN(<span style="color: #00ff00;">'Val'</span>, <span style="color: #00ff00;">'match against the saved value.'</span>)
+<span style="color: #eedd82;">New</span> = T2(<span style="color: #00ff00;">'New'</span>, <span style="color: #00ff00;">'build a new class/tuple instance'</span>)
+<span style="color: #eedd82;">Arg</span> = TB(<span style="color: #00ff00;">'Arg'</span>, <span style="color: #00ff00;">'pass matched data as arg to containing "New"'</span>)
+
+<span style="color: #eedd82;">ECHR</span>, <span style="color: #eedd82;">SQ</span>, <span style="color: #eedd82;">DQ</span> = [<span style="color: #00ff00;">'\\'</span>, <span style="color: #00ff00;">"'"</span>, <span style="color: #00ff00;">'"'</span>]
+<span style="color: #eedd82;">base</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [], <span style="color: #00ff00;">"rules common to all grammars"</span>, [
+    Def(<span style="color: #00ff00;">'main'</span>, Orp(<span style="color: #00ff00;">'token'</span>)),
+    Def(<span style="color: #00ff00;">'token'</span>,Seq([Skip(Orp(Ref(<span style="color: #00ff00;">'space'</span>))),
+                  Alt([Ref(<span style="color: #00ff00;">'STRING'</span>), Ref(<span style="color: #00ff00;">'NUMBER'</span>),
+                       Ref(<span style="color: #00ff00;">'IDENT'</span>), Ref(<span style="color: #00ff00;">'DELIM'</span>),
+                       Rep(Not(Ref(<span style="color: #00ff00;">'space'</span>)))])])),
+    Def(<span style="color: #00ff00;">'space'</span>, Orp(<span style="color: #00ff00;">'White'</span>)),
+    <span style="color: #66f;"># </span><span style="color: #66f;">character classes:</span>
+    Def(<span style="color: #00ff00;">'White'</span>, Alt([<span style="color: #ff00ff; font-weight: bold;">chr</span>(c) <span style="color: #00ffff;">for</span> c <span style="color: #00ffff;">in</span> <span style="color: #ff00ff; font-weight: bold;">range</span>(33)])),
+    Def(<span style="color: #00ff00;">'Upper'</span>, Alt(<span style="color: #ff00ff; font-weight: bold;">list</span>(string.ascii_uppercase))),
+    Def(<span style="color: #00ff00;">'Lower'</span>, Alt(<span style="color: #ff00ff; font-weight: bold;">list</span>(string.ascii_lowercase))),
+    Def(<span style="color: #00ff00;">'Alpha'</span>, Alt([Ref(<span style="color: #00ff00;">'Lower'</span>), Ref(<span style="color: #00ff00;">'Upper'</span>)])),
+    Def(<span style="color: #00ff00;">'Under'</span>, Lit(<span style="color: #00ff00;">'_'</span>)),
+    Def(<span style="color: #00ff00;">'Neg'</span>, Lit(<span style="color: #00ff00;">'-'</span>)),
+    Def(<span style="color: #00ff00;">'Digit'</span>, Alt([Lit(c) <span style="color: #00ffff;">for</span> c <span style="color: #00ffff;">in</span> string.digits])),
+    Def(<span style="color: #00ff00;">'Hexit'</span>, Alt([Ref(<span style="color: #00ff00;">'Digit'</span>)]+[Lit(c) <span style="color: #00ffff;">for</span> c <span style="color: #00ffff;">in</span> <span style="color: #00ff00;">'abcdefABCDEF'</span>])),
+    Def(<span style="color: #00ff00;">'Alnum'</span>, Alt([Ref(<span style="color: #00ff00;">'Under'</span>), Ref(<span style="color: #00ff00;">'Alpha'</span>), Ref(<span style="color: #00ff00;">'Digit'</span>)])),
+    <span style="color: #66f;"># </span><span style="color: #66f;">simple patterns:</span>
+    Def(<span style="color: #00ff00;">'IDENT'</span>, Seq([Alt([Ref(<span style="color: #00ff00;">'Under'</span>),Ref(<span style="color: #00ff00;">'Alpha'</span>)]), Orp(Ref(<span style="color: #00ff00;">'Alnum'</span>))])),
+    Def(<span style="color: #00ff00;">'NUMBER'</span>,Seq([Opt(Ref(<span style="color: #00ff00;">'Neg'</span>)), Rep(Ref(<span style="color: #00ff00;">'Digit'</span>)),
+                   Orp([Ref(<span style="color: #00ff00;">'Under'</span>),
+                        Ref(<span style="color: #00ff00;">'Digit'</span>),Ref(<span style="color: #00ff00;">'Digit'</span>),Ref(<span style="color: #00ff00;">'Digit'</span>)])])),
+    Def(<span style="color: #00ff00;">'STRING'</span>, Alt([Seq([Lit(DQ), Rep(Ref(<span style="color: #00ff00;">'STRCHR'</span>)), Lit(DQ)])])),
+    Def(<span style="color: #00ff00;">'STRCHR'</span>, Alt([Seq([Lit(ECHR), Alt([ Lit(ECHR), Lit(DQ) ])]),
+                       Not(DQ) ])),
+    Def(<span style="color: #00ff00;">'DELIM'</span>, Alt(<span style="color: #ff00ff; font-weight: bold;">list</span>(<span style="color: #00ff00;">'(){}[]'</span>))),
+])
+<span style="color: #eedd82;">ebnf</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [base], <span style="color: #00ff00;">"ebnf meta-grammar (for parsing grammars)"</span>, [
+    Def(<span style="color: #00ff00;">'main'</span>, Orp(Ref(<span style="color: #00ff00;">'rule'</span>))),
+    Def(<span style="color: #00ff00;">'rule'</span>, Seq([Var(<span style="color: #00ff00;">'name'</span>, Ref(<span style="color: #00ff00;">'IDENT'</span>)),
+                     Lit(<span style="color: #00ff00;">'='</span>), Ref(<span style="color: #00ff00;">'expr'</span>), Lit(<span style="color: #00ff00;">'.'</span>) ])),
+    Def(<span style="color: #00ff00;">'expr'</span>, Seq([ Ref(<span style="color: #00ff00;">'term'</span>), Orp([Lit(<span style="color: #00ff00;">'|'</span>), Ref(<span style="color: #00ff00;">'term'</span>) ]) ])),
+    Def(<span style="color: #00ff00;">'term'</span>, Seq([ Ref(<span style="color: #00ff00;">'factor'</span>), Rep(Ref(<span style="color: #00ff00;">'factor'</span>)) ])),
+    Def(<span style="color: #00ff00;">'factor'</span>, Alt([Ref(<span style="color: #00ff00;">'IDENT'</span>), Ref(<span style="color: #00ff00;">'STRING'</span>),
+                       Ref(<span style="color: #00ff00;">'rep'</span>), Ref(<span style="color: #00ff00;">'opt'</span>), Ref(<span style="color: #00ff00;">'grp'</span>)])),
+    Def(<span style="color: #00ff00;">'rep'</span>, Seq([Lit(<span style="color: #00ff00;">'{'</span>), New(Rep, Ref(<span style="color: #00ff00;">'expr'</span>)), Lit(<span style="color: #00ff00;">'}'</span>)])),  <span style="color: #66f;"># </span><span style="color: #66f;">'x*'</span>
+    Def(<span style="color: #00ff00;">'opt'</span>, Seq([Lit(<span style="color: #00ff00;">'['</span>), New(Opt, Ref(<span style="color: #00ff00;">'expr'</span>)), Lit(<span style="color: #00ff00;">']'</span>)])),  <span style="color: #66f;"># </span><span style="color: #66f;">'x?'</span>
+    Def(<span style="color: #00ff00;">'grp'</span>, Seq([Lit(<span style="color: #00ff00;">'('</span>), New(Grp, Ref(<span style="color: #00ff00;">'expr'</span>)), Lit(<span style="color: #00ff00;">')'</span>)])),  <span style="color: #66f;"># </span><span style="color: #66f;">'(x)'</span>
+])
+
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Dispatcher</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, tree):
+        <span style="color: #00ffff;">self</span>.root = tree
+        <span style="color: #00ffff;">self</span>.done = <span style="color: #ffaf00;">False</span>
+        <span style="color: #00ffff;">self</span>.node = <span style="color: #ffaf00;">None</span>
+        <span style="color: #00ffff;">self</span>.path = [] <span style="color: #66f;"># </span><span style="color: #66f;">stack of breadcrumbs from the root</span>
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">walk</span>(<span style="color: #00ffff;">self</span>, prefix, node):
+        <span style="color: #eedd82;">meth_name</span> = <span style="color: #00ff00;">"%s_%s"</span> % (prefix, node.__class__.<span style="color: #ff00ff; font-weight: bold;">__name__</span>)
+        <span style="color: #00ffff;">if</span> <span style="color: #ff00ff; font-weight: bold;">hasattr</span>(<span style="color: #00ffff;">self</span>, meth_name):
+            <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">getattr</span>(<span style="color: #00ffff;">self</span>, meth_name)(node)
+        <span style="color: #00ffff;">else</span>: warn(<span style="color: #00ff00;">'no handler for %s'</span> % (meth_name))
+
+
+<span style="color: #eedd82;">HOME</span> = {} <span style="color: #66f;"># </span><span style="color: #66f;">arbitrary dictionary object</span>
+
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">World</span>(<span style="color: #ff00ff; font-weight: bold;">dict</span>):
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, proto=HOME):
+        <span style="color: #ff00ff; font-weight: bold;">super</span>(World, <span style="color: #00ffff;">self</span>).__init__()
+        <span style="color: #00ffff;">self</span>.proto = proto
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__getattr__</span>(<span style="color: #00ffff;">self</span>, name):
+        <span style="color: #66f;"># </span><span style="color: #66f;">called when attribute has no local definition.</span>
+        <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">getattr</span>(<span style="color: #00ffff;">self</span>.proto, name)
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__getitem__</span>(<span style="color: #00ffff;">self</span>, key):
+        <span style="color: #00ffff;">if</span> key <span style="color: #00ffff;">in</span> <span style="color: #00ffff;">self</span>.keys(): <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">super</span>(World, <span style="color: #00ffff;">self</span>)[key]
+        <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.proto[key]
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">changed</span>(<span style="color: #00ffff;">self</span>, key, val):
+        <span style="color: #00ff00;">"""Forks a new world, with one key changed."""</span>
+        <span style="color: #eedd82;">res</span> = World(<span style="color: #00ffff;">self</span>)
+        <span style="color: #eedd82;">res</span>[key] = val
+        <span style="color: #00ffff;">return</span> res
+
+
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Grin</span>(Dispatcher):
+    <span style="color: #00ff00;">"""Grammar Interpreter"""</span>
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, root):
+        <span style="color: #ff00ff; font-weight: bold;">super</span>(Grin,<span style="color: #00ffff;">self</span>).__init__(root)
+        <span style="color: #00ffff;">self</span>.init(root)
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">parse</span>(<span style="color: #00ffff;">self</span>, src):
+        <span style="color: #00ffff;">self</span>.env = World()
+        <span style="color: #00ffff;">self</span>.src, <span style="color: #00ffff;">self</span>.pos, <span style="color: #00ffff;">self</span>.ch = src, 0, <span style="color: #00ff00;">''</span>
+        <span style="color: #00ffff;">self</span>.page, <span style="color: #00ffff;">self</span>.line, <span style="color: #00ffff;">self</span>.col = 0, 0, 0
+
+
+    <span style="color: #66f;"># </span><span style="color: #66f;">(inside  `class Grin`...)</span>
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Ref</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #66f;"># </span><span style="color: #66f;">pass in fresh World, then discard changes</span>
+        <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(<span style="color: #00ffff;">self</span>.defs[node.name], cur, World())
+        <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> (FAIL, env)
+        <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (tup[0], tup[1], env)
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Emp</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">return</span> (<span style="color: #ffaf00;">None</span>, cur, env)
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Lit</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">if</span> cur.value == node.item: <span style="color: #00ffff;">return</span> (cur.value, cur.fwd(), env)
+        <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (FAIL, cur, env)
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Seq</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">for</span> item <span style="color: #00ffff;">in</span> node.body:
+            <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(item, cur, env)
+            <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> (FAIL, tup[1])
+            <span style="color: #00ffff;">else</span>: <span style="color: #eedd82;">val</span>, <span style="color: #eedd82;">cur</span>, <span style="color: #eedd82;">env</span> = tup
+        <span style="color: #00ffff;">return</span> tup <span style="color: #66f;"># </span><span style="color: #66f;">last value</span>
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Alt</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">for</span> item <span style="color: #00ffff;">in</span> node.body:
+            <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(item, cur, env)
+            <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #eedd82;">env</span> = tup[1]
+            <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> tup
+        <span style="color: #00ffff;">return</span> tup <span style="color: #66f;"># </span><span style="color: #66f;">last failure</span>
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Orp</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #eedd82;">vals</span> = []
+        <span style="color: #00ffff;">while</span> <span style="color: #ffaf00;">True</span>:
+            <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(node.item, cur, env)
+            <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">break</span>
+            <span style="color: #00ffff;">else</span>:
+                <span style="color: #eedd82;">val</span>, <span style="color: #eedd82;">cur</span>, <span style="color: #eedd82;">env</span> = tup
+                vals.append(val)
+        <span style="color: #00ffff;">return</span> (vals, cur, env)
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Not</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(node.item, cur, env)
+        <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> (<span style="color: #ffaf00;">None</span>, cur, tup[1])
+        <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (FAIL, tup[1])
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Var</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(node.item, cur, env)
+        <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> tup
+        <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (tup[0], cur, env.changed(node.name, tup[0]))
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Act</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">NotImplementedError</span>(<span style="color: #00ff00;">'no semantic actions yet.'</span>)
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Box</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">NotImplementedError</span>(<span style="color: #00ff00;">'no tree matching yet.'</span>)
+
+
+    <span style="color: #66f;"># </span><span style="color: #66f;">(still inside  `class Grin`...)</span>
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.walk(<span style="color: #00ff00;">'init'</span>, node)
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init_Gram</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">self</span>.defs = {}
+        <span style="color: #00ffff;">for</span> child <span style="color: #00ffff;">in</span> node.body: <span style="color: #00ffff;">self</span>.init(child)
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init_Def</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">self</span>.defs[node.name] = node
+
+<span style="color: #eedd82;">ebnf_src</span> = <span style="color: #00ff00;">'''\</span>
+<span style="color: #00ff00;">main = { rule } .</span>
+<span style="color: #00ff00;">rule = IDENT "=" expr "." .</span>
+<span style="color: #00ff00;">expr = term { "|" term } .</span>
+<span style="color: #00ff00;">term = factor { factor } .</span>
+<span style="color: #00ff00;">factor = IDENT | STRING | "{" expr "}" | "[" expr "]" | "(" expr ")" .</span>
+<span style="color: #00ff00;">'''</span>
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">StringCursor</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, aString:<span style="color: #ff00ff; font-weight: bold;">str</span>):
+        <span style="color: #00ffff;">self</span>.string = s
+        <span style="color: #00ffff;">self</span>.pos = -1
+        <span style="color: #00ffff;">self</span>.line= 0
+        <span style="color: #00ffff;">self</span>.fwd()
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">fwd</span>(<span style="color: #00ffff;">self</span>):
+        <span style="color: #00ffff;">self</span>.pos += 1
+        <span style="color: #00ffff;">self</span>.ch
+
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Fail</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>): <span style="color: #00ff00;">"""Value to indicate failure."""</span>
+<span style="color: #eedd82;">FAIL</span> = Fail()
+<span style="color: #00ffff;">if</span> <span style="color: #ff00ff; font-weight: bold;">__name__</span>==<span style="color: #00ff00;">"__main__"</span>:
+    Grin(ebnf).parse(ebnf_src)
 </pre>
+</div>
 
 <p>
 If we try to run this now, here's what we'll get:
@@ -387,9 +600,8 @@ If we try to run this now, here's what we'll get:
 
 <div class="org-src-container">
 
-<pre class="src src-org"><span style="color: color-208;">wejalboot.py:82:</span> <span style="font-weight: bold;">UserWarning: no handler for tag: Gram</span>
+<pre class="src src-org"><span style="color: color-208;">wejalboot.py:92:</span> <span style="font-weight: bold;">UserWarning: no handler for init_Gram</span>
   <span style="color: #00ff00;">yield warn('no handler for tag: %s' % node.__class__.__name__)</span>
-<span style="color: #ffd700; font-style: italic;">None</span>
 </pre>
 </div>
 
@@ -450,58 +662,65 @@ The output format will be almost the same as the input format.
 <h2 id="sec-12"><a id="yg99mk91oqg0" name="yg99mk91oqg0"></a><span class="section-number-2">12</span> Inference Rules</h2>
 <div class="outline-text-2" id="text-12">
 
+<p>
+These were translated from the sequent notation in Warth's Ometa paper.
+</p>
+
 <div class="org-src-container">
 
 <pre class="src src-python" id="methods"><span style="color: #66f;"># </span><span style="color: #66f;">(inside  `class Grin`...)</span>
-<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">onRef</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
-    <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">NotImplementedError</span>(<span style="color: #00ff00;">'no nonterminal references yet.'</span>)
 
-<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">onEmp</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Ref</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+    <span style="color: #66f;"># </span><span style="color: #66f;">pass in fresh World, then discard changes</span>
+    <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(<span style="color: #00ffff;">self</span>.defs[node.name], cur, World())
+    <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> (FAIL, env)
+    <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (tup[0], tup[1], env)
+
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Emp</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
     <span style="color: #00ffff;">return</span> (<span style="color: #ffaf00;">None</span>, cur, env)
 
-<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">onLit</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Lit</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
     <span style="color: #00ffff;">if</span> cur.value == node.item: <span style="color: #00ffff;">return</span> (cur.value, cur.fwd(), env)
     <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (FAIL, cur, env)
 
-<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">onSeq</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Seq</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
     <span style="color: #00ffff;">for</span> item <span style="color: #00ffff;">in</span> node.body:
-        <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.walk(item, cur, env)
+        <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(item, cur, env)
         <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> (FAIL, tup[1])
         <span style="color: #00ffff;">else</span>: <span style="color: #eedd82;">val</span>, <span style="color: #eedd82;">cur</span>, <span style="color: #eedd82;">env</span> = tup
-    <span style="color: #66f;"># </span><span style="color: #66f;">if it didn't fail, return the last value:</span>
-    <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (val, cur, env)
+    <span style="color: #00ffff;">return</span> tup <span style="color: #66f;"># </span><span style="color: #66f;">last value</span>
 
-<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">onAlt</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Alt</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
     <span style="color: #00ffff;">for</span> item <span style="color: #00ffff;">in</span> node.body:
-        <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.walk(item, cur, env)
+        <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(item, cur, env)
         <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #eedd82;">env</span> = tup[1]
         <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> tup
     <span style="color: #00ffff;">return</span> tup <span style="color: #66f;"># </span><span style="color: #66f;">last failure</span>
 
-<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">onOrp</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Orp</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
     <span style="color: #eedd82;">vals</span> = []
     <span style="color: #00ffff;">while</span> <span style="color: #ffaf00;">True</span>:
-        <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.walk(node.item, cur, env)
+        <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(node.item, cur, env)
         <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">break</span>
         <span style="color: #00ffff;">else</span>:
             <span style="color: #eedd82;">val</span>, <span style="color: #eedd82;">cur</span>, <span style="color: #eedd82;">env</span> = tup
             vals.append(val)
     <span style="color: #00ffff;">return</span> (vals, cur, env)
 
-<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">onNot</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
-    <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.walk(node.item, cur, env)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Not</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+    <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(node.item, cur, env)
     <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> (<span style="color: #ffaf00;">None</span>, cur, tup[1])
     <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (FAIL, tup[1])
 
-<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">onVar</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
-    <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.walk(node.item, cur, env)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Var</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+    <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(node.item, cur, env)
     <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> tup
-    <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (tup[0], cur, env.changed(node.name, tup[0])
+    <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (tup[0], cur, env.changed(node.name, tup[0]))
 
-<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">onAct</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Act</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
     <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">NotImplementedError</span>(<span style="color: #00ff00;">'no semantic actions yet.'</span>)
 
-<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">onCell</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Box</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
     <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">NotImplementedError</span>(<span style="color: #00ff00;">'no tree matching yet.'</span>)
 </pre>
 </div>
@@ -516,12 +735,15 @@ The output format will be almost the same as the input format.
 <div class="org-src-container">
 
 <pre class="src src-python" id="methods"><span style="color: #66f;"># </span><span style="color: #66f;">(still inside  `class Grin`...)</span>
-<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">onGram</span>(<span style="color: #00ffff;">self</span>, node):
-    <span style="color: #00ffff;">self</span>.defs = {}
-    <span style="color: #00ffff;">for</span> child <span style="color: #00ffff;">in</span> node.body: <span style="color: #00ffff;">yield</span> <span style="color: #00ffff;">from</span> <span style="color: #00ffff;">self</span>.walk(child)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init</span>(<span style="color: #00ffff;">self</span>, node):
+    <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.walk(<span style="color: #00ff00;">'init'</span>, node)
 
-<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">onDef</span>(<span style="color: #00ffff;">self</span>, node):
-    <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">NotImplementedError</span>(<span style="color: #00ff00;">'TODO: onDef (and others)...'</span>)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init_Gram</span>(<span style="color: #00ffff;">self</span>, node):
+    <span style="color: #00ffff;">self</span>.defs = {}
+    <span style="color: #00ffff;">for</span> child <span style="color: #00ffff;">in</span> node.body: <span style="color: #00ffff;">self</span>.init(child)
+
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init_Def</span>(<span style="color: #00ffff;">self</span>, node):
+    <span style="color: #00ffff;">self</span>.defs[node.name] = node
 </pre>
 </div>
 </div>
