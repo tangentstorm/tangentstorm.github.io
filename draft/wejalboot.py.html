@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2016-04-15 Fri 15:26 -->
+<!-- 2016-04-15 Fri 15:35 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="viewport" content="width=device-width, initial-scale=1" />
 <title>wejal bootstrap</title>
@@ -106,7 +106,7 @@ For starters, we will focus on simple regular expressions:, much like python's b
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock1">&gt;&gt;&gt; <span style="color: #eedd82;">m</span> = Matcher(Alt([Lit(<span style="color: #00ff00;">"x"</span>), Lit(<span style="color: #00ff00;">"y"</span>))   <span style="color: #66f;"># </span><span style="color: #66f;">match "x" or "y", like re.compile("x|y")</span>
+<pre class="src src-python" id="orgsrcblock1">&gt;&gt;&gt; <span style="color: #eedd82;">m</span> = Matcher(Alt([Lit(<span style="color: #00ff00;">"x"</span>), Lit(<span style="color: #00ff00;">"y"</span>))   <span style="color: #66f;"># </span><span style="color: #66f;">like re.compile("x|y")</span>
 &gt;&gt;&gt; m.match(<span style="color: #00ff00;">"xyz"</span>)                         <span style="color: #66f;"># </span><span style="color: #66f;">should match "x" at position 0 </span>
 Match(txt=<span style="color: #00ff00;">"x"</span>, pos=0)
 &gt;&gt;&gt; m.match(<span style="color: #00ff00;">"zyx"</span>)                         <span style="color: #66f;"># </span><span style="color: #66f;">should fail to match</span>
@@ -115,7 +115,7 @@ FAIL
 </div>
 
 <p>
-Obviously, the nice syntax provided by the <code>re</code> module is nicer than building pattern structures by hand. We will address this soon by bootstrapping our own parser for patterns. In the meantime, we will build our rule definitions by building data structures with python's <code>namedtuple</code>.
+Obviously, the concise syntax provided by the <code>re</code> module is nicer than building pattern structures by hand. We will address this soon by bootstrapping our own parser for grammar definitions. In the meantime, we will build our rule definitions by building data structures with python's <code>namedtuple</code>.
 </p>
 </div>
 </div>
@@ -296,7 +296,6 @@ This state includes the match result, a cursor marking the position in the strin
 </div>
 </div>
 
-
 <div id="outline-container-orgheadline6" class="outline-2">
 <h2 id="orgheadline6"><a id="yba9ij4147h0"></a><span class="section-number-2">6</span> Simple pattern matching.</h2>
 <div class="outline-text-2" id="text-6">
@@ -390,7 +389,6 @@ At this point, our original example using <code>Alt([ Lit('x'), Lit('y') ])</cod
 </div>
 </div>
 </div>
-
 
 
 
@@ -982,15 +980,8 @@ These were translated from the sequent notation in Warth's Ometa paper.
 <h2 id="orgheadline17"><a id="hnv0l310pqg0"></a><span class="section-number-2">17</span> <span class="todo TODO">TODO</span> credits</h2>
 <div class="outline-text-2" id="text-17">
 <ul class="org-ul">
-<li>grammar rules are adapted from Alessandro Warth's <a href="http://tinlizzie.org/ometa/">Ometa</a> system.</li>
+<li>grammar rules (and the 'world' concept) are adapted from Alessandro Warth's <a href="http://tinlizzie.org/ometa/">Ometa</a> system.</li>
 </ul>
-
-
-<div class="org-src-container">
-
-<pre class="src src-j">i. 10 [ 'whatever'
-</pre>
-</div>
 </div>
 </div>
 </div>
