@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2016-04-15 Fri 14:48 -->
+<!-- 2016-04-15 Fri 15:26 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="viewport" content="width=device-width, initial-scale=1" />
 <title>wejal bootstrap</title>
@@ -106,10 +106,10 @@ For starters, we will focus on simple regular expressions:, much like python's b
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock1">&gt;&gt;&gt; m = Matcher(Alt([Lit("x"), Lit("y"))   # match the letter x or y, like re.compile("x|y")
-&gt;&gt;&gt; m.match("xyz")                         # should match "x" at position 0 
-Match(txt="x", pos=0)
-&gt;&gt;&gt; m.match("zyx")                         # should fail to match
+<pre class="src src-python" id="orgsrcblock1">&gt;&gt;&gt; <span style="color: #eedd82;">m</span> = Matcher(Alt([Lit(<span style="color: #00ff00;">"x"</span>), Lit(<span style="color: #00ff00;">"y"</span>))   <span style="color: #66f;"># </span><span style="color: #66f;">match "x" or "y", like re.compile("x|y")</span>
+&gt;&gt;&gt; m.match(<span style="color: #00ff00;">"xyz"</span>)                         <span style="color: #66f;"># </span><span style="color: #66f;">should match "x" at position 0 </span>
+Match(txt=<span style="color: #00ff00;">"x"</span>, pos=0)
+&gt;&gt;&gt; m.match(<span style="color: #00ff00;">"zyx"</span>)                         <span style="color: #66f;"># </span><span style="color: #66f;">should fail to match</span>
 FAIL
 </pre>
 </div>
@@ -129,43 +129,43 @@ Here are our data types for modeling grammar definitions. Since we are using <co
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock2">from collections import namedtuple
+<pre class="src src-python" id="orgsrcblock2"><span style="color: #00ffff;">from</span> collections <span style="color: #00ffff;">import</span> namedtuple
 </pre>
 </div>
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock3">def T(tag, doc, args):
-    """Creates a new tuple type."""
-    res = namedtuple(tag, args)
-    if doc: res.__doc__+=' : '+doc
-    return res
+<pre class="src src-python" id="orgsrcblock3"><span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">T</span>(tag, doc, args):
+    <span style="color: #00ff00;">"""Creates a new tuple type."""</span>
+    <span style="color: #eedd82;">res</span> = namedtuple(tag, args)
+    <span style="color: #00ffff;">if</span> doc: res.<span style="color: #ff00ff; font-weight: bold;">__doc__</span>+=<span style="color: #00ff00;">' : '</span>+doc
+    <span style="color: #00ffff;">return</span> res
 
-def TB(tag, doc, args=['body']): return T(tag, doc, args)
-def TI(tag, doc, args=['item']): return T(tag, doc, args)
-def TN(tag, doc, args=['name']): return T(tag, doc, args)
-def T2(tag, doc, args=['name','body']): return T(tag, doc, args)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">TB</span>(tag, doc, args=[<span style="color: #00ff00;">'body'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">TI</span>(tag, doc, args=[<span style="color: #00ff00;">'item'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">TN</span>(tag, doc, args=[<span style="color: #00ff00;">'name'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">T2</span>(tag, doc, args=[<span style="color: #00ff00;">'name'</span>,<span style="color: #00ff00;">'body'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
 
-Gram = T('Gram', 'contains grammar rules (may inherit from `base`).',
-         ['name', 'base', 'doc', 'body'])
-Def = T('Def', 'define a named rule.', ['name','body'])
-Ref = TN('Ref', 'refer to (invoke) a named rule')
+<span style="color: #eedd82;">Gram</span> = T(<span style="color: #00ff00;">'Gram'</span>, <span style="color: #00ff00;">'contains grammar rules (may inherit from `base`).'</span>,
+         [<span style="color: #00ff00;">'name'</span>, <span style="color: #00ff00;">'base'</span>, <span style="color: #00ff00;">'doc'</span>, <span style="color: #00ff00;">'body'</span>])
+<span style="color: #eedd82;">Def</span> = T(<span style="color: #00ff00;">'Def'</span>, <span style="color: #00ff00;">'define a named rule.'</span>, [<span style="color: #00ff00;">'name'</span>,<span style="color: #00ff00;">'body'</span>])
+<span style="color: #eedd82;">Ref</span> = TN(<span style="color: #00ff00;">'Ref'</span>, <span style="color: #00ff00;">'refer to (invoke) a named rule'</span>)
 
-Any = T('Any', 'match anything', [])
-Not = TI('Not', 'fail if the pattern would match, but do not consume')
-Skip = TI('Skip', 'match the pattern, but hide it from other rules')
+<span style="color: #eedd82;">Any</span> = T(<span style="color: #00ff00;">'Any'</span>, <span style="color: #00ff00;">'match anything'</span>, [])
+<span style="color: #eedd82;">Not</span> = TI(<span style="color: #00ff00;">'Not'</span>, <span style="color: #00ff00;">'fail if the pattern would match, but do not consume'</span>)
+<span style="color: #eedd82;">Skip</span> = TI(<span style="color: #00ff00;">'Skip'</span>, <span style="color: #00ff00;">'match the pattern, but hide it from other rules'</span>)
 
-Lit = TI('Lit', 'match literal item (using ==)')
-Seq = TB('Seq', 'match a sequence of patterns')
-Grp = TB('Grp', 'same as Seq, but renders in parentheses')
-Alt = TB('Alt', 'match any of the alternatives')
-Rep = TI('Rep', 'match 1 or more repetitions.')
-Opt = TI('Opt', 'match 0 or 1 repetitions.')
-Orp = TI('Orp', 'match 0 or more repetitions.')
+<span style="color: #eedd82;">Lit</span> = TI(<span style="color: #00ff00;">'Lit'</span>, <span style="color: #00ff00;">'match literal item (using ==)'</span>)
+<span style="color: #eedd82;">Seq</span> = TB(<span style="color: #00ff00;">'Seq'</span>, <span style="color: #00ff00;">'match a sequence of patterns'</span>)
+<span style="color: #eedd82;">Grp</span> = TB(<span style="color: #00ff00;">'Grp'</span>, <span style="color: #00ff00;">'same as Seq, but renders in parentheses'</span>)
+<span style="color: #eedd82;">Alt</span> = TB(<span style="color: #00ff00;">'Alt'</span>, <span style="color: #00ff00;">'match any of the alternatives'</span>)
+<span style="color: #eedd82;">Rep</span> = TI(<span style="color: #00ff00;">'Rep'</span>, <span style="color: #00ff00;">'match 1 or more repetitions.'</span>)
+<span style="color: #eedd82;">Opt</span> = TI(<span style="color: #00ff00;">'Opt'</span>, <span style="color: #00ff00;">'match 0 or 1 repetitions.'</span>)
+<span style="color: #eedd82;">Orp</span> = TI(<span style="color: #00ff00;">'Orp'</span>, <span style="color: #00ff00;">'match 0 or more repetitions.'</span>)
 
-Var = T2('Var', 'save matched string in a variable.')
-Val = TN('Val', 'match against the saved value.')
-New = T2('New', 'build a new class/tuple instance')
-Arg = TB('Arg', 'pass matched data as arg to containing "New"')
+<span style="color: #eedd82;">Var</span> = T2(<span style="color: #00ff00;">'Var'</span>, <span style="color: #00ff00;">'save matched string in a variable.'</span>)
+<span style="color: #eedd82;">Val</span> = TN(<span style="color: #00ff00;">'Val'</span>, <span style="color: #00ff00;">'match against the saved value.'</span>)
+<span style="color: #eedd82;">New</span> = T2(<span style="color: #00ff00;">'New'</span>, <span style="color: #00ff00;">'build a new class/tuple instance'</span>)
+<span style="color: #eedd82;">Arg</span> = TB(<span style="color: #00ff00;">'Arg'</span>, <span style="color: #00ff00;">'pass matched data as arg to containing "New"'</span>)
 </pre>
 </div>
 </div>
@@ -188,30 +188,30 @@ In other words, when we see an <code>Alt</code> node in the tree, we can use thi
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock4">from warnings import warn
+<pre class="src src-python" id="orgsrcblock4"><span style="color: #00ffff;">from</span> warnings <span style="color: #00ffff;">import</span> warn
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock5">def node_type(node):
-    return node.__class__.__name__
+<pre class="src src-python" id="orgsrcblock5"><span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">node_type</span>(node):
+    <span style="color: #00ffff;">return</span> node.__class__.<span style="color: #ff00ff; font-weight: bold;">__name__</span>
 
-class Dispatcher(object):
-    """Provides a simple generic dispatch mechanism based on method names"""
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Dispatcher</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+    <span style="color: #00ff00;">"""Provides a simple generic dispatch mechanism based on method names"""</span>
 
-    def _find_handler(self, prefix, node):
-        """(prefix, namedtuple) -&gt; callable"""
-        return getattr(self, '_'.join([prefix, node_type(node)]), self._unhandled)
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">_find_handler</span>(<span style="color: #00ffff;">self</span>, prefix, node):
+        <span style="color: #00ff00;">"""(prefix, namedtuple) -&gt; callable"""</span>
+        <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">getattr</span>(<span style="color: #00ffff;">self</span>, <span style="color: #00ff00;">'_'</span>.join([prefix, node_type(node)]), <span style="color: #00ffff;">self</span>._unhandled)
 
-    def _unhandled(self, node, *a, **kw):
-        """Warn about unrecognized node types. (Just for development.)"""
-        raise ValueError("no handler found for %s" % node_type(node))
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">_unhandled</span>(<span style="color: #00ffff;">self</span>, node, *a, **kw):
+        <span style="color: #00ff00;">"""Warn about unrecognized node types. (Just for development.)"""</span>
+        <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">ValueError</span>(<span style="color: #00ff00;">"no handler found for %s"</span> % node_type(node))
 
-    def dispatch(self, prefix, node, *a, **kw):
-        """Find and invoke a handler for the given node."""
-        h = self._find_handler(prefix, node)
-        return h(node, *a, **kw)
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">dispatch</span>(<span style="color: #00ffff;">self</span>, prefix, node, *a, **kw):
+        <span style="color: #00ff00;">"""Find and invoke a handler for the given node."""</span>
+        <span style="color: #eedd82;">h</span> = <span style="color: #00ffff;">self</span>._find_handler(prefix, node)
+        <span style="color: #00ffff;">return</span> h(node, *a, **kw)
 </pre>
 </div>
 </div>
@@ -227,20 +227,20 @@ The following helper class will do the work for us:
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock6">class Cursor(object):
+<pre class="src src-python" id="orgsrcblock6"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Cursor</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
 
-    def __init__(self, seq:[any]):
-        self.seq = seq    # sequence (probably a string)
-        self.val = None   # current value
-        self.pos = -1     # current position
-        self.fwd()
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, seq:[<span style="color: #ff00ff; font-weight: bold;">any</span>]):
+        <span style="color: #00ffff;">self</span>.seq = seq    <span style="color: #66f;"># </span><span style="color: #66f;">sequence (probably a string)</span>
+        <span style="color: #00ffff;">self</span>.val = <span style="color: #ffaf00;">None</span>   <span style="color: #66f;"># </span><span style="color: #66f;">current value</span>
+        <span style="color: #00ffff;">self</span>.pos = -1     <span style="color: #66f;"># </span><span style="color: #66f;">current position</span>
+        <span style="color: #00ffff;">self</span>.fwd()
 
-    def fwd(self)-&gt;any:
-        """Move forward in the sequence and return the next item."""
-        end = len(self.seq)
-        self.pos = min(self.pos+1, end)
-        self.val = None if self.pos == end else self.seq[self.pos] 
-        return self
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">fwd</span>(<span style="color: #00ffff;">self</span>)-&gt;<span style="color: #ff00ff; font-weight: bold;">any</span>:
+        <span style="color: #00ff00;">"""Move forward in the sequence and return the next item."""</span>
+        <span style="color: #eedd82;">end</span> = <span style="color: #ff00ff; font-weight: bold;">len</span>(<span style="color: #00ffff;">self</span>.seq)
+        <span style="color: #00ffff;">self</span>.pos = <span style="color: #ff00ff; font-weight: bold;">min</span>(<span style="color: #00ffff;">self</span>.pos+1, end)
+        <span style="color: #00ffff;">self</span>.val = <span style="color: #ffaf00;">None</span> <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">self</span>.pos == end <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">self</span>.seq[<span style="color: #00ffff;">self</span>.pos] 
+        <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>
 </pre>
 </div>
 </div>
@@ -259,8 +259,8 @@ Matching should either produce:
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock7">Match = namedtuple("Match", ['txt', 'pos'])
-Match.__doc__ = "Match Result"
+<pre class="src src-python" id="orgsrcblock7"><span style="color: #eedd82;">Match</span> = namedtuple(<span style="color: #00ff00;">"Match"</span>, [<span style="color: #00ff00;">'txt'</span>, <span style="color: #00ff00;">'pos'</span>])
+Match.<span style="color: #ff00ff; font-weight: bold;">__doc__</span> = <span style="color: #00ff00;">"Match Result"</span>
 </pre>
 </div>
 
@@ -270,11 +270,11 @@ Match.__doc__ = "Match Result"
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock8">class Fail(object):
-    """Value to indicate failure."""
-    def __repr__(self):
-        return "FAIL"
-FAIL = Fail()
+<pre class="src src-python" id="orgsrcblock8"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Fail</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+    <span style="color: #00ff00;">"""Value to indicate failure."""</span>
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__repr__</span>(<span style="color: #00ffff;">self</span>):
+        <span style="color: #00ffff;">return</span> <span style="color: #00ff00;">"FAIL"</span>
+<span style="color: #eedd82;">FAIL</span> = Fail()
 </pre>
 </div>
 
@@ -285,12 +285,12 @@ This state includes the match result, a cursor marking the position in the strin
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock9">class M(namedtuple("M", ['val', 'cur', 'env'])):
-    """Internal Match State"""
+<pre class="src src-python" id="orgsrcblock9"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">M</span>(namedtuple(<span style="color: #00ff00;">"M"</span>, [<span style="color: #00ff00;">'val'</span>, <span style="color: #00ff00;">'cur'</span>, <span style="color: #00ff00;">'env'</span>])):
+    <span style="color: #00ff00;">"""Internal Match State"""</span>
 
-    @property
-    def matched(self):
-        return self.val is not FAIL
+    <span style="color: #ff00ff;">@property</span>
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">matched</span>(<span style="color: #00ffff;">self</span>):
+        <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.val <span style="color: #00ffff;">is</span> <span style="color: #00ffff;">not</span> FAIL
 </pre>
 </div>
 </div>
@@ -306,20 +306,20 @@ Now we can start building the matcher. First we will set up the <code>Dispatch</
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock10">class Matcher(Dispatcher):
-    """A simple matcher for regular languages."""
+<pre class="src src-python" id="orgsrcblock10"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Matcher</span>(Dispatcher):
+    <span style="color: #00ff00;">"""A simple matcher for regular languages."""</span>
 
-    def __init__(self, node):
-        self.root = node
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">self</span>.root = node
 
-    def _match(self, node, cur, env):
-        """returns a match state tuple (the `M` class)"""
-        return self.dispatch('match', node, cur, env)
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">_match</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ff00;">"""returns a match state tuple (the `M` class)"""</span>
+        <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.dispatch(<span style="color: #00ff00;">'match'</span>, node, cur, env)
 
-    def match(self, s:str):
-        cur = Cursor(s)
-        env = {}
-        return self._match(self.root, cur, env).val
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match</span>(<span style="color: #00ffff;">self</span>, s:<span style="color: #ff00ff; font-weight: bold;">str</span>):
+        <span style="color: #eedd82;">cur</span> = Cursor(s)
+        <span style="color: #eedd82;">env</span> = {}
+        <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>._match(<span style="color: #00ffff;">self</span>.root, cur, env).val
 </pre>
 </div>
 
@@ -333,11 +333,11 @@ The simplest case is comparison against a single literal character (<code>Lit</c
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock11"># class Matcher:
+<pre class="src src-python" id="orgsrcblock11"><span style="color: #66f;"># </span><span style="color: #66f;">class Matcher:</span>
 
-    def match_Lit(self, node, cur, env):
-        return (M(Match(cur.val, cur.pos), cur.fwd(), env) if cur.val == node.item
-                else M(FAIL, cur, env))
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Lit</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">return</span> (M(Match(cur.val, cur.pos), cur.fwd(), env) <span style="color: #00ffff;">if</span> cur.val == node.item
+                <span style="color: #00ffff;">else</span> M(FAIL, cur, env))
 </pre>
 </div>
 
@@ -352,13 +352,13 @@ Note that only the <i>first</i> matching pattern is returned.
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock12"># class Matcher:
+<pre class="src src-python" id="orgsrcblock12"><span style="color: #66f;"># </span><span style="color: #66f;">class Matcher:</span>
 
-    def match_Alt(self, node, cur, env):
-        for item in node.body:
-            m = self._match(item, cur, env)
-            if m.matched: return m
-        return m # last failure
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Alt</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">for</span> item <span style="color: #00ffff;">in</span> node.body:
+            <span style="color: #eedd82;">m</span> = <span style="color: #00ffff;">self</span>._match(item, cur, env)
+            <span style="color: #00ffff;">if</span> m.matched: <span style="color: #00ffff;">return</span> m
+        <span style="color: #00ffff;">return</span> m <span style="color: #66f;"># </span><span style="color: #66f;">last failure</span>
 </pre>
 </div>
 
@@ -373,19 +373,19 @@ At this point, our original example using <code>Alt([ Lit('x'), Lit('y') ])</cod
 <div class="outline-text-2" id="text-7">
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock13"># class Matcher:
+<pre class="src src-python" id="orgsrcblock13"><span style="color: #66f;"># </span><span style="color: #66f;">class Matcher:</span>
 
-    def match_Seq(self, node):
-        pass
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Seq</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">pass</span>
 
-    def match_Rep(self, node):
-        pass
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Rep</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">pass</span>
 
-    def match_Opt(self, node):
-        pass
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Opt</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">pass</span>
 
-    def match_Orp(self, node):
-        pass
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Orp</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">pass</span>
 </pre>
 </div>
 </div>
@@ -421,38 +421,38 @@ Our first step is to define some types that we can use to tag the different part
 <div class="outline-text-2" id="text-9">
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock14">import string
+<pre class="src src-python" id="orgsrcblock14"><span style="color: #00ffff;">import</span> string
 </pre>
 </div>
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock15">ECHR, SQ, DQ = ['\\', "'", '"']
-base = Gram('ebnf', [], "rules common to all grammars", [
-    Def('main', Orp('token')),
-    Def('token',Seq([Skip(Orp(Ref('space'))),
-                  Alt([Ref('STRING'), Ref('NUMBER'),
-                       Ref('IDENT'), Ref('DELIM'),
-                       Rep(Not(Ref('space')))])])),
-    Def('space', Orp('White')),
-    # character classes:
-    Def('White', Alt([chr(c) for c in range(33)])),
-    Def('Upper', Alt(list(string.ascii_uppercase))),
-    Def('Lower', Alt(list(string.ascii_lowercase))),
-    Def('Alpha', Alt([Ref('Lower'), Ref('Upper')])),
-    Def('Under', Lit('_')),
-    Def('Neg', Lit('-')),
-    Def('Digit', Alt([Lit(c) for c in string.digits])),
-    Def('Hexit', Alt([Ref('Digit')]+[Lit(c) for c in 'abcdefABCDEF'])),
-    Def('Alnum', Alt([Ref('Under'), Ref('Alpha'), Ref('Digit')])),
-    # simple patterns:
-    Def('IDENT', Seq([Alt([Ref('Under'),Ref('Alpha')]), Orp(Ref('Alnum'))])),
-    Def('NUMBER',Seq([Opt(Ref('Neg')), Rep(Ref('Digit')),
-                   Orp([Ref('Under'),
-                        Ref('Digit'),Ref('Digit'),Ref('Digit')])])),
-    Def('STRING', Alt([Seq([Lit(DQ), Rep(Ref('STRCHR')), Lit(DQ)])])),
-    Def('STRCHR', Alt([Seq([Lit(ECHR), Alt([ Lit(ECHR), Lit(DQ) ])]),
+<pre class="src src-python" id="orgsrcblock15"><span style="color: #eedd82;">ECHR</span>, <span style="color: #eedd82;">SQ</span>, <span style="color: #eedd82;">DQ</span> = [<span style="color: #00ff00;">'\\'</span>, <span style="color: #00ff00;">"'"</span>, <span style="color: #00ff00;">'"'</span>]
+<span style="color: #eedd82;">base</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [], <span style="color: #00ff00;">"rules common to all grammars"</span>, [
+    Def(<span style="color: #00ff00;">'main'</span>, Orp(<span style="color: #00ff00;">'token'</span>)),
+    Def(<span style="color: #00ff00;">'token'</span>,Seq([Skip(Orp(Ref(<span style="color: #00ff00;">'space'</span>))),
+                  Alt([Ref(<span style="color: #00ff00;">'STRING'</span>), Ref(<span style="color: #00ff00;">'NUMBER'</span>),
+                       Ref(<span style="color: #00ff00;">'IDENT'</span>), Ref(<span style="color: #00ff00;">'DELIM'</span>),
+                       Rep(Not(Ref(<span style="color: #00ff00;">'space'</span>)))])])),
+    Def(<span style="color: #00ff00;">'space'</span>, Orp(<span style="color: #00ff00;">'White'</span>)),
+    <span style="color: #66f;"># </span><span style="color: #66f;">character classes:</span>
+    Def(<span style="color: #00ff00;">'White'</span>, Alt([<span style="color: #ff00ff; font-weight: bold;">chr</span>(c) <span style="color: #00ffff;">for</span> c <span style="color: #00ffff;">in</span> <span style="color: #ff00ff; font-weight: bold;">range</span>(33)])),
+    Def(<span style="color: #00ff00;">'Upper'</span>, Alt(<span style="color: #ff00ff; font-weight: bold;">list</span>(string.ascii_uppercase))),
+    Def(<span style="color: #00ff00;">'Lower'</span>, Alt(<span style="color: #ff00ff; font-weight: bold;">list</span>(string.ascii_lowercase))),
+    Def(<span style="color: #00ff00;">'Alpha'</span>, Alt([Ref(<span style="color: #00ff00;">'Lower'</span>), Ref(<span style="color: #00ff00;">'Upper'</span>)])),
+    Def(<span style="color: #00ff00;">'Under'</span>, Lit(<span style="color: #00ff00;">'_'</span>)),
+    Def(<span style="color: #00ff00;">'Neg'</span>, Lit(<span style="color: #00ff00;">'-'</span>)),
+    Def(<span style="color: #00ff00;">'Digit'</span>, Alt([Lit(c) <span style="color: #00ffff;">for</span> c <span style="color: #00ffff;">in</span> string.digits])),
+    Def(<span style="color: #00ff00;">'Hexit'</span>, Alt([Ref(<span style="color: #00ff00;">'Digit'</span>)]+[Lit(c) <span style="color: #00ffff;">for</span> c <span style="color: #00ffff;">in</span> <span style="color: #00ff00;">'abcdefABCDEF'</span>])),
+    Def(<span style="color: #00ff00;">'Alnum'</span>, Alt([Ref(<span style="color: #00ff00;">'Under'</span>), Ref(<span style="color: #00ff00;">'Alpha'</span>), Ref(<span style="color: #00ff00;">'Digit'</span>)])),
+    <span style="color: #66f;"># </span><span style="color: #66f;">simple patterns:</span>
+    Def(<span style="color: #00ff00;">'IDENT'</span>, Seq([Alt([Ref(<span style="color: #00ff00;">'Under'</span>),Ref(<span style="color: #00ff00;">'Alpha'</span>)]), Orp(Ref(<span style="color: #00ff00;">'Alnum'</span>))])),
+    Def(<span style="color: #00ff00;">'NUMBER'</span>,Seq([Opt(Ref(<span style="color: #00ff00;">'Neg'</span>)), Rep(Ref(<span style="color: #00ff00;">'Digit'</span>)),
+                   Orp([Ref(<span style="color: #00ff00;">'Under'</span>),
+                        Ref(<span style="color: #00ff00;">'Digit'</span>),Ref(<span style="color: #00ff00;">'Digit'</span>),Ref(<span style="color: #00ff00;">'Digit'</span>)])])),
+    Def(<span style="color: #00ff00;">'STRING'</span>, Alt([Seq([Lit(DQ), Rep(Ref(<span style="color: #00ff00;">'STRCHR'</span>)), Lit(DQ)])])),
+    Def(<span style="color: #00ff00;">'STRCHR'</span>, Alt([Seq([Lit(ECHR), Alt([ Lit(ECHR), Lit(DQ) ])]),
                        Not(DQ) ])),
-    Def('DELIM', Alt(list('(){}[]'))),
+    Def(<span style="color: #00ff00;">'DELIM'</span>, Alt(<span style="color: #ff00ff; font-weight: bold;">list</span>(<span style="color: #00ff00;">'(){}[]'</span>))),
 ])
 </pre>
 </div>
@@ -464,17 +464,17 @@ base = Gram('ebnf', [], "rules common to all grammars", [
 <div class="outline-text-2" id="text-10">
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock16">ebnf = Gram('ebnf', [base], "ebnf meta-grammar (for parsing grammars)", [
-    Def('main', Orp(Ref('rule'))),
-    Def('rule', Seq([Var('name', Ref('IDENT')),
-                     Lit('='), Ref('expr'), Lit('.') ])),
-    Def('expr', Seq([ Ref('term'), Orp([Lit('|'), Ref('term') ]) ])),
-    Def('term', Seq([ Ref('factor'), Rep(Ref('factor')) ])),
-    Def('factor', Alt([Ref('IDENT'), Ref('STRING'),
-                       Ref('rep'), Ref('opt'), Ref('grp')])),
-    Def('rep', Seq([Lit('{'), New(Rep, Ref('expr')), Lit('}')])),  # 'x*'
-    Def('opt', Seq([Lit('['), New(Opt, Ref('expr')), Lit(']')])),  # 'x?'
-    Def('grp', Seq([Lit('('), New(Grp, Ref('expr')), Lit(')')])),  # '(x)'
+<pre class="src src-python" id="orgsrcblock16"><span style="color: #eedd82;">ebnf</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [base], <span style="color: #00ff00;">"ebnf meta-grammar (for parsing grammars)"</span>, [
+    Def(<span style="color: #00ff00;">'main'</span>, Orp(Ref(<span style="color: #00ff00;">'rule'</span>))),
+    Def(<span style="color: #00ff00;">'rule'</span>, Seq([Var(<span style="color: #00ff00;">'name'</span>, Ref(<span style="color: #00ff00;">'IDENT'</span>)),
+                     Lit(<span style="color: #00ff00;">'='</span>), Ref(<span style="color: #00ff00;">'expr'</span>), Lit(<span style="color: #00ff00;">'.'</span>) ])),
+    Def(<span style="color: #00ff00;">'expr'</span>, Seq([ Ref(<span style="color: #00ff00;">'term'</span>), Orp([Lit(<span style="color: #00ff00;">'|'</span>), Ref(<span style="color: #00ff00;">'term'</span>) ]) ])),
+    Def(<span style="color: #00ff00;">'term'</span>, Seq([ Ref(<span style="color: #00ff00;">'factor'</span>), Rep(Ref(<span style="color: #00ff00;">'factor'</span>)) ])),
+    Def(<span style="color: #00ff00;">'factor'</span>, Alt([Ref(<span style="color: #00ff00;">'IDENT'</span>), Ref(<span style="color: #00ff00;">'STRING'</span>),
+                       Ref(<span style="color: #00ff00;">'rep'</span>), Ref(<span style="color: #00ff00;">'opt'</span>), Ref(<span style="color: #00ff00;">'grp'</span>)])),
+    Def(<span style="color: #00ff00;">'rep'</span>, Seq([Lit(<span style="color: #00ff00;">'{'</span>), New(Rep, Ref(<span style="color: #00ff00;">'expr'</span>)), Lit(<span style="color: #00ff00;">'}'</span>)])),  <span style="color: #66f;"># </span><span style="color: #66f;">'x*'</span>
+    Def(<span style="color: #00ff00;">'opt'</span>, Seq([Lit(<span style="color: #00ff00;">'['</span>), New(Opt, Ref(<span style="color: #00ff00;">'expr'</span>)), Lit(<span style="color: #00ff00;">']'</span>)])),  <span style="color: #66f;"># </span><span style="color: #66f;">'x?'</span>
+    Def(<span style="color: #00ff00;">'grp'</span>, Seq([Lit(<span style="color: #00ff00;">'('</span>), New(Grp, Ref(<span style="color: #00ff00;">'expr'</span>)), Lit(<span style="color: #00ff00;">')'</span>)])),  <span style="color: #66f;"># </span><span style="color: #66f;">'(x)'</span>
 ])
 </pre>
 </div>
@@ -506,27 +506,27 @@ It's very much like what happens when overriding methods in a subclass, except i
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock17">HOME = {} # arbitrary dictionary object
+<pre class="src src-python" id="orgsrcblock17"><span style="color: #eedd82;">HOME</span> = {} <span style="color: #66f;"># </span><span style="color: #66f;">arbitrary dictionary object</span>
 
-class World(dict):
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">World</span>(<span style="color: #ff00ff; font-weight: bold;">dict</span>):
 
-    def __init__(self, proto=HOME):
-        super(World, self).__init__()
-        self.proto = proto
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, proto=HOME):
+        <span style="color: #ff00ff; font-weight: bold;">super</span>(World, <span style="color: #00ffff;">self</span>).__init__()
+        <span style="color: #00ffff;">self</span>.proto = proto
 
-    def __getattr__(self, name):
-        # called when attribute has no local definition.
-        return getattr(self.proto, name)
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__getattr__</span>(<span style="color: #00ffff;">self</span>, name):
+        <span style="color: #66f;"># </span><span style="color: #66f;">called when attribute has no local definition.</span>
+        <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">getattr</span>(<span style="color: #00ffff;">self</span>.proto, name)
 
-    def __getitem__(self, key):
-        if key in self.keys(): return super(World, self)[key]
-        else: return self.proto[key]
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__getitem__</span>(<span style="color: #00ffff;">self</span>, key):
+        <span style="color: #00ffff;">if</span> key <span style="color: #00ffff;">in</span> <span style="color: #00ffff;">self</span>.keys(): <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">super</span>(World, <span style="color: #00ffff;">self</span>)[key]
+        <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.proto[key]
 
-    def changed(self, key, val):
-        """Forks a new world, with one key changed."""
-        res = World(self)
-        res[key] = val
-        return res
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">changed</span>(<span style="color: #00ffff;">self</span>, key, val):
+        <span style="color: #00ff00;">"""Forks a new world, with one key changed."""</span>
+        <span style="color: #eedd82;">res</span> = World(<span style="color: #00ffff;">self</span>)
+        <span style="color: #eedd82;">res</span>[key] = val
+        <span style="color: #00ffff;">return</span> res
 </pre>
 </div>
 </div>
@@ -541,17 +541,17 @@ We will assume for now that we have the entire string in memory.
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock18">class Grin(Dispatcher):
-    """Grammar Interpreter"""
+<pre class="src src-python" id="orgsrcblock18"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Grin</span>(Dispatcher):
+    <span style="color: #00ff00;">"""Grammar Interpreter"""</span>
 
-    def __init__(self, root):
-        super(Grin,self).__init__(root)
-        self.init(root)
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, root):
+        <span style="color: #ff00ff; font-weight: bold;">super</span>(Grin,<span style="color: #00ffff;">self</span>).__init__(root)
+        <span style="color: #00ffff;">self</span>.init(root)
 
-    def parse(self, src):
-        self.env = World()
-        self.src, self.pos, self.ch = src, 0, ''
-        self.page, self.line, self.col = 0, 0, 0
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">parse</span>(<span style="color: #00ffff;">self</span>, src):
+        <span style="color: #00ffff;">self</span>.env = World()
+        <span style="color: #00ffff;">self</span>.src, <span style="color: #00ffff;">self</span>.pos, <span style="color: #00ffff;">self</span>.ch = src, 0, <span style="color: #00ff00;">''</span>
+        <span style="color: #00ffff;">self</span>.page, <span style="color: #00ffff;">self</span>.line, <span style="color: #00ffff;">self</span>.col = 0, 0, 0
 
     &lt;&lt;@methods&gt;&gt;
 </pre>
@@ -572,11 +572,11 @@ This text is adapted from <a href="http://www.inf.ethz.ch/personal/wirth/Compile
 
 <div class="org-src-container">
 
-<pre class="src src-prolog" id="orgsrcblock19">main = { rule } .
-rule = IDENT "=" expr "." .
-expr = term { "|" term } .
-term = factor { factor } .
-factor = IDENT | STRING | "{" expr "}" | "[" expr "]" | "(" expr ")" .
+<pre class="src src-prolog" id="orgsrcblock19">main = <span style="color: #00ffff;">{</span> rule <span style="color: #00ffff;">}</span> .
+rule = <span style="color: #eedd82;">IDENT</span> <span style="color: #00ff00;">"="</span> expr <span style="color: #00ff00;">"."</span> .
+expr = term <span style="color: #00ffff;">{</span> <span style="color: #00ff00;">"|"</span> term <span style="color: #00ffff;">}</span> .
+term = factor <span style="color: #00ffff;">{</span> factor <span style="color: #00ffff;">}</span> .
+factor = <span style="color: #eedd82;">IDENT</span> <span style="color: #00ffff;">|</span> <span style="color: #eedd82;">STRING</span> <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">"{"</span> expr <span style="color: #00ff00;">"}"</span> <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">"["</span> expr <span style="color: #00ff00;">"]"</span> <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">"("</span> expr <span style="color: #00ff00;">")"</span> .
 </pre>
 </div>
 
@@ -586,9 +586,9 @@ I placed that code in a block of its own so it would be syntax highlighted, but 
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock20">ebnf_src = '''\
-&lt;&lt;ebnf&gt;&gt;
-'''
+<pre class="src src-python" id="orgsrcblock20"><span style="color: #eedd82;">ebnf_src</span> = <span style="color: #00ff00;">'''\</span>
+<span style="color: #00ff00;">&lt;&lt;ebnf&gt;&gt;</span>
+<span style="color: #00ff00;">'''</span>
 </pre>
 </div>
 </div>
@@ -603,283 +603,283 @@ And now we can put the whole thing together:
 
 <div class="org-src-container">
 
-<pre class="src src-python">from collections import namedtuple
-from warnings import warn
-import string
-def T(tag, doc, args):
-    """Creates a new tuple type."""
-    res = namedtuple(tag, args)
-    if doc: res.__doc__+=' : '+doc
-    return res
+<pre class="src src-python"><span style="color: #00ffff;">from</span> collections <span style="color: #00ffff;">import</span> namedtuple
+<span style="color: #00ffff;">from</span> warnings <span style="color: #00ffff;">import</span> warn
+<span style="color: #00ffff;">import</span> string
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">T</span>(tag, doc, args):
+    <span style="color: #00ff00;">"""Creates a new tuple type."""</span>
+    <span style="color: #eedd82;">res</span> = namedtuple(tag, args)
+    <span style="color: #00ffff;">if</span> doc: res.<span style="color: #ff00ff; font-weight: bold;">__doc__</span>+=<span style="color: #00ff00;">' : '</span>+doc
+    <span style="color: #00ffff;">return</span> res
 
-def TB(tag, doc, args=['body']): return T(tag, doc, args)
-def TI(tag, doc, args=['item']): return T(tag, doc, args)
-def TN(tag, doc, args=['name']): return T(tag, doc, args)
-def T2(tag, doc, args=['name','body']): return T(tag, doc, args)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">TB</span>(tag, doc, args=[<span style="color: #00ff00;">'body'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">TI</span>(tag, doc, args=[<span style="color: #00ff00;">'item'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">TN</span>(tag, doc, args=[<span style="color: #00ff00;">'name'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">T2</span>(tag, doc, args=[<span style="color: #00ff00;">'name'</span>,<span style="color: #00ff00;">'body'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
 
-Gram = T('Gram', 'contains grammar rules (may inherit from `base`).',
-         ['name', 'base', 'doc', 'body'])
-Def = T('Def', 'define a named rule.', ['name','body'])
-Ref = TN('Ref', 'refer to (invoke) a named rule')
+<span style="color: #eedd82;">Gram</span> = T(<span style="color: #00ff00;">'Gram'</span>, <span style="color: #00ff00;">'contains grammar rules (may inherit from `base`).'</span>,
+         [<span style="color: #00ff00;">'name'</span>, <span style="color: #00ff00;">'base'</span>, <span style="color: #00ff00;">'doc'</span>, <span style="color: #00ff00;">'body'</span>])
+<span style="color: #eedd82;">Def</span> = T(<span style="color: #00ff00;">'Def'</span>, <span style="color: #00ff00;">'define a named rule.'</span>, [<span style="color: #00ff00;">'name'</span>,<span style="color: #00ff00;">'body'</span>])
+<span style="color: #eedd82;">Ref</span> = TN(<span style="color: #00ff00;">'Ref'</span>, <span style="color: #00ff00;">'refer to (invoke) a named rule'</span>)
 
-Any = T('Any', 'match anything', [])
-Not = TI('Not', 'fail if the pattern would match, but do not consume')
-Skip = TI('Skip', 'match the pattern, but hide it from other rules')
+<span style="color: #eedd82;">Any</span> = T(<span style="color: #00ff00;">'Any'</span>, <span style="color: #00ff00;">'match anything'</span>, [])
+<span style="color: #eedd82;">Not</span> = TI(<span style="color: #00ff00;">'Not'</span>, <span style="color: #00ff00;">'fail if the pattern would match, but do not consume'</span>)
+<span style="color: #eedd82;">Skip</span> = TI(<span style="color: #00ff00;">'Skip'</span>, <span style="color: #00ff00;">'match the pattern, but hide it from other rules'</span>)
 
-Lit = TI('Lit', 'match literal item (using ==)')
-Seq = TB('Seq', 'match a sequence of patterns')
-Grp = TB('Grp', 'same as Seq, but renders in parentheses')
-Alt = TB('Alt', 'match any of the alternatives')
-Rep = TI('Rep', 'match 1 or more repetitions.')
-Opt = TI('Opt', 'match 0 or 1 repetitions.')
-Orp = TI('Orp', 'match 0 or more repetitions.')
+<span style="color: #eedd82;">Lit</span> = TI(<span style="color: #00ff00;">'Lit'</span>, <span style="color: #00ff00;">'match literal item (using ==)'</span>)
+<span style="color: #eedd82;">Seq</span> = TB(<span style="color: #00ff00;">'Seq'</span>, <span style="color: #00ff00;">'match a sequence of patterns'</span>)
+<span style="color: #eedd82;">Grp</span> = TB(<span style="color: #00ff00;">'Grp'</span>, <span style="color: #00ff00;">'same as Seq, but renders in parentheses'</span>)
+<span style="color: #eedd82;">Alt</span> = TB(<span style="color: #00ff00;">'Alt'</span>, <span style="color: #00ff00;">'match any of the alternatives'</span>)
+<span style="color: #eedd82;">Rep</span> = TI(<span style="color: #00ff00;">'Rep'</span>, <span style="color: #00ff00;">'match 1 or more repetitions.'</span>)
+<span style="color: #eedd82;">Opt</span> = TI(<span style="color: #00ff00;">'Opt'</span>, <span style="color: #00ff00;">'match 0 or 1 repetitions.'</span>)
+<span style="color: #eedd82;">Orp</span> = TI(<span style="color: #00ff00;">'Orp'</span>, <span style="color: #00ff00;">'match 0 or more repetitions.'</span>)
 
-Var = T2('Var', 'save matched string in a variable.')
-Val = TN('Val', 'match against the saved value.')
-New = T2('New', 'build a new class/tuple instance')
-Arg = TB('Arg', 'pass matched data as arg to containing "New"')
-
-
-def node_type(node):
-    return node.__class__.__name__
-
-class Dispatcher(object):
-    """Provides a simple generic dispatch mechanism based on method names"""
-
-    def _find_handler(self, prefix, node):
-        """(prefix, namedtuple) -&gt; callable"""
-        return getattr(self, '_'.join([prefix, node_type(node)]), self._unhandled)
-
-    def _unhandled(self, node, *a, **kw):
-        """Warn about unrecognized node types. (Just for development.)"""
-        raise ValueError("no handler found for %s" % node_type(node))
-
-    def dispatch(self, prefix, node, *a, **kw):
-        """Find and invoke a handler for the given node."""
-        h = self._find_handler(prefix, node)
-        return h(node, *a, **kw)
+<span style="color: #eedd82;">Var</span> = T2(<span style="color: #00ff00;">'Var'</span>, <span style="color: #00ff00;">'save matched string in a variable.'</span>)
+<span style="color: #eedd82;">Val</span> = TN(<span style="color: #00ff00;">'Val'</span>, <span style="color: #00ff00;">'match against the saved value.'</span>)
+<span style="color: #eedd82;">New</span> = T2(<span style="color: #00ff00;">'New'</span>, <span style="color: #00ff00;">'build a new class/tuple instance'</span>)
+<span style="color: #eedd82;">Arg</span> = TB(<span style="color: #00ff00;">'Arg'</span>, <span style="color: #00ff00;">'pass matched data as arg to containing "New"'</span>)
 
 
-class Cursor(object):
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">node_type</span>(node):
+    <span style="color: #00ffff;">return</span> node.__class__.<span style="color: #ff00ff; font-weight: bold;">__name__</span>
 
-    def __init__(self, seq:[any]):
-        self.seq = seq    # sequence (probably a string)
-        self.val = None   # current value
-        self.pos = -1     # current position
-        self.fwd()
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Dispatcher</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+    <span style="color: #00ff00;">"""Provides a simple generic dispatch mechanism based on method names"""</span>
 
-    def fwd(self)-&gt;any:
-        """Move forward in the sequence and return the next item."""
-        end = len(self.seq)
-        self.pos = min(self.pos+1, end)
-        self.val = None if self.pos == end else self.seq[self.pos] 
-        return self
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">_find_handler</span>(<span style="color: #00ffff;">self</span>, prefix, node):
+        <span style="color: #00ff00;">"""(prefix, namedtuple) -&gt; callable"""</span>
+        <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">getattr</span>(<span style="color: #00ffff;">self</span>, <span style="color: #00ff00;">'_'</span>.join([prefix, node_type(node)]), <span style="color: #00ffff;">self</span>._unhandled)
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">_unhandled</span>(<span style="color: #00ffff;">self</span>, node, *a, **kw):
+        <span style="color: #00ff00;">"""Warn about unrecognized node types. (Just for development.)"""</span>
+        <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">ValueError</span>(<span style="color: #00ff00;">"no handler found for %s"</span> % node_type(node))
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">dispatch</span>(<span style="color: #00ffff;">self</span>, prefix, node, *a, **kw):
+        <span style="color: #00ff00;">"""Find and invoke a handler for the given node."""</span>
+        <span style="color: #eedd82;">h</span> = <span style="color: #00ffff;">self</span>._find_handler(prefix, node)
+        <span style="color: #00ffff;">return</span> h(node, *a, **kw)
 
 
-Match = namedtuple("Match", ['txt', 'pos'])
-Match.__doc__ = "Match Result"
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Cursor</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
 
-class Fail(object):
-    """Value to indicate failure."""
-    def __repr__(self):
-        return "FAIL"
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, seq:[<span style="color: #ff00ff; font-weight: bold;">any</span>]):
+        <span style="color: #00ffff;">self</span>.seq = seq    <span style="color: #66f;"># </span><span style="color: #66f;">sequence (probably a string)</span>
+        <span style="color: #00ffff;">self</span>.val = <span style="color: #ffaf00;">None</span>   <span style="color: #66f;"># </span><span style="color: #66f;">current value</span>
+        <span style="color: #00ffff;">self</span>.pos = -1     <span style="color: #66f;"># </span><span style="color: #66f;">current position</span>
+        <span style="color: #00ffff;">self</span>.fwd()
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">fwd</span>(<span style="color: #00ffff;">self</span>)-&gt;<span style="color: #ff00ff; font-weight: bold;">any</span>:
+        <span style="color: #00ff00;">"""Move forward in the sequence and return the next item."""</span>
+        <span style="color: #eedd82;">end</span> = <span style="color: #ff00ff; font-weight: bold;">len</span>(<span style="color: #00ffff;">self</span>.seq)
+        <span style="color: #00ffff;">self</span>.pos = <span style="color: #ff00ff; font-weight: bold;">min</span>(<span style="color: #00ffff;">self</span>.pos+1, end)
+        <span style="color: #00ffff;">self</span>.val = <span style="color: #ffaf00;">None</span> <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">self</span>.pos == end <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">self</span>.seq[<span style="color: #00ffff;">self</span>.pos] 
+        <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>
+
+
+Match = namedtuple(<span style="color: #00ff00;">"Match"</span>, [<span style="color: #00ff00;">'txt'</span>, <span style="color: #00ff00;">'pos'</span>])
+Match.<span style="color: #ff00ff; font-weight: bold;">__doc__</span> = <span style="color: #00ff00;">"Match Result"</span>
+
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Fail</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+    <span style="color: #00ff00;">"""Value to indicate failure."""</span>
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__repr__</span>(<span style="color: #00ffff;">self</span>):
+        <span style="color: #00ffff;">return</span> <span style="color: #00ff00;">"FAIL"</span>
 FAIL = Fail()
 
-class M(namedtuple("M", ['val', 'cur', 'env'])):
-    """Internal Match State"""
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">M</span>(namedtuple(<span style="color: #00ff00;">"M"</span>, [<span style="color: #00ff00;">'val'</span>, <span style="color: #00ff00;">'cur'</span>, <span style="color: #00ff00;">'env'</span>])):
+    <span style="color: #00ff00;">"""Internal Match State"""</span>
 
-    @property
-    def matched(self):
-        return self.val is not FAIL
+    <span style="color: #ff00ff;">@property</span>
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">matched</span>(<span style="color: #00ffff;">self</span>):
+        <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.val <span style="color: #00ffff;">is</span> <span style="color: #00ffff;">not</span> FAIL
 
 
-class Matcher(Dispatcher):
-    """A simple matcher for regular languages."""
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Matcher</span>(Dispatcher):
+    <span style="color: #00ff00;">"""A simple matcher for regular languages."""</span>
 
-    def __init__(self, node):
-        self.root = node
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">self</span>.root = node
 
-    def _match(self, node, cur, env):
-        """returns a match state tuple (the `M` class)"""
-        return self.dispatch('match', node, cur, env)
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">_match</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ff00;">"""returns a match state tuple (the `M` class)"""</span>
+        <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.dispatch(<span style="color: #00ff00;">'match'</span>, node, cur, env)
 
-    def match(self, s:str):
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match</span>(<span style="color: #00ffff;">self</span>, s:<span style="color: #ff00ff; font-weight: bold;">str</span>):
         cur = Cursor(s)
         env = {}
-        return self._match(self.root, cur, env).val
+        <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>._match(<span style="color: #00ffff;">self</span>.root, cur, env).val
 
 
-# class Matcher:
+<span style="color: #66f;"># </span><span style="color: #66f;">class Matcher:</span>
 
-    def match_Lit(self, node, cur, env):
-        return (M(Match(cur.val, cur.pos), cur.fwd(), env) if cur.val == node.item
-                else M(FAIL, cur, env))
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Lit</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">return</span> (M(Match(cur.val, cur.pos), cur.fwd(), env) <span style="color: #00ffff;">if</span> cur.val == node.item
+                <span style="color: #00ffff;">else</span> M(FAIL, cur, env))
 
-# class Matcher:
+<span style="color: #66f;"># </span><span style="color: #66f;">class Matcher:</span>
 
-    def match_Alt(self, node, cur, env):
-        for item in node.body:
-            m = self._match(item, cur, env)
-            if m.matched: return m
-        return m # last failure
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Alt</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">for</span> item <span style="color: #00ffff;">in</span> node.body:
+            m = <span style="color: #00ffff;">self</span>._match(item, cur, env)
+            <span style="color: #00ffff;">if</span> m.matched: <span style="color: #00ffff;">return</span> m
+        <span style="color: #00ffff;">return</span> m <span style="color: #66f;"># </span><span style="color: #66f;">last failure</span>
 
 
-# class Matcher:
+<span style="color: #66f;"># </span><span style="color: #66f;">class Matcher:</span>
 
-    def match_Seq(self, node):
-        pass
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Seq</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">pass</span>
 
-    def match_Rep(self, node):
-        pass
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Rep</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">pass</span>
 
-    def match_Opt(self, node):
-        pass
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Opt</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">pass</span>
 
-    def match_Orp(self, node):
-        pass
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Orp</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">pass</span>
 
-ECHR, SQ, DQ = ['\\', "'", '"']
-base = Gram('ebnf', [], "rules common to all grammars", [
-    Def('main', Orp('token')),
-    Def('token',Seq([Skip(Orp(Ref('space'))),
-                  Alt([Ref('STRING'), Ref('NUMBER'),
-                       Ref('IDENT'), Ref('DELIM'),
-                       Rep(Not(Ref('space')))])])),
-    Def('space', Orp('White')),
-    # character classes:
-    Def('White', Alt([chr(c) for c in range(33)])),
-    Def('Upper', Alt(list(string.ascii_uppercase))),
-    Def('Lower', Alt(list(string.ascii_lowercase))),
-    Def('Alpha', Alt([Ref('Lower'), Ref('Upper')])),
-    Def('Under', Lit('_')),
-    Def('Neg', Lit('-')),
-    Def('Digit', Alt([Lit(c) for c in string.digits])),
-    Def('Hexit', Alt([Ref('Digit')]+[Lit(c) for c in 'abcdefABCDEF'])),
-    Def('Alnum', Alt([Ref('Under'), Ref('Alpha'), Ref('Digit')])),
-    # simple patterns:
-    Def('IDENT', Seq([Alt([Ref('Under'),Ref('Alpha')]), Orp(Ref('Alnum'))])),
-    Def('NUMBER',Seq([Opt(Ref('Neg')), Rep(Ref('Digit')),
-                   Orp([Ref('Under'),
-                        Ref('Digit'),Ref('Digit'),Ref('Digit')])])),
-    Def('STRING', Alt([Seq([Lit(DQ), Rep(Ref('STRCHR')), Lit(DQ)])])),
-    Def('STRCHR', Alt([Seq([Lit(ECHR), Alt([ Lit(ECHR), Lit(DQ) ])]),
+<span style="color: #eedd82;">ECHR</span>, <span style="color: #eedd82;">SQ</span>, DQ = [<span style="color: #00ff00;">'\\'</span>, <span style="color: #00ff00;">"'"</span>, <span style="color: #00ff00;">'"'</span>]
+base = Gram(<span style="color: #00ff00;">'ebnf'</span>, [], <span style="color: #00ff00;">"rules common to all grammars"</span>, [
+    Def(<span style="color: #00ff00;">'main'</span>, Orp(<span style="color: #00ff00;">'token'</span>)),
+    Def(<span style="color: #00ff00;">'token'</span>,Seq([Skip(Orp(Ref(<span style="color: #00ff00;">'space'</span>))),
+                  Alt([Ref(<span style="color: #00ff00;">'STRING'</span>), Ref(<span style="color: #00ff00;">'NUMBER'</span>),
+                       Ref(<span style="color: #00ff00;">'IDENT'</span>), Ref(<span style="color: #00ff00;">'DELIM'</span>),
+                       Rep(Not(Ref(<span style="color: #00ff00;">'space'</span>)))])])),
+    Def(<span style="color: #00ff00;">'space'</span>, Orp(<span style="color: #00ff00;">'White'</span>)),
+    <span style="color: #66f;"># </span><span style="color: #66f;">character classes:</span>
+    Def(<span style="color: #00ff00;">'White'</span>, Alt([<span style="color: #ff00ff; font-weight: bold;">chr</span>(c) <span style="color: #00ffff;">for</span> c <span style="color: #00ffff;">in</span> <span style="color: #ff00ff; font-weight: bold;">range</span>(33)])),
+    Def(<span style="color: #00ff00;">'Upper'</span>, Alt(<span style="color: #ff00ff; font-weight: bold;">list</span>(string.ascii_uppercase))),
+    Def(<span style="color: #00ff00;">'Lower'</span>, Alt(<span style="color: #ff00ff; font-weight: bold;">list</span>(string.ascii_lowercase))),
+    Def(<span style="color: #00ff00;">'Alpha'</span>, Alt([Ref(<span style="color: #00ff00;">'Lower'</span>), Ref(<span style="color: #00ff00;">'Upper'</span>)])),
+    Def(<span style="color: #00ff00;">'Under'</span>, Lit(<span style="color: #00ff00;">'_'</span>)),
+    Def(<span style="color: #00ff00;">'Neg'</span>, Lit(<span style="color: #00ff00;">'-'</span>)),
+    Def(<span style="color: #00ff00;">'Digit'</span>, Alt([Lit(c) <span style="color: #00ffff;">for</span> c <span style="color: #00ffff;">in</span> string.digits])),
+    Def(<span style="color: #00ff00;">'Hexit'</span>, Alt([Ref(<span style="color: #00ff00;">'Digit'</span>)]+[Lit(c) <span style="color: #00ffff;">for</span> c <span style="color: #00ffff;">in</span> <span style="color: #00ff00;">'abcdefABCDEF'</span>])),
+    Def(<span style="color: #00ff00;">'Alnum'</span>, Alt([Ref(<span style="color: #00ff00;">'Under'</span>), Ref(<span style="color: #00ff00;">'Alpha'</span>), Ref(<span style="color: #00ff00;">'Digit'</span>)])),
+    <span style="color: #66f;"># </span><span style="color: #66f;">simple patterns:</span>
+    Def(<span style="color: #00ff00;">'IDENT'</span>, Seq([Alt([Ref(<span style="color: #00ff00;">'Under'</span>),Ref(<span style="color: #00ff00;">'Alpha'</span>)]), Orp(Ref(<span style="color: #00ff00;">'Alnum'</span>))])),
+    Def(<span style="color: #00ff00;">'NUMBER'</span>,Seq([Opt(Ref(<span style="color: #00ff00;">'Neg'</span>)), Rep(Ref(<span style="color: #00ff00;">'Digit'</span>)),
+                   Orp([Ref(<span style="color: #00ff00;">'Under'</span>),
+                        Ref(<span style="color: #00ff00;">'Digit'</span>),Ref(<span style="color: #00ff00;">'Digit'</span>),Ref(<span style="color: #00ff00;">'Digit'</span>)])])),
+    Def(<span style="color: #00ff00;">'STRING'</span>, Alt([Seq([Lit(DQ), Rep(Ref(<span style="color: #00ff00;">'STRCHR'</span>)), Lit(DQ)])])),
+    Def(<span style="color: #00ff00;">'STRCHR'</span>, Alt([Seq([Lit(ECHR), Alt([ Lit(ECHR), Lit(DQ) ])]),
                        Not(DQ) ])),
-    Def('DELIM', Alt(list('(){}[]'))),
+    Def(<span style="color: #00ff00;">'DELIM'</span>, Alt(<span style="color: #ff00ff; font-weight: bold;">list</span>(<span style="color: #00ff00;">'(){}[]'</span>))),
 ])
-ebnf = Gram('ebnf', [base], "ebnf meta-grammar (for parsing grammars)", [
-    Def('main', Orp(Ref('rule'))),
-    Def('rule', Seq([Var('name', Ref('IDENT')),
-                     Lit('='), Ref('expr'), Lit('.') ])),
-    Def('expr', Seq([ Ref('term'), Orp([Lit('|'), Ref('term') ]) ])),
-    Def('term', Seq([ Ref('factor'), Rep(Ref('factor')) ])),
-    Def('factor', Alt([Ref('IDENT'), Ref('STRING'),
-                       Ref('rep'), Ref('opt'), Ref('grp')])),
-    Def('rep', Seq([Lit('{'), New(Rep, Ref('expr')), Lit('}')])),  # 'x*'
-    Def('opt', Seq([Lit('['), New(Opt, Ref('expr')), Lit(']')])),  # 'x?'
-    Def('grp', Seq([Lit('('), New(Grp, Ref('expr')), Lit(')')])),  # '(x)'
+ebnf = Gram(<span style="color: #00ff00;">'ebnf'</span>, [base], <span style="color: #00ff00;">"ebnf meta-grammar (for parsing grammars)"</span>, [
+    Def(<span style="color: #00ff00;">'main'</span>, Orp(Ref(<span style="color: #00ff00;">'rule'</span>))),
+    Def(<span style="color: #00ff00;">'rule'</span>, Seq([Var(<span style="color: #00ff00;">'name'</span>, Ref(<span style="color: #00ff00;">'IDENT'</span>)),
+                     Lit(<span style="color: #00ff00;">'='</span>), Ref(<span style="color: #00ff00;">'expr'</span>), Lit(<span style="color: #00ff00;">'.'</span>) ])),
+    Def(<span style="color: #00ff00;">'expr'</span>, Seq([ Ref(<span style="color: #00ff00;">'term'</span>), Orp([Lit(<span style="color: #00ff00;">'|'</span>), Ref(<span style="color: #00ff00;">'term'</span>) ]) ])),
+    Def(<span style="color: #00ff00;">'term'</span>, Seq([ Ref(<span style="color: #00ff00;">'factor'</span>), Rep(Ref(<span style="color: #00ff00;">'factor'</span>)) ])),
+    Def(<span style="color: #00ff00;">'factor'</span>, Alt([Ref(<span style="color: #00ff00;">'IDENT'</span>), Ref(<span style="color: #00ff00;">'STRING'</span>),
+                       Ref(<span style="color: #00ff00;">'rep'</span>), Ref(<span style="color: #00ff00;">'opt'</span>), Ref(<span style="color: #00ff00;">'grp'</span>)])),
+    Def(<span style="color: #00ff00;">'rep'</span>, Seq([Lit(<span style="color: #00ff00;">'{'</span>), New(Rep, Ref(<span style="color: #00ff00;">'expr'</span>)), Lit(<span style="color: #00ff00;">'}'</span>)])),  <span style="color: #66f;"># </span><span style="color: #66f;">'x*'</span>
+    Def(<span style="color: #00ff00;">'opt'</span>, Seq([Lit(<span style="color: #00ff00;">'['</span>), New(Opt, Ref(<span style="color: #00ff00;">'expr'</span>)), Lit(<span style="color: #00ff00;">']'</span>)])),  <span style="color: #66f;"># </span><span style="color: #66f;">'x?'</span>
+    Def(<span style="color: #00ff00;">'grp'</span>, Seq([Lit(<span style="color: #00ff00;">'('</span>), New(Grp, Ref(<span style="color: #00ff00;">'expr'</span>)), Lit(<span style="color: #00ff00;">')'</span>)])),  <span style="color: #66f;"># </span><span style="color: #66f;">'(x)'</span>
 ])
 
-HOME = {} # arbitrary dictionary object
+HOME = {} <span style="color: #66f;"># </span><span style="color: #66f;">arbitrary dictionary object</span>
 
-class World(dict):
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">World</span>(<span style="color: #ff00ff; font-weight: bold;">dict</span>):
 
-    def __init__(self, proto=HOME):
-        super(World, self).__init__()
-        self.proto = proto
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, proto=HOME):
+        <span style="color: #ff00ff; font-weight: bold;">super</span>(World, <span style="color: #00ffff;">self</span>).__init__()
+        <span style="color: #00ffff;">self</span>.proto = proto
 
-    def __getattr__(self, name):
-        # called when attribute has no local definition.
-        return getattr(self.proto, name)
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__getattr__</span>(<span style="color: #00ffff;">self</span>, name):
+        <span style="color: #66f;"># </span><span style="color: #66f;">called when attribute has no local definition.</span>
+        <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">getattr</span>(<span style="color: #00ffff;">self</span>.proto, name)
 
-    def __getitem__(self, key):
-        if key in self.keys(): return super(World, self)[key]
-        else: return self.proto[key]
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__getitem__</span>(<span style="color: #00ffff;">self</span>, key):
+        <span style="color: #00ffff;">if</span> key <span style="color: #00ffff;">in</span> <span style="color: #00ffff;">self</span>.keys(): <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">super</span>(World, <span style="color: #00ffff;">self</span>)[key]
+        <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.proto[key]
 
-    def changed(self, key, val):
-        """Forks a new world, with one key changed."""
-        res = World(self)
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">changed</span>(<span style="color: #00ffff;">self</span>, key, val):
+        <span style="color: #00ff00;">"""Forks a new world, with one key changed."""</span>
+        res = World(<span style="color: #00ffff;">self</span>)
         res[key] = val
-        return res
+        <span style="color: #00ffff;">return</span> res
 
 
-class Grin(Dispatcher):
-    """Grammar Interpreter"""
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Grin</span>(Dispatcher):
+    <span style="color: #00ff00;">"""Grammar Interpreter"""</span>
 
-    def __init__(self, root):
-        super(Grin,self).__init__(root)
-        self.init(root)
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, root):
+        <span style="color: #ff00ff; font-weight: bold;">super</span>(Grin,<span style="color: #00ffff;">self</span>).__init__(root)
+        <span style="color: #00ffff;">self</span>.init(root)
 
-    def parse(self, src):
-        self.env = World()
-        self.src, self.pos, self.ch = src, 0, ''
-        self.page, self.line, self.col = 0, 0, 0
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">parse</span>(<span style="color: #00ffff;">self</span>, src):
+        <span style="color: #00ffff;">self</span>.env = World()
+        <span style="color: #00ffff;">self</span>.src, <span style="color: #00ffff;">self</span>.pos, <span style="color: #00ffff;">self</span>.ch = src, 0, <span style="color: #00ff00;">''</span>
+        <span style="color: #00ffff;">self</span>.page, <span style="color: #00ffff;">self</span>.line, <span style="color: #00ffff;">self</span>.col = 0, 0, 0
 
 
-    # (inside  `class Grin`...)
+    <span style="color: #66f;"># </span><span style="color: #66f;">(inside  `class Grin`...)</span>
 
-    def match_Ref(self, node, cur, env):
-        # pass in fresh World, then discard changes
-        tup = self.match(self.defs[node.name], cur, World())
-        if tup[0] is FAIL: return (FAIL, env)
-        else: return (tup[0], tup[1], env)
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Ref</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #66f;"># </span><span style="color: #66f;">pass in fresh World, then discard changes</span>
+        tup = <span style="color: #00ffff;">self</span>.match(<span style="color: #00ffff;">self</span>.defs[node.name], cur, World())
+        <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> (FAIL, env)
+        <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (tup[0], tup[1], env)
 
-    def match_Emp(self, node, cur, env):
-        return (None, cur, env)
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Emp</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">return</span> (<span style="color: #ffaf00;">None</span>, cur, env)
 
-    def match_Seq(self, node, cur, env):
-        for item in node.body:
-            tup = self.match(item, cur, env)
-            if tup[0] is FAIL: return (FAIL, tup[1])
-            else: val, cur, env = tup
-        return tup # last value
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Seq</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">for</span> item <span style="color: #00ffff;">in</span> node.body:
+            tup = <span style="color: #00ffff;">self</span>.match(item, cur, env)
+            <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> (FAIL, tup[1])
+            <span style="color: #00ffff;">else</span>: <span style="color: #eedd82;">val</span>, <span style="color: #eedd82;">cur</span>, env = tup
+        <span style="color: #00ffff;">return</span> tup <span style="color: #66f;"># </span><span style="color: #66f;">last value</span>
 
-    def match_Orp(self, node, cur, env):
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Orp</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
         vals = []
-        while True:
-            tup = self.match(node.item, cur, env)
-            if tup[0] is FAIL: break
-            else:
-                val, cur, env = tup
+        <span style="color: #00ffff;">while</span> <span style="color: #ffaf00;">True</span>:
+            tup = <span style="color: #00ffff;">self</span>.match(node.item, cur, env)
+            <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">break</span>
+            <span style="color: #00ffff;">else</span>:
+                <span style="color: #eedd82;">val</span>, <span style="color: #eedd82;">cur</span>, env = tup
                 vals.append(val)
-        return (vals, cur, env)
+        <span style="color: #00ffff;">return</span> (vals, cur, env)
 
-    def match_Not(self, node, cur, env):
-        tup = self.match(node.item, cur, env)
-        if tup[0] is FAIL: return (None, cur, tup[1])
-        else: return (FAIL, tup[1])
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Not</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        tup = <span style="color: #00ffff;">self</span>.match(node.item, cur, env)
+        <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> (<span style="color: #ffaf00;">None</span>, cur, tup[1])
+        <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (FAIL, tup[1])
 
-    def match_Var(self, node, cur, env):
-        tup = self.match(node.item, cur, env)
-        if tup[0] is FAIL: return tup
-        else: return (tup[0], cur, env.changed(node.name, tup[0]))
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Var</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        tup = <span style="color: #00ffff;">self</span>.match(node.item, cur, env)
+        <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> tup
+        <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (tup[0], cur, env.changed(node.name, tup[0]))
 
-    def match_Act(self, node, cur, env):
-        raise NotImplementedError('no semantic actions yet.')
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Act</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">NotImplementedError</span>(<span style="color: #00ff00;">'no semantic actions yet.'</span>)
 
-    def match_Box(self, node, cur, env):
-        raise NotImplementedError('no tree matching yet.')
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Box</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">NotImplementedError</span>(<span style="color: #00ff00;">'no tree matching yet.'</span>)
 
 
-    # (still inside  `class Grin`...)
-    def init(self, node):
-        return self.dispatch('init', node)
+    <span style="color: #66f;"># </span><span style="color: #66f;">(still inside  `class Grin`...)</span>
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.dispatch(<span style="color: #00ff00;">'init'</span>, node)
 
-    def init_Gram(self, node):
-        self.defs = {}
-        for child in node.body: self.init(child)
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init_Gram</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">self</span>.defs = {}
+        <span style="color: #00ffff;">for</span> child <span style="color: #00ffff;">in</span> node.body: <span style="color: #00ffff;">self</span>.init(child)
 
-    def init_Def(self, node):
-        self.defs[node.name] = node
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init_Def</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">self</span>.defs[node.name] = node
 
-ebnf_src = '''\
-main = { rule } .
-rule = IDENT "=" expr "." .
-expr = term { "|" term } .
-term = factor { factor } .
-factor = IDENT | STRING | "{" expr "}" | "[" expr "]" | "(" expr ")" .
-'''
-if __name__=="__main__":
-    print(Grin(ebnf).parse(ebnf_src))
+ebnf_src = <span style="color: #00ff00;">'''\</span>
+<span style="color: #00ff00;">main = { rule } .</span>
+<span style="color: #00ff00;">rule = IDENT "=" expr "." .</span>
+<span style="color: #00ff00;">expr = term { "|" term } .</span>
+<span style="color: #00ff00;">term = factor { factor } .</span>
+<span style="color: #00ff00;">factor = IDENT | STRING | "{" expr "}" | "[" expr "]" | "(" expr ")" .</span>
+<span style="color: #00ff00;">'''</span>
+<span style="color: #00ffff;">if</span> <span style="color: #ff00ff; font-weight: bold;">__name__</span>==<span style="color: #00ff00;">"__main__"</span>:
+    <span style="color: #00ffff;">print</span>(Grin(ebnf).parse(ebnf_src))
 </pre>
 </div>
 
@@ -889,9 +889,9 @@ If we try to run this now, here's what we'll get:
 
 <div class="org-src-container">
 
-<pre class="src src-org">=wejalboot.py:92:= *UserWarning: no handler for init_Gram*
-  ~yield warn('no handler for tag: %s' % node.__class__.__name__)~
-/None/
+<pre class="src src-org"><span style="color: color-208;">wejalboot.py:92:</span> <span style="font-weight: bold;">UserWarning: no handler for init</span><span style="color: brightyellow; background-color: color-17; font-weight: bold;">_Gram</span>
+  <span style="color: #00ff00;">yield warn('no handler for tag: %s' % node.__class__.__name__)</span>
+<span style="color: #ffd700; font-style: italic;">None</span>
 </pre>
 </div>
 
@@ -910,49 +910,49 @@ These were translated from the sequent notation in Warth's Ometa paper.
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock21"># (inside  `class Grin`...)
+<pre class="src src-python" id="orgsrcblock21"><span style="color: #66f;"># </span><span style="color: #66f;">(inside  `class Grin`...)</span>
 
-def match_Ref(self, node, cur, env):
-    # pass in fresh World, then discard changes
-    tup = self.match(self.defs[node.name], cur, World())
-    if tup[0] is FAIL: return (FAIL, env)
-    else: return (tup[0], tup[1], env)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Ref</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+    <span style="color: #66f;"># </span><span style="color: #66f;">pass in fresh World, then discard changes</span>
+    <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(<span style="color: #00ffff;">self</span>.defs[node.name], cur, World())
+    <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> (FAIL, env)
+    <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (tup[0], tup[1], env)
 
-def match_Emp(self, node, cur, env):
-    return (None, cur, env)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Emp</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+    <span style="color: #00ffff;">return</span> (<span style="color: #ffaf00;">None</span>, cur, env)
 
-def match_Seq(self, node, cur, env):
-    for item in node.body:
-        tup = self.match(item, cur, env)
-        if tup[0] is FAIL: return (FAIL, tup[1])
-        else: val, cur, env = tup
-    return tup # last value
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Seq</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+    <span style="color: #00ffff;">for</span> item <span style="color: #00ffff;">in</span> node.body:
+        <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(item, cur, env)
+        <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> (FAIL, tup[1])
+        <span style="color: #00ffff;">else</span>: <span style="color: #eedd82;">val</span>, <span style="color: #eedd82;">cur</span>, <span style="color: #eedd82;">env</span> = tup
+    <span style="color: #00ffff;">return</span> tup <span style="color: #66f;"># </span><span style="color: #66f;">last value</span>
 
-def match_Orp(self, node, cur, env):
-    vals = []
-    while True:
-        tup = self.match(node.item, cur, env)
-        if tup[0] is FAIL: break
-        else:
-            val, cur, env = tup
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Orp</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+    <span style="color: #eedd82;">vals</span> = []
+    <span style="color: #00ffff;">while</span> <span style="color: #ffaf00;">True</span>:
+        <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(node.item, cur, env)
+        <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">break</span>
+        <span style="color: #00ffff;">else</span>:
+            <span style="color: #eedd82;">val</span>, <span style="color: #eedd82;">cur</span>, <span style="color: #eedd82;">env</span> = tup
             vals.append(val)
-    return (vals, cur, env)
+    <span style="color: #00ffff;">return</span> (vals, cur, env)
 
-def match_Not(self, node, cur, env):
-    tup = self.match(node.item, cur, env)
-    if tup[0] is FAIL: return (None, cur, tup[1])
-    else: return (FAIL, tup[1])
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Not</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+    <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(node.item, cur, env)
+    <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> (<span style="color: #ffaf00;">None</span>, cur, tup[1])
+    <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (FAIL, tup[1])
 
-def match_Var(self, node, cur, env):
-    tup = self.match(node.item, cur, env)
-    if tup[0] is FAIL: return tup
-    else: return (tup[0], cur, env.changed(node.name, tup[0]))
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Var</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+    <span style="color: #eedd82;">tup</span> = <span style="color: #00ffff;">self</span>.match(node.item, cur, env)
+    <span style="color: #00ffff;">if</span> tup[0] <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> tup
+    <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (tup[0], cur, env.changed(node.name, tup[0]))
 
-def match_Act(self, node, cur, env):
-    raise NotImplementedError('no semantic actions yet.')
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Act</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+    <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">NotImplementedError</span>(<span style="color: #00ff00;">'no semantic actions yet.'</span>)
 
-def match_Box(self, node, cur, env):
-    raise NotImplementedError('no tree matching yet.')
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Box</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+    <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">NotImplementedError</span>(<span style="color: #00ff00;">'no tree matching yet.'</span>)
 </pre>
 </div>
 </div>
@@ -963,16 +963,16 @@ def match_Box(self, node, cur, env):
 <div class="outline-text-2" id="text-16">
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock22"># (still inside  `class Grin`...)
-def init(self, node):
-    return self.dispatch('init', node)
+<pre class="src src-python" id="orgsrcblock22"><span style="color: #66f;"># </span><span style="color: #66f;">(still inside  `class Grin`...)</span>
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init</span>(<span style="color: #00ffff;">self</span>, node):
+    <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.dispatch(<span style="color: #00ff00;">'init'</span>, node)
 
-def init_Gram(self, node):
-    self.defs = {}
-    for child in node.body: self.init(child)
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init_Gram</span>(<span style="color: #00ffff;">self</span>, node):
+    <span style="color: #00ffff;">self</span>.defs = {}
+    <span style="color: #00ffff;">for</span> child <span style="color: #00ffff;">in</span> node.body: <span style="color: #00ffff;">self</span>.init(child)
 
-def init_Def(self, node):
-    self.defs[node.name] = node
+<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init_Def</span>(<span style="color: #00ffff;">self</span>, node):
+    <span style="color: #00ffff;">self</span>.defs[node.name] = node
 </pre>
 </div>
 </div>
@@ -984,6 +984,13 @@ def init_Def(self, node):
 <ul class="org-ul">
 <li>grammar rules are adapted from Alessandro Warth's <a href="http://tinlizzie.org/ometa/">Ometa</a> system.</li>
 </ul>
+
+
+<div class="org-src-container">
+
+<pre class="src src-j">i. 10 [ 'whatever'
+</pre>
+</div>
 </div>
 </div>
 </div>
