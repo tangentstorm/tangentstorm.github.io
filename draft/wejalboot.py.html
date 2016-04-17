@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2016-04-17 Sun 14:49 -->
+<!-- 2016-04-17 Sun 17:14 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="viewport" content="width=device-width, initial-scale=1" />
 <title>wejal bootstrap</title>
@@ -71,17 +71,18 @@ for the JavaScript code in this tag.
 <li><a href="#orgheadline6">6. Simple pattern matching.</a></li>
 <li><a href="#orgheadline7">7. Regular Expressions</a></li>
 <li><a href="#orgheadline8">8. Tokenization</a></li>
-<li><a href="#orgheadline9">9. <span class="todo nilTODO">TODO</span> -&#x2014; clean up below here ----</a></li>
-<li><a href="#orgheadline10">10. Strategy</a></li>
-<li><a href="#orgheadline11">11. Manually build a base grammar to provide generic tokenization.</a></li>
-<li><a href="#orgheadline12">12. Now define the bootstrap grammar to parse EBNF grammar definitions.</a></li>
-<li><a href="#orgheadline13">13. Worlds for backtracking.</a></li>
-<li><a href="#orgheadline14">14. Grammar Interpreter</a></li>
-<li><a href="#orgheadline15">15. ebnf in ebnf</a></li>
-<li><a href="#orgheadline16">16. OUTPUT wejalboot.py</a></li>
-<li><a href="#orgheadline17">17. Inference Rules</a></li>
-<li><a href="#orgheadline18">18. Compilation step.</a></li>
-<li><a href="#orgheadline19">19. <span class="todo nilTODO">TODO</span> credits</a></li>
+<li><a href="#orgheadline9">9. EBNF</a></li>
+<li><a href="#orgheadline10">10. A Bootstrap tokenizer.</a></li>
+<li><a href="#orgheadline11">11. <span class="todo nilTODO">TODO</span> -&#x2014; clean up below here ----</a></li>
+<li><a href="#orgheadline12">12. Strategy</a></li>
+<li><a href="#orgheadline13">13. Manually build a base grammar to provide generic tokenization.</a></li>
+<li><a href="#orgheadline14">14. Now define the bootstrap grammar to parse EBNF grammar definitions.</a></li>
+<li><a href="#orgheadline15">15. Worlds for backtracking.</a></li>
+<li><a href="#orgheadline16">16. Grammar Interpreter</a></li>
+<li><a href="#orgheadline17">17. OUTPUT wejalboot.py</a></li>
+<li><a href="#orgheadline18">18. Inference Rules</a></li>
+<li><a href="#orgheadline19">19. Compilation step.</a></li>
+<li><a href="#orgheadline20">20. <span class="todo nilTODO">TODO</span> credits</a></li>
 </ul>
 </div>
 </div>
@@ -147,8 +148,8 @@ Here are our data types for modeling grammar definitions. Since we are using <co
 <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">TN</span>(tag, doc, args=[<span style="color: #00ff00;">'name'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
 <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">T2</span>(tag, doc, args=[<span style="color: #00ff00;">'name'</span>,<span style="color: #00ff00;">'body'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
 
-<span style="color: #eedd82;">Gram</span> = T(<span style="color: #00ff00;">'Gram'</span>, <span style="color: #00ff00;">'contains grammar rules (may inherit from `base`).'</span>,
-         [<span style="color: #00ff00;">'name'</span>, <span style="color: #00ff00;">'base'</span>, <span style="color: #00ff00;">'doc'</span>, <span style="color: #00ff00;">'body'</span>])
+<span style="color: #eedd82;">Gram</span> = T(<span style="color: #00ff00;">'Gram'</span>, <span style="color: #00ff00;">'contains grammar rules (may inherit from `bases`).'</span>,
+         [<span style="color: #00ff00;">'name'</span>, <span style="color: #00ff00;">'bases'</span>, <span style="color: #00ff00;">'doc'</span>, <span style="color: #00ff00;">'body'</span>])
 <span style="color: #eedd82;">Def</span> = T(<span style="color: #00ff00;">'Def'</span>, <span style="color: #00ff00;">'define a named rule.'</span>, [<span style="color: #00ff00;">'name'</span>,<span style="color: #00ff00;">'body'</span>])
 <span style="color: #eedd82;">Ref</span> = TN(<span style="color: #00ff00;">'Ref'</span>, <span style="color: #00ff00;">'refer to (invoke) a named rule'</span>)
 
@@ -582,13 +583,114 @@ Later on, we can improve the performance by compiling the rules into a state mac
 </div>
 </div>
 
-
 <div id="outline-container-orgheadline9" class="outline-2">
-<h2 id="orgheadline9"><span class="section-number-2">9</span> <span class="todo TODO">TODO</span> -&#x2014; clean up below here ----</h2>
+<h2 id="orgheadline9"><a id="bd6hv400kqg0"></a><span class="section-number-2">9</span> EBNF</h2>
+<div class="outline-text-2" id="text-9">
+<p>
+We are about to extend the simple string matcher to a full parsing system.
+</p>
+
+<p>
+One thing we would like to be able to parse is a nicer syntax for building grammars.
+</p>
+
+<p>
+There are various languages for writing grammars. We will use one called 'EBNF', which is an acronym for <i>Extended Backus-Naur Form</i>).
+</p>
+
+<p>
+Here's a grammar for EBNF written in EBNF, so we can test the parser.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-prolog" id="orgsrcblock22">main = <span style="color: #00ffff;">{</span> rule <span style="color: #00ffff;">}</span> .
+rule = <span style="color: #eedd82;">IDENT</span> <span style="color: #00ff00;">"="</span> expr <span style="color: #00ff00;">"."</span> .
+expr = term <span style="color: #00ffff;">{</span> <span style="color: #00ff00;">"|"</span> term <span style="color: #00ffff;">}</span> .
+term = factor <span style="color: #00ffff;">{</span> factor <span style="color: #00ffff;">}</span> .
+factor = <span style="color: #eedd82;">IDENT</span> <span style="color: #00ffff;">|</span> <span style="color: #eedd82;">STRING</span> <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">"{"</span> expr <span style="color: #00ff00;">"}"</span> <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">"["</span> expr <span style="color: #00ff00;">"]"</span> <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">"("</span> expr <span style="color: #00ff00;">")"</span> .
+</pre>
 </div>
+
+<p>
+This definition is adapted from <a href="http://www.inf.ethz.ch/personal/wirth/CompilerConstruction/index.html">Compiler Construction</a> by Niklaus Wirth (who invented EBNF, as well as Pascal, Modula, Oberon, and a variety of other languages).
+</p>
+
+<p>
+It is self describing. The <code>{...}</code> syntax corresponds to <code>Orp(Seq(...))</code> in our world. The <code>|</code> is placed between alternatives, and the characters in quotes correspond to <code>Lit</code>.
+</p>
+
+<p>
+The <code>[...]</code> syntax defined in the <code>factor</code> rule isn't actually used by this grammar, but it corresponds to <code>Opt(...)</code>. The <code>(...)</code> syntax corresponds to <code>Seq(...)</code>. These can of course be nested inside each other to arbitrary depths.
+</p>
+
+<p>
+The lower case names correspond to rule definitions and references to those rules. These are <code>Def</code> and <code>Ref</code> in our system &#x2013; we'll be covering those soon.
+</p>
+
+<p>
+The upper case names refer to token types. A <code>STRING</code> is just a sequence of characters between double quotes, and an <code>IDENT</code> just means a sequence of english letters.
+</p>
+
+<p>
+I placed the definition code in a block of its own so it would be syntax highlighted, but for python it should be inside a string:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="orgsrcblock23"><span style="color: #eedd82;">ebnf_src</span> = <span style="color: #00ff00;">'''\</span>
+<span style="color: #00ff00;">&lt;&lt;ebnf&gt;&gt;</span>
+<span style="color: #00ff00;">'''</span>
+</pre>
+</div>
+
+<p>
+Our next major goal will be to parse grammars like these. First, we will manually create a tokenizer for this language, then we will extend the matcher with <code>Def</code> and <code>Ref</code> and the ability to match tokens rather than just strings. Then we will manually translate the above EBNF definition into a data structure built that we can pass to the grammar interpreter.
+</p>
+</div>
+</div>
+
+
 <div id="outline-container-orgheadline10" class="outline-2">
-<h2 id="orgheadline10"><a id="nrogjy71jqg0"></a><span class="section-number-2">10</span> Strategy</h2>
+<h2 id="orgheadline10"><a id="0zsa4ty077h0"></a><span class="section-number-2">10</span> A Bootstrap tokenizer.</h2>
 <div class="outline-text-2" id="text-10">
+<p>
+With the tools we have now, there's really not much work to define a scanner for EBNF:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="orgsrcblock24"><span style="color: #eedd82;">ECHR</span>, <span style="color: #eedd82;">SQ</span>, <span style="color: #eedd82;">DQ</span> = [<span style="color: #00ff00;">'\\'</span>, <span style="color: #00ff00;">"'"</span>, <span style="color: #00ff00;">'"'</span>]
+<span style="color: #eedd82;">LETTER</span> = Alt([Lit(ch) <span style="color: #00ffff;">for</span> ch <span style="color: #00ffff;">in</span> <span style="color: #00ff00;">'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'</span>])
+<span style="color: #eedd82;">STRCHR</span> = Alt([Seq([Lit(ECHR), Alt([ Lit(ECHR), Lit(DQ) ])]),
+              Alt([Lit(ch) <span style="color: #00ffff;">for</span> ch <span style="color: #00ffff;">in</span> <span style="color: #ff00ff; font-weight: bold;">map</span>(<span style="color: #ff00ff; font-weight: bold;">chr</span>, <span style="color: #ff00ff; font-weight: bold;">range</span>(32,127)) <span style="color: #00ffff;">if</span> ch <span style="color: #00ffff;">not</span> <span style="color: #00ffff;">in</span> <span style="color: #00ff00;">'"\\'</span>])])
+
+<span style="color: #eedd82;">ebnf_sc</span> = Scanner([(ch, Lit(ch)) <span style="color: #00ffff;">for</span> ch <span style="color: #00ffff;">in</span> <span style="color: #00ff00;">"{([=|.])}"</span>]
+                  + [(<span style="color: #00ff00;">'IDENT'</span>, Rep(LETTER)),
+                     (<span style="color: #00ff00;">'STRING'</span>, Alt([Seq([Lit(DQ), Rep(STRCHR), Lit(DQ)])]))])
+</pre>
+</div>
+
+<p>
+Here's how to use it:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="orgsrcblock25">&gt;&gt;&gt; ebnf_sc.scan(<span style="color: #00ff00;">'x = A | b'</span>)
+[(<span style="color: #00ff00;">'x'</span>, <span style="color: #00ff00;">'IDENT'</span>, 0), (<span style="color: #00ff00;">'='</span>, <span style="color: #00ff00;">'='</span>, 2), (<span style="color: #00ff00;">'A'</span>, <span style="color: #00ff00;">'IDENT'</span>, 4), (<span style="color: #00ff00;">'|'</span>, <span style="color: #00ff00;">'|'</span>, 6), (<span style="color: #00ff00;">'b'</span>, <span style="color: #00ff00;">'IDENT'</span>, 8)]
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline11" class="outline-2">
+<h2 id="orgheadline11"><span class="section-number-2">11</span> <span class="todo TODO">TODO</span> -&#x2014; clean up below here ----</h2>
+</div>
+<div id="outline-container-orgheadline12" class="outline-2">
+<h2 id="orgheadline12"><a id="nrogjy71jqg0"></a><span class="section-number-2">12</span> Strategy</h2>
+<div class="outline-text-2" id="text-12">
 <p>
 The idea here is to manually construct a data structure (an abstract syntax tree) that describes a meta-grammar.
 </p>
@@ -607,18 +709,17 @@ Our first step is to define some types that we can use to tag the different part
 </div>
 </div>
 
-<div id="outline-container-orgheadline11" class="outline-2">
-<h2 id="orgheadline11"><a id="9d0f2971jqg0"></a><span class="section-number-2">11</span> Manually build a base grammar to provide generic tokenization.</h2>
-<div class="outline-text-2" id="text-11">
+<div id="outline-container-orgheadline13" class="outline-2">
+<h2 id="orgheadline13"><a id="9d0f2971jqg0"></a><span class="section-number-2">13</span> Manually build a base grammar to provide generic tokenization.</h2>
+<div class="outline-text-2" id="text-13">
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock22"><span style="color: #00ffff;">import</span> string
+<pre class="src src-python" id="orgsrcblock26"><span style="color: #00ffff;">import</span> string
 </pre>
 </div>
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock23"><span style="color: #eedd82;">ECHR</span>, <span style="color: #eedd82;">SQ</span>, <span style="color: #eedd82;">DQ</span> = [<span style="color: #00ff00;">'\\'</span>, <span style="color: #00ff00;">"'"</span>, <span style="color: #00ff00;">'"'</span>]
-<span style="color: #eedd82;">base</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [], <span style="color: #00ff00;">"rules common to all grammars"</span>, [
+<pre class="src src-python" id="orgsrcblock27"><span style="color: #eedd82;">base</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [], <span style="color: #00ff00;">"rules common to all grammars"</span>, [
     Def(<span style="color: #00ff00;">'main'</span>, Orp(<span style="color: #00ff00;">'token'</span>)),
     Def(<span style="color: #00ff00;">'token'</span>,Seq([Skip(Orp(Ref(<span style="color: #00ff00;">'space'</span>))),
                   Alt([Ref(<span style="color: #00ff00;">'STRING'</span>), Ref(<span style="color: #00ff00;">'NUMBER'</span>),
@@ -640,7 +741,7 @@ Our first step is to define some types that we can use to tag the different part
     Def(<span style="color: #00ff00;">'NUMBER'</span>,Seq([Opt(Ref(<span style="color: #00ff00;">'Neg'</span>)), Rep(Ref(<span style="color: #00ff00;">'Digit'</span>)),
                    Orp([Ref(<span style="color: #00ff00;">'Under'</span>),
                         Ref(<span style="color: #00ff00;">'Digit'</span>),Ref(<span style="color: #00ff00;">'Digit'</span>),Ref(<span style="color: #00ff00;">'Digit'</span>)])])),
-    Def(<span style="color: #00ff00;">'STRING'</span>, Alt([Seq([Lit(DQ), Rep(Ref(<span style="color: #00ff00;">'STRCHR'</span>)), Lit(DQ)])])),
+    Def(<span style="color: #00ff00;">'STRING'</span>, Seq([Lit(DQ), Rep(Ref(<span style="color: #00ff00;">'STRCHR'</span>)), Lit(DQ)])),
     Def(<span style="color: #00ff00;">'STRCHR'</span>, Alt([Seq([Lit(ECHR), Alt([ Lit(ECHR), Lit(DQ) ])]),
                        Not(DQ) ])),
     Def(<span style="color: #00ff00;">'DELIM'</span>, Alt(<span style="color: #ff00ff; font-weight: bold;">list</span>(<span style="color: #00ff00;">'(){}[]'</span>))),
@@ -650,12 +751,12 @@ Our first step is to define some types that we can use to tag the different part
 </div>
 </div>
 
-<div id="outline-container-orgheadline12" class="outline-2">
-<h2 id="orgheadline12"><a id="7o9j7i21jqg0"></a><span class="section-number-2">12</span> Now define the bootstrap grammar to parse EBNF grammar definitions.</h2>
-<div class="outline-text-2" id="text-12">
+<div id="outline-container-orgheadline14" class="outline-2">
+<h2 id="orgheadline14"><a id="7o9j7i21jqg0"></a><span class="section-number-2">14</span> Now define the bootstrap grammar to parse EBNF grammar definitions.</h2>
+<div class="outline-text-2" id="text-14">
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock24"><span style="color: #eedd82;">ebnf</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [base], <span style="color: #00ff00;">"ebnf meta-grammar (for parsing grammars)"</span>, [
+<pre class="src src-python" id="orgsrcblock28"><span style="color: #eedd82;">ebnf</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [base], <span style="color: #00ff00;">"ebnf meta-grammar (for parsing grammars)"</span>, [
     Def(<span style="color: #00ff00;">'main'</span>, Orp(Ref(<span style="color: #00ff00;">'rule'</span>))),
     Def(<span style="color: #00ff00;">'rule'</span>, Seq([Var(<span style="color: #00ff00;">'name'</span>, Ref(<span style="color: #00ff00;">'IDENT'</span>)),
                      Lit(<span style="color: #00ff00;">'='</span>), Ref(<span style="color: #00ff00;">'expr'</span>), Lit(<span style="color: #00ff00;">'.'</span>) ])),
@@ -672,9 +773,9 @@ Our first step is to define some types that we can use to tag the different part
 </div>
 </div>
 
-<div id="outline-container-orgheadline13" class="outline-2">
-<h2 id="orgheadline13"><a id="u8s6vh00kqg0"></a><span class="section-number-2">13</span> Worlds for backtracking.</h2>
-<div class="outline-text-2" id="text-13">
+<div id="outline-container-orgheadline15" class="outline-2">
+<h2 id="orgheadline15"><a id="u8s6vh00kqg0"></a><span class="section-number-2">15</span> Worlds for backtracking.</h2>
+<div class="outline-text-2" id="text-15">
 <p>
 A world is a context for holding changes, similar to a working copy in a version control system. The idea is that any time we might need to backtrack (any time an <code>Alt</code> node is encountered), we'll fork a new world, and changes we make are done to the world object. This way, if the match ultimately fails, we can rewind the side effects.
 </p>
@@ -697,7 +798,7 @@ It's very much like what happens when overriding methods in a subclass, except i
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock25"><span style="color: #eedd82;">HOME</span> = {} <span style="color: #66f;"># </span><span style="color: #66f;">arbitrary dictionary object</span>
+<pre class="src src-python" id="orgsrcblock29"><span style="color: #eedd82;">HOME</span> = {} <span style="color: #66f;"># </span><span style="color: #66f;">arbitrary dictionary object</span>
 
 <span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">World</span>(<span style="color: #ff00ff; font-weight: bold;">dict</span>):
 
@@ -723,16 +824,16 @@ It's very much like what happens when overriding methods in a subclass, except i
 </div>
 </div>
 
-<div id="outline-container-orgheadline14" class="outline-2">
-<h2 id="orgheadline14"><a id="n0pcnnd1jqg0"></a><span class="section-number-2">14</span> Grammar Interpreter</h2>
-<div class="outline-text-2" id="text-14">
+<div id="outline-container-orgheadline16" class="outline-2">
+<h2 id="orgheadline16"><a id="n0pcnnd1jqg0"></a><span class="section-number-2">16</span> Grammar Interpreter</h2>
+<div class="outline-text-2" id="text-16">
 <p>
 We will assume for now that we have the entire string in memory.
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock26"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Grin</span>(Dispatcher):
+<pre class="src src-python" id="orgsrcblock30"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Grin</span>(Dispatcher):
     <span style="color: #00ff00;">"""Grammar Interpreter"""</span>
 
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, root):
@@ -750,51 +851,22 @@ We will assume for now that we have the entire string in memory.
 </div>
 </div>
 
-<div id="outline-container-orgheadline15" class="outline-2">
-<h2 id="orgheadline15"><a id="bd6hv400kqg0"></a><span class="section-number-2">15</span> ebnf in ebnf</h2>
-<div class="outline-text-2" id="text-15">
-<p>
-Here's an grammar for EBNF written in EBNF, so we can test the parser.
-</p>
 
-<p>
-This text is adapted from <a href="http://www.inf.ethz.ch/personal/wirth/CompilerConstruction/index.html">Compiler Construction</a> by Niklaus Wirth (who invented EBNF, as well as Pascal, Modula, Oberon, and a variety of other languages).
-</p>
-
-<div class="org-src-container">
-
-<pre class="src src-prolog" id="orgsrcblock27">main = <span style="color: #00ffff;">{</span> rule <span style="color: #00ffff;">}</span> .
-rule = <span style="color: #eedd82;">IDENT</span> <span style="color: #00ff00;">"="</span> expr <span style="color: #00ff00;">"."</span> .
-expr = term <span style="color: #00ffff;">{</span> <span style="color: #00ff00;">"|"</span> term <span style="color: #00ffff;">}</span> .
-term = factor <span style="color: #00ffff;">{</span> factor <span style="color: #00ffff;">}</span> .
-factor = <span style="color: #eedd82;">IDENT</span> <span style="color: #00ffff;">|</span> <span style="color: #eedd82;">STRING</span> <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">"{"</span> expr <span style="color: #00ff00;">"}"</span> <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">"["</span> expr <span style="color: #00ff00;">"]"</span> <span style="color: #00ffff;">|</span> <span style="color: #00ff00;">"("</span> expr <span style="color: #00ff00;">")"</span> .
-</pre>
-</div>
-
-<p>
-I placed that code in a block of its own so it would be syntax highlighted, but for python it should be inside a string.
-</p>
-
-<div class="org-src-container">
-
-<pre class="src src-python" id="orgsrcblock28"><span style="color: #eedd82;">ebnf_src</span> = <span style="color: #00ff00;">'''\</span>
-<span style="color: #00ff00;">&lt;&lt;ebnf&gt;&gt;</span>
-<span style="color: #00ff00;">'''</span>
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-orgheadline16" class="outline-2">
-<h2 id="orgheadline16"><a id="npdbb4e1jqg0"></a><span class="section-number-2">16</span> OUTPUT wejalboot.py</h2>
-<div class="outline-text-2" id="text-16">
+<div id="outline-container-orgheadline17" class="outline-2">
+<h2 id="orgheadline17"><a id="npdbb4e1jqg0"></a><span class="section-number-2">17</span> OUTPUT wejalboot.py</h2>
+<div class="outline-text-2" id="text-17">
 <p>
 And now we can put the whole thing together:
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-python"><span style="color: #00ffff;">from</span> collections <span style="color: #00ffff;">import</span> namedtuple
+<pre class="src src-python"><span style="color: #00ff00;">"""</span>
+<span style="color: #00ff00;">&gt;&gt;&gt; ebnf_sc.scan('x = A | b')</span>
+<span style="color: #00ff00;">[('x', 'IDENT', 0), ('=', '=', 2), ('A', 'IDENT', 4), ('|', '|', 6), ('b', 'IDENT', 8)]</span>
+
+<span style="color: #00ff00;">"""</span>
+<span style="color: #00ffff;">from</span> collections <span style="color: #00ffff;">import</span> namedtuple
 <span style="color: #00ffff;">from</span> warnings <span style="color: #00ffff;">import</span> warn
 <span style="color: #00ffff;">import</span> string
 <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">T</span>(tag, doc, args):
@@ -808,8 +880,8 @@ And now we can put the whole thing together:
 <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">TN</span>(tag, doc, args=[<span style="color: #00ff00;">'name'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
 <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">T2</span>(tag, doc, args=[<span style="color: #00ff00;">'name'</span>,<span style="color: #00ff00;">'body'</span>]): <span style="color: #00ffff;">return</span> T(tag, doc, args)
 
-<span style="color: #eedd82;">Gram</span> = T(<span style="color: #00ff00;">'Gram'</span>, <span style="color: #00ff00;">'contains grammar rules (may inherit from `base`).'</span>,
-         [<span style="color: #00ff00;">'name'</span>, <span style="color: #00ff00;">'base'</span>, <span style="color: #00ff00;">'doc'</span>, <span style="color: #00ff00;">'body'</span>])
+<span style="color: #eedd82;">Gram</span> = T(<span style="color: #00ff00;">'Gram'</span>, <span style="color: #00ff00;">'contains grammar rules (may inherit from `bases`).'</span>,
+         [<span style="color: #00ff00;">'name'</span>, <span style="color: #00ff00;">'bases'</span>, <span style="color: #00ff00;">'doc'</span>, <span style="color: #00ff00;">'body'</span>])
 <span style="color: #eedd82;">Def</span> = T(<span style="color: #00ff00;">'Def'</span>, <span style="color: #00ff00;">'define a named rule.'</span>, [<span style="color: #00ff00;">'name'</span>,<span style="color: #00ff00;">'body'</span>])
 <span style="color: #eedd82;">Ref</span> = TN(<span style="color: #00ff00;">'Ref'</span>, <span style="color: #00ff00;">'refer to (invoke) a named rule'</span>)
 
@@ -1021,7 +1093,23 @@ FAIL = Fail()
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">scan</span>(<span style="color: #00ffff;">self</span>, txt):
         <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">list</span>(<span style="color: #00ffff;">self</span>.gen_tokens(txt))
 
+ebnf_src = <span style="color: #00ff00;">'''\</span>
+<span style="color: #00ff00;">main = { rule } .</span>
+<span style="color: #00ff00;">rule = IDENT "=" expr "." .</span>
+<span style="color: #00ff00;">expr = term { "|" term } .</span>
+<span style="color: #00ff00;">term = factor { factor } .</span>
+<span style="color: #00ff00;">factor = IDENT | STRING | "{" expr "}" | "[" expr "]" | "(" expr ")" .</span>
+<span style="color: #00ff00;">'''</span>
+
 <span style="color: #eedd82;">ECHR</span>, <span style="color: #eedd82;">SQ</span>, DQ = [<span style="color: #00ff00;">'\\'</span>, <span style="color: #00ff00;">"'"</span>, <span style="color: #00ff00;">'"'</span>]
+LETTER = Alt([Lit(ch) <span style="color: #00ffff;">for</span> ch <span style="color: #00ffff;">in</span> <span style="color: #00ff00;">'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'</span>])
+STRCHR = Alt([Seq([Lit(ECHR), Alt([ Lit(ECHR), Lit(DQ) ])]),
+              Alt([Lit(ch) <span style="color: #00ffff;">for</span> ch <span style="color: #00ffff;">in</span> <span style="color: #ff00ff; font-weight: bold;">map</span>(<span style="color: #ff00ff; font-weight: bold;">chr</span>, <span style="color: #ff00ff; font-weight: bold;">range</span>(32,127)) <span style="color: #00ffff;">if</span> ch <span style="color: #00ffff;">not</span> <span style="color: #00ffff;">in</span> <span style="color: #00ff00;">'"\\'</span>])])
+
+ebnf_sc = Scanner([(ch, Lit(ch)) <span style="color: #00ffff;">for</span> ch <span style="color: #00ffff;">in</span> <span style="color: #00ff00;">"{([=|.])}"</span>]
+                  + [(<span style="color: #00ff00;">'IDENT'</span>, Rep(LETTER)),
+                     (<span style="color: #00ff00;">'STRING'</span>, Alt([Seq([Lit(DQ), Rep(STRCHR), Lit(DQ)])]))])
+
 base = Gram(<span style="color: #00ff00;">'ebnf'</span>, [], <span style="color: #00ff00;">"rules common to all grammars"</span>, [
     Def(<span style="color: #00ff00;">'main'</span>, Orp(<span style="color: #00ff00;">'token'</span>)),
     Def(<span style="color: #00ff00;">'token'</span>,Seq([Skip(Orp(Ref(<span style="color: #00ff00;">'space'</span>))),
@@ -1044,7 +1132,7 @@ base = Gram(<span style="color: #00ff00;">'ebnf'</span>, [], <span style="color:
     Def(<span style="color: #00ff00;">'NUMBER'</span>,Seq([Opt(Ref(<span style="color: #00ff00;">'Neg'</span>)), Rep(Ref(<span style="color: #00ff00;">'Digit'</span>)),
                    Orp([Ref(<span style="color: #00ff00;">'Under'</span>),
                         Ref(<span style="color: #00ff00;">'Digit'</span>),Ref(<span style="color: #00ff00;">'Digit'</span>),Ref(<span style="color: #00ff00;">'Digit'</span>)])])),
-    Def(<span style="color: #00ff00;">'STRING'</span>, Alt([Seq([Lit(DQ), Rep(Ref(<span style="color: #00ff00;">'STRCHR'</span>)), Lit(DQ)])])),
+    Def(<span style="color: #00ff00;">'STRING'</span>, Seq([Lit(DQ), Rep(Ref(<span style="color: #00ff00;">'STRCHR'</span>)), Lit(DQ)])),
     Def(<span style="color: #00ff00;">'STRCHR'</span>, Alt([Seq([Lit(ECHR), Alt([ Lit(ECHR), Lit(DQ) ])]),
                        Not(DQ) ])),
     Def(<span style="color: #00ff00;">'DELIM'</span>, Alt(<span style="color: #ff00ff; font-weight: bold;">list</span>(<span style="color: #00ff00;">'(){}[]'</span>))),
@@ -1134,13 +1222,6 @@ HOME = {} <span style="color: #66f;"># </span><span style="color: #66f;">arbitra
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init_Def</span>(<span style="color: #00ffff;">self</span>, node):
         <span style="color: #00ffff;">self</span>.defs[node.name] = node
 
-ebnf_src = <span style="color: #00ff00;">'''\</span>
-<span style="color: #00ff00;">main = { rule } .</span>
-<span style="color: #00ff00;">rule = IDENT "=" expr "." .</span>
-<span style="color: #00ff00;">expr = term { "|" term } .</span>
-<span style="color: #00ff00;">term = factor { factor } .</span>
-<span style="color: #00ff00;">factor = IDENT | STRING | "{" expr "}" | "[" expr "]" | "(" expr ")" .</span>
-<span style="color: #00ff00;">'''</span>
 <span style="color: #00ffff;">if</span> <span style="color: #ff00ff; font-weight: bold;">__name__</span>==<span style="color: #00ff00;">"__main__"</span>:
     <span style="color: #00ffff;">print</span>(Grin(ebnf).parse(ebnf_src))
 </pre>
@@ -1164,16 +1245,16 @@ So now our job is to go back and fill in a handler method for each node until it
 </div>
 </div>
 
-<div id="outline-container-orgheadline17" class="outline-2">
-<h2 id="orgheadline17"><a id="yg99mk91oqg0"></a><span class="section-number-2">17</span> Inference Rules</h2>
-<div class="outline-text-2" id="text-17">
+<div id="outline-container-orgheadline18" class="outline-2">
+<h2 id="orgheadline18"><a id="yg99mk91oqg0"></a><span class="section-number-2">18</span> Inference Rules</h2>
+<div class="outline-text-2" id="text-18">
 <p>
 These were translated from the sequent notation in Warth's Ometa paper.
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock29"><span style="color: #66f;"># </span><span style="color: #66f;">(inside  `class Grin`...)</span>
+<pre class="src src-python" id="orgsrcblock31"><span style="color: #66f;"># </span><span style="color: #66f;">(inside  `class Grin`...)</span>
 
 <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Ref</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
     <span style="color: #66f;"># </span><span style="color: #66f;">pass in fresh World, then discard changes</span>
@@ -1201,12 +1282,12 @@ These were translated from the sequent notation in Warth's Ometa paper.
 </div>
 </div>
 
-<div id="outline-container-orgheadline18" class="outline-2">
-<h2 id="orgheadline18"><a id="ks01bt30kqg0"></a><span class="section-number-2">18</span> Compilation step.</h2>
-<div class="outline-text-2" id="text-18">
+<div id="outline-container-orgheadline19" class="outline-2">
+<h2 id="orgheadline19"><a id="ks01bt30kqg0"></a><span class="section-number-2">19</span> Compilation step.</h2>
+<div class="outline-text-2" id="text-19">
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock30"><span style="color: #66f;"># </span><span style="color: #66f;">(still inside  `class Grin`...)</span>
+<pre class="src src-python" id="orgsrcblock32"><span style="color: #66f;"># </span><span style="color: #66f;">(still inside  `class Grin`...)</span>
 <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init</span>(<span style="color: #00ffff;">self</span>, node):
     <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.dispatch(<span style="color: #00ff00;">'init'</span>, node)
 
@@ -1221,9 +1302,9 @@ These were translated from the sequent notation in Warth's Ometa paper.
 </div>
 </div>
 
-<div id="outline-container-orgheadline19" class="outline-2">
-<h2 id="orgheadline19"><a id="hnv0l310pqg0"></a><span class="section-number-2">19</span> <span class="todo TODO">TODO</span> credits</h2>
-<div class="outline-text-2" id="text-19">
+<div id="outline-container-orgheadline20" class="outline-2">
+<h2 id="orgheadline20"><a id="hnv0l310pqg0"></a><span class="section-number-2">20</span> <span class="todo TODO">TODO</span> credits</h2>
+<div class="outline-text-2" id="text-20">
 <ul class="org-ul">
 <li>grammar rules (and the 'world' concept) are adapted from Alessandro Warth's <a href="http://tinlizzie.org/ometa/">Ometa</a> system.</li>
 </ul>
