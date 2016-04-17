@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2016-04-17 Sun 17:14 -->
+<!-- 2016-04-17 Sun 17:34 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="viewport" content="width=device-width, initial-scale=1" />
 <title>wejal bootstrap</title>
@@ -204,7 +204,7 @@ In other words, when we see an <code>Alt</code> node in the tree, we can use thi
 <pre class="src src-python" id="orgsrcblock5"><span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">node_type</span>(node):
     <span style="color: #00ffff;">return</span> node.__class__.<span style="color: #ff00ff; font-weight: bold;">__name__</span>
 
-<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Dispatcher</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Dispatcher</span>:
     <span style="color: #00ff00;">"""Provides a simple generic dispatch mechanism based on method names"""</span>
 
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">_find_handler</span>(<span style="color: #00ffff;">self</span>, prefix, node):
@@ -234,7 +234,7 @@ The following helper class will do the work for us:
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock6"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Cursor</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+<pre class="src src-python" id="orgsrcblock6"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Cursor</span>:
 
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, seq:[<span style="color: #ff00ff; font-weight: bold;">any</span>]):
         <span style="color: #00ffff;">self</span>.seq = seq    <span style="color: #66f;"># </span><span style="color: #66f;">sequence (probably a string)</span>
@@ -281,7 +281,7 @@ Match.<span style="color: #ff00ff; font-weight: bold;">__doc__</span> = <span st
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock8"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Fail</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+<pre class="src src-python" id="orgsrcblock8"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Fail</span>:
     <span style="color: #00ff00;">"""Value to indicate failure."""</span>
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__repr__</span>(<span style="color: #00ffff;">self</span>):
         <span style="color: #00ffff;">return</span> <span style="color: #00ff00;">"FAIL"</span>
@@ -549,7 +549,7 @@ Later on, we can improve the performance by compiling the rules into a state mac
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock21"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Scanner</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+<pre class="src src-python" id="orgsrcblock21"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Scanner</span>:
 
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, rules: [(<span style="color: #ff00ff; font-weight: bold;">str</span>, namedtuple)]):
         <span style="color: #00ffff;">self</span>.order = [rule[0] <span style="color: #00ffff;">for</span> rule <span style="color: #00ffff;">in</span> rules]  <span style="color: #66f;"># </span><span style="color: #66f;">test rules in given order</span>
@@ -910,7 +910,7 @@ And now we can put the whole thing together:
 <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">node_type</span>(node):
     <span style="color: #00ffff;">return</span> node.__class__.<span style="color: #ff00ff; font-weight: bold;">__name__</span>
 
-<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Dispatcher</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Dispatcher</span>:
     <span style="color: #00ff00;">"""Provides a simple generic dispatch mechanism based on method names"""</span>
 
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">_find_handler</span>(<span style="color: #00ffff;">self</span>, prefix, node):
@@ -927,7 +927,7 @@ And now we can put the whole thing together:
         <span style="color: #00ffff;">return</span> h(node, *a, **kw)
 
 
-<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Cursor</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Cursor</span>:
 
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, seq:[<span style="color: #ff00ff; font-weight: bold;">any</span>]):
         <span style="color: #00ffff;">self</span>.seq = seq    <span style="color: #66f;"># </span><span style="color: #66f;">sequence (probably a string)</span>
@@ -950,7 +950,7 @@ And now we can put the whole thing together:
 Match = namedtuple(<span style="color: #00ff00;">"Match"</span>, [<span style="color: #00ff00;">'txt'</span>, <span style="color: #00ff00;">'pos'</span>])
 Match.<span style="color: #ff00ff; font-weight: bold;">__doc__</span> = <span style="color: #00ff00;">"Match Result"</span>
 
-<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Fail</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Fail</span>:
     <span style="color: #00ff00;">"""Value to indicate failure."""</span>
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__repr__</span>(<span style="color: #00ffff;">self</span>):
         <span style="color: #00ffff;">return</span> <span style="color: #00ff00;">"FAIL"</span>
@@ -1063,7 +1063,7 @@ FAIL = Fail()
         <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>._match(Opt(Rep(node.item)), cur, env)
 
 
-<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Scanner</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Scanner</span>:
 
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, rules: [(<span style="color: #ff00ff; font-weight: bold;">str</span>, namedtuple)]):
         <span style="color: #00ffff;">self</span>.order = [rule[0] <span style="color: #00ffff;">for</span> rule <span style="color: #00ffff;">in</span> rules]  <span style="color: #66f;"># </span><span style="color: #66f;">test rules in given order</span>
