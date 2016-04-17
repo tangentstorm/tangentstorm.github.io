@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2016-04-17 Sun 12:36 -->
+<!-- 2016-04-17 Sun 14:49 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="viewport" content="width=device-width, initial-scale=1" />
 <title>wejal bootstrap</title>
@@ -69,18 +69,19 @@ for the JavaScript code in this tag.
 <li><a href="#orgheadline4">4. Input cursor</a></li>
 <li><a href="#orgheadline5">5. Data structure for parse results.</a></li>
 <li><a href="#orgheadline6">6. Simple pattern matching.</a></li>
-<li><a href="#orgheadline7">7. <span class="todo nilTODO">TODO</span> Regular Expressions</a></li>
-<li><a href="#orgheadline8">8. <span class="todo nilTODO">TODO</span> -&#x2014; clean up below here ----</a></li>
-<li><a href="#orgheadline9">9. Strategy</a></li>
-<li><a href="#orgheadline10">10. Manually build a base grammar to provide generic tokenization.</a></li>
-<li><a href="#orgheadline11">11. Now define the bootstrap grammar to parse EBNF grammar definitions.</a></li>
-<li><a href="#orgheadline12">12. Worlds for backtracking.</a></li>
-<li><a href="#orgheadline13">13. Grammar Interpreter</a></li>
-<li><a href="#orgheadline14">14. ebnf in ebnf</a></li>
-<li><a href="#orgheadline15">15. OUTPUT wejalboot.py</a></li>
-<li><a href="#orgheadline16">16. Inference Rules</a></li>
-<li><a href="#orgheadline17">17. Compilation step.</a></li>
-<li><a href="#orgheadline18">18. <span class="todo nilTODO">TODO</span> credits</a></li>
+<li><a href="#orgheadline7">7. Regular Expressions</a></li>
+<li><a href="#orgheadline8">8. Tokenization</a></li>
+<li><a href="#orgheadline9">9. <span class="todo nilTODO">TODO</span> -&#x2014; clean up below here ----</a></li>
+<li><a href="#orgheadline10">10. Strategy</a></li>
+<li><a href="#orgheadline11">11. Manually build a base grammar to provide generic tokenization.</a></li>
+<li><a href="#orgheadline12">12. Now define the bootstrap grammar to parse EBNF grammar definitions.</a></li>
+<li><a href="#orgheadline13">13. Worlds for backtracking.</a></li>
+<li><a href="#orgheadline14">14. Grammar Interpreter</a></li>
+<li><a href="#orgheadline15">15. ebnf in ebnf</a></li>
+<li><a href="#orgheadline16">16. OUTPUT wejalboot.py</a></li>
+<li><a href="#orgheadline17">17. Inference Rules</a></li>
+<li><a href="#orgheadline18">18. Compilation step.</a></li>
+<li><a href="#orgheadline19">19. <span class="todo nilTODO">TODO</span> credits</a></li>
 </ul>
 </div>
 </div>
@@ -108,7 +109,7 @@ For starters, we will focus on simple regular expressions:, much like python's b
 <div class="org-src-container">
 
 <pre class="src src-python" id="orgsrcblock1">&gt;&gt;&gt; <span style="color: #eedd82;">m</span> = Matcher(Alt([Lit(<span style="color: #00ff00;">"x"</span>), Lit(<span style="color: #00ff00;">"y"</span>)])) <span style="color: #66f;"># </span><span style="color: #66f;">like re.compile("x|y")</span>
-&gt;&gt;&gt; m.match(<span style="color: #00ff00;">'xyz'</span>)                         <span style="color: #66f;"># </span><span style="color: #66f;">should match "x" at position 0 </span>
+&gt;&gt;&gt; m.match(<span style="color: #00ff00;">'xyz'</span>)                         <span style="color: #66f;"># </span><span style="color: #66f;">should match "x" at position 0</span>
 Match(txt=<span style="color: #00ff00;">'x'</span>, pos=0)
 &gt;&gt;&gt; m.match(<span style="color: #00ff00;">"zyx"</span>)                         <span style="color: #66f;"># </span><span style="color: #66f;">should fail to match</span>
 FAIL
@@ -246,6 +247,10 @@ The following helper class will do the work for us:
         <span style="color: #00ffff;">self</span>.pos = <span style="color: #ff00ff; font-weight: bold;">min</span>(<span style="color: #00ffff;">self</span>.pos+1, end)
         <span style="color: #00ffff;">self</span>.val = <span style="color: #ffaf00;">None</span> <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">self</span>.pos == end <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">self</span>.seq[<span style="color: #00ffff;">self</span>.pos] 
         <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">at_end</span>(<span style="color: #00ffff;">self</span>)-&gt;<span style="color: #ff00ff; font-weight: bold;">bool</span>:
+        <span style="color: #00ff00;">"""Are we at the end of the sequence?"""</span>
+        <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.val <span style="color: #00ffff;">is</span> <span style="color: #ffaf00;">None</span>
 </pre>
 </div>
 </div>
@@ -376,7 +381,7 @@ At this point, our original example using <code>Alt([ Lit('x'), Lit('y') ])</cod
 </div>
 
 <div id="outline-container-orgheadline7" class="outline-2">
-<h2 id="orgheadline7"><a id="9u58i7e147h0"></a><span class="section-number-2">7</span> <span class="todo TODO">TODO</span> Regular Expressions</h2>
+<h2 id="orgheadline7"><a id="9u58i7e147h0"></a><span class="section-number-2">7</span> Regular Expressions</h2>
 <div class="outline-text-2" id="text-7">
 <p>
 With <code>Lit</code> and <code>Alt</code> out of the way, only need a few more cases to allow full regular expressions:
@@ -503,17 +508,87 @@ If you prefer, you could treat <code>Orp</code> as the more primitive operation,
         <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>._match(Opt(Rep(node.item)), cur, env)
 </pre>
 </div>
-</div>
-</div>
 
+<p>
+Most modern regular expression engines support additions like groups and backreferences. We will diverge a bit here, though, because we are interested in writing full parsers, with mutually recursive named rules.
+</p>
+</div>
+</div>
 
 <div id="outline-container-orgheadline8" class="outline-2">
-<h2 id="orgheadline8"><span class="section-number-2">8</span> <span class="todo TODO">TODO</span> -&#x2014; clean up below here ----</h2>
+<h2 id="orgheadline8"><a id="ua87gur077h0"></a><span class="section-number-2">8</span> Tokenization</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+While not strictly required, it's traditional to break parsing up into two phases: the first pass scans through the text and breaks it up into tokens, a process called tokenization or lexing.The second pass parses the stream of tokens and (at least conceptually) constructs a tree-like structure. 
+</p>
+
+<p>
+Our version of tokens will just be tuples strings, tagged with rule names and match positions:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="orgsrcblock20">&gt;&gt;&gt; <span style="color: #eedd82;">s</span> = Scanner([(<span style="color: #00ff00;">"a+"</span>, Rep(Lit(<span style="color: #00ff00;">"a"</span>))), (<span style="color: #00ff00;">"b+"</span>, Rep(Lit(<span style="color: #00ff00;">"b"</span>)))])
+&gt;&gt;&gt; s.scan(<span style="color: #00ff00;">"abaabb"</span>)
+[(<span style="color: #00ff00;">'a'</span>, <span style="color: #00ff00;">'a+'</span>, 0), (<span style="color: #00ff00;">'b'</span>, <span style="color: #00ff00;">'b+'</span>, 1), (<span style="color: #00ff00;">'aa'</span>, <span style="color: #00ff00;">'a+'</span>, 2), (<span style="color: #00ff00;">'bb'</span>, <span style="color: #00ff00;">'b+'</span>, 4)]
+
+&gt;&gt;&gt; s.scan(<span style="color: #00ff00;">"a b   \t bb a"</span>)  <span style="color: #66f;"># </span><span style="color: #66f;">whitespace is ignored by default.</span>
+[(<span style="color: #00ff00;">'a'</span>, <span style="color: #00ff00;">'a+'</span>, 0), (<span style="color: #00ff00;">'b'</span>, <span style="color: #00ff00;">'b+'</span>, 2), (<span style="color: #00ff00;">'bb'</span>, <span style="color: #00ff00;">'b+'</span>, 8), (<span style="color: #00ff00;">'a'</span>, <span style="color: #00ff00;">'a+'</span>,  11)]
+</pre>
 </div>
 
+
+<p>
+Our implementation is incredibly naive: it just keeps looping through the list of rules and trying to match each one.
+</p>
+
+<p>
+Later on, we can improve the performance by compiling the rules into a state machine, but we will stick with something simple while we're bootstrapping the rest of the system:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="orgsrcblock21"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Scanner</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, rules: [(<span style="color: #ff00ff; font-weight: bold;">str</span>, namedtuple)]):
+        <span style="color: #00ffff;">self</span>.order = [rule[0] <span style="color: #00ffff;">for</span> rule <span style="color: #00ffff;">in</span> rules]  <span style="color: #66f;"># </span><span style="color: #66f;">test rules in given order</span>
+        <span style="color: #00ffff;">self</span>.rules = <span style="color: #ff00ff; font-weight: bold;">dict</span>(rules)
+        <span style="color: #66f;"># </span><span style="color: #66f;">default whitespace handler:</span>
+        <span style="color: #00ffff;">if</span> <span style="color: #00ff00;">'_'</span> <span style="color: #00ffff;">not</span> <span style="color: #00ffff;">in</span> rules:
+            <span style="color: #00ffff;">self</span>.order.insert(0, <span style="color: #00ff00;">'_'</span>)
+            <span style="color: #00ffff;">self</span>.rules[<span style="color: #00ff00;">'_'</span>] = Alt([Lit(<span style="color: #ff00ff; font-weight: bold;">chr</span>(i)) <span style="color: #00ffff;">for</span> i <span style="color: #00ffff;">in</span> <span style="color: #ff00ff; font-weight: bold;">range</span>(33)])
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">gen_tokens</span>(<span style="color: #00ffff;">self</span>, txt):
+        <span style="color: #eedd82;">cur</span> = Cursor(txt)
+        <span style="color: #eedd82;">env</span> = {}
+        <span style="color: #eedd82;">matcher</span> = Matcher(Emp)
+        <span style="color: #00ffff;">while</span> <span style="color: #00ffff;">not</span> cur.at_end():
+            <span style="color: #00ffff;">for</span> rule <span style="color: #00ffff;">in</span> <span style="color: #00ffff;">self</span>.order:
+                <span style="color: #eedd82;">m</span> = matcher._match(<span style="color: #00ffff;">self</span>.rules[rule], cur, env)
+                <span style="color: #00ffff;">if</span> m.matched:
+                    <span style="color: #eedd82;">match</span>, <span style="color: #eedd82;">cur</span>, <span style="color: #eedd82;">env</span> = m
+                    <span style="color: #00ffff;">if</span> rule != <span style="color: #00ff00;">'_'</span>:
+                        <span style="color: #00ffff;">yield</span> (match.txt, rule, match.pos)
+                    <span style="color: #00ffff;">break</span>
+                <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">continue</span>
+            <span style="color: #00ffff;">else</span>:
+                <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">ValueError</span>(<span style="color: #00ff00;">"unrecognized character at position %i : '%s'"</span>
+                                 % (cur.pos, cur.val))
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">scan</span>(<span style="color: #00ffff;">self</span>, txt):
+        <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">list</span>(<span style="color: #00ffff;">self</span>.gen_tokens(txt))
+</pre>
+</div>
+</div>
+</div>
+
+
 <div id="outline-container-orgheadline9" class="outline-2">
-<h2 id="orgheadline9"><a id="nrogjy71jqg0"></a><span class="section-number-2">9</span> Strategy</h2>
-<div class="outline-text-2" id="text-9">
+<h2 id="orgheadline9"><span class="section-number-2">9</span> <span class="todo TODO">TODO</span> -&#x2014; clean up below here ----</h2>
+</div>
+<div id="outline-container-orgheadline10" class="outline-2">
+<h2 id="orgheadline10"><a id="nrogjy71jqg0"></a><span class="section-number-2">10</span> Strategy</h2>
+<div class="outline-text-2" id="text-10">
 <p>
 The idea here is to manually construct a data structure (an abstract syntax tree) that describes a meta-grammar.
 </p>
@@ -532,17 +607,17 @@ Our first step is to define some types that we can use to tag the different part
 </div>
 </div>
 
-<div id="outline-container-orgheadline10" class="outline-2">
-<h2 id="orgheadline10"><a id="9d0f2971jqg0"></a><span class="section-number-2">10</span> Manually build a base grammar to provide generic tokenization.</h2>
-<div class="outline-text-2" id="text-10">
+<div id="outline-container-orgheadline11" class="outline-2">
+<h2 id="orgheadline11"><a id="9d0f2971jqg0"></a><span class="section-number-2">11</span> Manually build a base grammar to provide generic tokenization.</h2>
+<div class="outline-text-2" id="text-11">
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock20"><span style="color: #00ffff;">import</span> string
+<pre class="src src-python" id="orgsrcblock22"><span style="color: #00ffff;">import</span> string
 </pre>
 </div>
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock21"><span style="color: #eedd82;">ECHR</span>, <span style="color: #eedd82;">SQ</span>, <span style="color: #eedd82;">DQ</span> = [<span style="color: #00ff00;">'\\'</span>, <span style="color: #00ff00;">"'"</span>, <span style="color: #00ff00;">'"'</span>]
+<pre class="src src-python" id="orgsrcblock23"><span style="color: #eedd82;">ECHR</span>, <span style="color: #eedd82;">SQ</span>, <span style="color: #eedd82;">DQ</span> = [<span style="color: #00ff00;">'\\'</span>, <span style="color: #00ff00;">"'"</span>, <span style="color: #00ff00;">'"'</span>]
 <span style="color: #eedd82;">base</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [], <span style="color: #00ff00;">"rules common to all grammars"</span>, [
     Def(<span style="color: #00ff00;">'main'</span>, Orp(<span style="color: #00ff00;">'token'</span>)),
     Def(<span style="color: #00ff00;">'token'</span>,Seq([Skip(Orp(Ref(<span style="color: #00ff00;">'space'</span>))),
@@ -575,12 +650,12 @@ Our first step is to define some types that we can use to tag the different part
 </div>
 </div>
 
-<div id="outline-container-orgheadline11" class="outline-2">
-<h2 id="orgheadline11"><a id="7o9j7i21jqg0"></a><span class="section-number-2">11</span> Now define the bootstrap grammar to parse EBNF grammar definitions.</h2>
-<div class="outline-text-2" id="text-11">
+<div id="outline-container-orgheadline12" class="outline-2">
+<h2 id="orgheadline12"><a id="7o9j7i21jqg0"></a><span class="section-number-2">12</span> Now define the bootstrap grammar to parse EBNF grammar definitions.</h2>
+<div class="outline-text-2" id="text-12">
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock22"><span style="color: #eedd82;">ebnf</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [base], <span style="color: #00ff00;">"ebnf meta-grammar (for parsing grammars)"</span>, [
+<pre class="src src-python" id="orgsrcblock24"><span style="color: #eedd82;">ebnf</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [base], <span style="color: #00ff00;">"ebnf meta-grammar (for parsing grammars)"</span>, [
     Def(<span style="color: #00ff00;">'main'</span>, Orp(Ref(<span style="color: #00ff00;">'rule'</span>))),
     Def(<span style="color: #00ff00;">'rule'</span>, Seq([Var(<span style="color: #00ff00;">'name'</span>, Ref(<span style="color: #00ff00;">'IDENT'</span>)),
                      Lit(<span style="color: #00ff00;">'='</span>), Ref(<span style="color: #00ff00;">'expr'</span>), Lit(<span style="color: #00ff00;">'.'</span>) ])),
@@ -597,9 +672,9 @@ Our first step is to define some types that we can use to tag the different part
 </div>
 </div>
 
-<div id="outline-container-orgheadline12" class="outline-2">
-<h2 id="orgheadline12"><a id="u8s6vh00kqg0"></a><span class="section-number-2">12</span> Worlds for backtracking.</h2>
-<div class="outline-text-2" id="text-12">
+<div id="outline-container-orgheadline13" class="outline-2">
+<h2 id="orgheadline13"><a id="u8s6vh00kqg0"></a><span class="section-number-2">13</span> Worlds for backtracking.</h2>
+<div class="outline-text-2" id="text-13">
 <p>
 A world is a context for holding changes, similar to a working copy in a version control system. The idea is that any time we might need to backtrack (any time an <code>Alt</code> node is encountered), we'll fork a new world, and changes we make are done to the world object. This way, if the match ultimately fails, we can rewind the side effects.
 </p>
@@ -622,7 +697,7 @@ It's very much like what happens when overriding methods in a subclass, except i
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock23"><span style="color: #eedd82;">HOME</span> = {} <span style="color: #66f;"># </span><span style="color: #66f;">arbitrary dictionary object</span>
+<pre class="src src-python" id="orgsrcblock25"><span style="color: #eedd82;">HOME</span> = {} <span style="color: #66f;"># </span><span style="color: #66f;">arbitrary dictionary object</span>
 
 <span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">World</span>(<span style="color: #ff00ff; font-weight: bold;">dict</span>):
 
@@ -648,16 +723,16 @@ It's very much like what happens when overriding methods in a subclass, except i
 </div>
 </div>
 
-<div id="outline-container-orgheadline13" class="outline-2">
-<h2 id="orgheadline13"><a id="n0pcnnd1jqg0"></a><span class="section-number-2">13</span> Grammar Interpreter</h2>
-<div class="outline-text-2" id="text-13">
+<div id="outline-container-orgheadline14" class="outline-2">
+<h2 id="orgheadline14"><a id="n0pcnnd1jqg0"></a><span class="section-number-2">14</span> Grammar Interpreter</h2>
+<div class="outline-text-2" id="text-14">
 <p>
 We will assume for now that we have the entire string in memory.
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock24"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Grin</span>(Dispatcher):
+<pre class="src src-python" id="orgsrcblock26"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Grin</span>(Dispatcher):
     <span style="color: #00ff00;">"""Grammar Interpreter"""</span>
 
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, root):
@@ -675,9 +750,9 @@ We will assume for now that we have the entire string in memory.
 </div>
 </div>
 
-<div id="outline-container-orgheadline14" class="outline-2">
-<h2 id="orgheadline14"><a id="bd6hv400kqg0"></a><span class="section-number-2">14</span> ebnf in ebnf</h2>
-<div class="outline-text-2" id="text-14">
+<div id="outline-container-orgheadline15" class="outline-2">
+<h2 id="orgheadline15"><a id="bd6hv400kqg0"></a><span class="section-number-2">15</span> ebnf in ebnf</h2>
+<div class="outline-text-2" id="text-15">
 <p>
 Here's an grammar for EBNF written in EBNF, so we can test the parser.
 </p>
@@ -688,7 +763,7 @@ This text is adapted from <a href="http://www.inf.ethz.ch/personal/wirth/Compile
 
 <div class="org-src-container">
 
-<pre class="src src-prolog" id="orgsrcblock25">main = <span style="color: #00ffff;">{</span> rule <span style="color: #00ffff;">}</span> .
+<pre class="src src-prolog" id="orgsrcblock27">main = <span style="color: #00ffff;">{</span> rule <span style="color: #00ffff;">}</span> .
 rule = <span style="color: #eedd82;">IDENT</span> <span style="color: #00ff00;">"="</span> expr <span style="color: #00ff00;">"."</span> .
 expr = term <span style="color: #00ffff;">{</span> <span style="color: #00ff00;">"|"</span> term <span style="color: #00ffff;">}</span> .
 term = factor <span style="color: #00ffff;">{</span> factor <span style="color: #00ffff;">}</span> .
@@ -702,7 +777,7 @@ I placed that code in a block of its own so it would be syntax highlighted, but 
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock26"><span style="color: #eedd82;">ebnf_src</span> = <span style="color: #00ff00;">'''\</span>
+<pre class="src src-python" id="orgsrcblock28"><span style="color: #eedd82;">ebnf_src</span> = <span style="color: #00ff00;">'''\</span>
 <span style="color: #00ff00;">&lt;&lt;ebnf&gt;&gt;</span>
 <span style="color: #00ff00;">'''</span>
 </pre>
@@ -710,9 +785,9 @@ I placed that code in a block of its own so it would be syntax highlighted, but 
 </div>
 </div>
 
-<div id="outline-container-orgheadline15" class="outline-2">
-<h2 id="orgheadline15"><a id="npdbb4e1jqg0"></a><span class="section-number-2">15</span> OUTPUT wejalboot.py</h2>
-<div class="outline-text-2" id="text-15">
+<div id="outline-container-orgheadline16" class="outline-2">
+<h2 id="orgheadline16"><a id="npdbb4e1jqg0"></a><span class="section-number-2">16</span> OUTPUT wejalboot.py</h2>
+<div class="outline-text-2" id="text-16">
 <p>
 And now we can put the whole thing together:
 </p>
@@ -795,6 +870,10 @@ And now we can put the whole thing together:
         <span style="color: #00ffff;">self</span>.val = <span style="color: #ffaf00;">None</span> <span style="color: #00ffff;">if</span> <span style="color: #00ffff;">self</span>.pos == end <span style="color: #00ffff;">else</span> <span style="color: #00ffff;">self</span>.seq[<span style="color: #00ffff;">self</span>.pos] 
         <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>
 
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">at_end</span>(<span style="color: #00ffff;">self</span>)-&gt;<span style="color: #ff00ff; font-weight: bold;">bool</span>:
+        <span style="color: #00ff00;">"""Are we at the end of the sequence?"""</span>
+        <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.val <span style="color: #00ffff;">is</span> <span style="color: #ffaf00;">None</span>
+
 
 Match = namedtuple(<span style="color: #00ff00;">"Match"</span>, [<span style="color: #00ff00;">'txt'</span>, <span style="color: #00ff00;">'pos'</span>])
 Match.<span style="color: #ff00ff; font-weight: bold;">__doc__</span> = <span style="color: #00ff00;">"Match Result"</span>
@@ -817,7 +896,7 @@ FAIL = Fail()
     <span style="color: #00ff00;">"""</span>
 <span style="color: #00ff00;">    A simple matcher for regular languages.</span>
 <span style="color: #00ff00;">    &gt;&gt;&gt; m = Matcher(Alt([Lit("x"), Lit("y")])) # like re.compile("x|y")</span>
-<span style="color: #00ff00;">    &gt;&gt;&gt; m.match('xyz')                         # should match "x" at position 0 </span>
+<span style="color: #00ff00;">    &gt;&gt;&gt; m.match('xyz')                         # should match "x" at position 0</span>
 <span style="color: #00ff00;">    Match(txt='x', pos=0)</span>
 <span style="color: #00ff00;">    &gt;&gt;&gt; m.match("zyx")                         # should fail to match</span>
 <span style="color: #00ff00;">    FAIL</span>
@@ -910,6 +989,37 @@ FAIL = Fail()
 
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Orp</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
         <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>._match(Opt(Rep(node.item)), cur, env)
+
+
+<span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Scanner</span>(<span style="color: #ff00ff; font-weight: bold;">object</span>):
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, rules: [(<span style="color: #ff00ff; font-weight: bold;">str</span>, namedtuple)]):
+        <span style="color: #00ffff;">self</span>.order = [rule[0] <span style="color: #00ffff;">for</span> rule <span style="color: #00ffff;">in</span> rules]  <span style="color: #66f;"># </span><span style="color: #66f;">test rules in given order</span>
+        <span style="color: #00ffff;">self</span>.rules = <span style="color: #ff00ff; font-weight: bold;">dict</span>(rules)
+        <span style="color: #66f;"># </span><span style="color: #66f;">default whitespace handler:</span>
+        <span style="color: #00ffff;">if</span> <span style="color: #00ff00;">'_'</span> <span style="color: #00ffff;">not</span> <span style="color: #00ffff;">in</span> rules:
+            <span style="color: #00ffff;">self</span>.order.insert(0, <span style="color: #00ff00;">'_'</span>)
+            <span style="color: #00ffff;">self</span>.rules[<span style="color: #00ff00;">'_'</span>] = Alt([Lit(<span style="color: #ff00ff; font-weight: bold;">chr</span>(i)) <span style="color: #00ffff;">for</span> i <span style="color: #00ffff;">in</span> <span style="color: #ff00ff; font-weight: bold;">range</span>(33)])
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">gen_tokens</span>(<span style="color: #00ffff;">self</span>, txt):
+        cur = Cursor(txt)
+        env = {}
+        matcher = Matcher(Emp)
+        <span style="color: #00ffff;">while</span> <span style="color: #00ffff;">not</span> cur.at_end():
+            <span style="color: #00ffff;">for</span> rule <span style="color: #00ffff;">in</span> <span style="color: #00ffff;">self</span>.order:
+                m = matcher._match(<span style="color: #00ffff;">self</span>.rules[rule], cur, env)
+                <span style="color: #00ffff;">if</span> m.matched:
+                    <span style="color: #eedd82;">match</span>, <span style="color: #eedd82;">cur</span>, env = m
+                    <span style="color: #00ffff;">if</span> rule != <span style="color: #00ff00;">'_'</span>:
+                        <span style="color: #00ffff;">yield</span> (match.txt, rule, match.pos)
+                    <span style="color: #00ffff;">break</span>
+                <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">continue</span>
+            <span style="color: #00ffff;">else</span>:
+                <span style="color: #00ffff;">raise</span> <span style="color: #ff00ff;">ValueError</span>(<span style="color: #00ff00;">"unrecognized character at position %i : '%s'"</span>
+                                 % (cur.pos, cur.val))
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">scan</span>(<span style="color: #00ffff;">self</span>, txt):
+        <span style="color: #00ffff;">return</span> <span style="color: #ff00ff; font-weight: bold;">list</span>(<span style="color: #00ffff;">self</span>.gen_tokens(txt))
 
 <span style="color: #eedd82;">ECHR</span>, <span style="color: #eedd82;">SQ</span>, DQ = [<span style="color: #00ff00;">'\\'</span>, <span style="color: #00ff00;">"'"</span>, <span style="color: #00ff00;">'"'</span>]
 base = Gram(<span style="color: #00ff00;">'ebnf'</span>, [], <span style="color: #00ff00;">"rules common to all grammars"</span>, [
@@ -1054,16 +1164,16 @@ So now our job is to go back and fill in a handler method for each node until it
 </div>
 </div>
 
-<div id="outline-container-orgheadline16" class="outline-2">
-<h2 id="orgheadline16"><a id="yg99mk91oqg0"></a><span class="section-number-2">16</span> Inference Rules</h2>
-<div class="outline-text-2" id="text-16">
+<div id="outline-container-orgheadline17" class="outline-2">
+<h2 id="orgheadline17"><a id="yg99mk91oqg0"></a><span class="section-number-2">17</span> Inference Rules</h2>
+<div class="outline-text-2" id="text-17">
 <p>
 These were translated from the sequent notation in Warth's Ometa paper.
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock27"><span style="color: #66f;"># </span><span style="color: #66f;">(inside  `class Grin`...)</span>
+<pre class="src src-python" id="orgsrcblock29"><span style="color: #66f;"># </span><span style="color: #66f;">(inside  `class Grin`...)</span>
 
 <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Ref</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
     <span style="color: #66f;"># </span><span style="color: #66f;">pass in fresh World, then discard changes</span>
@@ -1091,12 +1201,12 @@ These were translated from the sequent notation in Warth's Ometa paper.
 </div>
 </div>
 
-<div id="outline-container-orgheadline17" class="outline-2">
-<h2 id="orgheadline17"><a id="ks01bt30kqg0"></a><span class="section-number-2">17</span> Compilation step.</h2>
-<div class="outline-text-2" id="text-17">
+<div id="outline-container-orgheadline18" class="outline-2">
+<h2 id="orgheadline18"><a id="ks01bt30kqg0"></a><span class="section-number-2">18</span> Compilation step.</h2>
+<div class="outline-text-2" id="text-18">
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock28"><span style="color: #66f;"># </span><span style="color: #66f;">(still inside  `class Grin`...)</span>
+<pre class="src src-python" id="orgsrcblock30"><span style="color: #66f;"># </span><span style="color: #66f;">(still inside  `class Grin`...)</span>
 <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init</span>(<span style="color: #00ffff;">self</span>, node):
     <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.dispatch(<span style="color: #00ff00;">'init'</span>, node)
 
@@ -1111,9 +1221,9 @@ These were translated from the sequent notation in Warth's Ometa paper.
 </div>
 </div>
 
-<div id="outline-container-orgheadline18" class="outline-2">
-<h2 id="orgheadline18"><a id="hnv0l310pqg0"></a><span class="section-number-2">18</span> <span class="todo TODO">TODO</span> credits</h2>
-<div class="outline-text-2" id="text-18">
+<div id="outline-container-orgheadline19" class="outline-2">
+<h2 id="orgheadline19"><a id="hnv0l310pqg0"></a><span class="section-number-2">19</span> <span class="todo TODO">TODO</span> credits</h2>
+<div class="outline-text-2" id="text-19">
 <ul class="org-ul">
 <li>grammar rules (and the 'world' concept) are adapted from Alessandro Warth's <a href="http://tinlizzie.org/ometa/">Ometa</a> system.</li>
 </ul>
