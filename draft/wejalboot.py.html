@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2016-04-17 Sun 17:34 -->
+<!-- 2016-04-20 Wed 18:11 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="viewport" content="width=device-width, initial-scale=1" />
 <title>wejal bootstrap</title>
@@ -73,16 +73,18 @@ for the JavaScript code in this tag.
 <li><a href="#orgheadline8">8. Tokenization</a></li>
 <li><a href="#orgheadline9">9. EBNF</a></li>
 <li><a href="#orgheadline10">10. A Bootstrap tokenizer.</a></li>
-<li><a href="#orgheadline11">11. <span class="todo nilTODO">TODO</span> -&#x2014; clean up below here ----</a></li>
-<li><a href="#orgheadline12">12. Strategy</a></li>
-<li><a href="#orgheadline13">13. Manually build a base grammar to provide generic tokenization.</a></li>
-<li><a href="#orgheadline14">14. Now define the bootstrap grammar to parse EBNF grammar definitions.</a></li>
-<li><a href="#orgheadline15">15. Worlds for backtracking.</a></li>
-<li><a href="#orgheadline16">16. Grammar Interpreter</a></li>
-<li><a href="#orgheadline17">17. OUTPUT wejalboot.py</a></li>
-<li><a href="#orgheadline18">18. Inference Rules</a></li>
-<li><a href="#orgheadline19">19. Compilation step.</a></li>
-<li><a href="#orgheadline20">20. <span class="todo nilTODO">TODO</span> credits</a></li>
+<li><a href="#orgheadline11">11. Parsing</a></li>
+<li><a href="#orgheadline12">12. Named Rules</a></li>
+<li><a href="#orgheadline13">13. <span class="todo nilTODO">TODO</span> -&#x2014; clean up below here ----</a></li>
+<li><a href="#orgheadline14">14. Strategy</a></li>
+<li><a href="#orgheadline15">15. Manually build a base grammar to provide generic tokenization.</a></li>
+<li><a href="#orgheadline16">16. Now define the bootstrap grammar to parse EBNF grammar definitions.</a></li>
+<li><a href="#orgheadline17">17. Worlds for backtracking.</a></li>
+<li><a href="#orgheadline18">18. Grammar Interpreter</a></li>
+<li><a href="#orgheadline19">19. OUTPUT wejalboot.py</a></li>
+<li><a href="#orgheadline20">20. Inference Rules</a></li>
+<li><a href="#orgheadline21">21. Compilation step.</a></li>
+<li><a href="#orgheadline22">22. <span class="todo nilTODO">TODO</span> credits</a></li>
 </ul>
 </div>
 </div>
@@ -333,6 +335,8 @@ Now we can start building the matcher. First we will set up the <code>Dispatch</
         <span style="color: #eedd82;">cur</span> = Cursor(s)
         <span style="color: #eedd82;">env</span> = {}
         <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>._match(<span style="color: #00ffff;">self</span>.root, cur, env).val
+
+&lt;&lt;@Matcher.changes&gt;&gt;
 </pre>
 </div>
 
@@ -650,7 +654,6 @@ Our next major goal will be to parse grammars like these. First, we will manuall
 </div>
 </div>
 
-
 <div id="outline-container-orgheadline10" class="outline-2">
 <h2 id="orgheadline10"><a id="0zsa4ty077h0"></a><span class="section-number-2">10</span> A Bootstrap tokenizer.</h2>
 <div class="outline-text-2" id="text-10">
@@ -684,13 +687,84 @@ Here's how to use it:
 </div>
 </div>
 
-
 <div id="outline-container-orgheadline11" class="outline-2">
-<h2 id="orgheadline11"><span class="section-number-2">11</span> <span class="todo TODO">TODO</span> -&#x2014; clean up below here ----</h2>
+<h2 id="orgheadline11"><a id="3r1lhs11b7h0"></a><span class="section-number-2">11</span> Parsing</h2>
+<div class="outline-text-2" id="text-11">
+<p>
+To parse recursive grammars (where patterns can be nested inside each other to arbitrary depths) there's not too much more we need to do. We just need to supply our interpreter with a bunch of named rules, and then be able to tell it when to match those rules. Unlike a scanner, where the choice of pattern that gets matched depends on the input (as if each pattern were a child of an <code>Alt</code>), the parser starts with a top-level rule that it attempts to match, and follows references to other rules only when they appear in the patterns.
+</p>
 </div>
+</div>
+
+
 <div id="outline-container-orgheadline12" class="outline-2">
-<h2 id="orgheadline12"><a id="nrogjy71jqg0"></a><span class="section-number-2">12</span> Strategy</h2>
+<h2 id="orgheadline12"><a id="fy19ru21b7h0"></a><span class="section-number-2">12</span> Named Rules</h2>
 <div class="outline-text-2" id="text-12">
+<p>
+For our purposes, a <code>Parser</code> is just a generic <code>Matcher</code> that adds named rules that can refer to each other recursively, and which operates on a stream of tokens rather than just a string.
+</p>
+
+<p>
+Therefore, we are going to subclass <code>Matcher</code>. However, rather than adding support for <code>Def</code> and <code>Ref</code> only in the subclass, I'm going to push them up into <code>Matcher</code>. That way, <code>Matcher</code> will have support for named rules matching on strings, and the only difference we'll see in <code>Parser</code> is that it operates on tokens.
+</p>
+
+<p>
+We need one addition to the <code>Matcher</code> constructor:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="orgsrcblock26"><span style="color: #66f;"># </span><span style="color: #66f;">update to class Matcher</span>
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">self</span>.root = node
+        <span style="color: #00ffff;">self</span>.defs = {}
+</pre>
+</div>
+
+
+<p>
+Now we can create and refer to rules:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="orgsrcblock27"><span style="color: #66f;"># </span><span style="color: #66f;">addition to class Matcher</span>
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Def</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">self</span>.defs[node.name] = node.body
+        <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.match_Emp(node, cur, env)
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Ref</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #66f;"># </span><span style="color: #66f;">pass in fresh World, then discard changes</span>
+        <span style="color: #eedd82;">res</span> = <span style="color: #00ffff;">self</span>._match(<span style="color: #00ffff;">self</span>.defs[node.name], cur, {})
+        <span style="color: #00ffff;">return</span> M(res.val, res.cur, env) <span style="color: #00ffff;">if</span> res.matched <span style="color: #00ffff;">else</span> M(FAIL, cur, env)
+</pre>
+</div>
+
+<p>
+Here's how it works:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-python" id="orgsrcblock28">&gt;&gt;&gt; Matcher( Seq([Def(<span style="color: #00ff00;">"x"</span>, Lit(<span style="color: #00ff00;">"n"</span>)), Ref(<span style="color: #00ff00;">"x"</span>)])).match(<span style="color: #00ff00;">"n"</span>)
+Match(txt=<span style="color: #00ff00;">'n'</span>, pos=0)
+</pre>
+</div>
+</div>
+</div>
+
+
+
+
+
+<div id="outline-container-orgheadline13" class="outline-2">
+<h2 id="orgheadline13"><span class="section-number-2">13</span> <span class="todo TODO">TODO</span> -&#x2014; clean up below here ----</h2>
+</div>
+<div id="outline-container-orgheadline14" class="outline-2">
+<h2 id="orgheadline14"><a id="nrogjy71jqg0"></a><span class="section-number-2">14</span> Strategy</h2>
+<div class="outline-text-2" id="text-14">
 <p>
 The idea here is to manually construct a data structure (an abstract syntax tree) that describes a meta-grammar.
 </p>
@@ -709,17 +783,17 @@ Our first step is to define some types that we can use to tag the different part
 </div>
 </div>
 
-<div id="outline-container-orgheadline13" class="outline-2">
-<h2 id="orgheadline13"><a id="9d0f2971jqg0"></a><span class="section-number-2">13</span> Manually build a base grammar to provide generic tokenization.</h2>
-<div class="outline-text-2" id="text-13">
+<div id="outline-container-orgheadline15" class="outline-2">
+<h2 id="orgheadline15"><a id="9d0f2971jqg0"></a><span class="section-number-2">15</span> Manually build a base grammar to provide generic tokenization.</h2>
+<div class="outline-text-2" id="text-15">
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock26"><span style="color: #00ffff;">import</span> string
+<pre class="src src-python" id="orgsrcblock29"><span style="color: #00ffff;">import</span> string
 </pre>
 </div>
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock27"><span style="color: #eedd82;">base</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [], <span style="color: #00ff00;">"rules common to all grammars"</span>, [
+<pre class="src src-python" id="orgsrcblock30"><span style="color: #eedd82;">base</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [], <span style="color: #00ff00;">"rules common to all grammars"</span>, [
     Def(<span style="color: #00ff00;">'main'</span>, Orp(<span style="color: #00ff00;">'token'</span>)),
     Def(<span style="color: #00ff00;">'token'</span>,Seq([Skip(Orp(Ref(<span style="color: #00ff00;">'space'</span>))),
                   Alt([Ref(<span style="color: #00ff00;">'STRING'</span>), Ref(<span style="color: #00ff00;">'NUMBER'</span>),
@@ -751,12 +825,12 @@ Our first step is to define some types that we can use to tag the different part
 </div>
 </div>
 
-<div id="outline-container-orgheadline14" class="outline-2">
-<h2 id="orgheadline14"><a id="7o9j7i21jqg0"></a><span class="section-number-2">14</span> Now define the bootstrap grammar to parse EBNF grammar definitions.</h2>
-<div class="outline-text-2" id="text-14">
+<div id="outline-container-orgheadline16" class="outline-2">
+<h2 id="orgheadline16"><a id="7o9j7i21jqg0"></a><span class="section-number-2">16</span> Now define the bootstrap grammar to parse EBNF grammar definitions.</h2>
+<div class="outline-text-2" id="text-16">
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock28"><span style="color: #eedd82;">ebnf</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [base], <span style="color: #00ff00;">"ebnf meta-grammar (for parsing grammars)"</span>, [
+<pre class="src src-python" id="orgsrcblock31"><span style="color: #eedd82;">ebnf</span> = Gram(<span style="color: #00ff00;">'ebnf'</span>, [base], <span style="color: #00ff00;">"ebnf meta-grammar (for parsing grammars)"</span>, [
     Def(<span style="color: #00ff00;">'main'</span>, Orp(Ref(<span style="color: #00ff00;">'rule'</span>))),
     Def(<span style="color: #00ff00;">'rule'</span>, Seq([Var(<span style="color: #00ff00;">'name'</span>, Ref(<span style="color: #00ff00;">'IDENT'</span>)),
                      Lit(<span style="color: #00ff00;">'='</span>), Ref(<span style="color: #00ff00;">'expr'</span>), Lit(<span style="color: #00ff00;">'.'</span>) ])),
@@ -773,9 +847,9 @@ Our first step is to define some types that we can use to tag the different part
 </div>
 </div>
 
-<div id="outline-container-orgheadline15" class="outline-2">
-<h2 id="orgheadline15"><a id="u8s6vh00kqg0"></a><span class="section-number-2">15</span> Worlds for backtracking.</h2>
-<div class="outline-text-2" id="text-15">
+<div id="outline-container-orgheadline17" class="outline-2">
+<h2 id="orgheadline17"><a id="u8s6vh00kqg0"></a><span class="section-number-2">17</span> Worlds for backtracking.</h2>
+<div class="outline-text-2" id="text-17">
 <p>
 A world is a context for holding changes, similar to a working copy in a version control system. The idea is that any time we might need to backtrack (any time an <code>Alt</code> node is encountered), we'll fork a new world, and changes we make are done to the world object. This way, if the match ultimately fails, we can rewind the side effects.
 </p>
@@ -798,7 +872,7 @@ It's very much like what happens when overriding methods in a subclass, except i
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock29"><span style="color: #eedd82;">HOME</span> = {} <span style="color: #66f;"># </span><span style="color: #66f;">arbitrary dictionary object</span>
+<pre class="src src-python" id="orgsrcblock32"><span style="color: #eedd82;">HOME</span> = {} <span style="color: #66f;"># </span><span style="color: #66f;">arbitrary dictionary object</span>
 
 <span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">World</span>(<span style="color: #ff00ff; font-weight: bold;">dict</span>):
 
@@ -824,16 +898,16 @@ It's very much like what happens when overriding methods in a subclass, except i
 </div>
 </div>
 
-<div id="outline-container-orgheadline16" class="outline-2">
-<h2 id="orgheadline16"><a id="n0pcnnd1jqg0"></a><span class="section-number-2">16</span> Grammar Interpreter</h2>
-<div class="outline-text-2" id="text-16">
+<div id="outline-container-orgheadline18" class="outline-2">
+<h2 id="orgheadline18"><a id="n0pcnnd1jqg0"></a><span class="section-number-2">18</span> Grammar Interpreter</h2>
+<div class="outline-text-2" id="text-18">
 <p>
 We will assume for now that we have the entire string in memory.
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock30"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Grin</span>(Dispatcher):
+<pre class="src src-python" id="orgsrcblock33"><span style="color: #00ffff;">class</span> <span style="color: #ff00ff;">Grin</span>(Dispatcher):
     <span style="color: #00ff00;">"""Grammar Interpreter"""</span>
 
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, root):
@@ -851,10 +925,9 @@ We will assume for now that we have the entire string in memory.
 </div>
 </div>
 
-
-<div id="outline-container-orgheadline17" class="outline-2">
-<h2 id="orgheadline17"><a id="npdbb4e1jqg0"></a><span class="section-number-2">17</span> OUTPUT wejalboot.py</h2>
-<div class="outline-text-2" id="text-17">
+<div id="outline-container-orgheadline19" class="outline-2">
+<h2 id="orgheadline19"><a id="npdbb4e1jqg0"></a><span class="section-number-2">19</span> OUTPUT wejalboot.py</h2>
+<div class="outline-text-2" id="text-19">
 <p>
 And now we can put the whole thing together:
 </p>
@@ -865,6 +938,8 @@ And now we can put the whole thing together:
 <span style="color: #00ff00;">&gt;&gt;&gt; ebnf_sc.scan('x = A | b')</span>
 <span style="color: #00ff00;">[('x', 'IDENT', 0), ('=', '=', 2), ('A', 'IDENT', 4), ('|', '|', 6), ('b', 'IDENT', 8)]</span>
 
+<span style="color: #00ff00;">&gt;&gt;&gt; Matcher( Seq([Def("x", Lit("n")), Ref("x")])).match("n")</span>
+<span style="color: #00ff00;">Match(txt='n', pos=0)</span>
 <span style="color: #00ff00;">"""</span>
 <span style="color: #00ffff;">from</span> collections <span style="color: #00ffff;">import</span> namedtuple
 <span style="color: #00ffff;">from</span> warnings <span style="color: #00ffff;">import</span> warn
@@ -1006,6 +1081,26 @@ FAIL = Fail()
         cur = Cursor(s)
         env = {}
         <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>._match(<span style="color: #00ffff;">self</span>.root, cur, env).val
+
+
+<span style="color: #66f;"># </span><span style="color: #66f;">update to class Matcher</span>
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">__init__</span>(<span style="color: #00ffff;">self</span>, node):
+        <span style="color: #00ffff;">self</span>.root = node
+        <span style="color: #00ffff;">self</span>.defs = {}
+
+
+<span style="color: #66f;"># </span><span style="color: #66f;">addition to class Matcher</span>
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Def</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #00ffff;">self</span>.defs[node.name] = node.body
+        <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.match_Emp(node, cur, env)
+
+    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Ref</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
+        <span style="color: #66f;"># </span><span style="color: #66f;">pass in fresh World, then discard changes</span>
+        res = <span style="color: #00ffff;">self</span>._match(<span style="color: #00ffff;">self</span>.defs[node.name], cur, {})
+        <span style="color: #00ffff;">return</span> M(res.val, res.cur, env) <span style="color: #00ffff;">if</span> res.matched <span style="color: #00ffff;">else</span> M(FAIL, cur, env)
+
 
 
 <span style="color: #66f;"># </span><span style="color: #66f;">class Matcher:</span>
@@ -1188,11 +1283,6 @@ HOME = {} <span style="color: #66f;"># </span><span style="color: #66f;">arbitra
 
     <span style="color: #66f;"># </span><span style="color: #66f;">(inside  `class Grin`...)</span>
 
-    <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Ref</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
-        <span style="color: #66f;"># </span><span style="color: #66f;">pass in fresh World, then discard changes</span>
-        res = <span style="color: #00ffff;">self</span>.match(<span style="color: #00ffff;">self</span>.defs[node.name], cur, World())
-        <span style="color: #00ffff;">if</span> res.val <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> (FAIL, env)
-        <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (res.val, res[1], env)
 
     <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Not</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
         res = <span style="color: #00ffff;">self</span>.match(node.item, cur, env)
@@ -1245,22 +1335,17 @@ So now our job is to go back and fill in a handler method for each node until it
 </div>
 </div>
 
-<div id="outline-container-orgheadline18" class="outline-2">
-<h2 id="orgheadline18"><a id="yg99mk91oqg0"></a><span class="section-number-2">18</span> Inference Rules</h2>
-<div class="outline-text-2" id="text-18">
+<div id="outline-container-orgheadline20" class="outline-2">
+<h2 id="orgheadline20"><a id="yg99mk91oqg0"></a><span class="section-number-2">20</span> Inference Rules</h2>
+<div class="outline-text-2" id="text-20">
 <p>
 These were translated from the sequent notation in Warth's Ometa paper.
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock31"><span style="color: #66f;"># </span><span style="color: #66f;">(inside  `class Grin`...)</span>
+<pre class="src src-python" id="orgsrcblock34"><span style="color: #66f;"># </span><span style="color: #66f;">(inside  `class Grin`...)</span>
 
-<span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Ref</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
-    <span style="color: #66f;"># </span><span style="color: #66f;">pass in fresh World, then discard changes</span>
-    <span style="color: #eedd82;">res</span> = <span style="color: #00ffff;">self</span>.match(<span style="color: #00ffff;">self</span>.defs[node.name], cur, World())
-    <span style="color: #00ffff;">if</span> res.val <span style="color: #00ffff;">is</span> FAIL: <span style="color: #00ffff;">return</span> (FAIL, env)
-    <span style="color: #00ffff;">else</span>: <span style="color: #00ffff;">return</span> (res.val, res[1], env)
 
 <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">match_Not</span>(<span style="color: #00ffff;">self</span>, node, cur, env):
     <span style="color: #eedd82;">res</span> = <span style="color: #00ffff;">self</span>.match(node.item, cur, env)
@@ -1282,12 +1367,12 @@ These were translated from the sequent notation in Warth's Ometa paper.
 </div>
 </div>
 
-<div id="outline-container-orgheadline19" class="outline-2">
-<h2 id="orgheadline19"><a id="ks01bt30kqg0"></a><span class="section-number-2">19</span> Compilation step.</h2>
-<div class="outline-text-2" id="text-19">
+<div id="outline-container-orgheadline21" class="outline-2">
+<h2 id="orgheadline21"><a id="ks01bt30kqg0"></a><span class="section-number-2">21</span> Compilation step.</h2>
+<div class="outline-text-2" id="text-21">
 <div class="org-src-container">
 
-<pre class="src src-python" id="orgsrcblock32"><span style="color: #66f;"># </span><span style="color: #66f;">(still inside  `class Grin`...)</span>
+<pre class="src src-python" id="orgsrcblock35"><span style="color: #66f;"># </span><span style="color: #66f;">(still inside  `class Grin`...)</span>
 <span style="color: #00ffff;">def</span> <span style="color: #ffffff; font-weight: bold;">init</span>(<span style="color: #00ffff;">self</span>, node):
     <span style="color: #00ffff;">return</span> <span style="color: #00ffff;">self</span>.dispatch(<span style="color: #00ff00;">'init'</span>, node)
 
@@ -1302,9 +1387,9 @@ These were translated from the sequent notation in Warth's Ometa paper.
 </div>
 </div>
 
-<div id="outline-container-orgheadline20" class="outline-2">
-<h2 id="orgheadline20"><a id="hnv0l310pqg0"></a><span class="section-number-2">20</span> <span class="todo TODO">TODO</span> credits</h2>
-<div class="outline-text-2" id="text-20">
+<div id="outline-container-orgheadline22" class="outline-2">
+<h2 id="orgheadline22"><a id="hnv0l310pqg0"></a><span class="section-number-2">22</span> <span class="todo TODO">TODO</span> credits</h2>
+<div class="outline-text-2" id="text-22">
 <ul class="org-ul">
 <li>grammar rules (and the 'world' concept) are adapted from Alessandro Warth's <a href="http://tinlizzie.org/ometa/">Ometa</a> system.</li>
 </ul>
